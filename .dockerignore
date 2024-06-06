@@ -1,0 +1,15 @@
+.github
+.next
+.vercel
+
+/out
+/build
+
+.idea
+*.iml
+.vscode
+*.swp
+
+node_modules
+
+*.log*

@@ -1,0 +1,52 @@
+import type { ParentComponent } from 'solid-js'
+import { A } from '@solidjs/router'
+import clsx from 'clsx'
+
+import Icon, { IconProps } from '~/components/material/Icon'
+import Typography from '~/components/material/Typography'
+
+type NavigationBarItemProps = {
+  icon: IconProps['children']
+  href: string
+  selected?: boolean
+}
+
+export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (
+  props,
+) => {
+  // TODO: active indicator
+  return (
+    <A
+      class="state-layer flex h-20 min-w-[48px] grow basis-0 flex-col items-center justify-center transition before:mx-auto before:mt-2.5 before:h-8 before:w-16 before:rounded-full"
+      href={props.href}
+      activeClass="text-on-surface before:bg-on-surface before:opacity-[.12]"
+      inactiveClass="text-on-surface-variant before:bg-on-surface-variant"
+    >
+      <Icon class="flex transition-all" filled={props.selected}>
+        {props.icon}
+      </Icon>
+      <Typography as="div" class="mt-2 flex" variant="label-lg">
+        {props.children}
+      </Typography>
+    </A>
+  )
+}
+
+type NavigationBarProps = {
+  className?: string
+}
+
+const NavigationBar: ParentComponent<NavigationBarProps> = (props) => {
+  return (
+    <div
+      class={clsx(
+        'pb-safe elevation-2 z-20 flex h-20 w-full flex-row gap-x-2 bg-surface text-on-surface',
+        props.className,
+      )}
+    >
+      {props.children}
+    </div>
+  )
+}
+
+export default NavigationBar

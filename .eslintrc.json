@@ -1,0 +1,29 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "plugins": [
+    "solid",
+    "prettier",
+    "tailwindcss"
+  ],
+  "extends": [
+    "plugin:prettier/recommended",
+    "plugin:solid/typescript",
+    "plugin:tailwindcss/recommended"
+  ],
+  "rules": {
+    "prettier/prettier": [
+      "error",
+      {
+        "semi": false,
+        "singleQuote": true,
+        "trailingComma": "all"
+      }
+    ]
+  },
+  "settings": {
+    "tailwindcss": {
+      "callees": ["clsx"],
+      "config": "tailwind.config.cjs"
+    }
+  }
+}

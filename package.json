@@ -1,0 +1,55 @@
+{
+  "name": "connect-beta",
+  "version": "1.0.0",
+  "homepage": "https://connect-beta.comma.ai",
+  "license": "MIT",
+  "author": "comma.ai",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/commaai/connect-beta.git"
+  },
+  "scripts": {
+    "dev": "solid-start dev",
+    "build": "solid-start build",
+    "start": "solid-start start",
+    "lint": "eslint --ext .ts,.tsx src",
+    "lint:fix": "eslint --ext .ts,.tsx --fix src"
+  },
+  "type": "module",
+  "devDependencies": {
+    "@types/luxon": "^3.2.0",
+    "@types/mapbox__polyline": "^1.0.2",
+    "@typescript-eslint/eslint-plugin": "^5.53.0",
+    "@typescript-eslint/parser": "^5.53.0",
+    "autoprefixer": "^10.4.13",
+    "eslint": "^8.34.0",
+    "eslint-config-prettier": "^8.6.0",
+    "eslint-plugin-prettier": "^4.2.1",
+    "eslint-plugin-solid": "^0.10.0",
+    "eslint-plugin-tailwindcss": "^3.9.0",
+    "postcss": "^8.4.21",
+    "prettier": "2.8.4",
+    "prettier-plugin-tailwindcss": "^0.2.2",
+    "rollup-plugin-visualizer": "^5.9.0",
+    "solid-start-node": "^0.2.21",
+    "tailwindcss": "^3.2.7",
+    "typescript": "^4.9.5",
+    "vite": "^3.2.5"
+  },
+  "dependencies": {
+    "@mapbox/polyline": "^1.1.1",
+    "@solidjs/meta": "^0.28.2",
+    "@solidjs/router": "^0.7.0",
+    "clsx": "^1.2.1",
+    "dayjs": "^1.11.7",
+    "hls.js": "^1.3.3",
+    "lodash.kebabcase": "^4.1.1",
+    "solid-js": "^1.6.11",
+    "solid-start": "^0.2.22",
+    "tw-colors": "^1.1.2",
+    "undici": "^5.20.0"
+  },
+  "engines": {
+    "node": ">=16"
+  }
+}
