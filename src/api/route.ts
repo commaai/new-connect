@@ -24,10 +24,13 @@ export class RouteName {
     )
   }
 
-  constructor(
-    public readonly dongleId: Device['dongle_id'],
-    public readonly dateStr: string,
-  ) {}
+  readonly dongleId: Device['dongle_id']
+  readonly dateStr: string
+
+  constructor(dongleId: Device['dongle_id'], dateStr: string) {
+    this.dongleId = dongleId
+    this.dateStr = dateStr
+  }
 
   toString(): string {
     return `${this.dongleId}|${this.dateStr}`

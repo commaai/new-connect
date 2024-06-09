@@ -136,7 +136,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       )}
       title="Disengaged"
     >
-      <Suspense fallback={<div class="skeleton-loader h-full w-full" />}>
+      <Suspense fallback={<div class="skeleton-loader size-full" />}>
         <Show when={route()} keyed>
           {(route) => (
             <>

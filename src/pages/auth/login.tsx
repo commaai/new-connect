@@ -48,7 +48,7 @@ export default function Login() {
             class="h-16 gap-5 pr-7"
             href={getAppleAuthUrl()}
             leading={
-              <div class="relative h-8 w-8">
+              <div class="relative size-8">
                 <img
                   src="/images/logo-apple.svg"
                   alt=""

@@ -1,5 +1,5 @@
 import { Show } from 'solid-js'
-import { Navigate, useNavigate, useSearchParams } from 'solid-start'
+import { Navigate, useNavigate, useSearchParams } from '@solidjs/router'
 
 import { refreshAccessToken } from '~/api/auth/client'
 

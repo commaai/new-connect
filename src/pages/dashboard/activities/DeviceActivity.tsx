@@ -27,7 +27,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-[72px] overflow-hidden rounded-lg bg-surface-1">
-          <Suspense fallback={<div class="skeleton-loader h-full w-full" />}>
+          <Suspense fallback={<div class="skeleton-loader size-full" />}>
             <div class="p-4">
               <DeviceStatistics dongleId={props.dongleId} />
             </div>

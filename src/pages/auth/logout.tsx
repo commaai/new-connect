@@ -1,4 +1,4 @@
-import { Navigate } from 'solid-start'
+import { Navigate } from '@solidjs/router'
 
 import { signOut } from '~/api/auth/client'
 
