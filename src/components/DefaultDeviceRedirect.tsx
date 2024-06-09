@@ -2,7 +2,7 @@ import { createResource, Show } from 'solid-js'
 import { Navigate } from 'solid-start'
 
 import { getDevices } from '~/api/devices'
-import { Device } from '~/types'
+import type { Device } from '~/types'
 
 export default function DeviceRedirect() {
   const [devices] = createResource(getDevices)

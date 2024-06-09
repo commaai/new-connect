@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
 import { getRoute } from '~/api/route'
-import { Route } from '~/types'
+import type { Route } from '~/types'
 
 function renderTimelineEvents(
   route: Route | undefined,
