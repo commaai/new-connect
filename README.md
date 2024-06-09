@@ -23,24 +23,27 @@ A few constraints:
 
 These are the minimum features for parity with connect.
 
-Drive videos
+Drives
+- [ ] list
 - [ ] show map
-- [ ] show qcams
+- [ ] play qcams
 - [ ] file uploads
 
 Navigation
+- [ ] show user and car location
 - [ ] send destination to device
 - [ ] manage home, work, and favorites
 
 Misc
 - [ ] demo mode
+- [ ] snapshot
 - [ ] comma prime sign up + management
 - [ ] pairing to an openpilot device
 - [ ] PWA: splash, icon, offline mode, etc.
 
----
-
-Beyond connect:
+And some eventual features beyond connect's current feature set:
+- [ ] SSH console
+- [ ] sentry mode
 - [ ] dashcam clips
 - [ ] manage openpilot settings
 - [ ] replace all of useradmin.comma.ai
