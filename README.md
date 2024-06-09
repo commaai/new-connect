@@ -15,9 +15,9 @@ Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
 
 A few constraints:
-- 5k line limit; no room for bloat
+- 5k line limit
+- 500KB bundle size limit
 - 1m timeout for all CI; a fast development environment is a delightful one
-- XXXMB bundle size limit
 
 ## Features
 
