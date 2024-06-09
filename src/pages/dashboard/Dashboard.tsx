@@ -12,6 +12,7 @@ import type { VoidComponent } from 'solid-js'
 import { Navigate, useLocation } from 'solid-start'
 
 import { getDevices } from '~/api/devices'
+import { getProfile } from '~/api/profile'
 import type { Device } from '~/types'
 
 import Drawer from '~/components/material/Drawer'
@@ -66,6 +67,8 @@ const DashboardLayout: VoidComponent = () => {
   const toggleDrawer = () => setDrawer((prev) => !prev)
 
   const [devices] = createResource(getDevices)
+  const [profile] = createResource(getProfile)
+
   return (
     <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
       <Drawer
@@ -85,6 +88,9 @@ const DashboardLayout: VoidComponent = () => {
             </>
           }
         >
+          <Match when={profile.error}>
+            <Navigate href="/login" />
+          </Match>
           <Match when={dateStr()} keyed>
             <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
           </Match>
