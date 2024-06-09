@@ -45,10 +45,7 @@ export function setAccessToken(token: string): void {
 }
 
 export function clearAccessToken(): void {
-  if (typeof window === 'undefined') {
-    return
-  }
-  window.localStorage.removeItem(AUTH_KEY)
+  setAccessToken('')
 }
 
 export function isSignedIn(): boolean {
