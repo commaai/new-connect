@@ -1,4 +1,4 @@
-import { Route } from '~/types'
+import type { Route } from '~/types'
 
 export interface GPSPathPoint {
   t: number

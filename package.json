@@ -15,6 +15,7 @@
     "lint": "eslint --ext .ts,.tsx src",
     "lint:fix": "eslint --ext .ts,.tsx --fix src"
   },
+  "packageManager": "pnpm@9.2.0",
   "type": "module",
   "devDependencies": {
     "@types/luxon": "^3.2.0",
