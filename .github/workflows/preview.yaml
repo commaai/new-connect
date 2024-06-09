@@ -4,7 +4,6 @@ on:
   workflow_run:
     workflows: ["build"]
     types:
-      - requested
       - completed
 
 permissions:
@@ -49,11 +48,11 @@ jobs:
         id: cloudflare-publish
         uses: cloudflare/pages-action@v1.5.0
         with:
+          directory: dist
           branch: ${{ steps.pr.outputs.result }}
           projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          directory: dist
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
