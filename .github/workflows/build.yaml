@@ -27,7 +27,7 @@ jobs:
       # deploy
       - name: Deploy to Cloudflare Pages
         id: cloudflare-publish
-        #if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
+        if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
         uses: cloudflare/pages-action@v1.5.0
         with:
           directory: dist
