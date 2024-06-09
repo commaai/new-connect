@@ -6,9 +6,9 @@ Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 
 ## Development
 
-- Install pnpm: https://pnpm.io/installation
-- Install dependencies: `pnpm install`
-- Start dev server: `pnpm dev --open`
+- Install bun: https://bun.sh
+- Install dependencies: `bun install`
+- Start dev server: `bun dev --open`
 
 ## Contributing
 

@@ -15,7 +15,7 @@
     "lint": "eslint .",
     "lint:fix": "eslint --fix ."
   },
-  "packageManager": "pnpm@9.2.0",
+  "packageManager": "bun@1.1.12",
   "type": "module",
   "devDependencies": {
     "@types/mapbox__polyline": "^1.0.2",

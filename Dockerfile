@@ -1,47 +1,38 @@
-FROM node:18-alpine AS base
-
-# 1. Install dependencies only when needed
-FROM base AS deps
-
-# Check https://github.com/nodejs/docker-node/tree/b4117f9333da4138b03a546ec926ef50a31506c3#nodealpine to understand why libc6-compat might be needed.
-RUN apk add --no-cache libc6-compat
-
+# use the official Bun image
+# see all versions at https://hub.docker.com/r/oven/bun/tags
+FROM oven/bun:1-slim AS base
 WORKDIR /app
 
-# Install dependencies based on the preferred package manager
 
-COPY package.json yarn.lock* package-lock.json* pnpm-lock.yaml* ./
-RUN \
-  if [ -f yarn.lock ]; then yarn --frozen-lockfile; \
-  elif [ -f package-lock.json ]; then npm ci; \
-  elif [ -f pnpm-lock.yaml ]; then yarn global add pnpm && pnpm i; \
-  else echo "Lockfile not found." && exit 1; \
-  fi
+# install dependencies into temp directory
+# this will cache them and speed up future builds
+FROM base AS install
+RUN mkdir -p /temp/dev
+COPY package.json bun.lockb /temp/dev/
+RUN cd /temp/dev && bun install --frozen-lockfile
+
+# install with --production (exclude devDependencies)
+RUN mkdir -p /temp/prod
+COPY package.json bun.lockb /temp/prod/
+RUN cd /temp/prod && bun install --frozen-lockfile --production
 
 
-# 2. Rebuild the source code only when needed
-FROM base AS builder
-WORKDIR /app
-COPY --from=deps /app/node_modules ./node_modules
+# copy node_modules from temp directory
+# then copy all (non-ignored) project files into the image
+FROM base AS build
+COPY --from=install /temp/dev/node_modules node_modules
 COPY . .
-RUN yarn build
+
+# build app
+RUN bun run build
 
 
-# 3. Production image, copy all the files and run next
-FROM base AS runner
-WORKDIR /app
+# copy dist and serve with nginx
+FROM nginx:1.24
 
-ENV NODE_ENV production
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY --from=build /app/dist /usr/share/nginx/html
 
-RUN addgroup -g 1001 -S nodejs
-RUN adduser -S solidjs -u 1001
+ENV NGINX_ENVSUBST_OUTPUT_DIR /usr/share/nginx/html
 
-RUN npm install undici
-
-COPY --from=builder --chown=solidjs:nodejs /app/package.json /app/dist ./
-
-USER solidjs
-EXPOSE 3000
-ENV PORT 3000
-
-CMD ["node", "server.js"]
+EXPOSE 80/tcp

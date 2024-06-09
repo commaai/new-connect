@@ -25,10 +25,7 @@ stats.html
 Thumbs.db
 
 # debug
-npm-debug.log*
-yarn-debug.log*
-yarn-error.log*
-.pnpm-debug.log*
+*.log*
 
 # local env files
 .env*.local
