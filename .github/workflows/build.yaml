@@ -1,0 +1,25 @@
+name: build
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/setup-pnpm
+
+      - run: pnpm build
+
+      - name: Upload built project
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./dist
+          overwrite: true
+          retention-days: 1
+          name: build-artifacts-${{ github.run_id }}
