@@ -1,8 +1,8 @@
 # connect
 
-This is an experimental rewrite of [comma connect](https://github.com/commaai/connect).
+This is an experimental rewrite of [comma connect](https://github.com/commaai/connect). connect is the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
 
-connect is the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
+Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 
 ## Development
 
