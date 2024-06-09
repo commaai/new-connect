@@ -1,6 +1,6 @@
 # connect
 
-This is an experimental rewrite of [comma connect](https://github.com/commaai/connect). connect is the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
+This is an experimental rewrite of [comma connect](https://github.com/commaai/connect), the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
 
 Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 
@@ -12,10 +12,22 @@ Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 
 ## Contributing
 
-If you don't have a comma device, connect has a demo mode with some example drives. This should allow for testing most functionality except for interactions with the device, such as getting the car battery voltage.
+Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
 
-- Use best practices
-- Write test cases
-- Keep files small and clean
-- Use branches / pull requests to isolate work
-- Don't do work that can't be merged quickly, find ways to break it up
+A few constraints:
+- 5k line limit; no room for bloat
+- 1m timeout for all CI; a fast development environment is a delightful one
+- XXXMB bundle size limit
+
+## Features
+
+Drive videos
+- [ ] show map
+- [ ] show qcams
+- [ ] file uploads
+
+Misc
+- [ ] demo mode
+- [ ] comma prime sign up + management
+- [ ] pairing to an openpilot device
+- [ ] PWA: splash, icon, offline mode, etc.
