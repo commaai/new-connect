@@ -1,4 +1,4 @@
 export const getThemeId = (): string => {
   if (typeof document === 'undefined') return 'light'
-  return document.documentElement.getAttribute('data-theme') || 'light'
+  return document.body.getAttribute('data-theme') || 'light'
 }
