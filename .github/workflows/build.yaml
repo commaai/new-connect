@@ -12,9 +12,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: ./.github/actions/setup-pnpm
+      - uses: oven-sh/setup-bun@v1
 
-      - run: pnpm build
+      - run: bun install --frozen-lockfile
+      - run: bun run build
 
       - name: Upload built project
         uses: actions/upload-artifact@v4
