@@ -50,7 +50,7 @@ jobs:
         uses: cloudflare/pages-action@v1.5.0
         with:
           branch: ${{ steps.pr.outputs.result }}
-          projectName: new-connect
+          projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           directory: dist
@@ -65,7 +65,7 @@ jobs:
             * mark your PR as a draft until it's ready to review
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
-            deployed preview: https://${{ steps.pr.outputs.result }}.new-connect.pages.dev
+            deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
