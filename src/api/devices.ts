@@ -23,4 +23,4 @@ export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
 
 export const getDevices = async () =>
-  fetcher<Device[]>(`/v1/me/devices/`).then(sortDevices)
+  fetcher<Device[]>('/v1/me/devices/').then(sortDevices).catch(() => [])

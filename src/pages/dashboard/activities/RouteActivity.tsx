@@ -75,7 +75,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <div class="h-64 overflow-hidden rounded-lg">
             <Suspense
               fallback={
-                <div class="skeleton-loader h-full w-full bg-surface" />
+                <div class="skeleton-loader size-full bg-surface" />
               }
             >
               <RouteStaticMap route={route()} />

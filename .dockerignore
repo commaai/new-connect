@@ -1,9 +1,6 @@
 .github
-.next
-.vercel
 
-/out
-/build
+/dist
 
 .idea
 *.iml

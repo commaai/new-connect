@@ -9,7 +9,7 @@ import {
   Switch,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import { Navigate, useLocation } from 'solid-start'
+import { Navigate, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import type { Device } from '~/types'
@@ -91,8 +91,8 @@ const DashboardLayout: VoidComponent = () => {
           <Match when={dongleId()} keyed>
             <DeviceActivity dongleId={dongleId()} />
           </Match>
-          <Match when={devices()} keyed>
-            {(devices) => <Navigate href={`/${devices[0].dongle_id}`} />}
+          <Match when={devices()?.length} keyed>
+            <Navigate href={`/${devices()![0].dongle_id}`} />
           </Match>
         </Switch>
       </Drawer>

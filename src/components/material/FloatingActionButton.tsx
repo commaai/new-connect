@@ -14,7 +14,7 @@ const FloatingActionButton: ParentComponent<FloatingActionButtonProps> = (
   return (
     <ButtonBase
       class={clsx(
-        `elevation-1 state-layer flex items-center gap-2 rounded-lg bg-primary-container p-4 text-on-primary-container before:bg-on-primary-container`,
+        'elevation-1 state-layer flex items-center gap-2 rounded-lg bg-primary-container p-4 text-on-primary-container before:bg-on-primary-container',
         props.class,
       )}
       onClick={props.onClick}

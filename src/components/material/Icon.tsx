@@ -1,4 +1,3 @@
-/* eslint-disable tailwindcss/no-custom-classname */
 import { Component } from 'solid-js'
 import clsx from 'clsx'
 
@@ -11,12 +10,13 @@ export type IconProps = {
 
 const Icon: Component<IconProps> = (props) => {
   // size-20, 24 etc. defined in root.css
+  const size = () => `size-${props.size || '24'}`
   return (
     <span
       class={clsx(
         'material-symbols-outlined flex',
         props.filled ? 'icon-filled' : 'icon-outline',
-        `size-${props.size || '24'}`,
+        size(),
         props.class,
       )}
     >

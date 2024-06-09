@@ -44,7 +44,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 
       <div class="mx-2 h-48 overflow-hidden rounded-lg">
         <Suspense
-          fallback={<div class="skeleton-loader h-full w-full bg-surface" />}
+          fallback={<div class="skeleton-loader size-full bg-surface" />}
         >
           <RouteStaticMap route={props.route} />
         </Suspense>

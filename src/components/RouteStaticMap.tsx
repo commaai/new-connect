@@ -42,7 +42,7 @@ const State = (props: {
   return (
     <div
       class={clsx(
-        'absolute flex h-full w-full items-center justify-center gap-2',
+        'absolute flex size-full items-center justify-center gap-2',
         props.opaque && 'bg-surface text-on-surface',
       )}
     >
@@ -82,7 +82,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
         </Match>
         <Match when={url() && loadedUrl()} keyed>
           <img
-            class="pointer-events-none h-full w-full object-cover"
+            class="pointer-events-none size-full object-cover"
             src={loadedUrl()}
             alt=""
           />

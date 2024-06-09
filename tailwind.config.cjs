@@ -17,7 +17,7 @@ const getSchemeColours = (scheme) => ({
 
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.tsx'],
+  content: ['./src/**/*.tsx', './index.html'],
   theme: {
     borderRadius: {
       none: '0',

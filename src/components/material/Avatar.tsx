@@ -20,7 +20,7 @@ const Avatar: ParentComponent<AvatarProps> = (props) => {
   return (
     <div
       class={clsx(
-        'flex h-10 w-10 items-center justify-center rounded-full transition-colors',
+        'flex size-10 items-center justify-center rounded-full transition-colors',
         colorClasses(),
         props.class,
       )}

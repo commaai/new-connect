@@ -36,6 +36,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   }
   const getPage = (page: number): Promise<Route[]> => {
     if (!pages[page]) {
+      // eslint-disable-next-line no-async-promise-executor
       pages[page] = new Promise(async (resolve) => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)

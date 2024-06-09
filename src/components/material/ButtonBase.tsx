@@ -1,6 +1,6 @@
 import { Show, splitProps } from 'solid-js'
 import type { Component, JSX } from 'solid-js'
-import { A } from 'solid-start'
+import { A } from '@solidjs/router'
 import clsx from 'clsx'
 
 export type ButtonBaseProps = JSX.HTMLAttributes<HTMLButtonElement> & {

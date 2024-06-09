@@ -47,7 +47,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     >
       <video
         ref={video!}
-        class="absolute inset-0 h-full w-full object-cover"
+        class="absolute inset-0 size-full object-cover"
         autoplay
         muted
         controls

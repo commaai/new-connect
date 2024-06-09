@@ -15,7 +15,7 @@ type CardHeaderProps = {
 export const CardHeader: VoidComponent<CardHeaderProps> = (props) => {
   return (
     <div
-      class={clsx('flex h-[72px] items-center gap-4 py-3 px-4', props.class)}
+      class={clsx('flex h-[72px] items-center gap-4 px-4 py-3', props.class)}
     >
       {props.leading}
       <div class="flex h-12 grow flex-col justify-between">
