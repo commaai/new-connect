@@ -9,8 +9,6 @@ import Typography from '~/components/material/Typography'
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import Card from '~/components/material/Card'
-import Surface from '~/components/material/Surface'
 
 type DeviceActivityProps = {
   dongleId: string
