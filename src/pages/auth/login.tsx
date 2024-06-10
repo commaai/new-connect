@@ -1,9 +1,15 @@
 import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
+import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
 import Typography from '~/components/material/Typography'
 
 export default function Login() {
+  const loginAsDemoUser = function() {
+    setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw');
+    window.location.href = window.location.origin;
+  };
+
   return (
     <div class="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-8">
@@ -31,7 +37,7 @@ export default function Login() {
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
-            class="h-16 gap-4"
+            class="h-16 gap-4 hover:bg-gray-200"
             href={getGoogleAuthUrl()}
             leading={
               <img
@@ -45,7 +51,7 @@ export default function Login() {
             Sign in with Google
           </Button>
           <Button
-            class="h-16 gap-5 pr-7"
+            class="h-16 gap-5 pr-7 hover:bg-gray-200"
             href={getAppleAuthUrl()}
             leading={
               <div class="relative size-8">
@@ -62,7 +68,7 @@ export default function Login() {
             Sign in with Apple
           </Button>
           <Button
-            class="h-16 gap-4"
+            class="h-16 gap-4 hover:bg-gray-200"
             href={getGitHubAuthUrl()}
             leading={
               <img
@@ -90,6 +96,22 @@ export default function Login() {
             height={32}
           />
         </div>
+
+        <Button
+          class="h-13 gap-4 hover:bg-gray-200"
+          onclick={loginAsDemoUser}
+          trailing={
+            <img
+              src="/images/chevron.svg"
+              alt=""
+              width={18}
+              height={18}
+              style={{ transform: 'rotate(180deg)' }}
+            />
+          }
+        >
+          Try the demo 
+        </Button>
       </div>
     </div>
   )
