@@ -1,6 +1,5 @@
 import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
 
-import Button from '~/components/material/Button'
 import Typography from '~/components/material/Typography'
 
 export default function Login() {
@@ -30,51 +29,39 @@ export default function Login() {
         </div>
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
-          <Button
+          <md-filled-button
             class="h-16 gap-4"
             href={getGoogleAuthUrl()}
-            leading={
-              <img
-                src="/images/logo-google.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            }
           >
+            <img
+              src="/images/logo-google.svg"
+              alt=""
+              slot="icon"
+            />
             Sign in with Google
-          </Button>
-          <Button
+          </md-filled-button>
+          <md-filled-button
             class="h-16 gap-5 pr-7"
             href={getAppleAuthUrl()}
-            leading={
-              <div class="relative size-8">
-                <img
-                  src="/images/logo-apple.svg"
-                  alt=""
-                  width="100%"
-                  height="100%"
-                  style={{ 'object-fit': 'contain' }}
-                />
-              </div>
-            }
           >
+            <img
+              src="/images/logo-apple.svg"
+              alt=""
+              slot="icon"
+            />
             Sign in with Apple
-          </Button>
-          <Button
+          </md-filled-button>
+          <md-filled-button
             class="h-16 gap-4"
             href={getGitHubAuthUrl()}
-            leading={
-              <img
-                src="/images/logo-github.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            }
           >
+            <img
+              src="/images/logo-github.svg"
+              alt=""
+              slot="icon"
+            />
             Sign in with GitHub
-          </Button>
+          </md-filled-button>
         </div>
 
         <div class="flex justify-between gap-4">
