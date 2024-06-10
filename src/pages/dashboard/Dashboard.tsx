@@ -40,7 +40,7 @@ const DashboardDrawer = (props: {
     <>
       <TopAppBar
         as="h1"
-        leading={<IconButton onClick={props.onClose}>menu</IconButton>}
+        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
       >
         comma connect
       </TopAppBar>
