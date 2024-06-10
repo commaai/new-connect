@@ -5,7 +5,7 @@ import Button from '~/components/material/Button'
 import Typography from '~/components/material/Typography'
 
 export default function Login() {
-  const loginAsDemoUser = function() {
+  const loginAsDemoUser = function () {
     setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw');
     window.location.href = window.location.origin;
   };
@@ -101,16 +101,12 @@ export default function Login() {
           class="h-13 gap-4 hover:bg-gray-200"
           onclick={loginAsDemoUser}
           trailing={
-            <img
-              src="/images/chevron.svg"
-              alt=""
-              width={18}
-              height={18}
-              style={{ transform: 'rotate(180deg)' }}
-            />
+            <span class="material-symbols-outlined icon-outline">
+              chevron_right
+            </span>
           }
         >
-          Try the demo 
+          Try the demo
         </Button>
       </div>
     </div>
