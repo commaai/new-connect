@@ -48,7 +48,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <Suspense
           fallback={
-            <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-1" />
+            <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface" />
           }
         >
           <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />

@@ -1,20 +1,5 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
-const { createThemes } = require('tw-colors')
-const kebabcase = require('lodash.kebabcase')
-
-const theme = require('./src/theme/theme.json')
-
-const getSchemeColours = (scheme) => ({
-  ...Object.fromEntries(
-    Object.entries(theme.schemes[scheme]).map(([key, value]) => [
-      kebabcase(key),
-      value,
-    ]),
-  ),
-  white: '#ffffff',
-})
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
   content: ['./src/**/*.tsx', './index.html'],
@@ -37,7 +22,50 @@ module.exports = {
       extrabold: 800,
     },
     extend: {
+      colors: [
+        'background',
+        'on-background',
+        'surface',
+        'surface-dim',
+        'surface-bright',
+        'surface-container-lowest',
+        'surface-container-low',
+        'surface-container',
+        'surface-container-high',
+        'surface-container-highest',
+        'on-surface',
+        'surface-variant',
+        'on-surface-variant',
+        'inverse-surface',
+        'inverse-surface-variant',
+        'outline',
+        'outline-variant',
+        'shadow',
+        'scrim',
+        'surface-tint',
+        'primary',
+        'on-primary',
+        'primary-container',
+        'on-primary-container',
+        'inverse-primary',
+        'secondary',
+        'on-secondary',
+        'secondary-container',
+        'on-secondary-container',
+        'tertiary',
+        'on-tertiary',
+        'tertiary-container',
+        'on-tertiary-container',
+        'error',
+        'on-error',
+        'error-container',
+        'on-error-container',
+      ].reduce((acc, color) => {
+        acc[color] = `var(--md-sys-color-${color})`
+        return acc
+      }, {}),
       fontFamily: {
+        // TODO: align with index.css
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
         mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
       },
@@ -121,10 +149,4 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    createThemes(({ light, dark }) => ({
-      light: light(getSchemeColours('light')),
-      dark: dark(getSchemeColours('dark')),
-    })),
-  ],
 }

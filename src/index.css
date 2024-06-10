@@ -21,6 +21,57 @@
     height: 100%;
   }
 
+  /*
+   * material-web theme
+   *
+   * https://material-web.dev/theming/material-theming/
+   */
+  :root,
+  :host {
+    /* typography */
+    --md-ref-typeface-brand: Inter;
+    --md-ref-typeface-plain: system-ui;
+
+    /* color */
+    --md-sys-color-background: #101319;
+    --md-sys-color-on-background: #e0e2eb;
+    --md-sys-color-surface: #101319;
+    --md-sys-color-surface-dim: #101319;
+    --md-sys-color-surface-bright: #363940;
+    --md-sys-color-surface-container-lowest: #0b0e14;
+    --md-sys-color-surface-container-low: #181c22;
+    --md-sys-color-surface-container: #1c2026;
+    --md-sys-color-surface-container-high: #272a30;
+    --md-sys-color-surface-container-highest: #32353b;
+    --md-sys-color-on-surface: #e0e2eb;
+    --md-sys-color-surface-variant: #414752;
+    --md-sys-color-on-surface-variant: #c1c6d4;
+    --md-sys-color-inverse-surface: #e0e2eb;
+    --md-sys-color-inverse-on-surface: #2d3037;
+    --md-sys-color-outline: #8b919e;
+    --md-sys-color-outline-variant: #414752;
+    --md-sys-color-shadow: #000000;
+    --md-sys-color-scrim: #000000;
+    --md-sys-color-surface-tint: #a6c8ff;
+    --md-sys-color-primary: #a6c8ff;
+    --md-sys-color-on-primary: #00315f;
+    --md-sys-color-primary-container: #0067be;
+    --md-sys-color-on-primary-container: #ffffff;
+    --md-sys-color-inverse-primary: #005fb0;
+    --md-sys-color-secondary: #afc8f2;
+    --md-sys-color-on-secondary: #163154;
+    --md-sys-color-secondary-container: #274064;
+    --md-sys-color-on-secondary-container: #bdd5ff;
+    --md-sys-color-tertiary: #edb1ff;
+    --md-sys-color-on-tertiary: #530070;
+    --md-sys-color-tertiary-container: #9148ad;
+    --md-sys-color-on-tertiary-container: #ffffff;
+    --md-sys-color-error: #ffb4ab;
+    --md-sys-color-on-error: #690005;
+    --md-sys-color-error-container: #93000a;
+    --md-sys-color-on-error-container: #ffdad6;
+  }
+
   button {
     /* revert user-agent style */
     text-align: unset;
