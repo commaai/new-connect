@@ -16,7 +16,7 @@ import { getProfile } from '~/api/profile'
 import type { Device } from '~/types'
 
 import Drawer from '~/components/material/Drawer'
-import IconButton from '~/components/material/IconButton'
+import Icon from '~/components/material/Icon'
 import TopAppBar from '~/components/material/TopAppBar'
 import Typography from '~/components/material/Typography'
 
@@ -40,7 +40,7 @@ const DashboardDrawer = (props: {
     <>
       <TopAppBar
         as="h1"
-        leading={<IconButton onClick={props.onClose}>menu</IconButton>}
+        leading={<md-icon-button onClick={props.onClose}><Icon>menu</Icon></md-icon-button>}
       >
         comma connect
       </TopAppBar>
@@ -81,7 +81,7 @@ const DashboardLayout: VoidComponent = () => {
           fallback={
             <>
               <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+                leading={<md-icon-button onClick={toggleDrawer}><Icon>menu</Icon></md-icon-button>}
               >
                 No device
               </TopAppBar>

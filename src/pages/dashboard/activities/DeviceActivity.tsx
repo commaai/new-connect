@@ -3,12 +3,13 @@ import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
 
-import IconButton from '~/components/material/IconButton'
+import Icon from '~/components/material/Icon'
 import TopAppBar from '~/components/material/TopAppBar'
 import Typography from '~/components/material/Typography'
+import DeviceStatistics from '~/components/DeviceStatistics'
+
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
-import DeviceStatistics from '~/components/DeviceStatistics'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -20,7 +21,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   return (
     <>
-      <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
+      <TopAppBar leading={<md-icon-button onClick={toggleDrawer}><Icon>menu</Icon></md-icon-button>}>
         <Suspense fallback={<>Device</>}>{device()?.alias}</Suspense>
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">

@@ -1,4 +1,4 @@
-import { Component } from 'solid-js'
+import { Component, splitProps } from 'solid-js'
 import clsx from 'clsx'
 
 export type IconProps = {
@@ -9,6 +9,7 @@ export type IconProps = {
 }
 
 const Icon: Component<IconProps> = (props) => {
+  const [, rest] = splitProps(props, ['children', 'class', 'filled'])
   // size-20, 24 etc. defined in root.css
   const size = () => `size-${props.size || '24'}`
   return (
@@ -19,6 +20,7 @@ const Icon: Component<IconProps> = (props) => {
         size(),
         props.class,
       )}
+      {...rest}
     >
       {props.children}
     </span>

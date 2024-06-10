@@ -1,12 +1,10 @@
 import { useContext, For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import { useLocation } from '@solidjs/router'
-import clsx from 'clsx'
 
 import type { Device } from '~/types'
 
 import Icon from '~/components/material/Icon'
-import List, { ListItem, ListItemContent } from '~/components/material/List'
 import Typography from '~/components/material/Typography'
 import { DashboardContext } from '../Dashboard'
 
@@ -20,32 +18,30 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const location = useLocation()
 
   return (
-    <List variant="nav" class={clsx(props.class)}>
+    <md-list class={props.class}>
       <For each={props.devices}>
         {(device) => {
           const isSelected = () => location.pathname.includes(device.dongle_id)
           const onClick = () => setDrawer(false)
           return (
-            <ListItem
-              variant="nav"
-              leading={<Icon>directions_car</Icon>}
+            <md-list-item
+              type="text"
               selected={isSelected()}
               onClick={onClick}
               href={`/${device.dongle_id}`}
             >
-              <ListItemContent
-                headline={device.alias}
-                subhead={
-                  <Typography class="lowercase" variant="label-sm">
-                    {device.dongle_id}
-                  </Typography>
-                }
-              />
-            </ListItem>
+              <Icon slot="start">directions_car</Icon>
+              <Typography color="on-surface" variant="body-lg" as="div">
+                {device.alias}
+              </Typography>
+              <Typography class="lowercase" color="on-surface-variant" variant="label-sm" as="div">
+                {device.dongle_id}
+              </Typography>
+            </md-list-item>
           )
         }}
       </For>
-    </List>
+    </md-list>
   )
 }
 

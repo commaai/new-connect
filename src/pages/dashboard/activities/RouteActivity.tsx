@@ -8,7 +8,7 @@ import {
 
 import { getRoute } from '~/api/route'
 
-import IconButton from '~/components/material/IconButton'
+import Icon from '~/components/material/Icon'
 import TopAppBar from '~/components/material/TopAppBar'
 import Typography from '~/components/material/Typography'
 
@@ -39,7 +39,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     <>
       <TopAppBar
         leading={
-          <IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>
+          <md-icon-button href={`/${props.dongleId}`}><Icon>arrow_back</Icon></md-icon-button>
         }
       >
         {approxTime().format('ddd, MMM D, YYYY')}

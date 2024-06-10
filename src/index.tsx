@@ -1,5 +1,6 @@
 /* @refresh reload */
 import './index.css'
+import '@material/web/all'
 
 import { Suspense, lazy } from 'solid-js'
 import { render } from 'solid-js/web'

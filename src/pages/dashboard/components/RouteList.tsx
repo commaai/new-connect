@@ -12,7 +12,6 @@ import type { Route } from '~/types'
 
 import RouteCard from '~/components/RouteCard'
 import { fetcher } from '~/api'
-import Button from '~/components/material/Button'
 
 const PAGE_SIZE = 3
 
@@ -85,7 +84,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         }}
       </For>
       <div class="flex justify-center">
-        <Button onClick={onLoadMore}>Load more</Button>
+        <md-filled-button onClick={onLoadMore}>Load more</md-filled-button>
       </div>
     </div>
   )
