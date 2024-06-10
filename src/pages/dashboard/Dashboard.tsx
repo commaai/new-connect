@@ -23,6 +23,7 @@ import Typography from '~/components/material/Typography'
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
+import AppBar from '~/components/material/AppBar'
 
 type DashboardState = {
   drawer: Accessor<boolean>

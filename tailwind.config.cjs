@@ -70,12 +70,6 @@ module.exports = {
         mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
       },
       keyframes: {
-        ripple: {
-          '100%': {
-            transform: 'scale(4)',
-            opacity: 0,
-          },
-        },
         shimmer: {
           '100%': {
             transform: 'translateX(100%)',
