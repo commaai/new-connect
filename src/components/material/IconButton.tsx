@@ -24,7 +24,7 @@ const IconButton: Component<IconButtonProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer inline-flex items-center justify-center rounded-full before:rounded-full before:bg-on-surface',
+        'state-layer inline-flex items-center justify-center rounded-full before:rounded-full before:bg-on-surface p-2',
         buttonSize,
         props.class,
       )}
