@@ -1,23 +1,9 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
 
-const { createThemes } = require('tw-colors')
-const kebabcase = require('lodash.kebabcase')
-
-const theme = require('./src/theme/theme.json')
-
-const getSchemeColours = (scheme) => ({
-  ...Object.fromEntries(
-    Object.entries(theme.schemes[scheme]).map(([key, value]) => [
-      kebabcase(key),
-      value,
-    ]),
-  ),
-  white: '#ffffff',
-})
-
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  content: ['./src/**/*.tsx', './index.html'],
+  content: ['./src/**/*.{ts,tsx}', './index.html'],
+  darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     borderRadius: {
       none: '0',
@@ -37,6 +23,59 @@ module.exports = {
       extrabold: 800,
     },
     extend: {
+      colors: Object.fromEntries(
+        [
+          'primary',
+          'surface-tint',
+          'on-primary',
+          'primary-container',
+          'on-primary-container',
+          'secondary',
+          'on-secondary',
+          'secondary-container',
+          'on-secondary-container',
+          'tertiary',
+          'on-tertiary',
+          'tertiary-container',
+          'on-tertiary-container',
+          'error',
+          'on-error',
+          'error-container',
+          'on-error-container',
+          'background',
+          'on-background',
+          'surface',
+          'on-surface',
+          'surface-variant',
+          'on-surface-variant',
+          'outline',
+          'outline-variant',
+          'shadow',
+          'scrim',
+          'inverse-surface',
+          'inverse-on-surface',
+          'inverse-primary',
+          'primary-fixed',
+          'on-primary-fixed',
+          'primary-fixed-dim',
+          'on-primary-fixed-variant',
+          'secondary-fixed',
+          'on-secondary-fixed',
+          'secondary-fixed-dim',
+          'on-secondary-fixed-variant',
+          'tertiary-fixed',
+          'on-tertiary-fixed',
+          'tertiary-fixed-dim',
+          'on-tertiary-fixed-variant',
+          'surface-dim',
+          'surface-bright',
+          'surface-container-lowest',
+          'surface-container-low',
+          'surface-container',
+          'surface-container-high',
+          'surface-container-highest',
+        ].map((name) => [name, `var(--color-${name})`]),
+      ),
       fontFamily: {
         sans: ['Inter', ...defaultTheme.fontFamily.sans],
         mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
@@ -106,10 +145,8 @@ module.exports = {
       },
       animation: {
         ripple: 'ripple 600ms linear',
-        indeterminate1:
-          'indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite',
-        indeterminate2:
-          'indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite',
+        indeterminate1: 'indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite',
+        indeterminate2: 'indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite',
         'circular-rotate': 'circular-rotate 1.4s linear infinite',
         'circular-dash': 'circular-dash 1.4s ease-in-out infinite',
       },
@@ -121,10 +158,4 @@ module.exports = {
       },
     },
   },
-  plugins: [
-    createThemes(({ light, dark }) => ({
-      light: light(getSchemeColours('light')),
-      dark: dark(getSchemeColours('dark')),
-    })),
-  ],
 }

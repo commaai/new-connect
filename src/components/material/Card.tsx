@@ -100,7 +100,7 @@ const Card: ParentComponent<CardProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer elevation-1 flex max-w-md flex-col rounded-lg bg-surface-1 text-on-surface before:bg-on-surface',
+        'state-layer elevation-1 flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface',
         props.class,
       )}
       onClick={props.onClick}
