@@ -16,6 +16,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
+      - run: bun pre-commit
       - run: bun run build
 
       - name: Upload built project
