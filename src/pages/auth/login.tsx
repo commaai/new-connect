@@ -1,9 +1,15 @@
 import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
+import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
 import Typography from '~/components/material/Typography'
 
 export default function Login() {
+  const loginAsDemoUser = function () {
+    setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw');
+    window.location.href = window.location.origin;
+  };
+
   return (
     <div class="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-8">
@@ -90,6 +96,18 @@ export default function Login() {
             height={32}
           />
         </div>
+
+        <Button
+          class="gap-4"
+          onclick={loginAsDemoUser}
+          trailing={
+            <span class="material-symbols-outlined icon-outline">
+              chevron_right
+            </span>
+          }
+        >
+          Try the demo
+        </Button>
       </div>
     </div>
   )
