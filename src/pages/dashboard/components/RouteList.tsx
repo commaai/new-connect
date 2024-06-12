@@ -107,7 +107,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           User Flags
         </div>
       </div>
-      <div class="flex flex-col w-full h-full gap-4 overflow-y-auto custom-scrollbar">
+      <div class="flex flex-col w-full h-full gap-4 overflow-y-auto hide-scrollbar lg:custom-scrollbar">
         <For each={pageNumbers()}>
           {(i) => {
             const [routes] = createResource(() => i, getPage)
