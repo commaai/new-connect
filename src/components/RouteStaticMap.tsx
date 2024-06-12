@@ -70,7 +70,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
       )}
     >
       <Switch>
-        <Match when={coords.error || url.error || loadedUrl.error} keyed>
+        <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon filled>error</Icon>}>
             Problem loading map
           </State>

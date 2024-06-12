@@ -43,7 +43,7 @@ type StateDriveEvent = IDriveEvent & {
 
 type UserFlagDriveEvent = IDriveEvent & {
   type: 'user_flag'
-  data: {}
+  data: Record<string, never>
 }
 
 type DriveEvent = EventDriveEvent | StateDriveEvent | UserFlagDriveEvent

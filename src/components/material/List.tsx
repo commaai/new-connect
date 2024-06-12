@@ -42,7 +42,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       '1-line': 'h-14',
       '2-line': 'h-20',
       '3-line': 'h-28',
-      nav: 'h-14 before:rounded-full',
+      nav: 'h-14 before:rounded-full before:duration-0',
     }[variant()])
   return (
     <ButtonBase
