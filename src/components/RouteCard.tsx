@@ -1,4 +1,4 @@
-import { createSignal, createEffect, onCleanup, Suspense, type VoidComponent } from 'solid-js'
+import { createSignal, createEffect, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
