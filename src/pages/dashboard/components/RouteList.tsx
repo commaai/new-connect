@@ -64,7 +64,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   })
 
   const [size, setSize] = createSignal(0)
-  const onLoadMore = () => setSize(size() + 1)
   const pageNumbers = () => Array.from(Array(size()).keys())
 
   let bottomRef!: HTMLDivElement;
