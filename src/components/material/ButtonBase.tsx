@@ -10,7 +10,7 @@ export type ButtonBaseProps = JSX.HTMLAttributes<HTMLButtonElement> & {
 }
 
 const ButtonBase: Component<ButtonBaseProps> = (props) => {
-  const onClick: JSX.EventHandler<any, MouseEvent> = (e: MouseEvent) => {
+  const onClick: JSX.EventHandler<unknown, MouseEvent> = (e: MouseEvent) => {
     props.onClick?.(e)
   }
 

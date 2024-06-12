@@ -13,7 +13,7 @@ const Search: ParentComponent<SearchProps> = (props) => {
   return (
     <div
       class={clsx(
-        'elevation-1 min-w-[320px] max-w-[720px] overflow-hidden rounded-xl bg-surface-1 text-on-surface transition-colors',
+        'elevation-1 min-w-[320px] max-w-[720px] overflow-hidden rounded-xl bg-surface-container-low text-on-surface transition-colors',
         props.class,
       )}
     >
