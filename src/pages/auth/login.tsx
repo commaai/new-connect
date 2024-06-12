@@ -98,7 +98,7 @@ export default function Login() {
         </div>
 
         <Button
-          class="h-13 gap-4 hover:bg-gray-200"
+          class="gap-4 hover:bg-gray-200"
           onclick={loginAsDemoUser}
           trailing={
             <span class="material-symbols-outlined icon-outline">
