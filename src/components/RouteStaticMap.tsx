@@ -82,7 +82,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
         </Match>
         <Match when={url() && loadedUrl()} keyed>
           <img
-            class="pointer-events-none size-full object-cover"
+            class="pointer-events-none size-full object-contain"
             src={loadedUrl()}
             alt=""
           />

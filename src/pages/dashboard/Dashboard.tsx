@@ -7,6 +7,7 @@ import {
   Setter,
   Show,
   Switch,
+  Suspense
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import { Navigate, useLocation } from '@solidjs/router'
@@ -77,30 +78,35 @@ const DashboardLayout: VoidComponent = () => {
         onClose={onClose}
         drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
       >
-        <Switch
+        <Suspense
           fallback={
-            <>
-              <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-              >
-                No device
-              </TopAppBar>
-            </>
-          }
-        >
-          <Match when={!!profile.error}>
-            <Navigate href="/login" />
-          </Match>
-          <Match when={dateStr()} keyed>
-            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
-          </Match>
-          <Match when={dongleId()} keyed>
-            <DeviceActivity dongleId={dongleId()} />
-          </Match>
-          <Match when={devices()?.length} keyed>
-            <Navigate href={`/${devices()![0].dongle_id}`} />
-          </Match>
-        </Switch>
+            <div class="skeleton-loader size-full bg-surface" />
+          }>
+          <Switch
+            fallback={
+              <>
+                <TopAppBar
+                  leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+                >
+                  No device
+                </TopAppBar>
+              </>
+            }
+          >
+            <Match when={!!profile.error}>
+              <Navigate href="/login" />
+            </Match>
+            <Match when={dateStr()} keyed>
+              <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
+            </Match>
+            <Match when={dongleId()} keyed>
+              <DeviceActivity dongleId={dongleId()} devices={devices()} />
+            </Match>
+            <Match when={devices()?.length} keyed>
+              <Navigate href={`/${devices()![0].dongle_id}`} />
+            </Match>
+          </Switch>
+        </Suspense>
       </Drawer>
     </DashboardContext.Provider>
   )

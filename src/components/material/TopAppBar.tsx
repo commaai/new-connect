@@ -1,16 +1,16 @@
-import type { JSXElement, ParentComponent } from 'solid-js'
+import { onCleanup, createSignal } from 'solid-js';
 import clsx from 'clsx'
-
 import Typography from '~/components/material/Typography'
 
-type TopAppBarProps = {
-  class?: string
-  leading?: JSXElement
-  trailing?: JSXElement
-  as?: string
-}
-
 const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
+  const [isLargeScreen, setIsLargeScreen] = createSignal(false);
+
+  const mql = window.matchMedia('(min-width: 1024px)');
+  setIsLargeScreen(mql.matches);
+  mql.addEventListener('change', (e) => setIsLargeScreen(e.matches));
+
+  onCleanup(() => mql.removeEventListener('change', (e) => setIsLargeScreen(e.matches)));
+
   return (
     <div
       class={clsx(
@@ -18,13 +18,13 @@ const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
         props.class,
       )}
     >
-      {props.leading}
+      {!isLargeScreen() && props.leading}
       <Typography class="grow" as={props.as || 'h2'} variant="title-lg">
         {props.children}
       </Typography>
       {props.trailing}
     </div>
-  )
-}
+  );
+};
 
-export default TopAppBar
+export default TopAppBar;

@@ -11,7 +11,6 @@ function renderTimelineEvents(
   events: TimelineEvent[],
 ) {
   if (!route) return null
-
   const duration =
     route.segment_end_times[route.segment_end_times.length - 1] -
     route.segment_start_times[0]
@@ -124,8 +123,8 @@ interface TimelineProps {
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const [route] = createResource(() => props.routeName, getRoute)
-  const [events] = createResource(route, getTimelineEvents)
+  const route = () => props.route
+  const [events] = createResource(route(), getTimelineEvents)
 
   return (
     <div
