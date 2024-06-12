@@ -88,7 +88,7 @@ const DashboardLayout: VoidComponent = () => {
             </>
           }
         >
-          <Match when={profile.error}>
+          <Match when={!!profile.error}>
             <Navigate href="/login" />
           </Match>
           <Match when={dateStr()} keyed>

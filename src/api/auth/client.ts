@@ -19,14 +19,15 @@ export async function refreshAccessToken(
       throw new Error(`${resp.status}: ${await resp.text()}`)
     }
 
-    const json = await resp.json()
+    // TODO: validate response
+    const json = await resp.json() as Record<string, string>
     if (!json.access_token) {
       throw new Error('unknown error')
     }
 
     setAccessToken(json.access_token)
   } catch (e) {
-    throw new Error(`Could not exchange oauth code for access token: ${e}`)
+    throw new Error('Could not exchange oauth code for access token', { cause: e })
   }
 }
 
