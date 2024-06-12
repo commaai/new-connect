@@ -48,8 +48,8 @@ const RouteRevGeo = (props: { route: Route }) => {
       const start_revGeo = await reverseGeocode(start_lng, start_lat);
       const end_revGeo = await reverseGeocode(end_lng, end_lat);
 
-      const { neighborhood: startNeighborhood, region: startRegion } = start_revGeo?.features[0].properties?.context || {};
-      const { neighborhood: endNeighborhood, region: endRegion } = end_revGeo?.features[0].properties?.context || {};
+      const { neighborhood: startNeighborhood, region: startRegion } = start_revGeo?.features[0]?.properties?.context || {};
+      const { neighborhood: endNeighborhood, region: endRegion } = end_revGeo?.features[0]?.properties?.context || {};
 
       setStartLocation({ neighborhood: startNeighborhood?.name, region: startRegion?.region_code });
       setEndLocation({ neighborhood: endNeighborhood?.name, region: endRegion?.region_code });
@@ -69,11 +69,15 @@ const RouteRevGeo = (props: { route: Route }) => {
   );
 }
 
+type RouteCardProps = {
+  route: Route;
+};
+
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const route = () => props.route
 
   return (
-    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} class="flex flex-col md:flex-row flex-shrink-0 card-fit-width">
+    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} class="flex flex-col md:flex-row shrink-0 card-fit-width">
       <div class="overflow-hidden md:max-w-[400px]">
         <Suspense
           fallback={<div class="skeleton-loader size-full bg-surface" />}

@@ -75,6 +75,10 @@ export interface Route {
   init_logmonotime?: number
   share_exp?: string
   share_sig?: string
+  start_lng?: number
+  start_lat?: number
+  end_lng?: number
+  end_lat?: number
 }
 
 export interface Clip {
