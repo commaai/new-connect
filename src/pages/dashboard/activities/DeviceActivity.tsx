@@ -13,8 +13,8 @@ import DeviceList from '../components/DeviceList'
 
 import type { Device } from '~/types'
 
-const DashboardDrawer = ({ devices = [] }: { devices?: Device[] }) => {
-  const hasDevices = devices.length > 0;
+const DashboardDrawer = (props: { devices?: Device[] }) => {
+  const hasDevices = props.devices && props.devices.length > 0;
 
   return (
     <div class='hidden lg:flex flex-col gap-4 w-[378px] ml-[150px]'>
@@ -22,7 +22,7 @@ const DashboardDrawer = ({ devices = [] }: { devices?: Device[] }) => {
         <p class="font-bold mb-4">Devices</p>
         <div class='flex flex-col gap-5 w-full h-[250px] overflow-auto'>
           <Show when={hasDevices}>
-            <DeviceList class="w-full" devices={devices} />
+            <DeviceList class="w-full" devices={props.devices ?? []} />
           </Show>
           <Show when={!hasDevices}>
             <Typography variant='label-sm'>No devices</Typography>
@@ -40,7 +40,8 @@ const DashboardDrawer = ({ devices = [] }: { devices?: Device[] }) => {
 }
 
 type DeviceActivityProps = {
-  dongleId: string
+  dongleId: string;
+  devices?: Device[];
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {

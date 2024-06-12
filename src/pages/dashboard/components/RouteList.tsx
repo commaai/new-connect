@@ -14,7 +14,6 @@ import type { Route } from '~/types'
 
 import RouteCard from '~/components/RouteCard'
 import { fetcher } from '~/api'
-import Button from '~/components/material/Button'
 import Typography from '~/components/material/Typography'
 
 const PAGE_SIZE = 3
@@ -44,15 +43,15 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   const getPage = (page: number): Promise<Route[]> => {
     if (!pages[page]) {
-      pages[page] = new Promise(async (resolve) => {
+      pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
         const routes = key ? await fetcher<Route[]>(key) : []
         if (routes.length < PAGE_SIZE) {
           setHasMore(false); // Set hasMore to false when there are no more routes
         }
-        resolve(routes)
-      })
+        return routes
+      })()
     }
     return pages[page]
   }

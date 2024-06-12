@@ -1,6 +1,12 @@
-import { onCleanup, createSignal } from 'solid-js';
+import { onCleanup, createSignal, ParentComponent, JSX } from 'solid-js';
 import clsx from 'clsx'
 import Typography from '~/components/material/Typography'
+
+interface TopAppBarProps {
+  leading?: JSX.Element;
+  as?: string;
+  trailing?: JSX.Element;
+}
 
 const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
   const [isLargeScreen, setIsLargeScreen] = createSignal(false);
