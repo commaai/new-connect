@@ -21,7 +21,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
-        <Suspense fallback={<>Device</>}>{device()?.alias}</Suspense>
+        <Suspense fallback={<></>}>{device()?.alias}</Suspense>
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-[72px] overflow-hidden rounded-lg bg-surface-container-low">
