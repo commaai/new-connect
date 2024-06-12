@@ -56,7 +56,7 @@ export const createQCameraStreamUrl = (
 ): string =>
   `${BASE_URL}/v1/route/${routeName}/qcamera.m3u8?${new URLSearchParams(
     signature,
-  )}`
+  ).toString()}`
 
 export const getQCameraStreamUrl = (
   routeName: Route['fullname'],

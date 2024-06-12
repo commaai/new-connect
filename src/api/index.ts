@@ -8,7 +8,8 @@ export async function fetcher<T>(endpoint: string): Promise<T> {
     },
   })
 
-  const json = await res.json()
+  // TODO: validate responses
+  const json = await res.json() as T & { error?: string; description?: string }
   if (json.error) {
     throw new Error(json.description)
   }

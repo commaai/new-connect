@@ -1,7 +1,7 @@
-const defaultTheme = require('tailwindcss/defaultTheme')
+import type { Config } from 'tailwindcss'
+import * as defaultTheme from 'tailwindcss/defaultTheme'
 
-/** @type {import('tailwindcss').Config} */
-module.exports = {
+export default {
   content: ['./src/**/*.{ts,tsx}', './index.html'],
   darkMode: ['class', '[data-theme="dark"]'],
   theme: {
@@ -15,12 +15,12 @@ module.exports = {
       full: '9999px',
     },
     fontWeight: {
-      light: 300,
-      regular: 400,
-      medium: 500,
-      semibold: 600,
-      bold: 700,
-      extrabold: 800,
+      light: '300',
+      regular: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
     },
     extend: {
       colors: Object.fromEntries(
@@ -84,7 +84,7 @@ module.exports = {
         ripple: {
           '100%': {
             transform: 'scale(4)',
-            opacity: 0,
+            opacity: '0',
           },
         },
         shimmer: {
@@ -131,15 +131,15 @@ module.exports = {
         'circular-dash': {
           '0%': {
             strokeDasharray: '1px, 200px',
-            strokeDashoffset: 0,
+            strokeDashoffset: '0',
           },
           '50%': {
             strokeDasharray: '100px, 200px',
-            strokeDashoffset: -15,
+            strokeDashoffset: '-15',
           },
           '100%': {
             strokeDasharray: '100px, 200px',
-            strokeDashoffset: -125,
+            strokeDashoffset: '-125',
           },
         },
       },
@@ -158,4 +158,4 @@ module.exports = {
       },
     },
   },
-}
+} satisfies Config

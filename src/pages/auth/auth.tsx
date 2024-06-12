@@ -13,7 +13,7 @@ export default function Auth() {
   const [{ code, provider }] = useSearchParams<AuthParams>()
 
   if (code && provider) {
-    refreshAccessToken(code, provider).then(() => {
+    void refreshAccessToken(code, provider).then(() => {
       navigate('/')
     })
   }
