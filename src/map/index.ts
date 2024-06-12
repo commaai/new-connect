@@ -152,7 +152,6 @@ export async function reverseGeocode(lng: number, lat: number): Promise<GeocodeR
   try {
     const response = await fetch(url);
     const data: GeocodeResult = await response.json();
-    console.log(data)
     return data;
   } catch (error) {
     console.error(error);

@@ -1,9 +1,8 @@
 import { For, createResource, Show, Suspense } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
+import type { Component } from 'solid-js'
 import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
-import { getRoute } from '~/api/route'
 import type { Route } from '~/types'
 
 function renderTimelineEvents(
@@ -117,12 +116,13 @@ function renderMarker(route: Route | undefined, seekTime: number | undefined) {
 }
 
 interface TimelineProps {
+  route: Route | undefined
   class?: string
   routeName: string
   seekTime?: number
 }
 
-const Timeline: VoidComponent<TimelineProps> = (props) => {
+const Timeline: Component<TimelineProps> = (props) => {
   const route = () => props.route
   const [events] = createResource(route(), getTimelineEvents)
 
@@ -137,10 +137,10 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     >
       <Suspense fallback={<div class="skeleton-loader size-full" />}>
         <Show when={route()} keyed>
-          {(route) => (
+          {(route: Route | undefined) => (
             <>
               <Show when={events()} keyed>
-                {(events) => renderTimelineEvents(route, events)}
+                {(events: TimelineEvent[]) => renderTimelineEvents(route, events)}
               </Show>
               {renderMarker(route, props.seekTime)}
             </>
