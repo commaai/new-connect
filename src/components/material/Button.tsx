@@ -16,12 +16,11 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   const color = () => props.color || 'primary'
   const colorClasses = () =>
     ({
-      primary: 'bg-primary before:bg-on-primary-container text-on-primary',
-      secondary:
-        'bg-secondary before:bg-on-secondary-container text-on-secondary',
-      tertiary: 'bg-tertiary before:bg-on-tertiary-container text-on-tertiary',
-      error: 'bg-error before:bg-on-error-container text-on-error',
-    }[color()])
+      primary: 'bg-primary before:bg-on-primary text-on-primary',
+      secondary: 'bg-secondary before:bg-on-secondary text-on-secondary',
+      tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary',
+      error: 'bg-error before:bg-on-error text-on-error',
+    })[color()]
   const [, rest] = splitProps(props, [
     'color',
     'leading',
