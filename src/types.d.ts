@@ -63,7 +63,7 @@ export interface Route {
   maxqlog: number
   procqlog: number
   start_time: number
-  end_time?: number
+  end_time: number
   passive?: boolean
   version?: string
   git_commit?: string
@@ -79,6 +79,67 @@ export interface Route {
   start_lat?: number
   end_lng?: number
   end_lat?: number
+}
+
+interface RoutablePoints {
+  name: string;
+  latitude: number;
+  longitude: number;
+}
+
+interface ContextEntity {
+  mapbox_id: string;
+  name: string;
+  wikidata_id?: string;
+  address_number?: string;
+  street_name?: string;
+  region_code?: string;
+  region_code_full?: string;
+  country_code?: string;
+  country_code_alpha_3?: string;
+}
+
+interface Properties {
+  mapbox_id: string;
+  feature_type: string;
+  full_address: string;
+  name: string;
+  name_preferred: string;
+  coordinates: {
+    longitude: number;
+    latitude: number;
+    accuracy: string;
+    routable_points: RoutablePoints[];
+  };
+  place_formatted: string;
+  context: {
+    address: ContextEntity;
+    street: ContextEntity;
+    neighborhood: ContextEntity;
+    postcode: ContextEntity;
+    place: ContextEntity;
+    district: ContextEntity;
+    region: ContextEntity;
+    country: ContextEntity;
+  };
+}
+
+interface Geometry {
+  type: string;
+  coordinates: [number, number];
+}
+
+interface Feature {
+  type: string;
+  id: string;
+  geometry: Geometry;
+  properties: Properties;
+}
+
+interface GeocodeResult {
+  type: string;
+  features: Feature[];
+  attribution: string;
 }
 
 export interface Clip {

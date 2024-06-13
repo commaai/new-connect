@@ -1,4 +1,5 @@
 import polyline from '@mapbox/polyline'
+import type { GeocodeResult } from '~/types'
 
 import {
   MAPBOX_USERNAME,
@@ -85,67 +86,6 @@ export function getPathStaticMapUrl(
   }).join(',')
   return `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${styleId}/static/${paths}/auto/${width}x${height}${hidpiStr}?logo=false&attribution=false&padding=30,30,30,30&access_token=${MAPBOX_TOKEN}`
 } */
-
-interface RoutablePoints {
-  name: string;
-  latitude: number;
-  longitude: number;
-}
-
-interface ContextEntity {
-  mapbox_id: string;
-  name: string;
-  wikidata_id?: string;
-  address_number?: string;
-  street_name?: string;
-  region_code?: string;
-  region_code_full?: string;
-  country_code?: string;
-  country_code_alpha_3?: string;
-}
-
-interface Properties {
-  mapbox_id: string;
-  feature_type: string;
-  full_address: string;
-  name: string;
-  name_preferred: string;
-  coordinates: {
-    longitude: number;
-    latitude: number;
-    accuracy: string;
-    routable_points: RoutablePoints[];
-  };
-  place_formatted: string;
-  context: {
-    address: ContextEntity;
-    street: ContextEntity;
-    neighborhood: ContextEntity;
-    postcode: ContextEntity;
-    place: ContextEntity;
-    district: ContextEntity;
-    region: ContextEntity;
-    country: ContextEntity;
-  };
-}
-
-interface Geometry {
-  type: string;
-  coordinates: [number, number];
-}
-
-interface Feature {
-  type: string;
-  id: string;
-  geometry: Geometry;
-  properties: Properties;
-}
-
-interface GeocodeResult {
-  type: string;
-  features: Feature[];
-  attribution: string;
-}
 
 export async function reverseGeocode(lng: number, lat: number): Promise<GeocodeResult> {
   const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}.733&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`;

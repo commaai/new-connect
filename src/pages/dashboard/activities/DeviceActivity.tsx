@@ -17,7 +17,7 @@ const DashboardDrawer = (props: { devices?: Device[] }) => {
   const hasDevices = props.devices && props.devices.length > 0;
 
   return (
-    <div class='hidden lg:flex flex-col gap-4 w-[378px] ml-[150px]'>
+    <div class='hidden lg:flex flex-col gap-4 w-[378px] ml-[250px]'>
       <div class="p-4 rounded-lg" style={{ background: 'var(--color-surface-container-low)' }}>
         <p class="font-bold mb-4">Devices</p>
         <div class='flex flex-col gap-5 w-full h-[250px] overflow-auto'>
@@ -61,7 +61,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </Suspense>
         </div>
-        <div class='flex gap-x-8 w-full'>
+        <div class='flex gap-x-[40px] w-full'>
           {device() && <DashboardDrawer devices={props.devices} />}
           <RouteList dongleId={props.dongleId} />
         </div>

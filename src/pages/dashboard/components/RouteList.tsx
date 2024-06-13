@@ -4,8 +4,9 @@ import {
   createResource,
   createSignal,
   For,
-  Suspense,
-  onCleanup
+  createMemo,
+  onCleanup,
+  batch,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
@@ -26,7 +27,6 @@ type RouteListProps = {
 const pages: Promise<Route[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
-
   const endpoint = () =>
     `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
 
@@ -39,7 +39,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
 
-  const [hasMore, setHasMore] = createSignal(true); // Add this line
+  const [hasMore, setHasMore] = createSignal(true);
 
   const getPage = (page: number): Promise<Route[]> => {
     if (!pages[page]) {
@@ -48,7 +48,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         const key = getKey(previousPageData)
         const routes = key ? await fetcher<Route[]>(key) : []
         if (routes.length < PAGE_SIZE) {
-          setHasMore(false); // Set hasMore to false when there are no more routes
+          setHasMore(false);
         }
         return routes
       })()
@@ -60,6 +60,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
+      refetch();
     }
   })
 
@@ -70,7 +71,11 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   createEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
-        setSize(size() + 1);
+        batch(() => {
+          setSize(size() + 1);
+          // Refetch and sort when new pages are loaded
+          refetch(); 
+        });
       }
     });
 
@@ -81,7 +86,56 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     });
   });
 
-  const loadingOrEndMessage = hasMore() ? 'loading...' : 'No more routes';
+  const loadingOrEndMessage = createMemo(() => hasMore() ? 'loading...' : 'No more routes');
+
+  const [currentFilter, setCurrentFilter] = createSignal('date')
+
+  // Helper function for sorting routes based on filter
+  const sortRoutes = (routes: Route[]): Route[] => {
+    switch (currentFilter()) {
+      case 'date':
+        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+      case 'miles':
+        return routes.slice().sort((a, b) => (b.length || 0) - (a.length || 0));
+      case 'duration':
+        return routes.slice().sort((a, b) => {
+          const aDuration = new Date(a.end_time).getTime() - new Date(a.start_time).getTime();
+          const bDuration = new Date(b.end_time).getTime() - new Date(b.start_time).getTime();
+          return bDuration - aDuration;
+        });
+      default:
+        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+    }
+  }
+
+  // Fetch all pages and sort outside the For loop
+  const [allRoutes = [], { refetch }] = createResource(
+    [size, currentFilter],
+    async ([size, currentFilter]) => {
+      const pages = await Promise.all(pageNumbers().map(getPage));
+      const routes = pages.flat();
+  
+      if (routes && routes.length > 0) {
+        return sortRoutes(routes);
+      } else {
+        return [];
+      }
+    }
+  );
+
+  // Use createSignal to manage the sorted routes
+  const [sortedRoutes, setSortedRoutes] = createSignal<Route[]>([]);
+
+  // Update sortedRoutes whenever allRoutes changes
+  createEffect(() => {
+    const newRoutes = allRoutes();
+    setSortedRoutes((prevRoutes) => {
+      // Merge new routes with existing routes
+      const combinedRoutes = [...prevRoutes, ...newRoutes];
+      // Sort the combined routes
+      return sortRoutes(combinedRoutes);
+    });
+  });
 
   return (
     <div
@@ -91,41 +145,31 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       )} style={{ height: 'calc(100vh - 72px - 5rem)' }}
     >
       <div class='flex gap-5 w-full h-[45px] overflow-y-hidden overflow-x-auto hide-scrollbar'>
-        <div class='filter-custom-btn selected-filter-custom-btn'>
+        <div
+          class={`filter-custom-btn ${currentFilter() === 'date' ? 'selected-filter-custom-btn' : ''}`}
+          onClick={() => setCurrentFilter('date')}
+        >
           Date
         </div>
-        <div class='filter-custom-btn'>
+        <div
+          class={`filter-custom-btn ${currentFilter() === 'miles' ? 'selected-filter-custom-btn' : ''}`}
+          onClick={() => setCurrentFilter('miles')}
+        >
           Miles
         </div>
-        <div class='filter-custom-btn'>
+        <div
+          class={`filter-custom-btn ${currentFilter() === 'duration' ? 'selected-filter-custom-btn' : ''}`}
+          onClick={() => setCurrentFilter('duration')}
+        >
           Duration
-        </div>
-        <div class='filter-custom-btn'>
-          % Engaged
-        </div>
-        <div class='filter-custom-btn'>
-          User Flags
         </div>
       </div>
       <div class="flex flex-col w-full h-full gap-4 overflow-y-auto hide-scrollbar lg:custom-scrollbar">
-        <For each={pageNumbers()}>
-          {(i) => {
-            const [routes] = createResource(() => i, getPage)
-            return (
-              <Suspense
-                fallback={
-                  <div class="skeleton-loader size-full bg-surface" />
-                }
-              >
-                <For each={routes()}>
-                  {(route) => <RouteCard route={route} />}
-                </For>
-              </Suspense>
-            )
-          }}
+        <For each={sortedRoutes()}>
+          {(route: Route) => <RouteCard route={route} />}
         </For>
         <div ref={bottomRef} class='flex justify-center w-[735px] mb-3'>
-          <Typography>{loadingOrEndMessage}</Typography>
+          <Typography>{loadingOrEndMessage()}</Typography>
         </div>
       </div>
     </div>
