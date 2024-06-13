@@ -70,12 +70,8 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      refetch().catch((error: unknown) => {
-        if (error instanceof Error) {
-          console.error('Error refetching:', error.message);
-        } else {
-          console.error('Error refetching:', error);
-        }
+      refetch().catch((error: Error) => {
+        console.error('Error refetching:', error.message);
       });
     }
   })
@@ -89,12 +85,8 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       if (entries[0].isIntersecting) {
         batch(() => {
           setSize(size() + 1)
-          refetch().catch((error: unknown) => {
-            if (error instanceof Error) {
-              console.error('Error refetching:', error.message);
-            } else {
-              console.error('Error refetching:', error);
-            }
+          refetch().catch((error: Error) => {
+            console.error('Error refetching:', error.message);
           });
         })
       }
@@ -159,23 +151,15 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   // update sortedRoutes whenever allRoutes changes
   createEffect(() => {
-    try {
-      const newRoutesResult = allRoutes();
-      if (newRoutesResult instanceof Error) {
-        throw newRoutesResult;
-      }
-      const newRoutes: Route[] = newRoutesResult;
-      setSortedRoutes((prevRoutes: Route[]) => {
-        const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes];
-        return sortRoutes(combinedRoutes);
-      });
-    } catch (error: unknown) {
-      if (error instanceof Error) {
-        console.error('Error fetching all routes:', error.message);
-      } else {
-        console.error('Error fetching all routes:', error);
-      }
+    const newRoutesResult = allRoutes();
+    if (newRoutesResult instanceof Error) {
+      throw newRoutesResult;
     }
+    const newRoutes: Route[] = newRoutesResult;
+    setSortedRoutes((prevRoutes: Route[]) => {
+      const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes];
+      return sortRoutes(combinedRoutes);
+    });
   });
 
   return (
