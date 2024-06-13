@@ -70,7 +70,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      let refetch: () => Promise<any>;
       refetch().catch((error: unknown) => {
         if (error instanceof Error) {
           console.error('Error refetching:', error.message);
@@ -90,8 +89,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       if (entries[0].isIntersecting) {
         batch(() => {
           setSize(size() + 1)
-          // Refetch and sort when new pages are loaded
-          let refetch: () => Promise<any>;
           refetch().catch((error: unknown) => {
             if (error instanceof Error) {
               console.error('Error refetching:', error.message);
@@ -135,7 +132,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   // Fetch all pages and sort outside the For loop
   const [allRoutes = [], { refetch }] = createResource(
     [],
-    async () => {
+    async (): Promise<Route[]> => {
       try {
         const pages = await Promise.all(pageNumbers().map(getPage))
         const routes = pages.flat()
