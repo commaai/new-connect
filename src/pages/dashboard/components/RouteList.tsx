@@ -43,14 +43,20 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   const getPage = async (page: number): Promise<Route[]> => {
     if (!pages[page]) {
-      pages[page] = (async () => {
-        const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        const routes = key ? await fetcher<Route[]>(key) : []
-        if (routes.length < PAGE_SIZE) {
-          setHasMore(false)
+      pages[page] = await (async () => {
+        try {
+          const previousPageData = page > 0 ? await getPage(page - 1) : undefined
+          const key = getKey(previousPageData)
+          const routes = key ? await fetcher<Route[]>(key) : []
+          if (routes.length < PAGE_SIZE) {
+            setHasMore(false)
+          }
+          return routes
+        } catch (error) {
+          console.error('Error fetching page:', error)
+          // Handle the error appropriately, e.g., display an error message to the user
+          return []
         }
-        return routes
       })()
     }
     return pages[page]
@@ -110,14 +116,21 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   // Fetch all pages and sort outside the For loop
   const [allRoutes = [], { refetch }] = createResource(
-    [size, currentFilter],
-    async ([size, currentFilter]) => {
-      const pages = await Promise.all(pageNumbers().map(getPage))
-      const routes = pages.flat()
+    [],
+    async () => {
+      try {
+        const pages = await Promise.all(pageNumbers().map(getPage))
+        const routes = pages.flat() as Route[]
 
-      if (routes && routes.length > 0) {
-        return sortRoutes(routes)
-      } else {
+        if (routes && routes.length > 0) {
+          return sortRoutes(routes)
+        } else {
+          return []
+        }
+      } catch (error) {
+        console.error('Error fetching routes:', error)
+        // Handle the error appropriately. You could display an error message or
+        // return a default empty array.
         return []
       }
     }
