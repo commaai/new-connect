@@ -15,11 +15,15 @@
     "lint": "eslint",
     "lint:fix": "eslint --fix",
     "prepare": "husky",
-    "pre-commit": "bun lint"
+    "pre-commit": "bun lint",
+    "test": "vitest run"
   },
   "packageManager": "bun@1.1.13",
   "type": "module",
   "devDependencies": {
+    "@solidjs/testing-library": "^0.8.8",
+    "@testing-library/jest-dom": "^6.4.6",
+    "@testing-library/user-event": "^14.5.2",
     "@types/eslint__js": "^8.42.3",
     "@types/mapbox__polyline": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
@@ -30,13 +34,15 @@
     "eslint-plugin-tailwindcss": "^3.17.3",
     "globals": "^15.4.0",
     "husky": "^9.0.11",
+    "jsdom": "^24.1.0",
     "postcss": "^8.4.38",
     "solid-devtools": "^0.30.1",
     "tailwindcss": "^3.4.4",
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.13.0",
     "vite": "^5.2.13",
-    "vite-plugin-solid": "^2.10.2"
+    "vite-plugin-solid": "^2.10.2",
+    "vitest": "^1.6.0"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
