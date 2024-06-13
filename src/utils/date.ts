@@ -34,16 +34,17 @@ export const formatDuration = (minutes: number | undefined): string => {
   return _formatDuration(duration)
 }
 
-export const formatRouteDuration = (route: Route | undefined): string => {
-  if (!route || !route.segment_start_times || !route.segment_end_times)
-    return ''
+export const getRouteDuration = (route: Route): Duration | undefined => {
+  if (!route || !route.end_time) return undefined
+  const startTime = dayjs(route.start_time)
+  const endTime = dayjs(route.end_time)
+  return dayjs.duration(endTime.diff(startTime))
+}
 
-  const startTime = dayjs(route.segment_start_times[0])
-  const endTime = dayjs(
-    route.segment_end_times[route.segment_end_times.length - 1],
-  )
-  const duration = dayjs.duration(endTime.diff(startTime))
-  return _formatDuration(duration)
+export const formatRouteDuration = (route: Route | undefined): string => {
+  if (!route) return ''
+  const duration = getRouteDuration(route)
+  return duration ? _formatDuration(duration) : ''
 }
 
 export const parseDateStr = (dateStr: string): Dayjs => {

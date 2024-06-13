@@ -7,18 +7,15 @@ import Icon from '~/components/material/Icon'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 
-import type { Route } from '~/types'
+import type { RouteSegments } from '~/types'
 
-const RouteHeader = (props: { route: Route }) => {
+const RouteHeader = (props: { route: RouteSegments }) => {
   const startTime = () => dayjs(props.route.segment_start_times[0])
   const endTime = () =>
-    dayjs(
-      props.route.segment_end_times[props.route.segment_end_times.length - 1],
-    )
+    dayjs(props.route.segment_end_times[props.route.segment_end_times.length - 1])
 
   const headline = () => startTime().format('ddd, MMM D, YYYY')
-  const subhead = () =>
-    `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
+  const subhead = () => `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
 
   return (
     <CardHeader
@@ -34,7 +31,7 @@ const RouteHeader = (props: { route: Route }) => {
 }
 
 interface RouteCardProps {
-  route: Route
+  route: RouteSegments
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {

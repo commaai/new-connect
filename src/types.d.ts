@@ -46,35 +46,56 @@ export enum SegmentDataSource {
 }
 
 export interface Route {
-  fullname: string
-  dongle_id: string
-  user_id: string
-  is_public: boolean
-  url: string
+  can?: boolean
   create_time: number
+  devicetype: number
+  dongle_id: string
+  end_lat?: number
+  end_lng?: number
+  end_time?: string
+  fullname: string
+  git_branch?: string
+  git_commit?: string
+  git_dirty?: boolean
+  git_remote?: string
+  hpgps?: boolean
+  init_logmonotime?: number
+  is_public: boolean
+  length?: number
+  maxcamera: number
+  maxdcamera: number
+  maxecamera: number
+  maxlog: number
+  maxqcamera: number
+  maxqlog: number
+  passive?: boolean
+  platform?: string
+  proccamera: number
+  proclog: number
+  procqcamera: number
+  procqlog: number
+  radar?: boolean
+  start_time: string
+  url: string
+  user_id: string | null
+  version?: string
+  vin?: string
+}
+
+export interface RouteShareSignature extends Record<string, string> {
+  exp: string
+  sig: string
+}
+
+export interface RouteSegments extends Route {
+  end_time_utc_millis: number
+  is_preserved: boolean
+  segment_end_times: number[]
   segment_numbers: number[]
   segment_start_times: number[]
-  segment_end_times: number[]
-  length?: number
-  can?: boolean
-  hpgps?: boolean
-  radar?: boolean
-  devicetype: number
-  maxqlog: number
-  procqlog: number
-  start_time: number
-  end_time?: number
-  passive?: boolean
-  version?: string
-  git_commit?: string
-  git_branch?: string
-  git_remote?: string
-  git_dirty?: boolean
-  platform?: string
-  vin?: string
-  init_logmonotime?: number
-  share_exp?: string
-  share_sig?: string
+  share_exp: RouteShareSignature['exp']
+  share_sig: RouteShareSignature['sig']
+  start_time_utc_millis: number
 }
 
 export interface Clip {
