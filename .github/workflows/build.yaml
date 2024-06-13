@@ -13,6 +13,11 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      - run: bun install --frozen-lockfile
+      - run: bun pre-commit
+      - run: bun run test
       - run: ./check-lines.sh
 
   build:
@@ -23,7 +28,6 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
-      - run: bun pre-commit
       - run: bun run build
 
       - name: Upload built project
@@ -33,6 +37,19 @@ jobs:
           overwrite: true
           retention-days: 1
           name: build-artifacts-${{ github.run_id }}
+
+  deploy:
+    needs: [build, test]
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: build-artifacts-${{ github.run_id }}
+          path: ./dist
+          run-id: ${{ github.run_id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
       # deploy
       - name: Deploy to Cloudflare Pages
@@ -45,4 +62,3 @@ jobs:
           projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-
