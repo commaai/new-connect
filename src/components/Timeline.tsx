@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
 import { getRoute } from '~/api/route'
 import type { Route } from '~/types'
+import { getRouteDuration } from '~/utils/date'
 
 function renderTimelineEvents(
   route: Route | undefined,
@@ -12,10 +13,7 @@ function renderTimelineEvents(
 ) {
   if (!route) return null
 
-  const duration =
-    route.segment_end_times[route.segment_end_times.length - 1] -
-    route.segment_start_times[0]
-
+  const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
     <For each={events}>
       {(event) => {
@@ -99,12 +97,8 @@ function renderMarker(route: Route | undefined, seekTime: number | undefined) {
   if (!route) return null
   if (seekTime === undefined) return null
 
-  const duration =
-    route.segment_end_times[route.segment_end_times.length - 1] -
-    route.segment_start_times[0]
-
-  const offsetPct = (seekTime / (duration / 1000)) * 100
-
+  const duration = getRouteDuration(route)?.asSeconds() ?? 0
+  const offsetPct = (seekTime / duration) * 100
   return (
     <div
       class="absolute top-0 z-10 h-full"

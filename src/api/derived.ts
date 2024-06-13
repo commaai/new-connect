@@ -1,4 +1,5 @@
 import type { Route } from '~/types'
+import { getRouteDuration } from '~/utils/date'
 
 export interface GPSPathPoint {
   t: number
@@ -106,9 +107,7 @@ const generateTimelineEvents = (
   route: Route,
   events: DriveEvent[],
 ): TimelineEvent[] => {
-  const routeDuration =
-    route.segment_end_times[route.segment_end_times.length - 1] -
-    route.segment_start_times[0]
+  const routeDuration = getRouteDuration(route)?.asMilliseconds() ?? 0
 
   // sort events by timestamp
   events.sort((a, b) => {
@@ -218,9 +217,7 @@ const generateTimelineStatistics = (
   return {
     engagedDuration,
     userFlags,
-    duration:
-      route.segment_end_times[route.segment_end_times.length - 1] -
-      route.segment_start_times[0],
+    duration: getRouteDuration(route)?.asMilliseconds() ?? 0,
   }
 }
 
