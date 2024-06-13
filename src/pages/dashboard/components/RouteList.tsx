@@ -39,16 +39,16 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
 
-  const [hasMore, setHasMore] = createSignal(true);
+  const [hasMore, setHasMore] = createSignal(true)
 
-  const getPage = (page: number): Promise<Route[]> => {
+  const getPage = async (page: number): Promise<Route[]> => {
     if (!pages[page]) {
       pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
         const routes = key ? await fetcher<Route[]>(key) : []
         if (routes.length < PAGE_SIZE) {
-          setHasMore(false);
+          setHasMore(false)
         }
         return routes
       })()
@@ -60,33 +60,33 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      refetch();
+      refetch()
     }
   })
 
   const [size, setSize] = createSignal(0)
   const pageNumbers = () => Array.from(Array(size()).keys())
 
-  let bottomRef!: HTMLDivElement;
+  let bottomRef!: HTMLDivElement
   createEffect(() => {
     const observer = new IntersectionObserver((entries) => {
       if (entries[0].isIntersecting) {
         batch(() => {
-          setSize(size() + 1);
+          setSize(size() + 1)
           // Refetch and sort when new pages are loaded
-          refetch(); 
-        });
+          refetch()
+        })
       }
-    });
+    })
 
-    observer.observe(bottomRef);
+    observer.observe(bottomRef)
 
     onCleanup(() => {
-      observer.disconnect();
-    });
-  });
+      observer.disconnect()
+    })
+  })
 
-  const loadingOrEndMessage = createMemo(() => hasMore() ? 'loading...' : 'No more routes');
+  const loadingOrEndMessage = createMemo(() => (hasMore() ? 'loading...' : 'No more routes'))
 
   const [currentFilter, setCurrentFilter] = createSignal('date')
 
@@ -94,17 +94,17 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const sortRoutes = (routes: Route[]): Route[] => {
     switch (currentFilter()) {
       case 'date':
-        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
       case 'miles':
-        return routes.slice().sort((a, b) => (b.length || 0) - (a.length || 0));
+        return routes.slice().sort((a, b) => (b.length || 0) - (a.length || 0))
       case 'duration':
         return routes.slice().sort((a, b) => {
-          const aDuration = new Date(a.end_time).getTime() - new Date(a.start_time).getTime();
-          const bDuration = new Date(b.end_time).getTime() - new Date(b.start_time).getTime();
-          return bDuration - aDuration;
-        });
+          const aDuration = new Date(a.end_time).getTime() - new Date(a.start_time).getTime()
+          const bDuration = new Date(b.end_time).getTime() - new Date(b.start_time).getTime()
+          return bDuration - aDuration
+        })
       default:
-        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime());
+        return routes.sort((a, b) => new Date(b.start_time).getTime() - new Date(a.start_time).getTime())
     }
   }
 
@@ -112,39 +112,41 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const [allRoutes = [], { refetch }] = createResource(
     [size, currentFilter],
     async ([size, currentFilter]) => {
-      const pages = await Promise.all(pageNumbers().map(getPage));
-      const routes = pages.flat();
-  
+      const pages = await Promise.all(pageNumbers().map(getPage))
+      const routes = pages.flat()
+
       if (routes && routes.length > 0) {
-        return sortRoutes(routes);
+        return sortRoutes(routes)
       } else {
-        return [];
+        return []
       }
     }
-  );
+  )
 
   // Use createSignal to manage the sorted routes
-  const [sortedRoutes, setSortedRoutes] = createSignal<Route[]>([]);
+  const [sortedRoutes, setSortedRoutes] = createSignal<Route[]>([])
 
   // Update sortedRoutes whenever allRoutes changes
   createEffect(() => {
-    const newRoutes = allRoutes();
+    const newRoutes = allRoutes()
     setSortedRoutes((prevRoutes) => {
       // Merge new routes with existing routes
-      const combinedRoutes = [...prevRoutes, ...newRoutes];
+      const combinedRoutes = [...prevRoutes, ...newRoutes]
       // Sort the combined routes
-      return sortRoutes(combinedRoutes);
-    });
-  });
+      return sortRoutes(combinedRoutes)
+    })
+  })
 
   return (
     <div
       class={clsx(
         'flex w-full h-full flex-col',
-        props.class,
-      )} style={{ height: 'calc(100vh - 72px - 5rem)' }}
+        props.class
+      )}
+      style={{ height: 'calc(100vh - 72px - 5rem)' }}
     >
       <div class='flex gap-5 w-full h-[45px] overflow-y-hidden overflow-x-auto hide-scrollbar'>
+        <Typography variant='label-sm' class='my-auto pb-3'>Sort by:</Typography>
         <div
           class={`filter-custom-btn ${currentFilter() === 'date' ? 'selected-filter-custom-btn' : ''}`}
           onClick={() => setCurrentFilter('date')}
