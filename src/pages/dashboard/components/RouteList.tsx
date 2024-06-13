@@ -52,10 +52,14 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
             setHasMore(false)
           }
           return routes
-        } catch (error) {
-          console.error('Error fetching page:', error)
-          // Handle the error appropriately, e.g., display an error message to the user
-          return []
+        } catch (error: unknown) {
+          if (error instanceof Error) {
+            console.error('Error fetching page:', error.message);
+          } else {
+            console.error('Error fetching page:', error);
+          }
+  
+          return [] as Route[]
         }
       })()
     }
@@ -66,7 +70,13 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      refetch()
+      refetch().catch((error: unknown) => {
+        if (error instanceof Error) {
+          console.error('Error refetching:', error.message);
+        } else {
+          console.error('Error refetching:', error);
+        }
+      })
     }
   })
 
@@ -80,7 +90,13 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         batch(() => {
           setSize(size() + 1)
           // Refetch and sort when new pages are loaded
-          refetch()
+          refetch().catch((error: unknown) => {
+            if (error instanceof Error) {
+              console.error('Error refetching:', error.message);
+            } else {
+              console.error('Error refetching:', error);
+            }
+          })
         })
       }
     })
@@ -127,10 +143,13 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         } else {
           return []
         }
-      } catch (error) {
-        console.error('Error fetching routes:', error)
-        // Handle the error appropriately. You could display an error message or
-        // return a default empty array.
+      } catch (error: unknown) {
+        if (error instanceof Error) {
+          console.error('Error fetching page:', error.message);
+        } else {
+          console.error('Error fetching page:', error);
+        }
+
         return []
       }
     }
@@ -141,10 +160,10 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   // Update sortedRoutes whenever allRoutes changes
   createEffect(() => {
-    const newRoutes = allRoutes()
-    setSortedRoutes((prevRoutes) => {
+    const newRoutes: Route[] = allRoutes()
+    setSortedRoutes((prevRoutes: Route[]) => {
       // Merge new routes with existing routes
-      const combinedRoutes = [...prevRoutes, ...newRoutes]
+      const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes]
       // Sort the combined routes
       return sortRoutes(combinedRoutes)
     })
