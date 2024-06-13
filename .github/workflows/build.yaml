@@ -38,15 +38,10 @@ jobs:
           retention-days: 1
           name: build-artifacts-${{ github.run_id }}
 
-      # deploy
       - name: Deploy to Cloudflare Pages
-        id: cloudflare-publish
         if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
-        uses: cloudflare/pages-action@v1.5.0
+        uses: cloudflare/wrangler-action@v3
         with:
-          directory: dist
-          branch: new-connect
-          projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          wranglerVersion: '3'
+          command: pages deploy dist --project-name=connect --branch=new-connect --commit-dirty=true

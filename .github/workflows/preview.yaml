@@ -43,17 +43,12 @@ jobs:
             console.info("Pull request number is", pullRequestNumber)
             return pullRequestNumber
 
-      # deploy
       - name: Deploy to Cloudflare Pages
-        id: cloudflare-publish
-        uses: cloudflare/pages-action@v1.5.0
+        uses: cloudflare/wrangler-action@v3
         with:
-          directory: dist
-          branch: ${{ steps.pr.outputs.result }}
-          projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          wranglerVersion: '3'
+          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
