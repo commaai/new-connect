@@ -3,11 +3,12 @@ import type { VoidComponent } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import type { Device } from '~/types'
-
 import Icon from '~/components/material/Icon'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import Typography from '~/components/material/Typography'
+import type { Device } from '~/types'
+import { getDeviceName } from '~/utils/device'
+
 import { DashboardContext } from '../Dashboard'
 
 type DeviceListProps = {
@@ -34,7 +35,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
               href={`/${device.dongle_id}`}
             >
               <ListItemContent
-                headline={device.alias}
+                headline={getDeviceName(device)}
                 subhead={
                   <Typography class="lowercase" variant="label-sm">
                     {device.dongle_id}
