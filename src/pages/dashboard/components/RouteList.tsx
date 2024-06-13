@@ -1,12 +1,11 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
-  createResource,
   createSignal,
   For,
   createMemo,
   onCleanup,
-  batch,
+  onMount,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
@@ -17,14 +16,12 @@ import RouteCard from '~/components/RouteCard'
 import { fetcher } from '~/api'
 import Typography from '~/components/material/Typography'
 
-const PAGE_SIZE = 3
+const PAGE_SIZE = 6;
 
 type RouteListProps = {
   class?: string
   dongleId: string
 }
-
-const pages: Promise<Route[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const endpoint = () =>
@@ -39,67 +36,32 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
 
-  const [hasMore, setHasMore] = createSignal(true)
+  const [hasMore, setHasMore] = createSignal(true);
+  const [isLoading, setIsLoading] = createSignal(false);
+  const [routes, setRoutes] = createSignal<Route[]>([]);
 
-  const getPage = async (page: number): Promise<Route[]> => {
-    if (!pages[page]) {
-      pages[page] = await (async () => {
-        try {
-          const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-          const key = getKey(previousPageData)
-          const routes = key ? await fetcher<Route[]>(key) : []
-          if (routes.length < PAGE_SIZE) {
-            setHasMore(false)
-          }
-          return routes
-        } catch (error: unknown) {
-          if (error instanceof Error) {
-            console.error('Error fetching page:', error.message);
-          } else {
-            console.error('Error fetching page:', error);
-          }
-  
-          return [] as Route[]
-        }
-      })()
+  // Signal to force re-render
+  const [forceUpdate, setForceUpdate] = createSignal(false);
+
+  const updateVirtualizerSize = () => {
+    if (virtualizerInstance && virtualizerInstance.ref) {
+      virtualizerInstance.updateSize(sortRoutes(routes()).length);
     }
-    return pages[page]
+  };
+
+  interface Virtualizer {
+    size: number;
+    ref?: HTMLElement;
+    updateSize: (size: number) => void;
   }
-
-  createEffect(() => {
-    if (props.dongleId) {
-      pages.length = 0
-      setSize(1)
-      refetch().catch((error: Error) => {
-        console.error('Error refetching:', error.message);
-      });
-    }
-  })
-
-  const [size, setSize] = createSignal(0)
-  const pageNumbers = () => Array.from(Array(size()).keys())
-
-  let bottomRef!: HTMLDivElement
-  createEffect(() => {
-    const observer = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        batch(() => {
-          setSize(size() + 1)
-          refetch().catch((error: Error) => {
-            console.error('Error refetching:', error.message);
-          });
-        })
-      }
-    })
-
-    observer.observe(bottomRef)
-
-    onCleanup(() => {
-      observer.disconnect()
-    })
-  })
-
-  const loadingOrEndMessage = createMemo(() => (hasMore() ? 'loading...' : 'No more routes'))
+  
+  const virtualizerInstance: Virtualizer = {
+    size: 0,
+    ref: undefined,
+    updateSize: (size: number) => { 
+      virtualizerInstance.size = size; 
+    },
+  };
 
   const [currentFilter, setCurrentFilter] = createSignal('date')
 
@@ -112,7 +74,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         return routes.slice().sort((a, b) => (b.length || 0) - (a.length || 0))
       case 'duration':
         return routes.slice().sort((a, b) => {
-          const aDuration = new Date(a.end_time).getTime() - new Date(a.start_time).getTime()
+          const aDuration = new Date(b.end_time).getTime() - new Date(b.start_time).getTime()
           const bDuration = new Date(b.end_time).getTime() - new Date(b.start_time).getTime()
           return bDuration - aDuration
         })
@@ -121,51 +83,75 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   }
 
-  // Fetch all pages and sort outside the For loop
-  const [allRoutes, { refetch }] = createResource(
-    [],
-    async (): Promise<Route[]> => {
-      try {
-        const pages = await Promise.all(pageNumbers().map(getPage))
-        const routes = pages.flat()
+  const virtual = createMemo(() => {
+    virtualizerInstance.overscan = 10;
+    return virtualizerInstance;
+  });
 
-        if (routes && routes.length > 0) {
-          return sortRoutes(routes)
-        } else {
-          return []
-        }
-      } catch (error: unknown) {
-        if (error instanceof Error) {
-          console.error('Error fetching page:', error.message);
-        } else {
-          console.error('Error fetching page:', error);
-        }
+  const fetchMore = async () => {
+    setIsLoading(true);
+    try {
+      const previousPageData = routes();
+      const key = getKey(previousPageData);
+      const newRoutes = key ? await fetcher<Route[]>(key) : [];
 
-        return []
+      if (newRoutes.length < PAGE_SIZE) {
+        setHasMore(false);
       }
+
+      setRoutes((prevRoutes) => [...prevRoutes, ...newRoutes]);
+      updateVirtualizerSize();
+      setForceUpdate(!forceUpdate()); // Trigger re-render
+    } catch (error) {
+      console.error('Error fetching more routes:', error);
+    } finally {
+      setIsLoading(false);
     }
-  )
+  };
 
-  // manage the sorted routes
-  const [sortedRoutes, setSortedRoutes] = createSignal<Route[]>([])
-
-  // update sortedRoutes whenever allRoutes changes
+  // Effect to handle scroll and fetch more data
   createEffect(() => {
-    const newRoutesResult = allRoutes() || [];
-    if (newRoutesResult instanceof Error) {
-      throw newRoutesResult;
-    }
-    const newRoutes: Route[] = newRoutesResult;
-    setSortedRoutes((prevRoutes: Route[]) => {
-      const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes];
-      return sortRoutes(combinedRoutes);
+    let container: HTMLElement | null = null;
+    let scrollListener: EventListener | null = null;
+
+    onMount(() => {
+      container = virtual().ref?.parentElement;
+
+      if (container) {
+        scrollListener = () => {
+          if (
+            container.scrollTop + container.clientHeight >=
+            container.scrollHeight - 50 &&
+            hasMore() &&
+            !isLoading()
+          ) {
+            fetchMore().catch(error => console.error('Error in fetchMore:', error));
+          }
+        };
+        container.addEventListener('scroll', scrollListener);
+      }
     });
+
+    onCleanup(() => {
+      if (scrollListener && container) {
+        container.removeEventListener('scroll', scrollListener);
+      }
+    });
+  });
+
+  onMount(async () => {
+    try {
+      const initialRoutes = await fetcher<Route[]>(endpoint());
+      setRoutes(initialRoutes);
+    } catch (error) {
+      console.error('Error fetching initial routes:', error);
+    }
   });
 
   return (
     <div
       class={clsx(
-        'flex w-full h-full flex-col',
+        'flex size-full flex-col',
         props.class
       )}
       style={{ height: 'calc(100vh - 72px - 5rem)' }}
@@ -191,12 +177,20 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           Duration
         </div>
       </div>
-      <div class="flex flex-col w-full h-full gap-4 overflow-y-auto hide-scrollbar lg:custom-scrollbar">
-        <For each={sortedRoutes()}>
-          {(route: Route) => <RouteCard route={route} />}
-        </For>
-        <div ref={bottomRef} class='flex justify-center w-[735px] mb-3'>
-          <Typography>{loadingOrEndMessage()}</Typography>
+      <div class="flex flex-col size-full overflow-y-auto hide-scrollbar lg:custom-scrollbar">
+        <div ref={virtual().ref} class='flex flex-col gap-4 size-full'>
+          <For each={sortRoutes(routes())}>
+            {(route) => (
+              <div>
+                <RouteCard route={route} />
+              </div>
+            )}
+          </For>
+
+          {/* Filler element to push messages to the bottom */}
+          <div style={{ height: '1px' }} />
+          {isLoading() && <Typography variant="label-md" class='pb-8'>Loading...</Typography>}
+          {!hasMore() && !isLoading() && <Typography variant="label-md" class='pb-8'>No More Routes</Typography>}
         </div>
       </div>
     </div>
