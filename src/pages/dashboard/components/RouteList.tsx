@@ -122,7 +122,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   }
 
   // Fetch all pages and sort outside the For loop
-  const [allRoutes = [], { refetch }] = createResource(
+  const [allRoutes, { refetch }] = createResource(
     [],
     async (): Promise<Route[]> => {
       try {
@@ -151,7 +151,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   // update sortedRoutes whenever allRoutes changes
   createEffect(() => {
-    const newRoutesResult = allRoutes();
+    const newRoutesResult = allRoutes() || [];
     if (newRoutesResult instanceof Error) {
       throw newRoutesResult;
     }
