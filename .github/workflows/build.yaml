@@ -39,6 +39,7 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
 
   deploy:
+    if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
     needs: [build, test]
     runs-on: ubuntu-latest
     timeout-minutes: 1
@@ -54,7 +55,6 @@ jobs:
       # deploy
       - name: Deploy to Cloudflare Pages
         id: cloudflare-publish
-        if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
         uses: cloudflare/pages-action@v1.5.0
         with:
           directory: dist
