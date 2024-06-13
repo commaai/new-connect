@@ -72,11 +72,12 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       setSize(1)
       refetch().catch((error: unknown) => {
         if (error instanceof Error) {
-          console.error('Error refetching:', error.message);
+          const err = error as Error;
+          console.error('Error refetching:', err.message);
         } else {
           console.error('Error refetching:', error);
         }
-      })
+      });
     }
   })
 
@@ -92,11 +93,12 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           // Refetch and sort when new pages are loaded
           refetch().catch((error: unknown) => {
             if (error instanceof Error) {
-              console.error('Error refetching:', error.message);
+              const err = error as Error;
+              console.error('Error refetching:', err.message);
             } else {
               console.error('Error refetching:', error);
             }
-          })
+          });
         })
       }
     })
@@ -136,7 +138,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     async () => {
       try {
         const pages = await Promise.all(pageNumbers().map(getPage))
-        const routes = pages.flat() as Route[]
+        const routes = pages.flat()
 
         if (routes && routes.length > 0) {
           return sortRoutes(routes)
@@ -155,18 +157,24 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   )
 
-  // Use createSignal to manage the sorted routes
+  // manage the sorted routes
   const [sortedRoutes, setSortedRoutes] = createSignal<Route[]>([])
 
-  // Update sortedRoutes whenever allRoutes changes
+  // update sortedRoutes whenever allRoutes changes
   createEffect(() => {
-    const newRoutes: Route[] = allRoutes()
-    setSortedRoutes((prevRoutes: Route[]) => {
-      // Merge new routes with existing routes
-      const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes]
-      // Sort the combined routes
-      return sortRoutes(combinedRoutes)
-    })
+    try {
+      const newRoutes: Route[] = allRoutes()
+      setSortedRoutes((prevRoutes: Route[]) => {
+        const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes]
+        return sortRoutes(combinedRoutes)
+      })
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        console.error('Error fetching all routes:', error.message);
+      } else {
+        console.error('Error fetching all routes:', error);
+      }
+    }
   })
 
   return (
