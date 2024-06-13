@@ -70,10 +70,10 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
+      let refetch: () => Promise<any>;
       refetch().catch((error: unknown) => {
         if (error instanceof Error) {
-          const err = error as Error;
-          console.error('Error refetching:', err.message);
+          console.error('Error refetching:', error.message);
         } else {
           console.error('Error refetching:', error);
         }
@@ -91,10 +91,10 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         batch(() => {
           setSize(size() + 1)
           // Refetch and sort when new pages are loaded
+          let refetch: () => Promise<any>;
           refetch().catch((error: unknown) => {
             if (error instanceof Error) {
-              const err = error as Error;
-              console.error('Error refetching:', err.message);
+              console.error('Error refetching:', error.message);
             } else {
               console.error('Error refetching:', error);
             }
@@ -163,11 +163,15 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   // update sortedRoutes whenever allRoutes changes
   createEffect(() => {
     try {
-      const newRoutes: Route[] = allRoutes()
+      const newRoutesResult = allRoutes();
+      if (newRoutesResult instanceof Error) {
+        throw newRoutesResult;
+      }
+      const newRoutes: Route[] = newRoutesResult;
       setSortedRoutes((prevRoutes: Route[]) => {
-        const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes]
-        return sortRoutes(combinedRoutes)
-      })
+        const combinedRoutes: Route[] = [...prevRoutes, ...newRoutes];
+        return sortRoutes(combinedRoutes);
+      });
     } catch (error: unknown) {
       if (error instanceof Error) {
         console.error('Error fetching all routes:', error.message);
@@ -175,7 +179,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         console.error('Error fetching all routes:', error);
       }
     }
-  })
+  });
 
   return (
     <div
