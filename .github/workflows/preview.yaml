@@ -45,7 +45,6 @@ jobs:
             return pullRequestNumber
 
       - name: Deploy to Cloudflare Pages
-        id: cloudflare-publish
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -62,7 +61,7 @@ jobs:
             * mark your PR as a draft until it's ready to review
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
-            deployed preview: ${{ steps.cloudflare-publish.outputs.deployment-url }}
+            deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
