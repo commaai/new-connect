@@ -53,6 +53,7 @@ jobs:
           projectName: connect
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          wranglerVersion: '3'
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
