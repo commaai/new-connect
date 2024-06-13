@@ -11,8 +11,7 @@ import type { RouteSegments } from '~/types'
 
 const RouteHeader = (props: { route: RouteSegments }) => {
   const startTime = () => dayjs(props.route.segment_start_times[0])
-  const endTime = () =>
-    dayjs(props.route.segment_end_times[props.route.segment_end_times.length - 1])
+  const endTime = () => dayjs(props.route.segment_end_times.at(-1))
 
   const headline = () => startTime().format('ddd, MMM D, YYYY')
   const subhead = () => `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
