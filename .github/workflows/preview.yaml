@@ -30,6 +30,7 @@ jobs:
         id: pr
         uses: actions/github-script@v7
         with:
+          retries: 3
           script: |
             const response = await github.rest.search.issuesAndPullRequests({
               q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
@@ -41,7 +42,7 @@ jobs:
               return
             }
             const pullRequestNumber = items[0].number
-            console.info("Pull request number is", pullRequestNumber)
+            console.info('Pull request number is', pullRequestNumber)
             return pullRequestNumber
 
       - name: Deploy to Cloudflare Pages
