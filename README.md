@@ -24,9 +24,10 @@ A few constraints:
 These are the minimum features for parity with connect.
 
 Drives
-- [ ] list
-- [ ] show map
-- [ ] play qcams
+- [x] list
+- [x] show map
+- [x] play qcams
+- [x] engagement timeline
 - [ ] file uploads
 
 Navigation
@@ -35,10 +36,10 @@ Navigation
 - [ ] manage home, work, and favorites
 
 Misc
-- [ ] demo mode
+- [x] demo mode
 - [ ] snapshot
 - [ ] comma prime sign up + management
-- [ ] pairing to an openpilot device
+- [ ] pairing to a new device
 - [ ] PWA: splash, icon, offline mode, etc.
 
 And some eventual features beyond connect's current feature set:
