@@ -29,20 +29,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-
-  const approxTime = () => parseDateStr(props.dateStr)
-  // let startTime = route
-  //   ? DateTime.fromMillis(route.segment_start_times[0])
-  //   : approxTime
+  const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
 
   return (
     <>
-      <TopAppBar
-        leading={
-          <IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>
-        }
-      >
-        {approxTime().format('ddd, MMM D, YYYY')}
+      <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>}>
+        {startTime()}
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
@@ -58,11 +50,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <Typography as="h3" variant="label-sm">
             Timeline
           </Typography>
-          <Timeline
-            class="mb-1"
-            routeName={routeName()}
-            seekTime={seekTime()}
-          />
+          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
           <Suspense fallback={<div class="h-10" />}>
             <RouteStatistics route={route()} />
           </Suspense>
@@ -73,11 +61,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             Route Map
           </Typography>
           <div class="h-64 overflow-hidden rounded-lg">
-            <Suspense
-              fallback={
-                <div class="skeleton-loader size-full bg-surface" />
-              }
-            >
+            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
               <RouteStaticMap route={route()} />
             </Suspense>
           </div>
