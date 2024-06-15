@@ -13,7 +13,6 @@
     "dev": "vite",
     "serve": "vite prefix",
     "lint": "eslint",
-    "lint:fix": "eslint --fix",
     "prepare": "husky",
     "pre-commit": "bun lint",
     "test": "vitest run"
@@ -22,6 +21,7 @@
   "type": "module",
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.8",
+    "@stylistic/eslint-plugin": "^2.1.0",
     "@testing-library/jest-dom": "^6.4.6",
     "@testing-library/user-event": "^14.5.2",
     "@types/eslint__js": "^8.42.3",
