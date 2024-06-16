@@ -3,7 +3,6 @@ import { A } from '@solidjs/router'
 import clsx from 'clsx'
 
 import Icon, { IconProps } from '~/components/material/Icon'
-import Typography from '~/components/material/Typography'
 
 type NavigationBarItemProps = {
   icon: IconProps['children']
@@ -25,9 +24,9 @@ export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (
       <Icon class="flex transition-all" filled={props.selected}>
         {props.icon}
       </Icon>
-      <Typography as="div" class="mt-2 flex" variant="label-lg">
+      <div class="mt-2 flex text-label-lg">
         {props.children}
-      </Typography>
+      </div>
     </A>
   )
 }

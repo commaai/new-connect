@@ -5,8 +5,6 @@ import clsx from 'clsx'
 import { getDeviceStats } from '~/api/devices'
 import { formatDistance, formatDuration } from '~/utils/date'
 
-import Typography from '~/components/material/Typography'
-
 type DeviceStatisticsProps = {
   class?: string
   dongleId: string
@@ -19,28 +17,18 @@ const DeviceStatistics: VoidComponent<DeviceStatisticsProps> = (props) => {
   return (
     <div class={clsx('flex h-10 w-full gap-8', props.class)}>
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Distance
-        </Typography>
-        <Typography variant="label-lg">
-          {formatDistance(allTime()?.distance)}
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">Distance</span>
+        <span class="text-label-lg font-mono uppercase">{formatDistance(allTime()?.distance)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Duration
-        </Typography>
-        <Typography variant="label-lg">
-          {formatDuration(allTime()?.minutes)}
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">Duration</span>
+        <span class="text-label-lg font-mono uppercase">{formatDuration(allTime()?.minutes)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Routes
-        </Typography>
-        <Typography variant="label-lg">{allTime()?.routes ?? 0}</Typography>
+        <span class="text-body-sm text-on-surface-variant">Routes</span>
+        <span class="text-label-lg font-mono uppercase">{allTime()?.routes ?? 0}</span>
       </div>
     </div>
   )

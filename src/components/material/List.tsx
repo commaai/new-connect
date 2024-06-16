@@ -2,7 +2,6 @@ import type { JSXElement, ParentComponent, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
-import Typography from '~/components/material/Typography'
 
 type ListItemContentProps = {
   headline: JSXElement
@@ -12,14 +11,8 @@ type ListItemContentProps = {
 export const ListItemContent: VoidComponent<ListItemContentProps> = (props) => {
   return (
     <div>
-      <Typography color="on-surface" variant="body-lg" as="div">
-        {props.headline}
-      </Typography>
-      {props.subhead && (
-        <Typography color="on-surface-variant" variant="body-md" as="div">
-          {props.subhead}
-        </Typography>
-      )}
+      <div class="text-on-surface text-body-lg">{props.headline}</div>
+      {props.subhead && <div class="text-on-surface-variant text-body-md">{props.subhead}</div>}
     </div>
   )
 }

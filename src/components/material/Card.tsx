@@ -2,7 +2,6 @@ import type { ParentComponent, JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
-import Typography from '~/components/material/Typography'
 
 type CardHeaderProps = {
   class?: string
@@ -19,12 +18,8 @@ export const CardHeader: VoidComponent<CardHeaderProps> = (props) => {
     >
       {props.leading}
       <div class="flex h-12 grow flex-col justify-between">
-        {props.headline && (
-          <Typography variant="title-md">{props.headline}</Typography>
-        )}
-        {props.subhead && (
-          <Typography variant="body-md">{props.subhead}</Typography>
-        )}
+        {props.headline && <span class="text-title-md">{props.headline}</span>}
+        {props.subhead && <span class="text-body-md">{props.subhead}</span>}
       </div>
       {props.trailing}
     </div>
@@ -40,12 +35,8 @@ type CardHeadlineProps = {
 export const CardHeadline: VoidComponent<CardHeadlineProps> = (props) => {
   return (
     <div class={clsx('flex h-12 grow flex-col justify-between', props.class)}>
-      {props.title && <Typography variant="body-lg">{props.title}</Typography>}
-      {props.subhead && (
-        <Typography variant="body-md" color="on-surface-variant">
-          {props.subhead}
-        </Typography>
-      )}
+      {props.title && <span class="text-body-lg">{props.title}</span>}
+      {props.subhead && <span class="text-body-md text-on-surface-variant">{props.subhead}</span>}
     </div>
   )
 }
@@ -55,11 +46,7 @@ type CardContentProps = {
 }
 
 export const CardContent: ParentComponent<CardContentProps> = (props) => {
-  return (
-    <div class={clsx('flex flex-col gap-4 p-4', props.class)}>
-      {props.children}
-    </div>
-  )
+  return <div class={clsx('flex flex-col gap-4 p-4', props.class)}>{props.children}</div>
 }
 
 type CardTextContentProps = {
@@ -71,9 +58,7 @@ export const CardTextContent: ParentComponent<CardTextContentProps> = (
 ) => {
   return (
     <div class={clsx('flex', props.class)}>
-      <Typography variant="body-md" color="on-surface-variant">
-        {props.children}
-      </Typography>
+      <span class="text-body-md text-on-surface-variant">{props.children}</span>
     </div>
   )
 }
@@ -83,11 +68,7 @@ type CardActionsProps = {
 }
 
 export const CardActions: ParentComponent<CardActionsProps> = (props) => {
-  return (
-    <div class={clsx('flex justify-end gap-4', props.class)}>
-      {props.children}
-    </div>
-  )
+  return <div class={clsx('flex justify-end gap-4', props.class)}>{props.children}</div>
 }
 
 type CardProps = {

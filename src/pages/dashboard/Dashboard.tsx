@@ -18,7 +18,6 @@ import type { Device } from '~/types'
 import Drawer from '~/components/material/Drawer'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
-import Typography from '~/components/material/Typography'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
@@ -39,14 +38,14 @@ const DashboardDrawer = (props: {
   return (
     <>
       <TopAppBar
-        as="h1"
+        component="h1"
         leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
       >
         comma connect
       </TopAppBar>
-      <Typography class="mx-4 mb-2" as="h2" variant="label-sm">
+      <h2 class="mx-4 mb-2 text-label-sm">
         Devices
-      </Typography>
+      </h2>
       <Show when={props.devices} keyed>
         {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
       </Show>
