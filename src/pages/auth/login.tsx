@@ -20,7 +20,7 @@ export default function Login() {
         />
 
         <div class="flex flex-col items-center gap-2">
-          <h1 class="md:mt-4 text-display-sm font-extrabold">comma connect</h1>
+          <h1 class="text-display-sm font-extrabold md:mt-4">comma connect</h1>
           <p class="text-body-lg">Manage your openpilot experience.</p>
         </div>
 
