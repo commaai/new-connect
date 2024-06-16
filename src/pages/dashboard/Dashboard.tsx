@@ -22,6 +22,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
+import Button from '~/components/material/Button'
 
 type DashboardState = {
   drawer: Accessor<boolean>
@@ -49,6 +50,9 @@ const DashboardDrawer = (props: {
       <Show when={props.devices} keyed>
         {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
       </Show>
+      <div class="grow" />
+      <hr class="mx-4 opacity-20" />
+      <Button class="m-4" href="/logout">Sign out</Button>
     </>
   )
 }
