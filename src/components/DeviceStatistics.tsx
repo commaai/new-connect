@@ -18,17 +18,17 @@ const DeviceStatistics: VoidComponent<DeviceStatisticsProps> = (props) => {
     <div class={clsx('flex h-10 w-full gap-8', props.class)}>
       <div class="flex flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Distance</span>
-        <span class="text-label-lg font-mono uppercase">{formatDistance(allTime()?.distance)}</span>
+        <span class="font-mono text-label-lg uppercase">{formatDistance(allTime()?.distance)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Duration</span>
-        <span class="text-label-lg font-mono uppercase">{formatDuration(allTime()?.minutes)}</span>
+        <span class="font-mono text-label-lg uppercase">{formatDuration(allTime()?.minutes)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Routes</span>
-        <span class="text-label-lg font-mono uppercase">{allTime()?.routes ?? 0}</span>
+        <span class="font-mono text-label-lg uppercase">{allTime()?.routes ?? 0}</span>
       </div>
     </div>
   )
