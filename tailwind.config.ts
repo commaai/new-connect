@@ -203,8 +203,6 @@ export default {
         'circular-dash': 'circular-dash 1.4s ease-in-out infinite',
       },
       transitionProperty: {
-        typography: 'color, font-size, font-weight',
-        surface: 'background-color, border-color, color, box-shadow',
         indeterminate: 'transform, background-color',
         drawer: 'left, opacity, width',
       },
