@@ -15,6 +15,7 @@ import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import type { Device } from '~/types'
 
+import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -49,6 +50,9 @@ const DashboardDrawer = (props: {
       <Show when={props.devices} keyed>
         {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
       </Show>
+      <div class="grow" />
+      <hr class="mx-4 opacity-20" />
+      <Button class="m-4" href="/logout">Sign out</Button>
     </>
   )
 }
