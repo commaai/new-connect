@@ -2,7 +2,6 @@ import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
 import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
-import Typography from '~/components/material/Typography'
 
 export default function Login() {
   const loginAsDemoUser = function () {
@@ -21,18 +20,8 @@ export default function Login() {
         />
 
         <div class="flex flex-col items-center gap-2">
-          <Typography
-            class="md:mt-4"
-            variant="display-sm"
-            weight="extra-bold"
-            as="h1"
-          >
-            comma connect
-          </Typography>
-
-          <Typography variant="body-lg" as="p">
-            Manage your openpilot experience.
-          </Typography>
+          <h1 class="md:mt-4 text-display-sm font-extrabold">comma connect</h1>
+          <p class="text-body-lg">Manage your openpilot experience.</p>
         </div>
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
@@ -84,10 +73,10 @@ export default function Login() {
         </div>
 
         <div class="flex justify-between gap-4">
-          <Typography variant="body-lg" as="p">
+          <p class="text-body-lg">
             Make sure to sign in with the same account if you have previously
             paired your comma three.
-          </Typography>
+          </p>
 
           <img
             src="/images/icon-comma-three-light.svg"

@@ -5,7 +5,6 @@ import { getDevice } from '~/api/devices'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
-import Typography from '~/components/material/Typography'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
@@ -35,7 +34,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Suspense>
         </div>
         <div class="flex flex-col gap-2">
-          <Typography variant="label-sm">Routes</Typography>
+          <span class="text-label-sm">Routes</span>
           <RouteList dongleId={props.dongleId} />
         </div>
       </div>

@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 import Icon from '~/components/material/Icon'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
-import Typography from '~/components/material/Typography'
 import type { Device } from '~/types'
 import { getDeviceName } from '~/utils/device'
 
@@ -37,9 +36,9 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
               <ListItemContent
                 headline={getDeviceName(device)}
                 subhead={
-                  <Typography class="lowercase" variant="label-sm">
+                  <span class="lowercase text-label-sm font-mono">
                     {device.dongle_id}
-                  </Typography>
+                  </span>
                 }
               />
             </ListItem>

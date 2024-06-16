@@ -1,13 +1,12 @@
 import type { JSXElement, ParentComponent } from 'solid-js'
+import { Dynamic } from 'solid-js/web'
 import clsx from 'clsx'
-
-import Typography from '~/components/material/Typography'
 
 type TopAppBarProps = {
   class?: string
   leading?: JSXElement
   trailing?: JSXElement
-  as?: string
+  component?: string
 }
 
 const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
@@ -19,9 +18,9 @@ const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
       )}
     >
       {props.leading}
-      <Typography class="grow" as={props.as || 'h2'} variant="title-lg">
+      <Dynamic class="grow text-title-lg" component={props.component || 'h2'}>
         {props.children}
-      </Typography>
+      </Dynamic>
       {props.trailing}
     </div>
   )

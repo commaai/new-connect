@@ -3,7 +3,6 @@ import { splitProps } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase, { ButtonBaseProps } from './ButtonBase'
-import Typography from './Typography'
 
 type ButtonProps = ButtonBaseProps & {
   color?: 'primary' | 'secondary' | 'tertiary' | 'error'
@@ -42,7 +41,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       {...rest}
     >
       {props.leading}
-      <Typography variant="label-lg">{props.children}</Typography>
+      <span class="text-label-lg">{props.children}</span>
       {props.trailing}
     </ButtonBase>
   )

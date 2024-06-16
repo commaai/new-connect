@@ -2,7 +2,6 @@ import type { JSXElement, ParentComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase, { ButtonBaseProps } from '~/components/material/ButtonBase'
-import Typography from '~/components/material/Typography'
 
 type FloatingActionButtonProps = ButtonBaseProps & {
   leading?: JSXElement
@@ -20,7 +19,7 @@ const FloatingActionButton: ParentComponent<FloatingActionButtonProps> = (
       onClick={props.onClick}
     >
       {props.leading}
-      <Typography variant="label-lg">{props.children}</Typography>
+      <span class="text-label-lg">{props.children}</span>
     </ButtonBase>
   )
 }

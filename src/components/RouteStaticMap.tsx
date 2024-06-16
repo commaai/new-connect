@@ -8,7 +8,6 @@ import { getThemeId } from '~/theme'
 import type { Route } from '~/types'
 
 import Icon from '~/components/material/Icon'
-import Typography from '~/components/material/Typography'
 
 const loadImage = (url: string | undefined): Promise<string | undefined> => {
   if (!url) {
@@ -46,7 +45,7 @@ const State = (props: {
         props.opaque && 'bg-surface text-on-surface',
       )}
     >
-      <Typography variant="label-sm">{props.children}</Typography>
+      <span class="text-label-sm">{props.children}</span>
       {props.trailing}
     </div>
   )

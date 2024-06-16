@@ -6,8 +6,6 @@ import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
 import type { Route } from '~/types'
 import { formatRouteDistance, formatRouteDuration } from '~/utils/date'
 
-import Typography from '~/components/material/Typography'
-
 const formatEngagement = (timeline?: TimelineStatistics): string => {
   if (!timeline) return ''
   const { engagedDuration, duration } = timeline
@@ -29,42 +27,26 @@ const RouteStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
   return (
     <div class={clsx('flex size-full items-stretch gap-8', props.class)}>
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Distance
-        </Typography>
-        <Typography variant="label-lg">
-          {formatRouteDistance(props.route)}
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">Distance</span>
+        <span class="text-label-lg font-mono uppercase">{formatRouteDistance(props.route)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Duration
-        </Typography>
-        <Typography variant="label-lg">
-          {formatRouteDuration(props.route)}
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">Duration</span>
+        <span class="text-label-lg font-mono uppercase">{formatRouteDuration(props.route)}</span>
       </div>
 
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          Engaged
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">Engaged</span>
         <Suspense>
-          <Typography variant="label-lg">
-            {formatEngagement(timeline())}
-          </Typography>
+          <span class="text-label-lg font-mono uppercase">{formatEngagement(timeline())}</span>
         </Suspense>
       </div>
 
       <div class="flex flex-col justify-between">
-        <Typography variant="body-sm" color="on-surface-variant">
-          User flags
-        </Typography>
+        <span class="text-body-sm text-on-surface-variant">User flags</span>
         <Suspense>
-          <Typography variant="label-lg">
-            {formatUserFlags(timeline())}
-          </Typography>
+          <span class="text-label-lg font-mono uppercase">{formatUserFlags(timeline())}</span>
         </Suspense>
       </div>
     </div>
