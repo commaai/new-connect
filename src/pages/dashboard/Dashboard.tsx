@@ -15,6 +15,7 @@ import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import type { Device } from '~/types'
 
+import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -22,7 +23,6 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
-import Button from '~/components/material/Button'
 
 type DashboardState = {
   drawer: Accessor<boolean>
