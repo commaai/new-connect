@@ -12,11 +12,14 @@ interface TopAppBarProps {
 const TopAppBar: ParentComponent<TopAppBarProps & { className?: string; }> = (props) => {
   const [isLargeScreen, setIsLargeScreen] = createSignal(false)
 
-  const mql = window.matchMedia('(min-width: 1024px)')
-  setIsLargeScreen(mql.matches)
-  mql.addEventListener('change', (e) => setIsLargeScreen(e.matches))
+  let mql: MediaQueryList
+  if (typeof window !== 'undefined' && typeof window.matchMedia !== 'undefined') {
+    mql = window.matchMedia('(min-width: 1024px)')
+    setIsLargeScreen(mql.matches)
+    mql.addEventListener('change', (e) => setIsLargeScreen(e.matches))
 
-  onCleanup(() => mql.removeEventListener('change', (e) => setIsLargeScreen(e.matches)))
+    onCleanup(() => mql.removeEventListener('change', (e) => setIsLargeScreen(e.matches)))
+  }
 
   return (
     <div
