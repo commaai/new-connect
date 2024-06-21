@@ -36,7 +36,7 @@ export const DashboardContext = createContext<DashboardState>()
 const [isLargeScreen, setIsLargeScreen] = createSignal(false)
 
 let mql: MediaQueryList
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && typeof window.matchMedia !== 'undefined') {
   mql = window.matchMedia('(min-width: 1024px)')
   setIsLargeScreen(mql.matches)
   mql.addEventListener('change', (e) => setIsLargeScreen(e.matches))
