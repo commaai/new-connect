@@ -67,6 +67,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         controls
         playsinline
         loop
+        autoplay
       />
     </div>
   )
