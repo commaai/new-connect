@@ -38,7 +38,8 @@ interface GeoResult {
     properties?: {
       context?: {
         neighborhood?: string | null,
-        region?: string | null
+        region?: string | null,
+        place?: string | null
       }
     }
   }>
@@ -50,6 +51,9 @@ interface LocationContext {
   },
   region?: {
     region_code: string | null,
+  },
+  place?: {
+    name: string | null,
   }
 }
 
@@ -68,7 +72,7 @@ const RouteRevGeo = (props: { route?: Route }) => {
 
   createEffect(() => {
     if (!props.route) return
-    
+
     const { start_lng, start_lat, end_lng, end_lat } = props.route
 
     if (!start_lng || !start_lat || !end_lng || !end_lat) return
@@ -90,14 +94,20 @@ const RouteRevGeo = (props: { route?: Route }) => {
           return
         }
 
-        const { neighborhood: startNeighborhood, region: startRegion } =
+        const { neighborhood: startNeighborhood, region: startRegion, place: startPlace } =
           (start_revGeoResult?.features?.[0]?.properties?.context || {}) as LocationContext
 
-        const { neighborhood: endNeighborhood, region: endRegion } =
+        const { neighborhood: endNeighborhood, region: endRegion, place: endPlace } =
           (end_revGeoResult?.features?.[0]?.properties?.context || {}) as LocationContext
 
-        setStartLocation({ neighborhood: startNeighborhood?.name, region: startRegion?.region_code })
-        setEndLocation({ neighborhood: endNeighborhood?.name, region: endRegion?.region_code })
+        setStartLocation({
+          neighborhood: startNeighborhood?.name || startPlace?.name,
+          region: startRegion?.region_code,
+        })
+        setEndLocation({
+          neighborhood: endNeighborhood?.name || endPlace?.name,
+          region: endRegion?.region_code,
+        })
       } catch (error) {
         setError(error as Error)
         console.error(error)
@@ -146,7 +156,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 
           <CardContent class="py-0">
             <RouteRevGeo route={route()} />
-            <Timeline route={route()} rounded="rounded-sm"/>
+            <Timeline route={route()} rounded="rounded-sm" />
             <RouteStatistics route={route()} />
           </CardContent>
         </div>
