@@ -36,6 +36,7 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
         map.remove()
         map = null
       }
+      setSpeed(0)
     })
 
     const coordinates = coords();
