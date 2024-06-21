@@ -26,7 +26,7 @@ export default function Login() {
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
-            class="h-16 gap-4 hover:bg-gray-200"
+            class="h-16 gap-4"
             href={getGoogleAuthUrl()}
             leading={
               <img
@@ -40,24 +40,21 @@ export default function Login() {
             Sign in with Google
           </Button>
           <Button
-            class="h-16 gap-5 pr-7 hover:bg-gray-200"
+            class="h-16 gap-4"
             href={getAppleAuthUrl()}
             leading={
-              <div class="relative size-8">
-                <img
-                  src="/images/logo-apple.svg"
-                  alt=""
-                  width="100%"
-                  height="100%"
-                  style={{ 'object-fit': 'contain' }}
-                />
-              </div>
+              <img
+                src="/images/logo-apple.svg"
+                alt=""
+                width={32}
+                height={32}
+              />
             }
           >
-            Sign in with Apple
+            Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
-            class="h-16 gap-4 hover:bg-gray-200"
+            class="h-16 gap-4"
             href={getGitHubAuthUrl()}
             leading={
               <img
@@ -87,7 +84,7 @@ export default function Login() {
         </div>
 
         <Button
-          class="gap-4 hover:bg-gray-200"
+          class="gap-4"
           onclick={loginAsDemoUser}
           trailing={
             <span class="material-symbols-outlined icon-outline">
