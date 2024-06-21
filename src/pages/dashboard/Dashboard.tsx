@@ -3,6 +3,7 @@ import {
   createContext,
   createResource,
   createSignal,
+  onCleanup,
   Match,
   Setter,
   Show,
@@ -32,6 +33,14 @@ type DashboardState = {
 
 export const DashboardContext = createContext<DashboardState>()
 
+const [isLargeScreen, setIsLargeScreen] = createSignal(false)
+
+const mql = window.matchMedia('(min-width: 1024px)')
+setIsLargeScreen(mql.matches)
+mql.addEventListener('change', (e) => setIsLargeScreen(e.matches))
+
+onCleanup(() => mql.removeEventListener('change', (e) => setIsLargeScreen(e.matches)))
+
 const DashboardDrawer = (props: {
   onClose: () => void
   devices: Device[] | undefined
@@ -48,7 +57,7 @@ const DashboardDrawer = (props: {
         Devices
       </h2>
       <Show when={props.devices} keyed>
-        {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
+        {(devices: Device[]) => <DeviceList class="gap-3 p-2" devices={devices} />}
       </Show>
       <div class="grow" />
       <hr class="mx-4 opacity-20" />
@@ -95,10 +104,11 @@ const DashboardLayout: VoidComponent = () => {
             <Navigate href="/login" />
           </Match>
           <Match when={dateStr()} keyed>
-            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
+            {!isLargeScreen() && <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />}
+            {isLargeScreen() && <DeviceActivity devices={devices()} dongleId={dongleId()} dateStr={dateStr()} />}
           </Match>
           <Match when={dongleId()} keyed>
-            <DeviceActivity dongleId={dongleId()} />
+            <DeviceActivity dongleId={dongleId()} devices={devices()} />
           </Match>
           <Match when={devices()?.length} keyed>
             <Navigate href={`/${devices()![0].dongle_id}`} />

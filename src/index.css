@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+
   /* https://m3.material.io/styles/color/roles */
   :root {
     --color-primary: rgb(83 90 146);
@@ -114,7 +115,8 @@
     @apply select-none selection:bg-transparent;
   }
 
-  html, body {
+  html,
+  body {
     /*
      * fill visible viewport
      * https://developers.google.com/web/updates/2016/12/url-bar-resizing
@@ -206,11 +208,123 @@
   }
 
   .hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
 
     &::-webkit-scrollbar {
-      display: none; /* Safari and Chrome */
+      display: none;
+      /* Safari and Chrome */
     }
   }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-secondary-container) var(--color-surface);
+  }
+
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    background-color: var(--color-primary);
+    border-radius: 4px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background-color: var(--color-surface);
+  }
+
+  .filter-custom-btn {
+    font-size: 13px !important;
+    font-weight: 500;
+    width: fit-content;
+    height: fit-content;
+    padding: 3px 17px;
+    border-radius: 20px;
+    border: 1px solid #4b4b4b;
+    background-color: #4b4b4b;
+    color: #fff;
+    cursor: pointer;
+    white-space: nowrap;
+  }
+
+  .filter-custom-btn:hover {
+    background-color: #3a3a3a;
+  }
+
+  .selected-filter-custom-btn {
+    background-color: #bbc4fd;
+    color: #000;
+    cursor: default;
+  }
+
+  .selected-filter-custom-btn:hover {
+    background-color: #bbc4fd;
+  }
+  
+  .custom-card {
+    cursor: pointer;
+    background-color: var(--color-surface-container-low);
+  }
+
+  .custom-card:hover {
+    background-color: var(--color-surface-container);
+  }
+
+  .custom-switch {
+    position: relative;
+    display: inline-block;
+    width: 45px;
+    height: 28px;
+  }
+  
+  .custom-switch input { 
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+  
+  .custom-slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #8d8d8d;
+    transition: .4s;
+  }
+  
+  .custom-slider:before {
+    position: absolute;
+    content: "";
+    height: 100%;
+    width: 60%;
+    background-color: #fff;
+    transition: .4s;
+  }
+  
+  .custom-switch input:checked + .custom-slider {
+    background-color: #32CD32;
+  }
+  
+  .custom-switch input:focus + .custom-slider {
+    box-shadow: 0 0 1px #32CD32;
+  }
+  
+  .custom-switch input:checked + .custom-slider:before {
+    transform: translateX(26px);
+  }
+  
+  .custom-slider.round {
+    border-radius: 34px;
+  }
+  
+  .custom-slider.round:before {
+    border-radius: 50%;
+  }
+
 }
