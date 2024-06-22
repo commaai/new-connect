@@ -54,7 +54,7 @@ export function getPathStaticMapUrl(
 }
 
 export async function reverseGeocode(lng: number, lat: number): Promise<GeocodeResult> {
-  const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}.733&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`
+  const url = `https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`
   try {
     const response = await fetch(url)
     const data = await (response.json() as Promise<GeocodeResult>)
