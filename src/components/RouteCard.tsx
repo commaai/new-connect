@@ -56,64 +56,58 @@ interface LocationContext {
   }
 }
 
+async function fetchGeoData(lng: number, lat: number): Promise<GeoResult | null> {
+  try {
+    const revGeoResult = await reverseGeocode(lng, lat) as GeoResult
+    if (revGeoResult instanceof Error) throw revGeoResult
+    return revGeoResult
+  } catch (error) {
+    console.error(error)
+    // To allow execution to continue for the next location.
+    return null
+  }
+}
+
+function processGeoResult(
+  result: GeoResult | null, 
+  setLocation: (location: { neighborhood?: string | null, region?: string | null }) => void,
+) {
+  if (result) {
+    const { neighborhood, region, place } = 
+      (result?.features?.[0]?.properties?.context || {}) as LocationContext
+    setLocation({
+      neighborhood: neighborhood?.name || place?.name,
+      region: region?.region_code,
+    })
+  }
+}
+
+type LocationState = { neighborhood?: string | null, region?: string | null }
+
 const RouteRevGeo = (props: { route?: Route }) => {
-  const [startLocation, setStartLocation] = createSignal<{
-    neighborhood?: string | null,
-    region?: string | null
-  }>({ neighborhood: null, region: null })
-
-  const [endLocation, setEndLocation] = createSignal<{
-    neighborhood?: string | null,
-    region?: string | null
-  }>({ neighborhood: null, region: null })
-
+  const [startLocation, setStartLocation] = createSignal<LocationState>({ 
+    neighborhood: null, 
+    region: null, 
+  })
+  const [endLocation, setEndLocation] = createSignal<LocationState>({ 
+    neighborhood: null, 
+    region: null, 
+  })
   const [error, setError] = createSignal<Error | null>(null)
 
   createEffect(() => {
     if (!props.route) return
-
     const { start_lng, start_lat, end_lng, end_lat } = props.route
-
     if (!start_lng || !start_lat || !end_lng || !end_lat) return
 
-    const fetchGeoData = async () => {
-      try {
-        const start_revGeoResult = await reverseGeocode(start_lng, start_lat) as GeoResult
-        const end_revGeoResult = await reverseGeocode(end_lng, end_lat) as GeoResult
-
-        if (start_revGeoResult instanceof Error) {
-          setError(start_revGeoResult as Error)
-          console.error(start_revGeoResult)
-          return
-        }
-
-        if (end_revGeoResult instanceof Error) {
-          setError(end_revGeoResult as Error)
-          console.error(end_revGeoResult)
-          return
-        }
-
-        const { neighborhood: startNeighborhood, region: startRegion, place: startPlace } =
-          (start_revGeoResult?.features?.[0]?.properties?.context || {}) as LocationContext
-
-        const { neighborhood: endNeighborhood, region: endRegion, place: endPlace } =
-          (end_revGeoResult?.features?.[0]?.properties?.context || {}) as LocationContext
-
-        setStartLocation({
-          neighborhood: startNeighborhood?.name || startPlace?.name,
-          region: startRegion?.region_code,
-        })
-        setEndLocation({
-          neighborhood: endNeighborhood?.name || endPlace?.name,
-          region: endRegion?.region_code,
-        })
-      } catch (error) {
-        setError(error as Error)
-        console.error(error)
-      }
-    }
-
-    fetchGeoData().catch((error) => {
+    Promise.all([
+      fetchGeoData(start_lng, start_lat),
+      fetchGeoData(end_lng, end_lat),
+    ]).then(([startResult, endResult]) => {
+      processGeoResult(startResult, setStartLocation)
+      processGeoResult(endResult, setEndLocation)
+    }).catch((error) => {
+      setError(error as Error)
       console.error('An error occurred while fetching geolocation data:', error)
     })
   })
@@ -122,11 +116,11 @@ const RouteRevGeo = (props: { route?: Route }) => {
     <div>
       {error() && <div>Error: {error()?.message}</div>}
       <div class="flex w-fit items-center gap-2 rounded-xl border border-gray-700 bg-black px-4 py-1 text-[13px]">
-        {startLocation() && <div>{startLocation()?.neighborhood}, {startLocation()?.region}</div>}
+        {startLocation().neighborhood && <div>{startLocation().neighborhood}, {startLocation().region}</div>}
         <span class="material-symbols-outlined icon-outline" style={{ 'font-size': '14px' }}>
           arrow_right_alt
         </span>
-        {endLocation() && <div>{endLocation()?.neighborhood}, {endLocation()?.region}</div>}
+        {endLocation().neighborhood && <div>{endLocation().neighborhood}, {endLocation().region}</div>}
       </div>
     </div>
   )
