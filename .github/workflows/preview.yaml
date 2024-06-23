@@ -14,6 +14,8 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
+    outputs:
+      pr_number: ${{ steps.pr.outputs.result }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -66,3 +68,39 @@ jobs:
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  screenshots:
+    needs: preview
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: install playwright
+        run: | 
+          pip install --upgrade pip
+          pip install playwright
+          playwright install --with-deps webkit
+
+      - name: run playwright
+        working-directory: .github/workflows/utils
+        run: |
+          python3 screenshots.py https://${{ needs.preview.outputs.pr_number }}.connect-d5y.pages.dev
+      
+      # TODO: upload files not as zips somewhere else then add images to comments
+      - name: Upload screenshots
+        uses: actions/upload-artifact@v4
+        id: upload-screenshots
+        with:
+          name: screenshots
+          path: .github/workflows/utils/screenshots
+
+      - name: Comment URL on PR
+        uses: thollander/actions-comment-pull-request@v2
+        with:
+          message: |
+            ![Zipped Screenshots](${{ steps.upload-screenshots.outputs.artifact-url }})
+          comment_tag: ${{ github.run_id }}_screenshots
+          pr_number: ${{ needs.preview.outputs.pr_number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      
