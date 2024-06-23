@@ -21,7 +21,7 @@ def take_screenshots(device_type, browser):
 
 with sync_playwright() as p:
     iphone_13 = p.devices['iPhone 13']
-    browser = p.webkit.launch(headless=False)
+    browser = p.webkit.launch()
     context = browser.new_context(**iphone_13)
     take_screenshots("mobile", context)
     browser = p.webkit.launch()
