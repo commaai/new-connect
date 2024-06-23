@@ -1,5 +1,5 @@
 /* eslint-disable */
-const { webkit, devices } = require('playwright');
+const { chromium, devices } = require('playwright');
 
 const base_url = process.argv[2];
 const out_dir = process.argv[3] ? process.argv[3] : 'screenshots';
