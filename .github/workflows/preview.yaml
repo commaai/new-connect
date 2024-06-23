@@ -69,23 +69,10 @@ jobs:
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  screenshots:
-    needs: preview
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: install playwright
-        run: | 
-          pip install --upgrade pip
-          pip install playwright
-          playwright install --with-deps webkit
-
-      - name: run playwright
-        working-directory: .github/workflows/utils
+      - name: run playwright screenshots script
         run: |
-          python3 screenshots.py https://${{ needs.preview.outputs.pr_number }}.connect-d5y.pages.dev
-      
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+
       # TODO: upload files not as zips somewhere else then add images to comments
       - name: Upload screenshots
         uses: actions/upload-artifact@v4
@@ -102,5 +89,3 @@ jobs:
           comment_tag: ${{ github.run_id }}_screenshots
           pr_number: ${{ needs.preview.outputs.pr_number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      
