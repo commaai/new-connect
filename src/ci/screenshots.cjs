@@ -16,8 +16,8 @@ async function takeScreenshots(deviceType, context) {
   for (const endpoint in endpoints) {
     await page.goto(`${base_url}/${endpoints[endpoint]}`)
     await page.waitForTimeout(2000)
-    await page.screenshot({path: `${out_dir}/${endpoint}-${deviceType}.png`})
-    console.log(`${endpoint}-${deviceType}.png`)
+    await page.screenshot({path: `${out_dir}/${endpoint}-${deviceType}.playwright.png`})
+    console.log(`${endpoint}-${deviceType}.playwright.png`)
   }
   await page.close()
 }

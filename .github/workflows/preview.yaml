@@ -14,8 +14,6 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
-    outputs:
-      pr_number: ${{ steps.pr.outputs.result }}
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -47,21 +45,20 @@ jobs:
             console.info('Pull request number is', pullRequestNumber)
             return pullRequestNumber
 
-      - name: run playwright screenshots script
-        run: |
-          bun install
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev public/images/ > ss.txt
-          while read -r line; do
-            md_links="$md_links\n![${line}](https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev/images/${line})"
-          done < ss.txt
-          echo "md_links=$md_links" >> "$GITHUB_OUTPUT"
-
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+
+      - name: build screenshot urls in markdown
+        id: ss_urls
+        run: |
+          for img in dist/images/*.playwright.png; do
+            md_links="$md_links\n![${img}](https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev/images/${img})"
+          done
+          echo "md_links=$md_links" >> $GITHUB_OUTPUT
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
@@ -74,9 +71,8 @@ jobs:
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
             deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
-
             Screenshots:
-            ${{ steps.run.outputs.md_links }}
+            ${{ steps.ss_urls.outputs.md_links }}
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
