@@ -2,6 +2,7 @@
 const { webkit, devices } = require('playwright');
 
 const base_url = process.argv[2];
+const out_dir = process.argv[3] ? process.argv[3] : 'screenshots';
 const endpoints = {
   Login: 'login',
   RouteList: '1d3dc3e03047b0c7',
@@ -15,7 +16,8 @@ async function takeScreenshots(deviceType, context) {
   for (const endpoint in endpoints) {
     await page.goto(`${base_url}/${endpoints[endpoint]}`)
     await page.waitForTimeout(2000)
-    await page.screenshot({path: `screenshots/${endpoint}-${deviceType}.png`})
+    await page.screenshot({path: `${out_dir}/${endpoint}-${deviceType}.png`})
+    console.log(`${endpoint}-${deviceType}.png`)
   }
   await page.close()
 }
