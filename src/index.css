@@ -3,6 +3,7 @@
 @tailwind utilities;
 
 @layer base {
+
   /* https://m3.material.io/styles/color/roles */
   :root {
     --color-primary: rgb(83 90 146);
@@ -58,15 +59,15 @@
 
   .dark,
   [data-theme="dark"] {
-    --color-primary: rgb(188 195 255);
+    --color-primary: rgb(145, 151, 201);
     --color-surface-tint: rgb(188 195 255);
     --color-on-primary: rgb(36 43 97);
     --color-primary-container: rgb(59 66 121);
     --color-on-primary-container: rgb(223 224 255);
     --color-secondary: rgb(196 197 221);
     --color-on-secondary: rgb(45 47 66);
-    --color-secondary-container: rgb(67 69 89);
-    --color-on-secondary-container: rgb(224 225 249);
+    --color-secondary-container: rgb(34, 34, 43);
+    --color-on-secondary-container: rgb(92, 92, 134);
     --color-tertiary: rgb(168 210 147);
     --color-on-tertiary: rgb(21 56 9);
     --color-tertiary-container: rgb(43 79 30);
@@ -114,7 +115,8 @@
     @apply select-none selection:bg-transparent;
   }
 
-  html, body {
+  html,
+  body {
     /*
      * fill visible viewport
      * https://developers.google.com/web/updates/2016/12/url-bar-resizing
@@ -125,6 +127,23 @@
   button {
     /* revert user-agent style */
     text-align: unset;
+  }
+
+  ::-webkit-scrollbar {
+    width: 5px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: var(--color-secondary-container);
+    border-radius: 5px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--color-on-secondary-container);
   }
 }
 
@@ -206,11 +225,14 @@
   }
 
   .hide-scrollbar {
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE 10+ */
+    scrollbar-width: none;
+    /* Firefox */
+    -ms-overflow-style: none;
+    /* IE 10+ */
 
     &::-webkit-scrollbar {
-      display: none; /* Safari and Chrome */
+      display: none;
+      /* Safari and Chrome */
     }
   }
 }

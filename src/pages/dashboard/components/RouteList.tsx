@@ -4,88 +4,112 @@ import {
   createResource,
   createSignal,
   For,
+  Show,
   Suspense,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import clsx from 'clsx'
-
 import type { RouteSegments } from '~/types'
-
+import { getKey, getRouteCardsData } from '~/api/routelist'
 import RouteCard from '~/components/RouteCard'
-import { fetcher } from '~/api'
-import Button from '~/components/material/Button'
+import Loader from '~/components/Loader'
 
-const PAGE_SIZE = 3
-
-type RouteListProps = {
-  class?: string
-  dongleId: string
-}
-
+const PAGE_SIZE = 5
 const pages: Promise<RouteSegments[]>[] = []
 
-const RouteList: VoidComponent<RouteListProps> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
-  const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData) return endpoint()
-    if (previousPageData.length === 0) return undefined
-    const lastSegmentEndTime = previousPageData.at(-1)!.segment_start_times.at(-1)!
-    return `${endpoint()}&end=${lastSegmentEndTime - 1}`
-  }
+type Props = {
+  searchQuery: string,
+  dongleId: string | undefined
+}
+
+const RouteList: VoidComponent<Props> = (props) => {
+  
+  const [searchResults, setSearchResults] = createSignal<RouteSegments[]>([])
+
+  const dongleId = () => props.dongleId
+  const query = () => props.searchQuery
+  let cache: RouteSegments[] = []
+
   const getPage = (page: number): Promise<RouteSegments[]> => {
     if (!pages[page]) {
       // eslint-disable-next-line no-async-promise-executor
       pages[page] = new Promise(async (resolve) => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
+        const key = getKey(dongleId(), PAGE_SIZE, previousPageData)
+        const data = await getRouteCardsData(key)
+        cache = data
+        resolve(data)
       })
     }
     return pages[page]
   }
 
   createEffect(() => {
-    if (props.dongleId) {
+    if (dongleId()) {
       pages.length = 0
       setSize(1)
     }
   })
 
+  createEffect(() => {
+    if (query()) {
+      const results = cache.filter(route => {
+        const address = route.ui_derived?.address
+        return address?.start.toLowerCase().includes(query()) || address?.end.toLowerCase().includes(query())
+      })
+      setSearchResults(results)
+    } else {
+      setSearchResults([])
+    }
+  })
+
   const [size, setSize] = createSignal(1)
-  const onLoadMore = () => setSize(size() + 1)
   const pageNumbers = () => Array.from(Array(size()).keys())
 
+  const Filters: VoidComponent = () => {
+    const [selected, setSelected] = createSignal('')
+
+    const filters = ['miles', 'duration', 'engaged']
+    return (
+      <div class="flex h-40 w-full items-end space-x-4 p-4">
+        <For each={filters}>
+          {(filter) => (
+            <div
+              onClick={() => setSelected(filter === selected() ? '' : filter)}
+              class={`group flex items-center justify-center rounded-lg border-2 border-secondary-container px-4 py-2 ${selected() === filter ? 'bg-primary-container' : 'hover:bg-secondary-container'}`}
+            >
+              <p class={`${selected() === filter ? 'text-on-primary-container' : 'text-on-secondary-container group-hover:text-primary'}`}>{filter}</p>
+            </div>
+          )}
+        </For>
+      </div>
+    )
+  }
+
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
-    >
+    <Show when={searchResults().length <= 0} fallback={
+      <>
+        <Filters />
+        <For each={searchResults()}>
+          {(route) => <RouteCard route={route} />}
+        </For>
+        <div class="h-60 w-full sm:h-44" />
+      </>
+    }>
       <For each={pageNumbers()}>
         {(i) => {
           const [routes] = createResource(() => i, getPage)
           return (
-            <Suspense
-              fallback={
-                <>
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                </>
-              }
-            >
+            <Suspense fallback={<div class="flex size-full items-center justify-center"><Loader /></div>}>
+              <Filters />
               <For each={routes()}>
                 {(route) => <RouteCard route={route} />}
               </For>
+              <div class="h-60 w-full sm:h-44" />
             </Suspense>
           )
         }}
       </For>
-      <div class="flex justify-center">
-        <Button onClick={onLoadMore}>Load more</Button>
-      </div>
-    </div>
+    </Show>
   )
 }
 

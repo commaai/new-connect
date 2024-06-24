@@ -50,3 +50,21 @@ export function getPathStaticMapUrl(
   )})`
   return `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${styleId}/static/${path}/auto/${width}x${height}${hidpiStr}?logo=false&attribution=false&padding=30,30,30,30&access_token=${MAPBOX_TOKEN}`
 }
+
+export function getPlaceFromCoords(lng: number | undefined, lat:number | undefined): Promise<string> {
+  return new Promise((resolve, reject) => {
+    if(!lat || !lng) reject('supply valid coords') // keeps the calling code a bit cleaner
+    fetch(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}.733&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`)
+      .then(res => res.json())
+      .then(res => {
+        // if the object is not found, we can handle the error appropriately in the ui
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @stylistic/max-len
+        const neighborhood = res.features[0].properties.context.neighborhood, region = res.features[0].properties.context.region
+        if(neighborhood && region) {
+          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+          resolve(`${neighborhood.name}, ${region.region_code}`)
+        } else reject('coords dont have required details')
+      })
+      .catch(err => reject(err))
+  })
+}
