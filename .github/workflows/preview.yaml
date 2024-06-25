@@ -68,6 +68,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Use CI_ARTIFACTS_DEPLOY_KEY
-        with:
-          CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
         run: echo "using secret in master"
+        env:
+          CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
