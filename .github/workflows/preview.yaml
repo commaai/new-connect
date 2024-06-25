@@ -66,3 +66,8 @@ jobs:
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Use CI_ARTIFACTS_DEPLOY_KEY
+        with:
+          CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+        run: echo "using secret in master"
