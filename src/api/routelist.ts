@@ -32,6 +32,7 @@ export const getRouteCardsData = async (url: string | undefined): Promise<RouteS
   try {
     const res = await fetcher<RouteSegments[]>(url)
   
+    // TODO: use getDerviedData() /api/routes here to reduce code
     const updatedRes = await Promise.all(res.map(async (each) => {
       const [startPlace, endPlace, timeline] = await Promise.all([
         getPlaceFromCoords(each.start_lng, each.start_lat),

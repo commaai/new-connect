@@ -4,7 +4,7 @@ import dayjs from 'dayjs'
 
 import Icon from '~/components/material/Icon'
 import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
+import { RouteCardStatistics } from '~/components/RouteStatistics'
 
 import type { RouteSegments } from '~/types'
 import { DashboardContext, generateContextType } from '~/pages/dashboard/Dashboard'
@@ -49,7 +49,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           </div>
         </Show>
         <Timeline routeName={props.route.fullname} class="my-2 h-[5px]" />
-        <RouteStatistics route={props.route} />
+        <RouteCardStatistics route={props.route} />
       </div>
     </div>
   )

@@ -30,7 +30,7 @@ export const generateContextType = () => {
   const [width] = createSignal(MAX_WIDTH)
   const [route] = createSignal<string | undefined>(params.route)
   const [device] = createResource(() => dongleId(), getDevice)
-  const [isDesktop] = createSignal(window.innerWidth > 1024)
+  const [isDesktop] = createSignal(window.innerWidth > 768)
 
   return {width, isDesktop, device, route} as const
 }
@@ -43,21 +43,22 @@ function DashboardLayout() {
   const params = useParams()
   
   const [dongleId, setDongleId] = createSignal<string | undefined>(params.dongleId)
-  const [route] = createSignal<string | undefined>(params.route)
+  const [route, setRoute] = createSignal<string | undefined>(params.route)
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
   const [device] = createResource(() => dongleId(), getDevice)
 
   const [leftContainerWidth, setLeftContainerWidth] = createSignal(MAX_WIDTH)
-  const [isDesktop, setView] = createSignal(window.innerWidth > 1024)
+  const [isDesktop, setView] = createSignal(window.innerWidth > 768)
 
   const [searchQuery, setSearchQuery] = createSignal('')
 
   onMount(() => {
     window.addEventListener('resize', () => {
-      setView(window.innerWidth > 1024)
+      setView(window.innerWidth > 768)
     })
+    console.log('dashboard')
   })
 
   createEffect(() => {
@@ -66,6 +67,7 @@ function DashboardLayout() {
       setDongleId(deviceList[1].dongle_id)
       navigate(`/${deviceList[1].dongle_id}`)
     }
+    setRoute(params.route)
   })
 
   onCleanup(() => {
@@ -84,17 +86,19 @@ function DashboardLayout() {
     >
       <Show when={!profile.error} fallback={<Navigate href="/login" />}>
         <div class="flex size-full">
-          <div style={{ width: isDesktop() ? `${leftContainerWidth()}%` : route() ? '0%' : '100%' }} class={'flex h-screen flex-col overflow-hidden p-4'}>
-            <Search onSearch={setSearchQuery} />
-            <Show when={dongleId()} fallback={<div class="flex size-full items-center justify-center"><Loader /></div>}>
-              <div class={'size-full flex-col overflow-y-auto'}>
-                <RouteList searchQuery={searchQuery()} dongleId={dongleId()} />
-              </div>
-            </Show>
-            <Controls devices={devices} />
-          </div>
+          <Show when={isDesktop() || !route()}>
+            <div style={{ width: isDesktop() ? `${leftContainerWidth()}%` : route() ? '0%' : '100%' }} class={'flex h-screen flex-col overflow-hidden p-4'}>
+              <Search onSearch={setSearchQuery} />
+              <Show when={dongleId()} fallback={<div class="flex size-full items-center justify-center"><Loader /></div>}>
+                <div class={'size-full flex-col overflow-y-auto'}>
+                  <RouteList searchQuery={searchQuery()} dongleId={dongleId()} />
+                </div>
+              </Show>
+              <Controls devices={devices} />
+            </div>
+          </Show>
           <Show when={isDesktop()}><div class="h-screen w-0.5 cursor-ew-resize bg-gray-800 hover:w-2" draggable="true" onDragEnd={handleResize} />          </Show>
-          <div style={{ width: isDesktop() ? `${100 - leftContainerWidth()}%` : route() ? '100%' : '0%' }} class={isDesktop() ? 'p-4' : 'p-0'}>
+          <div style={{ width: isDesktop() ? `${100 - leftContainerWidth()}%` : route() ? '100%' : '0%' }} class={isDesktop() ? 'p-4' : 'h-screen p-0'}>
             <Show when={route()} fallback={<PlaceHolder />}>
               <RouteActivity dongleId={dongleId()} dateStr={route()} />
             </Show>
