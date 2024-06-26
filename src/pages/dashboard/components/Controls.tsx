@@ -6,6 +6,7 @@ import Icon from '~/components/material/Icon'
 import Dates from '../../../components/Dates'
 import { DashboardContext, generateContextType } from '../Dashboard'
 import { Device } from '~/types'
+import { getDeviceName } from '~/utils/device'
 
 type SelectorProps = {
   onUiChange: (change: boolean) => void,
@@ -32,7 +33,7 @@ const DeviceSelector: VoidComponent<SelectorProps> = (props) => {
         when={isSelectorOpen()}
         fallback={<div class="flex h-16 w-full flex-col justify-center">
           <Show when={!device.loading && device.latest}>
-            <h2>{device.latest?.alias}</h2>
+            <h2>{getDeviceName(device.latest)}</h2>
             <p class="text-on-secondary-container">{device.latest?.dongle_id}</p>
           </Show>
         </div>}
@@ -46,7 +47,7 @@ const DeviceSelector: VoidComponent<SelectorProps> = (props) => {
                 setTimeout(() => window.location.reload(), 200)
               }} 
               class="flex h-16 w-full flex-col justify-center rounded-md pl-3 hover:bg-on-secondary-container">
-              <h2>{item.alias}</h2>
+              <h2>{getDeviceName(item)}</h2>
               <p class="text-on-secondary-container">{item.dongle_id}</p>
             </div>
           }}
