@@ -144,10 +144,10 @@ const RouteList: VoidComponent<Props> = (props) => {
         <Filters /><For each={display()}>
           {(route) => <RouteCard route={route} />}
         </For>
-        <div class="flex h-20 w-full items-center justify-center">
+        <div class="flex h-24 w-full items-center justify-center">
           <Button onClick={() => setSize(pageSize() + 1)}>Load more</Button>
         </div>
-        <div class="h-60 w-full sm:h-44" />
+        <div class="h-60 w-full sm:h-64" />
       </Show>
     </Suspense>
   )
