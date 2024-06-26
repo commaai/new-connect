@@ -101,6 +101,12 @@ const RouteList: VoidComponent<Props> = (props) => {
   })
 
   createEffect(() => {
+    if(dongleId()) {
+      setSize(0)
+    }
+  })
+
+  createEffect(() => {
     setDisplay(searchResults(query()))
   })
 
@@ -131,7 +137,7 @@ const RouteList: VoidComponent<Props> = (props) => {
         {(route) => <RouteCard route={route} />}
       </For>
       <Show when={display().length > 0}>
-        <div class="h-20 w-full flex items-center justify-center">
+        <div class="flex h-20 w-full items-center justify-center">
           <Button onClick={() => setSize(pageSize() + 1)}>Load more</Button>
         </div>
       </Show>

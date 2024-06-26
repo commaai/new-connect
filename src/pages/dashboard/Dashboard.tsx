@@ -7,7 +7,7 @@ import {
   onMount,
   createEffect,
 } from 'solid-js'
-import { Navigate, useParams, useNavigate } from '@solidjs/router'
+import { Navigate, useNavigate, useLocation } from '@solidjs/router'
 
 import { getDevices, getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -25,10 +25,11 @@ const MIN_WIDTH = 20
 // adapted from https://www.solidjs.com/guides/typescript#context
 // TODO: find a better way to type annotate context without child components complaining DashboardState | undefined 
 export const generateContextType = () => {
-  const params = useParams()
-  const [dongleId] = createSignal<string | undefined>(params.dongleId)
+  const pathParts = (): string[] => location.pathname.split('/').slice(1).filter(Boolean)
+
+  const [dongleId] = createSignal<string | undefined>(pathParts()[0])
   const [width] = createSignal(MAX_WIDTH)
-  const [route] = createSignal<string | undefined>(params.route)
+  const [route] = createSignal<string | undefined>(pathParts()[1])
   const [device] = createResource(() => dongleId(), getDevice)
   const [isDesktop] = createSignal(window.innerWidth > 768)
 
@@ -40,10 +41,11 @@ export const DashboardContext = createContext<DashboardState>()
 
 function DashboardLayout() {
   const navigate = useNavigate()
-  const params = useParams()
+  const location = useLocation()
   
-  const [dongleId, setDongleId] = createSignal<string | undefined>(params.dongleId)
-  const [route, setRoute] = createSignal<string | undefined>(params.route)
+  const pathParts = (): string[] => location.pathname.split('/').slice(1).filter(Boolean)
+  const [dongleId, setDongleId] = createSignal<string | undefined>(pathParts()[0])
+  const [route, setRoute] = createSignal<string | undefined>(pathParts()[1])
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
@@ -66,8 +68,8 @@ function DashboardLayout() {
       setDongleId(deviceList[1].dongle_id)
       navigate(`/${deviceList[1].dongle_id}`)
     }
-    setDongleId(params.dongleId)
-    setRoute(params.route)
+    setDongleId(pathParts()[0])
+    setRoute(pathParts()[1])
   })
 
   onCleanup(() => {

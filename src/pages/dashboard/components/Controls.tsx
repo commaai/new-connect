@@ -1,6 +1,6 @@
 import { createEffect, createSignal, For, Show, useContext } from 'solid-js'
 import type { VoidComponent, Resource } from 'solid-js'
-import { A } from '@solidjs/router'
+import { useNavigate } from '@solidjs/router'
 import Avatar from '~/components/material/Avatar'
 import Icon from '~/components/material/Icon'
 import Dates from '../../../components/Dates'
@@ -15,6 +15,7 @@ type SelectorProps = {
 const DeviceSelector: VoidComponent<SelectorProps> = (props) => {
 
   const { device } = useContext(DashboardContext) ?? generateContextType()
+  const navigate = useNavigate()
 
   const [isSelectorOpen, openSelector] = createSignal(false)
   // eslint-disable-next-line solid/reactivity
@@ -38,17 +39,20 @@ const DeviceSelector: VoidComponent<SelectorProps> = (props) => {
       >
         <For each={data()}>
           {(item) => {
-            return <A href={`/${item.dongle_id}`}>
-              <div onClick={() => openSelector(false)} 
-                class="flex h-16 w-full flex-col justify-center rounded-md pl-3 hover:bg-on-secondary-container">
-                <h2>{item.alias}</h2>
-                <p class="text-on-secondary-container">{item.dongle_id}</p>
-              </div>
-            </A>
+            return <div 
+              onClick={() => {
+                openSelector(false)
+                navigate(`/${item.dongle_id}`)
+                setTimeout(() => window.location.reload(), 200)
+              }} 
+              class="flex h-16 w-full flex-col justify-center rounded-md pl-3 hover:bg-on-secondary-container">
+              <h2>{item.alias}</h2>
+              <p class="text-on-secondary-container">{item.dongle_id}</p>
+            </div>
           }}
         </For>
         <div onClick={() => openSelector(false)} 
-          class="flex h-16 w-full space-x-2 items-center rounded-md pl-3 hover:bg-on-secondary-container">
+          class="flex h-16 w-full items-center space-x-2 rounded-md pl-3 hover:bg-on-secondary-container">
           <Icon class="text-on-secondary-container" size="40">add</Icon>
           <h2 class="text-on-secondary-container">Add device</h2>
         </div>
