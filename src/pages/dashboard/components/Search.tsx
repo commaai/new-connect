@@ -2,6 +2,7 @@ import { VoidComponent, createSignal, useContext, onMount, Show } from 'solid-js
 import { createShortcut } from '@solid-primitives/keyboard'
 import Icon from '~/components/material/Icon'
 import { DashboardContext, generateContextType } from '../Dashboard'
+import { A } from '@solidjs/router'
 
 type Props = {
   onSearch: (query: string) => void
@@ -32,9 +33,9 @@ const Search: VoidComponent<Props> = (props) => {
     class="absolute left-3 top-6 z-20 flex h-14 animate-load-bounce rounded-full bg-secondary-container sm:left-5 sm:top-10"
   >
 
-    <div class="flex w-20 items-center justify-center">
+    <A class="flex w-20 items-center justify-center" href="/logout">
       <Icon class="text-on-secondary-container">account_circle</Icon>
-    </div>
+    </A>
     <div class="flex w-10/12 items-center justify-center">
       <Show 
         when={query() || focused()}
