@@ -58,7 +58,6 @@ function DashboardLayout() {
     window.addEventListener('resize', () => {
       setView(window.innerWidth > 768)
     })
-    console.log('dashboard')
   })
 
   createEffect(() => {
@@ -67,6 +66,7 @@ function DashboardLayout() {
       setDongleId(deviceList[1].dongle_id)
       navigate(`/${deviceList[1].dongle_id}`)
     }
+    setDongleId(params.dongleId)
     setRoute(params.route)
   })
 

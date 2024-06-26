@@ -8,11 +8,10 @@ import {
   type VoidComponent,
   Show,
 } from 'solid-js'
+import { createShortcut } from '@solid-primitives/keyboard'
 
 import { getRoute } from '~/api/route'
-
 import IconButton from '~/components/material/IconButton'
-
 import Timeline from '~/components/Timeline'
 import { parseDateStr } from '~/utils/date'
 import { DashboardContext, generateContextType } from '../Dashboard'
@@ -20,6 +19,7 @@ import Icon from '~/components/material/Icon'
 import DriveMap from '~/map/DriveMap'
 import { DriveStatistics } from '~/components/RouteStatistics'
 import { getCoords } from '~/api/derived'
+import { useNavigate } from '@solidjs/router'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -29,6 +29,8 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
+
+  const navigate = useNavigate()
 
   const [seekTime, setSeekTime] = createSignal(0)
   const { isDesktop, width } = useContext(DashboardContext) ?? generateContextType()
@@ -40,10 +42,27 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('dddd, MMM D, YYYY'))
   const [videoHeight, setVideoHeight] = createSignal(60)
 
+  createShortcut(
+    ['ESC'],
+    () => navigate(`/${props.dongleId}`),
+    { preventDefault: true },
+  )
+
   createEffect(() => {
     setVideoHeight(90 - width())
-    console.log(`Set video height to ${videoHeight()}`)
   })
+
+  const copyToClipboard = () => {
+    navigator.clipboard.writeText(props.dateStr || '')
+      .then(() => {})
+      .catch(() => {})
+  }
+
+  const shareDrive = () => {
+    navigator.share({ url: window.location.href })
+      .then(() => {})
+      .catch(() => {})
+  }
 
   type ActionProps = {
     icon?: string
@@ -76,10 +95,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <h1 class="text-xl">{startTime()}</h1>
         <div class="flex h-1/4 w-full items-center space-x-2 lg:w-3/4">
           <p class="text-on-secondary-container">{props.dongleId}</p>
-          <div class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
+          <div onClick={copyToClipboard} class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
             <Icon class="text-on-secondary-container" size="20">content_copy</Icon>
           </div>
-          <div class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
+          <div onClick={shareDrive} class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
             <Icon class="text-on-secondary-container" size="20">share</Icon>
           </div>
         </div>
