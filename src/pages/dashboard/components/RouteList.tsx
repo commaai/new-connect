@@ -12,6 +12,7 @@ import { getKey, getRouteCardsData } from '~/api/routelist'
 import RouteCard from '~/components/RouteCard'
 import Loader from '~/components/Loader'
 import Button from '~/components/material/Button'
+import Icon from '~/components/material/Icon'
 
 type Filter = {
   label: string
@@ -133,15 +134,21 @@ const RouteList: VoidComponent<Props> = (props) => {
 
   return (
     <Suspense fallback={<div class="flex size-full items-center justify-center"><Loader /></div>} >
-      <Filters /><For each={display()}>
-        {(route) => <RouteCard route={route} />}
-      </For>
-      <Show when={display().length > 0}>
+      <Show 
+        when={display().length > 0}
+        fallback={<div class="size-full flex flex-col items-center justify-center">
+          <Icon class="text-secondary-container">car_crash</Icon>
+          <p class="text-secondary-container">No drives</p>
+        </div>}
+      >
+        <Filters /><For each={display()}>
+          {(route) => <RouteCard route={route} />}
+        </For>
         <div class="flex h-20 w-full items-center justify-center">
           <Button onClick={() => setSize(pageSize() + 1)}>Load more</Button>
         </div>
+        <div class="h-60 w-full sm:h-44" />
       </Show>
-      <div class="h-60 w-full sm:h-44" />
     </Suspense>
   )
 }
