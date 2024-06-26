@@ -74,9 +74,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     icon?: string
     label: string
     selectable?: boolean
+    selected?: boolean
   }
   const Action: VoidComponent<ActionProps> = (props) => {
-    const [selected, setSelected] = createSignal(false)
+    const [selected, setSelected] = createSignal(props.selected)
     return <div class="flex w-full items-center justify-center" >
       <div
         onClick={() => {
@@ -137,7 +138,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
         <div class="flex basis-4/12 flex-col items-center justify-center p-4">
           <div class="grid size-full h-full grid-cols-2 grid-rows-2 rounded-md lg:h-1/2">
-            <Action selectable label="Preserved" icon="hide_source" />
+            <Action selectable selected label="Preserved" icon="hide_source" />
             <Action selectable label="Public Access" icon="key" />
             <Action label="View in useradmin" icon="admin_panel_settings" />
             <Action label="Upload options" icon="cloud_upload" /> 
