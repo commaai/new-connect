@@ -65,10 +65,9 @@ function DashboardLayout() {
   createEffect(() => {
     const deviceList = devices.latest
     if (!dongleId() && deviceList && deviceList.length > 0) {
-      setDongleId(deviceList[1].dongle_id)
-      navigate(`/${deviceList[1].dongle_id}`)
+      setDongleId(deviceList[0].dongle_id)
+      navigate(`/${deviceList[0].dongle_id}`)
     }
-    setDongleId(pathParts()[0])
     setRoute(pathParts()[1])
   })
 
