@@ -47,6 +47,11 @@ const DeviceSelector: VoidComponent<SelectorProps> = (props) => {
             </A>
           }}
         </For>
+        <div onClick={() => openSelector(false)} 
+          class="flex h-16 w-full space-x-2 items-center rounded-md pl-3 hover:bg-on-secondary-container">
+          <Icon class="text-on-secondary-container" size="40">add</Icon>
+          <h2 class="text-on-secondary-container">Add device</h2>
+        </div>
       </Show>
     </div>
     <div onClick={() => openSelector(!isSelectorOpen())} class="flex w-2/12 items-center justify-center">
