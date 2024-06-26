@@ -41,11 +41,15 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <div class={`flex ${width() <= 23 || !isDesktop() ? 'basis-full' : 'basis-3/4'} flex-col justify-center p-4`}>
         <h2 class="text-lg">{headline()}</h2>
         <p class="text-sm text-neutral-600">{subhead()}</p>
-        <Show when={props.route.ui_derived?.address}>
+        <Show when={props.route.ui_derived?.address?.end || props.route.ui_derived?.address?.start}>
           <div class={`mt-1 ${width() > 23 ? 'flex w-full sm:w-3/4':'inline-flex'} h-6 items-center justify-center space-x-3 rounded-sm bg-black`}>
-            <p class="text-xs">{props.route.ui_derived?.address?.start}</p>
-            <Icon size="20">arrow_forward</Icon>
-            <p class="text-xs">{props.route.ui_derived?.address?.end}</p>
+            <Show when={props.route.ui_derived?.address?.start}>
+              <p class="text-xs">{props.route.ui_derived?.address?.start}</p>
+            </Show>
+            <Show when={props.route.ui_derived?.address?.end}>
+              <Icon size="20">arrow_forward</Icon>
+              <p class="text-xs">{props.route.ui_derived?.address?.end}</p>
+            </Show>
           </div>
         </Show>
         <Timeline routeName={props.route.fullname} class="my-2 h-[5px]" />

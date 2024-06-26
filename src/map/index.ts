@@ -52,19 +52,19 @@ export function getPathStaticMapUrl(
 }
 
 export function getPlaceFromCoords(lng: number | undefined, lat:number | undefined): Promise<string> {
-  return new Promise((resolve, reject) => {
-    if(!lat || !lng) resolve('unknown') // keeps the calling code a bit cleaner
+  return new Promise((resolve) => {
+    if(!lat || !lng) resolve('') // keeps the calling code a bit cleaner
     fetch(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}.733&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`)
       .then(res => res.json())
       .then(res => {
         // if the object is not found, we can handle the error appropriately in the ui
-        // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-assignment, @stylistic/max-len
+        // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @stylistic/max-len, @typescript-eslint/no-unsafe-member-access
         const neighborhood = res.features[0].properties.context.neighborhood, region = res.features[0].properties.context.region
         if(neighborhood && region) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           resolve(`${neighborhood.name}, ${region.region_code}`)
-        } else resolve('unknown')
+        } else resolve('')
       })
-      .catch(err => reject(err))
+      .catch(() => resolve(''))
   })
 }
