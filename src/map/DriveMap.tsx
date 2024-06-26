@@ -24,11 +24,19 @@ const DriveMap: VoidComponent<Props> = (props) => {
     zoom: 12,
   } as Viewport)
 
+  let lastBearing: number = 180
+  const BEARING_THRESHOLD = 15
+
   const getBearing = (time: number) => {
     const start = coords().findIndex(coord => coord.t === Math.round(time))
     const path = coords().slice(start, Math.min(start + 10, coords().length))
 
-    return calculateAverageBearing(path)
+    const newBearing = calculateAverageBearing(path)
+    if(Math.abs(newBearing - lastBearing) > BEARING_THRESHOLD) {
+      lastBearing = newBearing
+      return newBearing
+    }
+    return lastBearing
   }
 
   createEffect(() => {
