@@ -5,6 +5,7 @@ import { MAPBOX_TOKEN, MAPBOX_USERNAME } from './config'
 import { GPSPathPoint } from '~/api/derived'
 import { getMapStyleId } from '.'
 import { getThemeId } from '~/theme'
+import { calculateAverageBearing } from './bearing'
 
 type Props = {
   coords: GPSPathPoint[],
@@ -23,15 +24,22 @@ const DriveMap: VoidComponent<Props> = (props) => {
     zoom: 12,
   } as Viewport)
 
+  const getBearing = (time: number) => {
+    const start = coords().findIndex(coord => coord.t === Math.round(time))
+    const path = coords().slice(start, Math.min(start + 10, coords().length))
+
+    return calculateAverageBearing(path)
+  }
+
   createEffect(() => {
-    const coord = coords().find(coord => coord.t === parseInt(point().toFixed(0)))
+    const coord = coords().find(coord => coord.t === Math.round(point()))
     if(coord?.lat && coord.lng) {
       setMarker([coord.lng, coord.lat])
       setViewport({
         center: [coord.lng, coord.lat],
         zoom: 15,
         pitch: 45,
-        bearing: 180,
+        bearing: getBearing(coord.t),
       })
     }
   })
