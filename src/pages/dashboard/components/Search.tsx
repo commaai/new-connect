@@ -42,7 +42,7 @@ const Search: VoidComponent<Props> = (props) => {
       >
         <input
           value={query()}
-          onChange={ev => {
+          onInput={ev => {
             setQuery(ev.target.value)
             onSearch(ev.target.value)
           }}
