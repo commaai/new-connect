@@ -117,8 +117,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
-          <div class="relative left-40 z-40 flex h-8 w-24 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-10">
-            <p class="text-xs">{speed()} mph / {Math.round(speed() * 1.60934)} kph</p>
+          <div class="relative left-40 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-14">
+            <p class="text-xs">{speed()} mph</p>
+          </div>
+          <div class="relative left-40 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-16">
+            <p class="text-xs">{Math.round(speed() * 1.60934)} kph</p>
           </div>
           <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
           <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
