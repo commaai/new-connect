@@ -7,6 +7,7 @@ import Dates from '../../../components/Dates'
 import { DashboardContext, generateContextType } from '../Dashboard'
 import { Device } from '~/types'
 import { getDeviceName } from '~/utils/device'
+import DeviceStatistics from '~/components/DeviceStatistics'
 
 type SelectorProps = {
   onUiChange: (change: boolean) => void,
@@ -73,20 +74,20 @@ type Props = {
 
 export const Controls: VoidComponent<Props> = (props) => {
 
-  const { width, isDesktop } = useContext(DashboardContext) ?? generateContextType()
-
+  const { width, isDesktop, device } = useContext(DashboardContext) ?? generateContextType()
   const [isSelectorOpen, setSelector] = createSignal(false)
 
   return <Show 
     when={!props.devices.loading}
   >
-    <div style={{ width: !isDesktop() ? '95%' : `${width() - 2}%` }} class={`absolute bottom-5 left-3 z-10 flex animate-load-bounce sm:left-4 ${isSelectorOpen() ? 'h-1/4' : 'h-44'} flex-col overflow-hidden rounded-md bg-secondary-container transition-controls ${isSelectorOpen() ? 'md:h-80' : 'md:h-40'}`}>
+    <div style={{ width: !isDesktop() ? '95%' : `${width() - 2}%` }} class={`absolute bottom-5 left-3 z-10 flex animate-load-bounce sm:left-4 ${isSelectorOpen() ? 'h-1/4' : 'h-52'} flex-col overflow-hidden rounded-md bg-secondary-container transition-controls ${isSelectorOpen() ? 'md:h-96' : 'md:h-60'}`}>
       <div class={`mt-4 flex ${isSelectorOpen() ? 'basis-2/3' : 'basis-1/3'} flex-row`}>
         <DeviceSelector 
           onUiChange={change => setSelector(change)}
           data={props.devices.latest || []}
         />
       </div>
+      <DeviceStatistics device={device()} class={isSelectorOpen() ? 'basis-1/3' : 'basis-2/3'} />
       <div class={`flex items-center justify-center ${isSelectorOpen() ? 'basis-1/3' : 'basis-2/3'}`}>
         <Dates />
       </div>
