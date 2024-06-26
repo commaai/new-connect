@@ -41,6 +41,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('dddd, MMM D, YYYY'))
   const [videoHeight, setVideoHeight] = createSignal(60)
+  const [speed, setSpeed] = createSignal(0)
 
   createShortcut(
     ['ESC'],
@@ -63,6 +64,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       .then(() => {})
       .catch(() => {})
   }
+
+  createEffect(() => {
+    const coord = coords.latest?.find(coord => coord.t === Math.round(seekTime()))
+    setSpeed(coord ? Math.round(coord.speed) : 0)
+  })
 
   type ActionProps = {
     icon?: string
@@ -111,6 +117,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
+          <div class="relative left-40 z-40 flex h-8 w-24 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-10">
+            <p class="text-xs">{speed()} mph / {Math.round(speed() * 1.60934)} kph</p>
+          </div>
           <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
           <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
         </Suspense>
