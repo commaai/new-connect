@@ -53,7 +53,7 @@ export function getPathStaticMapUrl(
 
 export function getPlaceFromCoords(lng: number | undefined, lat:number | undefined): Promise<string> {
   return new Promise((resolve, reject) => {
-    if(!lat || !lng) reject('supply valid coords') // keeps the calling code a bit cleaner
+    if(!lat || !lng) resolve('unknown') // keeps the calling code a bit cleaner
     fetch(`https://api.mapbox.com/search/geocode/v6/reverse?longitude=${lng}&latitude=${lat}.733&types=address&worldview=us&access_token=${MAPBOX_TOKEN}`)
       .then(res => res.json())
       .then(res => {
@@ -63,7 +63,7 @@ export function getPlaceFromCoords(lng: number | undefined, lat:number | undefin
         if(neighborhood && region) {
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           resolve(`${neighborhood.name}, ${region.region_code}`)
-        } else reject('coords dont have required details')
+        } else resolve('unknown')
       })
       .catch(err => reject(err))
   })
