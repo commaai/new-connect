@@ -28,16 +28,6 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
-
-      - name: run playwright screenshots script
-        if: github.event_name == 'pull_request'
-        run: |
-          bun playwright install chromium 
-          bun run dev &
-          while ! curl http://localhost:3000; do sleep 0.5; done > /dev/null
-          node src/ci/screenshots.cjs http://localhost:3000 public/images/
-          kill -9 $(lsof -t -i:3000)
-
       - run: bun run build
 
       - name: Upload built project
