@@ -74,9 +74,10 @@ const RouteList: VoidComponent<Props> = (props) => {
   const searchResults = (searchQuery: string | undefined) => {
     let results = routes
     if(searchQuery) {
+      const query = searchQuery.toLowerCase()
       results = routes.filter(route => {
         const address = route.ui_derived?.address
-        return address?.start.toLowerCase().includes(searchQuery) || address?.end.toLowerCase().includes(searchQuery)
+        return address?.start.toLowerCase().includes(query) || address?.end.toLowerCase().includes(query)
       })
     }
     return results
