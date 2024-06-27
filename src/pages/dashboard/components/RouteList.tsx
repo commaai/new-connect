@@ -133,14 +133,15 @@ const RouteList: VoidComponent<Props> = (props) => {
   }
 
   return (
-    <Suspense fallback={<div class="flex size-full items-center justify-center"><Loader /></div>} >
-      <Show 
-        when={display().length > 0}
-        fallback={<div class="size-full flex flex-col items-center justify-center">
-          <Icon class="text-secondary-container">car_crash</Icon>
-          <p class="text-secondary-container">No drives</p>
-        </div>}
-      >
+    <Show 
+      when={display().length > 0}
+      fallback={<div class="flex size-full flex-col items-center justify-center">
+        <Icon class="text-secondary-container">car_crash</Icon>
+        <p class="text-secondary-container">No drives</p>
+      </div>}
+    >
+      <Suspense fallback={<div class="flex size-full items-center justify-center"><Loader /></div>} >
+
         <Filters /><For each={display()}>
           {(route) => <RouteCard route={route} />}
         </For>
@@ -148,8 +149,9 @@ const RouteList: VoidComponent<Props> = (props) => {
           <Button onClick={() => setSize(pageSize() + 1)}>Load more</Button>
         </div>
         <div class="h-60 w-full sm:h-64" />
-      </Show>
-    </Suspense>
+      </Suspense>
+
+    </Show>
   )
 }
 
