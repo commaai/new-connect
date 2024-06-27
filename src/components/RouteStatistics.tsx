@@ -8,7 +8,6 @@ import Icon from './material/Icon'
 type RouteStatisticsProps = {
   class?: string
   route?: Route
-  speed?: number
 }
 
 export const RouteCardStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
@@ -57,7 +56,6 @@ export const DriveStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
   }
 
   return <div class="mb-2 flex h-full w-screen items-center justify-center rounded-md lg:w-full lg:flex-col">
-    <Statistic icon="speed" label="Speed" data={`${props.speed}mph`} />
     <Statistic icon="map" label="Distance" data={`${props.route?.ui_derived?.distance}mi`} />
     <Statistic icon="timer" label="Duration" data={formatRouteDuration(props.route?.ui_derived?.duration)} />
     <Statistic icon="search_hands_free" label="Engagement" data={`${props.route?.ui_derived?.engagement}%`} />

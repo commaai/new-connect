@@ -107,19 +107,22 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
       </div>
     </div>
-    <div class="flex basis-10/12 flex-col items-center p-2 lg:basis-8/12 lg:justify-center lg:p-6" >
-      <div style={{ height: `${isDesktop() ? videoHeight() : 50}%`, width: `${isDesktop() ? 120 - width() : 100}%` }} class="flex w-full flex-col items-center justify-center lg:flex-row lg:space-x-10">
+    <div class="flex basis-10/12 flex-col items-center px-2 py-0 lg:basis-8/12 lg:justify-center lg:p-6" >
+      <div style={{ height: `${isDesktop() ? videoHeight() : 50}%`, width: `${isDesktop() ? 120 - width() : 100}%` }} class="flex w-full flex-col-reverse items-center justify-center lg:flex-row lg:space-x-10">
         <div class="flex size-full flex-col items-center justify-center lg:w-2/12">
-          <DriveStatistics speed={speed()} route={route()} />
+          <DriveStatistics route={route()} />
         </div>
-        <div class="flex h-full w-11/12 flex-col">
+        <div class="flex h-full w-full lg:w-11/12 flex-col">
           <Suspense
             fallback={
               <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
             }
           >
+            <div class="relative left-2 top-10 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-4">
+              <p class="text-xs">{speed()} mph</p>
+            </div>
             <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
-            <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
+            <Timeline class="mb-4" routeName={routeName()} seekTime={seekTime()} />
           </Suspense>
         </div>
       </div>
@@ -132,7 +135,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           </Suspense>
         </div>
         <div class="flex basis-4/12 flex-col items-center justify-center p-4">
-          <div class="grid size-full h-full grid-cols-2 grid-rows-3 rounded-md lg:h-3/4">
+          <div class="grid size-full h-full grid-cols-2 grid-rows-3 space-y-2 rounded-md lg:h-3/4">
             <Action selectable selected label="Preserved" icon="hide_source" />
             <Action selectable label="Public Access" icon="key" />
             <Action label="View in useradmin" icon="admin_panel_settings" />
