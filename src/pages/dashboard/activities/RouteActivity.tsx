@@ -75,6 +75,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     label: string
     selectable?: boolean
     selected?: boolean
+    onClick?: () => void
   }
   const Action: VoidComponent<ActionProps> = (props) => {
     const [selected, setSelected] = createSignal(props.selected)
@@ -82,6 +83,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div
         onClick={() => {
           if(props.selectable) setSelected(!selected())
+          if(props.onClick) props.onClick()
         }} 
         class={`mx-1 flex size-full items-center justify-center space-x-2 rounded-md border-2 border-secondary-container p-2 lg:h-3/4 ${selected() ? 'bg-primary-container' : 'hover:bg-secondary-container'}`}
       >
@@ -92,7 +94,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   }
 
   return <div class="flex size-full flex-col">
-    <div class="flex max-h-[15vh] basis-2/12 lg:basis-4/12">
+    <div class="flex max-h-[15vh] basis-2/12 lg:basis-3/12">
       <div class="flex basis-16 items-center justify-center">
         <div class="flex size-1/2 items-center justify-center rounded-full hover:bg-secondary-container">
           <IconButton href={`/${props.dongleId}`}>{isDesktop() ? 'close' : 'arrow_back_ios'}</IconButton>
@@ -102,34 +104,27 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <h1 class="text-xl">{startTime()}</h1>
         <div class="flex h-1/4 w-full items-center space-x-2 lg:w-3/4">
           <p class="text-on-secondary-container">{props.dongleId}</p>
-          <div onClick={copyToClipboard} class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
-            <Icon class="text-on-secondary-container" size="20">content_copy</Icon>
-          </div>
-          <div onClick={shareDrive} class="flex size-5 items-center justify-center rounded-full hover:bg-secondary-container">
-            <Icon class="text-on-secondary-container" size="20">share</Icon>
-          </div>
         </div>
       </div>
     </div>
-    <div class="flex basis-10/12 flex-col items-center p-6 lg:basis-8/12 lg:justify-center" >
-      <div style={{ height: `${isDesktop() ? videoHeight() : 30}%`, width: `${isDesktop() ? 100 - width() : 100}%` }} class="flex w-full flex-col items-center justify-center">
-        <Suspense
-          fallback={
-            <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
-          }
-        >
-          <div class="relative left-40 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-14">
-            <p class="text-xs">{speed()} mph</p>
-          </div>
-          <div class="relative left-40 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-1/2 sm:top-16">
-            <p class="text-xs">{Math.round(speed() * 1.60934)} kph</p>
-          </div>
-          <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
-        </Suspense>
+    <div class="flex basis-10/12 flex-col items-center p-2 lg:basis-8/12 lg:justify-center lg:p-6" >
+      <div style={{ height: `${isDesktop() ? videoHeight() : 50}%`, width: `${isDesktop() ? 120 - width() : 100}%` }} class="flex w-full flex-col items-center justify-center lg:flex-row lg:space-x-10">
+        <div class="flex size-full flex-col items-center justify-center lg:w-2/12">
+          <DriveStatistics speed={speed()} route={route()} />
+        </div>
+        <div class="flex h-full w-11/12 flex-col">
+          <Suspense
+            fallback={
+              <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
+            }
+          >
+            <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
+            <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
+          </Suspense>
+        </div>
       </div>
       <div style={{ height: `${isDesktop() ? 100 - videoHeight() : 70}%` }} class="flex w-full flex-col lg:flex-row" >
-        <div class="flex size-full basis-8/12 items-center justify-center p-4">
+        <div class="flex size-full basis-6/12 items-center justify-center p-4 lg:basis-8/12">
           <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />} >
             <Show when={coords.latest}>
               <DriveMap coords={coords.latest || []} point={seekTime()} />
@@ -137,15 +132,17 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           </Suspense>
         </div>
         <div class="flex basis-4/12 flex-col items-center justify-center p-4">
-          <div class="grid size-full h-full grid-cols-2 grid-rows-2 rounded-md lg:h-1/2">
+          <div class="grid size-full h-full grid-cols-2 grid-rows-3 rounded-md lg:h-3/4">
             <Action selectable selected label="Preserved" icon="hide_source" />
             <Action selectable label="Public Access" icon="key" />
             <Action label="View in useradmin" icon="admin_panel_settings" />
-            <Action label="Upload options" icon="cloud_upload" /> 
+            <Action label="Upload options" icon="cloud_upload" />
+            <Action onClick={copyToClipboard} label="Copy ID" icon="content_copy" />
+            <Action onClick={shareDrive} label="Share route" icon="share" /> 
           </div>
-          <Show when={isDesktop()}>
+          {/* <Show when={isDesktop()}>
             <DriveStatistics route={route()} />
-          </Show>
+          </Show> */}
         </div>
       </div>
     </div>

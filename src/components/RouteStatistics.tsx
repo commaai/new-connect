@@ -8,6 +8,7 @@ import Icon from './material/Icon'
 type RouteStatisticsProps = {
   class?: string
   route?: Route
+  speed?: number
 }
 
 export const RouteCardStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
@@ -44,18 +45,19 @@ export const DriveStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
     label: string
   }
   const Statistic: VoidComponent<Props> = (statisticProps) => {
-    return <div class="flex size-full flex-col">
-      <div class="flex basis-3/4 items-end justify-center space-x-2">
-        <Icon class="text-on-secondary-container">{statisticProps.icon}</Icon>
+    return <div class="flex size-full basis-1/4 flex-col">
+      <div class="flex basis-1/2 flex-col items-center justify-center space-x-2 lg:flex-row lg:items-end">
+        <Icon class="hidden text-on-secondary-container lg:block">{statisticProps.icon}</Icon>
         <h1>{statisticProps?.data}</h1>
       </div>
-      <div class="flex basis-1/4 items-center justify-center">
-        <p class="text-sm text-on-secondary-container">{statisticProps.label}</p>
+      <div class="flex basis-1/2 items-center justify-center">
+        <p class="text-xs text-on-secondary-container lg:text-sm">{statisticProps.label}</p>
       </div>
     </div>
   }
 
-  return <div class="grid size-full h-1/2 grid-cols-2 grid-rows-2 rounded-md">
+  return <div class="mb-2 flex h-full w-screen items-center justify-center rounded-md lg:w-full lg:flex-col">
+    <Statistic icon="speed" label="Speed" data={`${props.speed}mph`} />
     <Statistic icon="map" label="Distance" data={`${props.route?.ui_derived?.distance}mi`} />
     <Statistic icon="timer" label="Duration" data={formatRouteDuration(props.route?.ui_derived?.duration)} />
     <Statistic icon="search_hands_free" label="Engagement" data={`${props.route?.ui_derived?.engagement}%`} />
