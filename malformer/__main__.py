@@ -7,6 +7,7 @@ from corrupter import Corrupter
 def main():
 
     ui = UI()
+    ui.banner()
 
     account, device, route = get_cli_args()
     account = account if account else ui.get_account()
@@ -23,7 +24,7 @@ def main():
     print(verifier)
 
     if ui.do_continue(): ui.clear_screen()
-    else: quit()
+    else: ui.close()
 
     params = ui.get_params()
     corrupter = Corrupter(paths)

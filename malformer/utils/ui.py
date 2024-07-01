@@ -81,10 +81,11 @@ class UI:
         cli = YesNo(prompt="Do you wish to continue (y/n) > ", default='y')
         return cli.launch()
     
-    def close(self, path):
+    def close(self, path=None):
         self._clear()
-        print(f"\nYour newly corrupted route files are at {path}")
+        if path is not None: print(f"\nYour newly corrupted route files are at {path}")
         print(f"Thanks for using malformer. Run again to corrupt more routes. Happy testing!\n")
+        quit()
 
     def _clear(self):
         os.system('cls' if os.name == 'nt' else 'clear')
