@@ -112,14 +112,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex size-full flex-col items-center justify-center lg:w-2/12">
           <DriveStatistics route={route()} />
         </div>
-        <div class="flex h-full w-full lg:w-11/12 flex-col">
+        <div class="flex size-full flex-col lg:w-11/12">
           <Suspense
             fallback={
               <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
             }
           >
             <div class="relative left-2 top-10 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-4">
-              <p class="text-xs">{speed()} mph</p>
+              <p class="text-xs">{parseInt(speed()*2.237)} mph</p>
             </div>
             <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
             <Timeline class="mb-4" routeName={routeName()} seekTime={seekTime()} />
