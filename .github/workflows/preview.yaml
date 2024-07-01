@@ -69,11 +69,12 @@ jobs:
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
+          git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add new-connect
           git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
-          git push
+          git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
@@ -89,18 +90,18 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/master/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
