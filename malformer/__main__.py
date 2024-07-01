@@ -1,5 +1,6 @@
 from utils.downloader import Downloader
 from utils.ui import UI
+from utils.args import get_cli_args
 from verify import Verifier
 from corrupter import Corrupter
 
@@ -7,10 +8,10 @@ def main():
 
     ui = UI()
 
-    account = ui.get_account()
-    device = ui.get_device()
-    route = ui.get_route(device)
-    if not account or not device or not route: quit()
+    account, device, route = get_cli_args()
+    account = account if account else ui.get_account()
+    device = device if device else ui.get_device()
+    route = route if route else ui.get_route(device)
 
     print(f'\n-------- Downloading raw driving files of {route} -----------')
     downloader = Downloader(account=account, dongleId=device, route=route)
