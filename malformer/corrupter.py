@@ -33,7 +33,7 @@ class Corrupter:
         readers = LogFileReader(source)
         
         directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
-        os.makedirs(directory, exist_ok=True)  # Corrected directory creation
+        os.makedirs(directory, exist_ok=True)
         fn = os.path.join(directory, 'qlog.bz2')
 
         data = bytearray()
@@ -48,7 +48,7 @@ class Corrupter:
     
     def _copy_qcam(self, source, index):
         destination = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
-        os.makedirs(destination, exist_ok=True)  # Corrected directory creation
+        os.makedirs(destination, exist_ok=True)
         shutil.copy(source, destination)
 
     def _corrupt_segment(self, log, qcam, index, miss):
@@ -64,3 +64,5 @@ class Corrupter:
             ]
             for future in futures:
                 future.result()
+        
+        return f'{STORAGE_PATH}/{self.route}/'

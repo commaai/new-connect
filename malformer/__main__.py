@@ -1,14 +1,15 @@
 from utils.downloader import Downloader
-from utils.ui import banner, get_account, get_device, get_route, get_params, do_continue
+from utils.ui import UI
 from verify import Verifier
 from corrupter import Corrupter
 
 def main():
-    
-    banner()
-    account = get_account()
-    device = get_device()
-    route = get_route()
+
+    ui = UI()
+
+    account = ui.get_account()
+    device = ui.get_device()
+    route = ui.get_route(device)
     if not account or not device or not route: quit()
 
     print(f'\n-------- Downloading raw driving files of {route} -----------')
@@ -20,11 +21,13 @@ def main():
     verifier.verify()
     print(verifier)
 
-    if not do_continue(): quit()
+    if ui.do_continue(): ui.clear_screen()
+    else: quit()
 
-    params = get_params()
+    params = ui.get_params()
     corrupter = Corrupter(paths)
-    corrupter.corrupt(miss=params)
+    path = corrupter.corrupt(miss=params)
+    ui.close(path)
 
 if __name__ == '__main__':
     main()
