@@ -11,7 +11,7 @@ import os
 class Corrupter:
     def __init__(self, paths, route=ROUTE):
         self.route = self._generate_name(route)
-        self._qlogs = paths['qlogs']
+        self._segments = paths['qlogs']
         self._qcams = paths['qcameras']
     
     def _generate_name(self, name, n=4):
@@ -29,7 +29,7 @@ class Corrupter:
         modified_word = ''.join(word_list)
         return f"{words[0]}--{modified_word}"
 
-    def _corrupt_qlog(self, source, index, miss=[]):
+    def _corrupt_log(self, source, index, miss=[]):
         readers = LogFileReader(source)
         
         directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
@@ -51,16 +51,16 @@ class Corrupter:
         os.makedirs(destination, exist_ok=True)  # Corrected directory creation
         shutil.copy(source, destination)
 
-    def _corrupt_segment(self, qlog, qcam, index, miss):
-        self._corrupt_qlog(qlog, index, miss)
+    def _corrupt_segment(self, log, qcam, index, miss):
+        self._corrupt_log(log, index, miss)
         if 'qcameras' not in miss:
             self._copy_qcam(qcam, index)
 
     def corrupt(self, miss=[]):
         with ThreadPoolExecutor() as executor:
             futures = [
-                executor.submit(self._corrupt_segment, qlog, self._qcams[index], index, miss)
-                for index, qlog in enumerate(self._qlogs)
+                executor.submit(self._corrupt_segment, segment, self._qcams[index], index, miss)
+                for index, segment in enumerate(self._segments)
             ]
             for future in futures:
                 future.result()
