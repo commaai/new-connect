@@ -1,56 +1,64 @@
-import { createResource, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
 import type { Route } from '~/types'
-import { formatRouteDistance, formatRouteDuration } from '~/utils/date'
-
-const formatEngagement = (timeline?: TimelineStatistics): string => {
-  if (!timeline) return ''
-  const { engagedDuration, duration } = timeline
-  return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
-}
-
-const formatUserFlags = (timeline?: TimelineStatistics): string => {
-  return timeline?.userFlags.toString() ?? ''
-}
+import { formatRouteDuration } from '~/utils/date'
+import Icon from './material/Icon'
 
 type RouteStatisticsProps = {
   class?: string
   route?: Route
 }
 
-const RouteStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
-
+export const RouteCardStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
   return (
-    <div class={clsx('flex size-full items-stretch gap-8', props.class)}>
-      <div class="flex flex-col justify-between">
+    <div class={clsx('flex w-full items-stretch gap-4', props.class)}>
+      <div class="flex flex-col">
         <span class="text-body-sm text-on-surface-variant">Distance</span>
-        <span class="font-mono text-label-lg uppercase">{formatRouteDistance(props.route)}</span>
+        <span class="font-mono text-label-lg uppercase">{props.route?.ui_derived?.distance}mi</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex flex-col">
         <span class="text-body-sm text-on-surface-variant">Duration</span>
-        <span class="font-mono text-label-lg uppercase">{formatRouteDuration(props.route)}</span>
+        <span class="font-mono text-label-lg uppercase">{formatRouteDuration(props.route?.ui_derived?.duration)}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex flex-col">
         <span class="text-body-sm text-on-surface-variant">Engaged</span>
-        <Suspense>
-          <span class="font-mono text-label-lg uppercase">{formatEngagement(timeline())}</span>
-        </Suspense>
+        <span class="font-mono text-label-lg uppercase">{`${props.route?.ui_derived?.engagement}%`}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex flex-col">
         <span class="text-body-sm text-on-surface-variant">User flags</span>
-        <Suspense>
-          <span class="font-mono text-label-lg uppercase">{formatUserFlags(timeline())}</span>
-        </Suspense>
+        <span class="font-mono text-label-lg uppercase">{props.route?.ui_derived?.flags}</span>
       </div>
     </div>
   )
 }
 
-export default RouteStatistics
+export const DriveStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
+
+  type Props = {
+    icon: string
+    data: string | number | undefined
+    label: string
+  }
+  const Statistic: VoidComponent<Props> = (statisticProps) => {
+    return <div class="flex size-full basis-1/4 flex-col">
+      <div class="flex basis-1/2 flex-col items-center justify-center space-x-2 lg:flex-row lg:items-end">
+        <Icon class="hidden text-on-secondary-container lg:block">{statisticProps.icon}</Icon>
+        <h1>{statisticProps?.data}</h1>
+      </div>
+      <div class="flex basis-1/2 items-center justify-center">
+        <p class="text-xs text-on-secondary-container lg:text-sm">{statisticProps.label}</p>
+      </div>
+    </div>
+  }
+
+  return <div class="mb-2 flex h-full w-screen items-center justify-center rounded-md lg:w-full lg:flex-col">
+    <Statistic icon="map" label="Distance" data={`${props.route?.ui_derived?.distance}mi`} />
+    <Statistic icon="timer" label="Duration" data={formatRouteDuration(props.route?.ui_derived?.duration)} />
+    <Statistic icon="search_hands_free" label="Engagement" data={`${props.route?.ui_derived?.engagement}%`} />
+    <Statistic icon="flag" label="User Flags" data={props.route?.ui_derived?.flags} /> 
+  </div>
+}

@@ -7,13 +7,13 @@ import type { Route } from '~/types'
 dayjs.extend(customParseFormat)
 dayjs.extend(duration)
 
-export const formatDistance = (miles: number | undefined): string => {
-  if (miles === undefined) return ''
-  return `${miles.toFixed(1) ?? 0} mi`
+export const formatDistance = (miles: number | undefined): number => {
+  if (miles === undefined) return 0
+  return parseFloat(miles.toFixed(1)) ?? 0
 }
 
-export const formatRouteDistance = (route: Route | undefined): string => {
-  if (route?.length === undefined) return ''
+export const formatRouteDistance = (route: Route | undefined): number => {
+  if (route?.length === undefined) return 0
   return formatDistance(route.length)
 }
 
@@ -41,9 +41,8 @@ export const getRouteDuration = (route: Route): Duration | undefined => {
   return dayjs.duration(endTime.diff(startTime))
 }
 
-export const formatRouteDuration = (route: Route | undefined): string => {
-  if (!route) return ''
-  const duration = getRouteDuration(route)
+export const formatRouteDuration = (duration: Duration | undefined): string => {
+  if (!duration) return ''
   return duration ? _formatDuration(duration) : ''
 }
 

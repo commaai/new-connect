@@ -1,3 +1,5 @@
+import { Duration } from 'dayjs/plugin/duration'
+
 export interface Profile {
   email: string
   id: string
@@ -45,11 +47,26 @@ export enum SegmentDataSource {
   THREE = 7,
 }
 
+interface Address {
+  start: string,
+  end: string
+}
+
+interface UIDerived {
+  distance?: number,
+  duration?: Duration,
+  engagement?: number,
+  flags?: number,
+  address?: Address
+}
+
 export interface Route {
   can?: boolean
   create_time: number
   devicetype: number
   dongle_id: string
+  start_lat?: number
+  start_lng?: number
   end_lat?: number
   end_lng?: number
   end_time?: string
@@ -79,7 +96,8 @@ export interface Route {
   url: string
   user_id: string | null
   version?: string
-  vin?: string
+  vin?: string,
+  ui_derived?: UIDerived
 }
 
 export interface RouteShareSignature extends Record<string, string> {

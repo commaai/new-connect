@@ -1,6 +1,10 @@
 import { fetcher } from '.'
 import { BASE_URL } from './config'
 import type { Device, Route, RouteShareSignature } from '~/types'
+import { TimelineStatistics } from './derived'
+import { getPlaceFromCoords } from '~/map'
+import { getTimelineStatistics } from './derived'
+import { formatRouteDistance, getRouteDuration } from '~/utils/date'
 
 export class RouteName {
   // dongle ID        date str
@@ -33,8 +37,47 @@ export class RouteName {
   }
 }
 
-export const getRoute = (routeName: Route['fullname']): Promise<Route> =>
-  fetcher<Route>(`/v1/route/${routeName}/`)
+const formatEngagement = (timeline?: TimelineStatistics): number => {
+  if (!timeline) return 0
+  const { engagedDuration, duration } = timeline
+  return parseInt((100 * (engagedDuration / duration)).toFixed(0))
+}
+  
+const formatUserFlags = (timeline?: TimelineStatistics): number => {
+  return timeline?.userFlags ?? 0
+}
+
+export const getDerivedData = async(route: Route): Promise<Route> => {
+  const [startPlace, endPlace, timeline] = await Promise.all([
+    getPlaceFromCoords(route.start_lng, route.start_lat),
+    getPlaceFromCoords(route.end_lng, route.end_lat),
+    getTimelineStatistics(route),
+  ])
+
+  route.ui_derived = {
+    distance: formatRouteDistance(route),
+    duration: getRouteDuration(route),
+    flags: formatUserFlags(timeline),
+    engagement: formatEngagement(timeline),
+    address: {
+      start: startPlace,
+      end: endPlace,
+    },
+  }
+
+  return route
+}
+
+export const getRoute = (routeName: Route['fullname']): Promise<Route> => {
+  return new Promise((resolve, reject) => {
+    fetcher<Route>(`/v1/route/${routeName}/`)
+      .then(route => {
+        getDerivedData(route)
+          .then(res => resolve(res))
+          .catch(() => resolve(route))
+      }).catch(err => reject(err))
+  })
+}
 
 export const getRouteShareSignature = (routeName: string): Promise<RouteShareSignature> =>
   fetcher(`/v1/route/${routeName}/share_signature`)

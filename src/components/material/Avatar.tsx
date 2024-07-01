@@ -4,6 +4,7 @@ import clsx from 'clsx'
 type AvatarProps = {
   class?: string
   color?: string
+  onClick?: () => void
 }
 
 const Avatar: ParentComponent<AvatarProps> = (props) => {
@@ -24,6 +25,7 @@ const Avatar: ParentComponent<AvatarProps> = (props) => {
         colorClasses(),
         props.class,
       )}
+      onClick={props.onClick}
     >
       {props.children}
     </div>
