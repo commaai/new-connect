@@ -1,7 +1,7 @@
 from utils.defaults import FPS
 from utils.reader import LogFileReader
 from concurrent.futures import ThreadPoolExecutor
-import os, threading
+import os
 
 class Verifier:
     def __init__(self, paths):
