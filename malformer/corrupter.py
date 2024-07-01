@@ -1,4 +1,4 @@
-from utils.defaults import ROUTE
+from utils.defaults import ROUTE, STORAGE_PATH
 from utils.reader import LogFileReader
 from schema import log
 from concurrent.futures import ThreadPoolExecutor
@@ -32,7 +32,7 @@ class Corrupter:
     def _corrupt_qlog(self, source, index, miss=[]):
         readers = LogFileReader(source)
         
-        directory = f'./routes/{self.route}/{self.route}--{index}/'
+        directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
         os.makedirs(directory, exist_ok=True)  # Corrected directory creation
         fn = os.path.join(directory, 'qlog.bz2')
 
@@ -47,7 +47,7 @@ class Corrupter:
             qlog.write(compressed)
     
     def _copy_qcam(self, source, index):
-        destination = f'./routes/{self.route}/{self.route}--{index}/'
+        destination = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
         os.makedirs(destination, exist_ok=True)  # Corrected directory creation
         shutil.copy(source, destination)
 

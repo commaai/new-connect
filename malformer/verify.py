@@ -30,7 +30,7 @@ class Verifier:
         if self.status is None:
             return "Segments haven't been verified yet. Run Verifier.verify() to get verification results."
         
-        result = ["\n================== VERIFICATION ===================="]
+        result = []
         for segment in self.status:
             result.append(f"Route segment {segment['segment']}")
             issues = [msg for key, msg in segment.items() if key != 'segment' and msg]

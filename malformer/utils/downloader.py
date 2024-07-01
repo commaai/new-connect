@@ -1,5 +1,5 @@
 import threading, requests, os
-from utils.defaults import DEVICE, ROUTE, ACCOUNT
+from utils.defaults import DEVICE, ROUTE, ACCOUNT, STORAGE_PATH
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
 class Downloader:
@@ -16,7 +16,7 @@ class Downloader:
     def _download_resource(self, url, index, name):
         response = requests.get(url)
         if response.status_code == 200:
-            directory = f'./routes/{self.route}/{self.route}--{index}/'
+            directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
             os.makedirs(os.path.dirname(directory), exist_ok=True)
             fn = os.path.join(directory, name)
             with open(fn, 'wb') as f:
