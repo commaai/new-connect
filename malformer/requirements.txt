@@ -1,0 +1,4 @@
+bullet==2.2.0
+requests==2.32.3
+pycapnp==2.0.0
+urllib3==2.2.1
