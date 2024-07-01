@@ -64,7 +64,7 @@ jobs:
         run: |
           bun install --frozen-lockfile
           bun playwright install --with-deps webkit
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
@@ -72,7 +72,7 @@ jobs:
           git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
-          git add new-connect
+          git add .
           git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
           git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
 
@@ -90,18 +90,18 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
