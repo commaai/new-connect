@@ -83,7 +83,7 @@ class UI:
     
     def close(self, path):
         self._clear()
-        print(f"\nYour newly corrupted route files are at new-connect/{path}")
+        print(f"\nYour newly corrupted route files are at {path}")
         print(f"Thanks for using malformer. Run again to corrupt more routes. Happy testing!\n")
 
     def _clear(self):
