@@ -1,7 +1,6 @@
 from utils.downloader import Downloader
 from utils.args import get_cli_args
 from utils.defaults import CAPNP_MAP
-from verify import Verifier
 from corrupter import Corrupter
 from bullet import Check
 
@@ -16,15 +15,9 @@ def main():
     downloader = Downloader(account=account, dongleId=device, route=route) if account and device and route else Downloader()
     paths = downloader.download_resources([{ 'name': 'qlogs', 'ext': '.bz2' }, { 'name': 'qcameras', 'ext': '.ts' }])
 
-    print('\n--------------- Segment-wise verification --------------------')
-    verifier = Verifier(paths)
-    verifier.verify()
-    print(verifier)
-
-    params = get_params()
     corrupter = Corrupter(paths)
-    path = corrupter.corrupt(miss=params)
-    print(f"\nThe corrupted copy of {route} is at {path}")
+    path = corrupter.corrupt(miss=get_params())
+    print(f"\nThe corrupted copy of route is at {path}")
 
 if __name__ == '__main__':
     main()

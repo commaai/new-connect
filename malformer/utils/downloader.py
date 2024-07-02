@@ -1,6 +1,28 @@
 import threading, requests, os
-from utils.defaults import DEVICE, ROUTE, ACCOUNT, STORAGE_PATH
+from utils.defaults import DEVICE, ROUTE, ACCOUNT, STORAGE_PATH, FPS
+from utils.reader import LogFileReader
 from concurrent.futures import ThreadPoolExecutor, as_completed
+
+def verify(qlogs, qcams):
+    print('\n--------------- Segment-wise verification --------------------')
+    for index, qlog in enumerate(qlogs):
+        print(f"\nVerifying segment {index}")
+        reader = LogFileReader(qlog)
+        messages = list(reader)  # Read messages once and reuse
+
+        checks = {
+            "start segment": lambda: index > 0 or any(msg.which() == 'qRoadEncodeIdx' and msg.qRoadEncodeIdx.segmentNum == 0 for msg in messages),
+            "60 qlogs": lambda: sum(1 for msg in messages if msg.which() == 'qRoadEncodeIdx') / 60 == FPS,
+            "60 GPS coordinates": lambda: sum(1 for msg in messages if msg.which() == 'gpsLocation') == 60,
+            "qcamera.ts file": lambda: os.path.exists(qcams[index]),
+        }
+
+        if all(check() for check in checks.values()):
+            print("\nSegment OK\n")
+        else:
+            for check, result in checks.items():
+                if not result():
+                    print(f"\n• {check} not found")
 
 class Downloader:
     def __init__(self, account=ACCOUNT, dongleId=DEVICE, route=ROUTE):
@@ -50,5 +72,5 @@ class Downloader:
                 if path: downloads[name].append(path)
         
         for key in downloads: downloads[key].sort()
-
+        verify(downloads['qlogs'], downloads['qcameras'])
         return downloads
