@@ -9,8 +9,7 @@ class Downloader:
     
     def _request(self, url, headers):
         response = requests.get(url, headers=headers)
-        if response.status_code == 200:
-            return response.json()
+        if response.status_code == 200: return response.json()
         raise Exception(f'{url} returned a response {response.text} with status code {response.status_code}')
     
     def _download_resource(self, url, index, name):
@@ -26,9 +25,8 @@ class Downloader:
         raise Exception(f'{url} returned a response {response.text} with status code {response.status_code}')
     
     def download_resources(self, resources: 'what all you want to download (eg, qlogs, qcams)'):
-        if self.files is None:
-            return None
-        
+        if self.files is None: return None
+        print(f'\n-------- Downloading raw driving files of {self.route} -----------')
         downloads = {resource['name']: [] for resource in resources}
 
         def _download(url, index, name, ext):
@@ -49,10 +47,8 @@ class Downloader:
             
             for future in as_completed(futures):
                 name, path = future.result()
-                if path:
-                    downloads[name].append(path)
+                if path: downloads[name].append(path)
         
-        for key in downloads:
-            downloads[key].sort()
+        for key in downloads: downloads[key].sort()
 
         return downloads

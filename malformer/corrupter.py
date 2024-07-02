@@ -38,7 +38,7 @@ class Corrupter:
                 data.extend(builder.to_bytes())
 
         with open(fn, 'wb') as qlog:
-            qlog.write(compressed)
+            qlog.write(data)
     
     def _copy_qcam(self, source, index):
         destination = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
