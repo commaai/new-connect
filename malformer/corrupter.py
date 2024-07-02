@@ -2,11 +2,7 @@ from utils.defaults import ROUTE, STORAGE_PATH
 from utils.reader import LogFileReader
 from schema import log
 from concurrent.futures import ThreadPoolExecutor
-import random
-import string
-import bz2
-import shutil
-import os
+import random, string, shutil, os
 
 class Corrupter:
     def __init__(self, paths, route=ROUTE):
@@ -19,8 +15,7 @@ class Corrupter:
         if len(words) < 1:
             return name
 
-        length = len(words[1])
-        word_list = list(words[1])
+        length, word_list = len(words[1]), list(words[1])
 
         random_indices = random.sample(range(length), n)
         for index in random_indices:
@@ -41,7 +36,6 @@ class Corrupter:
             if reader.which() not in miss:
                 builder = reader.as_builder()
                 data.extend(builder.to_bytes())
-        compressed = bz2.compress(data)
 
         with open(fn, 'wb') as qlog:
             qlog.write(compressed)
@@ -58,10 +52,7 @@ class Corrupter:
 
     def corrupt(self, miss=[]):
         with ThreadPoolExecutor() as executor:
-            futures = [
-                executor.submit(self._corrupt_segment, segment, self._qcams[index], index, miss)
-                for index, segment in enumerate(self._segments)
-            ]
+            futures = [executor.submit(self._corrupt_segment, segment, self._qcams[index], index, miss) for index, segment in enumerate(self._segments)]
             for future in futures:
                 future.result()
         
