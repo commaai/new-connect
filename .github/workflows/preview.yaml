@@ -52,6 +52,30 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
+      - name: Checkout ci-artifacts
+        uses: actions/checkout@v4
+        with: 
+          repository: commaai/ci-artifacts
+          ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          path: ${{ github.workspace }}/ci-artifacts
+          ref: master
+
+      - name: take screenshots
+        run: |
+          bun install --frozen-lockfile
+          bun playwright install --with-deps webkit
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+
+      - name: Push Screenshots
+        working-directory: ${{ github.workspace }}/ci-artifacts
+        run: |
+          git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git add .
+          git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
+          git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
+
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
         with:
@@ -63,11 +87,23 @@ jobs:
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
             deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+            ### Mobile
+            <table>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+              </tr>
+            </table>
+
+            ### Desktop
+            <table>
+              <tr>
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+              </tr>
+            </table>
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Use CI_ARTIFACTS_DEPLOY_KEY
-        run: echo "using secret in master"
-        env:
-          CI_ARTIFACTS_DEPLOY_KEY: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
