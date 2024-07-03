@@ -7,39 +7,26 @@ import random, string, shutil, os
 class Corrupter:
     def __init__(self, paths, route=ROUTE):
         self.route = self._generate_name(route)
-        self._segments = paths['qlogs']
-        self._qcams = paths['qcameras']
+        self._segments, self._qcams = paths['qlogs'], paths['qcameras']
     
     def _generate_name(self, name, n=4):
-        words = name.split('--')
-        if len(words) < 1:
-            return name
+        parts = name.split('--')
+        if len(parts) < 2: return name
 
-        length, word_list = len(words[1]), list(words[1])
-
-        random_indices = random.sample(range(length), n)
-        for index in random_indices:
-            word_list[index] = random.choice(string.ascii_lowercase)
-
-        modified_word = ''.join(word_list)
-        return f"{words[0]}--{modified_word}"
+        word = parts[1]
+        word_list = [random.choice(string.ascii_lowercase) if i in random.sample(range(len(word)), n) else char for i, char in enumerate(word)]
+        return f"{parts[0]}--{''.join(word_list)}"
 
     def _corrupt_log(self, source, index, miss=[]):
         readers = LogFileReader(source)
-        
-        directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
+        directory = os.path.join(STORAGE_PATH, self.route, f'{self.route}--{index}')
         os.makedirs(directory, exist_ok=True)
         fn = os.path.join(directory, 'qlog.bz2')
 
-        data = bytearray()
-        for reader in readers:
-            if reader.which() not in miss:
-                builder = reader.as_builder()
-                data.extend(builder.to_bytes())
-
+        data = b''.join(builder.to_bytes() for reader in readers if reader.which() not in miss for builder in [reader.as_builder()])
         with open(fn, 'wb') as qlog:
             qlog.write(data)
-    
+
     def _copy_qcam(self, source, index):
         destination = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
         os.makedirs(destination, exist_ok=True)
