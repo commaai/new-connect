@@ -18,11 +18,11 @@ def verify(qlogs, qcams):
         }
 
         if all(check() for check in checks.values()):
-            print("\nSegment OK\n")
+            print("Segment OK\n")
         else:
             for check, result in checks.items():
                 if not result():
-                    print(f"\n• {check} not found")
+                    print(f"• {check} not found")
 
 class Downloader:
     def __init__(self, account=ACCOUNT, dongleId=DEVICE, route=ROUTE):

@@ -3,8 +3,7 @@ from collections.abc import Iterator
 from schema import log
 
 class LogFileReader:
-    def __init__(self, fn, only_union_types=False, sort_by_time=False, dat=None):
-        self.data_version = None
+    def __init__(self, fn, only_union_types=False, dat=None):
         self._only_union_types = only_union_types
 
         if not dat:
@@ -26,9 +25,6 @@ class LogFileReader:
             self._ents = list(log.Event.read_multiple_bytes(dat))
         except capnp.KjException:
             warnings.warn("Corrupted events detected", RuntimeWarning, stacklevel=1)
-
-        if sort_by_time:
-            self._ents.sort(key=lambda x: x.logMonoTime)
 
     def __iter__(self) -> Iterator[capnp._DynamicStructReader]:
         for ent in self._ents:
