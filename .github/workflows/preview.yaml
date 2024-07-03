@@ -54,13 +54,13 @@ jobs:
 
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
-        with: 
+        with:
           repository: commaai/ci-artifacts
           ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
           path: ${{ github.workspace }}/ci-artifacts
           ref: master
 
-      - name: take screenshots
+      - name: Take screenshots
         run: |
           bun install --frozen-lockfile
           bun playwright install --with-deps webkit
