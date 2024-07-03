@@ -30,10 +30,8 @@ Drives
 - [x] engagement timeline
 - [ ] file uploads
 
-Navigation
+Map
 - [ ] show user and car location
-- [ ] send destination to device
-- [ ] manage home, work, and favorites
 
 Misc
 - [x] demo mode
