@@ -12,10 +12,8 @@ class Corrupter:
     def _generate_name(self, name, n=4):
         parts = name.split('--')
         if len(parts) < 2: return name
-
         word = parts[1]
-        word_list = [random.choice(string.ascii_lowercase) if i in random.sample(range(len(word)), n) else char for i, char in enumerate(word)]
-        return f"{parts[0]}--{''.join(word_list)}"
+        return f"{parts[0]}--{''.join(random.choice(string.ascii_lowercase) if i in random.sample(range(len(word)), n) else char for i, char in enumerate(word))}"
 
     def _corrupt_log(self, source, index, miss=[]):
         readers = LogFileReader(source)

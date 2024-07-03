@@ -36,15 +36,14 @@ class Downloader:
     
     def _download_resource(self, url, index, name):
         response = requests.get(url)
-        if response.status_code == 200:
-            directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
-            os.makedirs(os.path.dirname(directory), exist_ok=True)
-            fn = os.path.join(directory, name)
-            with open(fn, 'wb') as f:
-                for chunk in response.iter_content(chunk_size=8192):
-                    f.write(chunk)
-            return fn
-        raise Exception(f'{url} returned a response {response.text} with status code {response.status_code}')
+        response.raise_for_status()
+        directory = f'{STORAGE_PATH}/{self.route}/{self.route}--{index}/'
+        os.makedirs(os.path.dirname(directory), exist_ok=True)
+        fn = os.path.join(directory, name)
+        with open(fn, 'wb') as f:
+            for chunk in response.iter_content(chunk_size=8192):
+                f.write(chunk)
+        return fn
     
     def download_resources(self, resources: 'what all you want to download (eg, qlogs, qcams)'):
         if self.files is None: return None

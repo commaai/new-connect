@@ -43,6 +43,3 @@ Thumbs.db
 .classpath
 *.launch
 .settings/
-
-# malformer
-/malformer/routes
