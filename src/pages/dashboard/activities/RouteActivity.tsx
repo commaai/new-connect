@@ -55,14 +55,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const copyToClipboard = () => {
     navigator.clipboard.writeText(props.dateStr || '')
-      .then(() => {})
-      .catch(() => {})
+      .then(() => { })
+      .catch(() => { })
   }
 
   const shareDrive = () => {
     navigator.share({ url: window.location.href })
-      .then(() => {})
-      .catch(() => {})
+      .then(() => { })
+      .catch(() => { })
   }
 
   createEffect(() => {
@@ -82,12 +82,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     return <div class="flex w-full items-center justify-center" >
       <div
         onClick={() => {
-          if(props.selectable) setSelected(!selected())
-          if(props.onClick) props.onClick()
-        }} 
+          if (props.selectable) setSelected(!selected())
+          if (props.onClick) props.onClick()
+        }}
         class={`mx-1 flex size-full items-center justify-center space-x-2 rounded-md border-2 border-secondary-container p-2 lg:h-3/4 ${selected() ? 'bg-primary-container' : 'hover:bg-secondary-container'}`}
       >
-        <Icon class={selected() ? 'text-on-primary-container' :'text-on-secondary-container'} size="20">{`${props.icon}`}</Icon>
+        <Icon class={selected() ? 'text-on-primary-container' : 'text-on-secondary-container'} size="20">{`${props.icon}`}</Icon>
         <p class={`text-center text-sm ${selected() ? 'text-on-primary-container' : 'text-on-secondary-container'}`}>{props.label}</p>
       </div>
     </div>
@@ -119,7 +119,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             }
           >
             <div class="relative left-2 top-10 z-40 flex h-8 w-20 items-center justify-center rounded-lg bg-primary-container px-2 py-1 text-on-primary-container sm:left-4">
-              <p class="text-xs">{parseInt(speed()*2.237)} mph</p>
+              <p class="text-xs">{Math.round(speed() * 2.237)} mph</p>
             </div>
             <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
             <Timeline class="mb-4" routeName={routeName()} seekTime={seekTime()} />
@@ -141,7 +141,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <Action label="View in useradmin" icon="admin_panel_settings" />
             <Action label="Upload options" icon="cloud_upload" />
             <Action onClick={copyToClipboard} label="Copy ID" icon="content_copy" />
-            <Action onClick={shareDrive} label="Share route" icon="share" /> 
+            <Action onClick={shareDrive} label="Share route" icon="share" />
           </div>
           {/* <Show when={isDesktop()}>
             <DriveStatistics route={route()} />
