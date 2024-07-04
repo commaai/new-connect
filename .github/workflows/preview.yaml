@@ -14,7 +14,7 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 2  # FIXME: this should be 1m!
+    timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -64,7 +64,7 @@ jobs:
       - name: take screenshots
         run: |
           bun install --frozen-lockfile
-          bun playwright install --with-deps webkit
+          bun playwright install chromium
           node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
