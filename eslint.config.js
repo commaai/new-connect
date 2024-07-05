@@ -46,6 +46,6 @@ export default [
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'never'],
     },
-    ignores: ['node_modules', 'dist'],
+    ignores: ['node_modules', 'dist', 'malformer'],
   },
 ]
