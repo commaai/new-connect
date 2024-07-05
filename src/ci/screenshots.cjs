@@ -23,13 +23,13 @@ async function takeScreenshots(deviceType, context) {
 }
 
 (async () => {
-  const mobile_browser = await chromium.launch()
+  const mobile_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
   const iphone_13 = devices['iPhone 13']
   const mobile_context = await mobile_browser.newContext(iphone_13)
   await takeScreenshots('mobile', mobile_context)
   await mobile_browser.close()
 
-  const desktop_browser = await chromium.launch()
+  const desktop_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
   const desktop_context = await desktop_browser.newContext({viewport: { width: 1920, height: 1080 }})
   await takeScreenshots('desktop', desktop_context)
   await desktop_browser.close()
