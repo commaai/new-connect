@@ -1,8 +1,7 @@
 from bullet import Check
-from schema import log
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from collections.abc import Iterator
-import argparse, random, requests, string, shutil, os, capnp, urllib, bz2, zstd, warnings
+import argparse, random, requests, string, shutil, os, capnp, urllib, bz2, zstd, warnings, capnp
 
 ACCOUNT = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
 DEVICE = '1d3dc3e03047b0c7'
@@ -10,6 +9,22 @@ ROUTE = '000000dd--455f14369d'
 FPS = 20 # video frame rate, for performing calculations on qlogs
 STORAGE_PATH = './malformer/routes'
 CAPNP_MAP = { 'GPS': 'gpsLocation', 'Thumbnail': 'thumbnail', 'qlogs': 'qEncodeIdx' }
+SCHEMA_BASE = os.path.join(os.path.dirname(os.path.abspath(__file__)),'schema')
+schemas = ['log.capnp', 'custom.capnp', 'legacy.capnp', 'car.capnp', 'include/c++.capnp']
+
+def get_capnp_schema():
+    if not all(os.path.isfile(os.path.join(SCHEMA_BASE, schema)) for schema in schemas):
+        print("\nPlease wait, downloading capnp schema files...\nThis is a one time thing and won't take long.\n")
+        os.makedirs(os.path.dirname(f'{SCHEMA_BASE}/include/'), exist_ok=True)
+        for schema in schemas:
+            response = requests.get(f"https://raw.githubusercontent.com/commaai/openpilot/master/cereal/{schema}".replace("+", "%2B"))
+            response.raise_for_status()
+            with open(os.path.join(SCHEMA_BASE, schema), 'w') as capnp_file:
+                capnp_file.write(response.text)
+    return capnp.load(os.path.join(SCHEMA_BASE, "log.capnp"))
+
+capnp.remove_import_hook()
+log = get_capnp_schema()
 
 class LogFileReader:
     def __init__(self, fn, only_union_types=False, dat=None):
