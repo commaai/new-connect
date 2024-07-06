@@ -1,9 +1,10 @@
-import { createSignal, createEffect, Suspense, type VoidComponent } from 'solid-js'
+import { createSignal, createEffect, Suspense, Show, type Component } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
 import { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
+import RouteOptions from '~/components/RouteOptions'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from './Timeline'
@@ -12,12 +13,83 @@ import type { Route, RouteSegments } from '~/types'
 
 import { reverseGeocode } from '~/map'
 
+type RouteOptionsProps = {
+  route?: Route;
+}
+
+const [showRouteOptionsCard, setShowRouteOptionsCard] = createSignal(false)
+
+const RouteOptionsCard: Component<RouteOptionsProps> = (props) => {
+  const [isMdOrLarger, setIsMdOrLarger] = createSignal(false)
+
+  // listen isMdOrLarger
+  createEffect(() => {
+    const updateSize = () => {
+      setIsMdOrLarger(window.innerWidth >= 768)
+    }
+    window.addEventListener('resize', updateSize)
+    // Initial check
+    updateSize() 
+
+    return () => window.removeEventListener('resize', updateSize)
+  })
+
+  const stopPropagation = (event: MouseEvent) => {
+    event.stopPropagation()
+
+    setShowRouteOptionsCard(false)
+  }
+
+  return (
+    <Show when={showRouteOptionsCard()}>
+      <div onClick={stopPropagation} classList={{
+        'fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 transition duration-800 ease-in-out': isMdOrLarger(),
+        'fixed inset-0 z-50 flex flex-col-reverse bg-black bg-opacity-50 p-4 transition duration-800 ease-in-out': !isMdOrLarger(),
+        'transform translate-y-0': !isMdOrLarger() && showRouteOptionsCard(),
+        'transform translate-y-full': !isMdOrLarger() && !showRouteOptionsCard(),
+      }}>
+        <div onClick={(event: MouseEvent) => event.stopPropagation()}>
+          <RouteOptions {...props} />
+        </div>
+      </div>
+    </Show>
+  )
+}
+
+type FavoriteRoutes = string[]
+
 const RouteHeader = (props: { route?: RouteSegments }) => {
+
   const startTime = () => props?.route?.segment_start_times ? dayjs(props.route.segment_start_times[0]) : null
   const endTime = () => props?.route?.segment_end_times ? dayjs(props.route.segment_end_times.at(-1)) : null
 
   const headline = () => startTime()?.format('ddd, MMM D, YYYY')
   const subhead = () => `${startTime()?.format('h:mm A')} to ${endTime()?.format('h:mm A')}`
+
+  const [isFavorite, setIsFavorite] = createSignal(false)
+
+  const toggleFavorite = (routeName: string) => {
+    let favorites: FavoriteRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]') as FavoriteRoutes
+    const isFavorite = favorites.includes(routeName)
+    favorites = isFavorite ? favorites.filter(name => name !== routeName) : [...favorites, routeName]
+    localStorage.setItem('favoriteRoutes', JSON.stringify(favorites))
+    setIsFavorite(!isFavorite)
+  }
+
+  createEffect(() => {
+    const favorites: FavoriteRoutes = JSON.parse(localStorage.getItem('favoriteRoutes') || '[]') as FavoriteRoutes
+    setIsFavorite(favorites.includes(props.route?.fullname ?? ''))
+  })
+
+  const handleLikeClick = (event: MouseEvent) => {
+    event.stopPropagation()
+    props.route?.fullname && toggleFavorite(props.route.fullname)
+  }
+
+  const handleMoreOptionsClick = (event: MouseEvent) => {
+    event.stopPropagation()
+    setShowRouteOptionsCard(true)
+  }
 
   return (
     <CardHeader
@@ -27,6 +99,16 @@ const RouteHeader = (props: { route?: RouteSegments }) => {
         <Avatar>
           <Icon>directions_car</Icon>
         </Avatar>
+      }
+      trailing={
+        <div class="flex items-center gap-3.5">
+          <button onClick={(event) => handleLikeClick(event)}>
+            <Icon filled={isFavorite()} class={isFavorite() ? 'text-red-400 hover:text-white' : 'text-white hover:text-red-400'}>favorite_border</Icon>
+          </button>
+          <button class="hover:text-blue-400" onClick={(event) => handleMoreOptionsClick(event)}>
+            <Icon>more_vert</Icon>
+          </button>
+        </div>
       }
     />
   )
@@ -130,31 +212,34 @@ type RouteCardProps = {
   route?: Route;
 }
 
-const RouteCard: VoidComponent<RouteCardProps> = (props) => {
+const RouteCard: Component<RouteCardProps> = (props) => {
   const route = () => props.route
 
+  const navigateToRouteActivity = () => {
+    location.href = `/${route()?.dongle_id}/${route()?.fullname?.slice(17)}`
+  }
+
   return (
-    <a href={`/${route()?.dongle_id}/${route()?.fullname?.slice(17)}`}>
-      <div class="custom-card flex shrink-0 flex-col rounded-lg md:flex-row">
-        <div class="h-full w-[410px]">
-          <Suspense
-            fallback={<div class="skeleton-loader size-full bg-surface" />}
-          >
-            <RouteStaticMap route={route()} />
-          </Suspense>
-        </div>
-
-        <div class="flex flex-col">
-          <RouteHeader route={route()} />
-
-          <CardContent class="py-0">
-            <RouteRevGeo route={route()} />
-            <Timeline route={route()} rounded="rounded-sm" />
-            <RouteStatistics route={route()} />
-          </CardContent>
-        </div>
+    <div class="custom-card flex shrink-0 flex-col rounded-lg md:flex-row" onClick={navigateToRouteActivity}>
+      <RouteOptionsCard route={route()} />
+      <div class="h-full lg:w-[410px]">
+        <Suspense
+          fallback={<div class="skeleton-loader size-full bg-surface" />}
+        >
+          <RouteStaticMap route={route()} />
+        </Suspense>
       </div>
-    </a>
+
+      <div class="flex flex-col">
+        <RouteHeader route={route()} />
+
+        <CardContent class="py-0">
+          <RouteRevGeo route={route()} />
+          <Timeline route={route()} rounded="rounded-sm" />
+          <RouteStatistics route={route()} />
+        </CardContent>
+      </div>
+    </div>
   )
 }
 
