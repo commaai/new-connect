@@ -13,13 +13,10 @@ import type { Route, RouteSegments } from '~/types'
 
 import { reverseGeocode } from '~/map'
 
-type RouteOptionsProps = {
-  route?: Route;
-}
-
 const [showRouteOptionsCard, setShowRouteOptionsCard] = createSignal(false)
+const [currentCardRoute, setCurrentCardRoute] = createSignal<Route | undefined>(undefined)
 
-const RouteOptionsCard: Component<RouteOptionsProps> = (props) => {
+const RouteOptionsCard: Component = () => {
   const [isMdOrLarger, setIsMdOrLarger] = createSignal(false)
 
   // listen isMdOrLarger
@@ -49,7 +46,7 @@ const RouteOptionsCard: Component<RouteOptionsProps> = (props) => {
         'transform translate-y-full': !isMdOrLarger() && !showRouteOptionsCard(),
       }}>
         <div onClick={(event: MouseEvent) => event.stopPropagation()}>
-          <RouteOptions {...props} />
+          <RouteOptions route={currentCardRoute()} />
         </div>
       </div>
     </Show>
@@ -89,6 +86,7 @@ const RouteHeader = (props: { route?: RouteSegments }) => {
   const handleMoreOptionsClick = (event: MouseEvent) => {
     event.stopPropagation()
     setShowRouteOptionsCard(true)
+    setCurrentCardRoute(props.route)
   }
 
   return (
@@ -221,7 +219,7 @@ const RouteCard: Component<RouteCardProps> = (props) => {
 
   return (
     <div class="custom-card flex shrink-0 flex-col rounded-lg md:flex-row" onClick={navigateToRouteActivity}>
-      <RouteOptionsCard route={route()} />
+      <RouteOptionsCard />
       <div class="h-full lg:w-[410px]">
         <Suspense
           fallback={<div class="skeleton-loader size-full bg-surface" />}
