@@ -82,13 +82,11 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
       >
         <Switch
           fallback={
-            <>
-              <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-              >
-                No device
-              </TopAppBar>
-            </>
+            <TopAppBar
+              leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+            >
+              No device
+            </TopAppBar>
           }
         >
           <Match when={!!profile.error}>
