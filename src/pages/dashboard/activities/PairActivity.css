@@ -1,0 +1,16 @@
+#video-container {
+  .scan-region-highlight {
+    border-radius: 1em;
+    outline: rgba(0, 0, 0, .25) solid 50vmax;
+  }
+
+  .scan-region-highlight-svg {
+    display: none;
+  }
+
+  .code-outline-highlight {
+    stroke: var(--color-primary) !important;
+    stroke-width: 10 !important;
+    stroke-dasharray: none !important;
+  }
+}
