@@ -3,6 +3,7 @@ import {
   createContext,
   createResource,
   createSignal,
+  lazy,
   Match,
   Setter,
   Show,
@@ -23,9 +24,10 @@ import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
-import PairActivity from './activities/PairActivity'
 import RouteActivity from './activities/RouteActivity'
 import storage from '~/utils/storage'
+
+const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 type DashboardState = {
   drawer: Accessor<boolean>
