@@ -79,7 +79,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
     if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
-    return devices()?.[0].dongle_id
+    return devices()?.[0]?.dongle_id
   }
 
   return (
