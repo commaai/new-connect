@@ -17,7 +17,7 @@
     "pre-commit": "bun lint",
     "test": "vitest run"
   },
-  "packageManager": "bun@1.1.13",
+  "packageManager": "bun@1.1.18",
   "type": "module",
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.8",
