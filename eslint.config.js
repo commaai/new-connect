@@ -7,7 +7,10 @@ import solid from 'eslint-plugin-solid/configs/typescript.js'
 import stylistic from '@stylistic/eslint-plugin'
 
 export default [
-  { languageOptions: { globals: globals.browser } },
+  {
+    languageOptions: { globals: globals.browser },
+    ignores: ['.github', '.husky', '.vscode', 'node_modules', 'dist'],
+  },
   js.configs.recommended,
   ...ts.configs.recommendedTypeChecked,
   {
@@ -46,6 +49,5 @@ export default [
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'never'],
     },
-    ignores: ['node_modules', 'dist'],
   },
 ]
