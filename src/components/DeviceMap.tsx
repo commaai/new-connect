@@ -1,4 +1,4 @@
-import { VoidComponent, createSignal, onMount, createEffect, Show } from 'solid-js'
+import { VoidComponent, createSignal, onMount, createEffect, Show, Suspense } from 'solid-js'
 import { MAPBOX_TOKEN, MAPBOX_USERNAME } from '~/map/config'
 import { getMapStyleId, getPlaceFromCoords } from '~/map'
 import { getThemeId } from '~/theme'
@@ -7,6 +7,7 @@ import { Device } from '~/types'
 import Icon from './material/Icon'
 import Button from './material/Button'
 import 'mapbox-gl/dist/mapbox-gl.css'
+import { getDeviceName } from '~/utils/device'
 
 type Location = {
   lat: number, lng: number, address: string,
@@ -49,15 +50,13 @@ const DeviceMap: VoidComponent<Props> = (props) => {
   const device = () => props.device
 
   const [userLocation, setUserLocation] = createSignal<Location>({ lng: 0, lat: 0, address: '' })
+  const [deviceLocation, setDeviceLocation] = createSignal<Location>({ lng: 0, lat: 0, address: '' })
   const [popUp, setPopUp] = createSignal<Location>()
   const [viewport, setViewport] = createSignal({ center: [-122.41, 37.78], zoom: 11 } as Viewport)
 
   onMount(() => {
     navigator.geolocation.getCurrentPosition((location) => {
-      setViewport({
-        center: [location.coords.longitude, location.coords.latitude],
-        zoom: 11,
-      } as Viewport)
+      setViewport({ center: [location.coords.longitude, location.coords.latitude], zoom: 15 } as Viewport)
       getPlaceFromCoords(location.coords.longitude, location.coords.latitude)
         .then(address => setUserLocation({ 
           lng: location.coords.longitude, lat: location.coords.latitude, address, agent: 'You', 
@@ -67,7 +66,14 @@ const DeviceMap: VoidComponent<Props> = (props) => {
   })
 
   createEffect(() => {
-    console.log(device())
+    const lat = device()?.last_gps_lat
+    const lng = device()?.last_gps_lng
+    if(lng && lat) {
+      setViewport({ center: [lng, lat], zoom: 15 } as Viewport)
+      getPlaceFromCoords(lng, lat)
+        .then(address => setDeviceLocation({ lng, lat, address, agent: getDeviceName(device()) }))
+        .catch(err => console.error(err))
+    }
   })
 
   type MarkerProps = {
@@ -80,21 +86,26 @@ const DeviceMap: VoidComponent<Props> = (props) => {
   }
 
   return <div class="relative h-3/4 w-full overflow-hidden" >
-    <div class="size-full">
-      <MapGL
-        options={{
-          accessToken: MAPBOX_TOKEN,
-          style: `mapbox://styles/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}`,
-        }}
-        viewport={viewport()}
-        onViewportChange={(evt: Viewport) => setViewport(evt)}
-        style={{ position: 'absolute', inset: '0px', 'z-index': 1 }}
-      >
-        <Show when={userLocation().agent}>
-          <Marker lngLat={userLocation()} onOpen={() => setPopUp(userLocation())} onClose={() => setPopUp()} options={{ element: <MapMarker icon="person" /> }} />
-        </Show>
-      </MapGL>
-    </div>
+    <Suspense fallback={<div class="skeleton-loader size-full"/>}>
+      <div class="size-full">
+        <MapGL
+          options={{
+            accessToken: MAPBOX_TOKEN,
+            style: `mapbox://styles/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}`,
+          }}
+          viewport={viewport()}
+          onViewportChange={(evt: Viewport) => setViewport(evt)}
+          style={{ position: 'absolute', inset: '0px', 'z-index': 1 }}
+        >
+          <Show when={userLocation().agent}>
+            <Marker lngLat={userLocation()} onOpen={() => setPopUp(userLocation())} onClose={() => setPopUp()} options={{ element: <MapMarker icon="person" /> }} />
+          </Show>
+          <Show when={deviceLocation().agent}>
+            <Marker lngLat={deviceLocation()} onOpen={() => setPopUp(deviceLocation())} onClose={() => setPopUp()} options={{ element: <MapMarker icon="directions_car" /> }} />
+          </Show>
+        </MapGL>
+      </div>
+    </Suspense>
     <PopUp location={popUp()} />
   </div>
 }
