@@ -8,8 +8,8 @@ import {
   Show,
   Switch,
 } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import { Navigate, useLocation } from '@solidjs/router'
+import type { Component } from 'solid-js'
+import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -57,7 +57,7 @@ const DashboardDrawer = (props: {
   )
 }
 
-const DashboardLayout: VoidComponent = () => {
+const DashboardLayout: Component<RouteSectionProps> = () => {
   const location = useLocation()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
