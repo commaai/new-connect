@@ -12,12 +12,12 @@
     "build": "vite build",
     "dev": "vite",
     "serve": "vite prefix",
-    "lint": "eslint",
+    "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
     "test": "vitest run"
   },
-  "packageManager": "bun@1.1.13",
+  "packageManager": "bun@1.1.18",
   "type": "module",
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.8",
@@ -35,6 +35,7 @@
     "globals": "^15.4.0",
     "husky": "^9.0.11",
     "jsdom": "^24.1.0",
+    "playwright": "^1.44.1",
     "postcss": "^8.4.38",
     "solid-devtools": "^0.30.1",
     "tailwindcss": "^3.4.4",
