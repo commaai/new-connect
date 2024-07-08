@@ -7,6 +7,7 @@ import Icon from '~/components/material/Icon'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/types'
 import { getDeviceName } from '~/utils/device'
+import storage from '~/utils/storage'
 
 import { DashboardContext } from '../Dashboard'
 
@@ -24,7 +25,10 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
       <For each={props.devices}>
         {(device) => {
           const isSelected = () => location.pathname.includes(device.dongle_id)
-          const onClick = () => setDrawer(false)
+          const onClick = () => {
+            setDrawer(false)
+            storage.setItem('lastSelectedDongleId', device.dongle_id)
+          }
           return (
             <ListItem
               variant="nav"

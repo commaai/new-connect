@@ -8,8 +8,8 @@ import {
   Show,
   Switch,
 } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import { Navigate, useLocation } from '@solidjs/router'
+import type { Component } from 'solid-js'
+import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -23,6 +23,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
+import storage from '~/utils/storage'
 
 type DashboardState = {
   drawer: Accessor<boolean>
@@ -57,7 +58,7 @@ const DashboardDrawer = (props: {
   )
 }
 
-const DashboardLayout: VoidComponent = () => {
+const DashboardLayout: Component<RouteSectionProps> = () => {
   const location = useLocation()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
@@ -72,6 +73,15 @@ const DashboardLayout: VoidComponent = () => {
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
 
+  const getDefaultDongleId = () => {
+    // Do not redirect if dongle ID already selected
+    if (dongleId()) return undefined
+
+    const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
+    if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
+    return devices()?.[0]?.dongle_id
+  }
+
   return (
     <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
       <Drawer
@@ -82,13 +92,11 @@ const DashboardLayout: VoidComponent = () => {
       >
         <Switch
           fallback={
-            <>
-              <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-              >
-                No device
-              </TopAppBar>
-            </>
+            <TopAppBar
+              leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+            >
+              No device
+            </TopAppBar>
           }
         >
           <Match when={!!profile.error}>
@@ -100,8 +108,9 @@ const DashboardLayout: VoidComponent = () => {
           <Match when={dongleId()} keyed>
             <DeviceActivity dongleId={dongleId()} />
           </Match>
-          <Match when={devices()?.length} keyed>
-            <Navigate href={`/${devices()![0].dongle_id}`} />
+          <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
+            <Navigate href={`/${defaultDongleId}`} />
+          )}
           </Match>
         </Switch>
       </Drawer>
