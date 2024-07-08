@@ -1,91 +1,158 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
-  createResource,
   createSignal,
   For,
+  Show,
   Suspense,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import clsx from 'clsx'
-
 import type { RouteSegments } from '~/types'
-
+import { getKey, getRouteCardsData } from '~/api/routelist'
 import RouteCard from '~/components/RouteCard'
-import { fetcher } from '~/api'
+import Loader from '~/components/Loader'
 import Button from '~/components/material/Button'
+import Icon from '~/components/material/Icon'
 
-const PAGE_SIZE = 3
-
-type RouteListProps = {
-  class?: string
-  dongleId: string
+type Filter = {
+  label: string
+  sorter?: (a: RouteSegments, b: RouteSegments) => number
 }
+const filters: Filter[] = [
+  {
+    label: 'Miles',
+    sorter: (a: RouteSegments, b: RouteSegments) => { 
+      return (b.ui_derived?.distance || 0) - (a.ui_derived?.distance || 0)
+    },
+  },
+  {
+    label: 'Duration',
+    sorter: (a: RouteSegments, b: RouteSegments) => { 
+      return (b.ui_derived?.duration?.asMilliseconds() || 0) - (a.ui_derived?.duration?.asMilliseconds() || 0)
+    },
+  },
+  {
+    label: 'Engagement',
+    sorter: (a: RouteSegments, b: RouteSegments) => { 
+      return (b.ui_derived?.engagement || 0) - (a.ui_derived?.engagement || 0)
+    },
+  },
+]
 
+const PAGE_SIZE = 5
 const pages: Promise<RouteSegments[]>[] = []
 
-const RouteList: VoidComponent<RouteListProps> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
-  const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData) return endpoint()
-    if (previousPageData.length === 0) return undefined
-    const lastSegmentEndTime = previousPageData.at(-1)!.segment_start_times.at(-1)!
-    return `${endpoint()}&end=${lastSegmentEndTime - 1}`
-  }
+type Props = {
+  searchQuery: string,
+  dongleId: string | undefined
+}
+
+const RouteList: VoidComponent<Props> = (props) => {
+  
+  const dongleId = () => props.dongleId
+  const query = () => props.searchQuery
+  
+  let routes: RouteSegments[] = []
+
+  const [display, setDisplay] = createSignal<RouteSegments[]>([])
+  const [pageSize, setSize] = createSignal<number>(0)
+  const [filter, setFilter] = createSignal<Filter>({ label: '' })
+
   const getPage = (page: number): Promise<RouteSegments[]> => {
     if (!pages[page]) {
       // eslint-disable-next-line no-async-promise-executor
       pages[page] = new Promise(async (resolve) => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
+        const key = getKey(dongleId(), PAGE_SIZE, previousPageData)
+        const data = await getRouteCardsData(key)
+        resolve(data)
       })
     }
     return pages[page]
   }
 
+  const searchResults = (searchQuery: string | undefined) => {
+    let results = routes
+    if(searchQuery) {
+      const query = searchQuery.toLowerCase()
+      results = routes.filter(route => {
+        const address = route.ui_derived?.address
+        return address?.start.toLowerCase().includes(query) || address?.end.toLowerCase().includes(query)
+      })
+    }
+    return results
+  }
+
+  const filteredResults = () => {
+    let results = routes
+    if(filter().label != '') {
+      results = results.slice().sort(filter().sorter)
+    }
+    return results
+  }
+
   createEffect(() => {
-    if (props.dongleId) {
-      pages.length = 0
-      setSize(1)
+    getPage(pageSize())
+      .then(res => {
+        routes = routes.concat(res)
+        routes = searchResults(query())
+        routes = filteredResults()
+        setDisplay(routes)
+      })
+      .catch(() => {})
+  })
+
+  createEffect(() => {
+    if(dongleId()) {
+      setSize(0)
     }
   })
 
-  const [size, setSize] = createSignal(1)
-  const onLoadMore = () => setSize(size() + 1)
-  const pageNumbers = () => Array.from(Array(size()).keys())
+  createEffect(() => {
+    setDisplay(searchResults(query()))
+  })
+
+  const Filters: VoidComponent = () => {
+
+    return (
+      <div class="flex h-40 w-full items-end space-x-4 p-4">
+        <For each={filters}>
+          {(each) => (
+            <div
+              onClick={() => {
+                setFilter(each.label === filter().label ? { label: '' } : each)
+                setDisplay(filteredResults())
+              }}
+              class={`group flex items-center justify-center rounded-lg border-2 border-secondary-container px-4 py-2 ${each.label === filter().label ? 'bg-primary-container' : 'hover:bg-secondary-container'}`}
+            >
+              <p class={`${each.label === filter().label ? 'text-on-primary-container' : 'text-on-secondary-container group-hover:text-primary'}`}>{each.label}</p>
+            </div>
+          )}
+        </For>
+      </div>
+    )
+  }
 
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
+    <Show 
+      when={display().length > 0}
+      fallback={<div class="flex size-full flex-col items-center justify-center">
+        <Icon class="text-secondary-container">car_crash</Icon>
+        <p class="text-secondary-container">No drives</p>
+      </div>}
     >
-      <For each={pageNumbers()}>
-        {(i) => {
-          const [routes] = createResource(() => i, getPage)
-          return (
-            <Suspense
-              fallback={
-                <>
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                </>
-              }
-            >
-              <For each={routes()}>
-                {(route) => <RouteCard route={route} />}
-              </For>
-            </Suspense>
-          )
-        }}
-      </For>
-      <div class="flex justify-center">
-        <Button onClick={onLoadMore}>Load more</Button>
-      </div>
-    </div>
+      <Suspense fallback={<div class="flex size-full items-center justify-center"><Loader /></div>} >
+
+        <Filters /><For each={display()}>
+          {(route) => <RouteCard route={route} />}
+        </For>
+        <div class="flex h-24 w-full items-center justify-center">
+          <Button onClick={() => setSize(pageSize() + 1)}>Load more</Button>
+        </div>
+        <div class="h-60 w-full sm:h-64" />
+      </Suspense>
+
+    </Show>
   )
 }
 

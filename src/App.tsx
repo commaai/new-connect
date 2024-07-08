@@ -14,7 +14,7 @@ const App: VoidComponent = () => {
       <Route path="/logout" component={Logout} />
       <Route path="/auth" component={Auth} />
 
-      <Route path="/*dongleId" component={Dashboard} />
+      <Route path="*" component={Dashboard} />
     </Router>
   )
 }

@@ -1,110 +1,111 @@
 import {
-  Accessor,
   createContext,
   createResource,
   createSignal,
-  Match,
-  Setter,
+  onCleanup,
   Show,
-  Switch,
+  onMount,
+  createEffect,
 } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import { Navigate, useLocation } from '@solidjs/router'
+import { Navigate, useNavigate, useLocation } from '@solidjs/router'
 
-import { getDevices } from '~/api/devices'
+import { getDevices, getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import type { Device } from '~/types'
 
-import Button from '~/components/material/Button'
-import Drawer from '~/components/material/Drawer'
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
-
-import DeviceList from './components/DeviceList'
-import DeviceActivity from './activities/DeviceActivity'
+import { Controls } from '~/pages/dashboard/components/Controls'
+import Search from './components/Search'
+import RouteList from './components/RouteList'
+import Loader from '~/components/Loader'
+import PlaceHolder from '~/components/PlaceHolder'
 import RouteActivity from './activities/RouteActivity'
 
-type DashboardState = {
-  drawer: Accessor<boolean>
-  setDrawer: Setter<boolean>
-  toggleDrawer: () => void
+const MAX_WIDTH = 30
+const MIN_WIDTH = 20
+
+// adapted from https://www.solidjs.com/guides/typescript#context
+// TODO: find a better way to type annotate context without child components complaining DashboardState | undefined 
+export const generateContextType = () => {
+  const pathParts = (): string[] => location.pathname.split('/').slice(1).filter(Boolean)
+
+  const [dongleId] = createSignal<string | undefined>(pathParts()[0])
+  const [width] = createSignal(MAX_WIDTH)
+  const [route] = createSignal<string | undefined>(pathParts()[1])
+  const [device] = createResource(() => dongleId(), getDevice)
+  const [isDesktop] = createSignal(window.innerWidth > 768)
+
+  return {width, isDesktop, device, route} as const
 }
 
+type DashboardState = ReturnType<typeof generateContextType>
 export const DashboardContext = createContext<DashboardState>()
 
-const DashboardDrawer = (props: {
-  onClose: () => void
-  devices: Device[] | undefined
-}) => {
-  return (
-    <>
-      <TopAppBar
-        component="h1"
-        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
-      >
-        comma connect
-      </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
-        Devices
-      </h2>
-      <Show when={props.devices} keyed>
-        {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
-      </Show>
-      <div class="grow" />
-      <hr class="mx-4 opacity-20" />
-      <Button class="m-4" href="/logout">Sign out</Button>
-    </>
-  )
-}
-
-const DashboardLayout: VoidComponent = () => {
+function DashboardLayout() {
+  const navigate = useNavigate()
   const location = useLocation()
-
-  const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
-  const dongleId = () => pathParts()[0]
-  const dateStr = () => pathParts()[1]
-
-  const [drawer, setDrawer] = createSignal(false)
-  const onOpen = () => setDrawer(true)
-  const onClose = () => setDrawer(false)
-  const toggleDrawer = () => setDrawer((prev) => !prev)
+  
+  const pathParts = (): string[] => location.pathname.split('/').slice(1).filter(Boolean)
+  const [dongleId, setDongleId] = createSignal<string | undefined>(pathParts()[0])
+  const [route, setRoute] = createSignal<string | undefined>(pathParts()[1])
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
+  const [device] = createResource(() => dongleId(), getDevice)
+
+  const [leftContainerWidth, setLeftContainerWidth] = createSignal(MAX_WIDTH)
+  const [isDesktop, setView] = createSignal(window.innerWidth > 768)
+
+  const [searchQuery, setSearchQuery] = createSignal('')
+
+  onMount(() => {
+    window.addEventListener('resize', () => {
+      setView(window.innerWidth > 768)
+    })
+  })
+
+  createEffect(() => {
+    const deviceList = devices.latest
+    if (!dongleId() && deviceList && deviceList.length > 0) {
+      setDongleId(deviceList[0].dongle_id)
+      navigate(`/${deviceList[0].dongle_id}`)
+    }
+    setRoute(pathParts()[1])
+  })
+
+  onCleanup(() => {
+    window.removeEventListener('resize', () => {})
+  })
+
+  const handleResize = (e: { clientX: number, preventDefault: () => void }) => {
+    const offset = (e.clientX / window.innerWidth) * 100
+    setLeftContainerWidth(Math.min(Math.max(offset, MIN_WIDTH), MAX_WIDTH))
+    e.preventDefault()
+  }
 
   return (
-    <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
-      <Drawer
-        open={drawer()}
-        onOpen={onOpen}
-        onClose={onClose}
-        drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
-      >
-        <Switch
-          fallback={
-            <>
-              <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-              >
-                No device
-              </TopAppBar>
-            </>
-          }
-        >
-          <Match when={!!profile.error}>
-            <Navigate href="/login" />
-          </Match>
-          <Match when={dateStr()} keyed>
-            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
-          </Match>
-          <Match when={dongleId()} keyed>
-            <DeviceActivity dongleId={dongleId()} />
-          </Match>
-          <Match when={devices()?.length} keyed>
-            <Navigate href={`/${devices()![0].dongle_id}`} />
-          </Match>
-        </Switch>
-      </Drawer>
+    <DashboardContext.Provider
+      value={{ width: leftContainerWidth, isDesktop, device, route }}
+    >
+      <Show when={!profile.error} fallback={<Navigate href="/login" />}>
+        <div class="flex size-full">
+          <Show when={isDesktop() || !route()}>
+            <div style={{ width: isDesktop() ? `${leftContainerWidth()}%` : route() ? '0%' : '100%' }} class={'flex h-screen flex-col overflow-hidden p-4'}>
+              <Search onSearch={setSearchQuery} />
+              <Show when={dongleId()} fallback={<div class="flex size-full items-center justify-center"><Loader /></div>}>
+                <div class={'size-full flex-col overflow-y-auto'}>
+                  <RouteList searchQuery={searchQuery()} dongleId={dongleId()} />
+                </div>
+              </Show>
+              <Controls devices={devices} />
+            </div>
+          </Show>
+          <Show when={isDesktop()}><div class="h-screen w-0.5 cursor-ew-resize bg-gray-800 hover:w-2" draggable="true" onDragEnd={handleResize} />          </Show>
+          <div style={{ width: isDesktop() ? `${100 - leftContainerWidth()}%` : route() ? '100%' : '0%' }} class={isDesktop() ? 'p-4' : 'h-screen p-0'}>
+            <Show when={route()} fallback={<PlaceHolder />}>
+              <RouteActivity dongleId={dongleId()} dateStr={route()} />
+            </Show>
+          </div>
+        </div>
+      </Show>
     </DashboardContext.Provider>
   )
 }
