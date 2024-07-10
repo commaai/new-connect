@@ -5,8 +5,9 @@ export type SortKey = 'date' | 'miles' | 'duration' | 'engaged' | 'userFlags'
 export type SortOrder = 'asc' | 'desc'
 
 export interface SortOption {
+  label: string
   key: SortKey
-  order: SortOrder
+  order: SortOrder | null
 }
 
 export const sortRoutes = async (routes: RouteSegments[], option: SortOption): Promise<RouteSegments[]> => {

@@ -7,7 +7,7 @@ import {
 } from 'solid-js'
 import type { Component } from 'solid-js'
 import { RouteSegments } from '~/types'
-import { SortOption, sortRoutes } from '~/utils/sorting'
+import { SortOption, SortKey, sortRoutes } from '~/utils/sorting'
 import { fetchRoutes } from '~/api/route'
 import RouteCard from '~/components/RouteCard'
 import RouteSorter from '~/components/RouteSorter'
@@ -19,7 +19,7 @@ interface RouteListProps {
 }
 
 const RouteList: Component<RouteListProps> = (props) => {
-  const [sortOption, setSortOption] = createSignal<SortOption>({ key: 'date', order: 'desc' })
+  const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
   const [page, setPage] = createSignal(1)
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
@@ -29,6 +29,7 @@ const RouteList: Component<RouteListProps> = (props) => {
     fetchRoutes,
   )
 
+  // Effect to update allRoutes when new routesData is available
   createEffect(() => {
     const newRoutes = routesData()
     if (newRoutes) {
@@ -36,20 +37,28 @@ const RouteList: Component<RouteListProps> = (props) => {
     }
   })
 
-  createEffect(async () => {
+  // Effect to sort routes whenever allRoutes or sortOption changes
+  createEffect(() => {
     const routes = allRoutes()
+    const currentSortOption = sortOption()
     if (routes.length > 0) {
-      const sorted = await sortRoutes(routes, sortOption())
-      setSortedRoutes(sorted)
+      void sortAndSetRoutes(routes, currentSortOption)
     }
   })
 
-  // ! Fix this
-  const handleSortChange = (key: string, order: 'asc' | 'desc' | null) => {
-    setSortOption({ key, order: order || 'desc' })
+  // Function to sort and set sorted routes
+  const sortAndSetRoutes = async (routes: RouteSegments[], currentSortOption: SortOption) => {
+    const sorted = await sortRoutes(routes, currentSortOption)
+    setSortedRoutes(sorted)
+  }
+
+  // Handle sort change without returning a promise
+  const handleSortChange = (key: SortKey, order: 'asc' | 'desc') => {
+    const label = key.charAt(0).toUpperCase() + key.slice(1) // Create a label from the key
+    setSortOption({ label, key, order })
     setPage(1)
     setAllRoutes([])
-    void refetch() 
+    void refetch()
   }
 
   let bottomRef: HTMLDivElement | undefined
@@ -75,7 +84,7 @@ const RouteList: Component<RouteListProps> = (props) => {
 
   return (
     <div class="flex flex-col gap-4">
-      <RouteSorter onSortChange={handleSortChange} />
+      <RouteSorter onSortChange={handleSortChange} currentSort={sortOption()} />
       <For each={sortedRoutes()}>
         {(route: RouteSegments) => <RouteCard route={route} />}
       </For>
