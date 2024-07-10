@@ -96,6 +96,10 @@ export interface RouteSegments extends Route {
   share_exp: RouteShareSignature['exp']
   share_sig: RouteShareSignature['sig']
   start_time_utc_millis: number
+  duration?: number
+  engagedDuration?: number
+  userFlags?: number
+  length?: number
 }
 
 export interface Clip {

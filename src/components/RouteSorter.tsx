@@ -19,6 +19,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
     { label: 'User Flags', key: 'userFlags', order: null },
   ])
 
+  // Allows mouse wheel to scroll through filters
   const handleScroll = (e: WheelEvent) => {
     const container = e.currentTarget as HTMLDivElement
     container.scrollLeft += e.deltaY
@@ -27,7 +28,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
   const handleClick = (clickedOption: SortOption) => {
     let newOrder: SortOrder
     if (props.currentSort.key === clickedOption.key) {
-      // If the same button is clicked, toggle between asc and desc
+      // If the same button is clicked, toggle the order
       newOrder = props.currentSort.order === 'desc' ? 'asc' : 'desc'
     } else {
       // If a new button is clicked, always start with descending order

@@ -1,10 +1,4 @@
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  For,
-  onCleanup,
-} from 'solid-js'
+import { createEffect, createResource, createSignal, For, onCleanup } from 'solid-js'
 import type { Component } from 'solid-js'
 import { RouteSegments } from '~/types'
 import { SortOption, SortKey, sortRoutes } from '~/utils/sorting'
@@ -29,37 +23,65 @@ const RouteList: Component<RouteListProps> = (props) => {
     fetchRoutes,
   )
 
-  // Effect to update allRoutes when new routesData is available
   createEffect(() => {
     const newRoutes = routesData()
     if (newRoutes) {
-      setAllRoutes(prev => [...prev, ...newRoutes])
+      setAllRoutes(prev => {
+        const uniqueNewRoutes = newRoutes.filter(newRoute => 
+          !prev.some(existingRoute => existingRoute.start_time === newRoute.start_time),
+        )
+        return [...prev, ...uniqueNewRoutes]
+      })
     }
   })
 
-  // Effect to sort routes whenever allRoutes or sortOption changes
   createEffect(() => {
     const routes = allRoutes()
     const currentSortOption = sortOption()
+    console.log('Current all routes:', routes.map(r => ({ 
+      start_time: r.start_time_utc_millis, 
+      duration: r.duration,
+      miles: r.length,
+      engaged: r.engagedDuration,
+      userFlags: r.userFlags,
+    })))
+    console.log('Current sort option:', currentSortOption)
     if (routes.length > 0) {
       void sortAndSetRoutes(routes, currentSortOption)
     }
   })
 
-  // Function to sort and set sorted routes
   const sortAndSetRoutes = async (routes: RouteSegments[], currentSortOption: SortOption) => {
+    console.log('Sorting with option:', currentSortOption)
     const sorted = await sortRoutes(routes, currentSortOption)
+    console.log('Sorted routes before setting state:', sorted.map(r => ({ 
+      start_time: r.start_time_utc_millis, 
+      duration: r.duration,
+      miles: r.length,
+      engaged: r.engagedDuration,
+      userFlags: r.userFlags,
+    })))
     setSortedRoutes(sorted)
+    console.log('Routes after setting state:', sortedRoutes().map(r => ({ 
+      start_time: r.start_time_utc_millis, 
+      duration: r.duration,
+      miles: r.length,
+      engaged: r.engagedDuration,
+      userFlags: r.userFlags,
+    })))
   }
 
-  // Handle sort change without returning a promise
   const handleSortChange = (key: SortKey, order: 'asc' | 'desc') => {
-    const label = key.charAt(0).toUpperCase() + key.slice(1) // Create a label from the key
+    const label = key.charAt(0).toUpperCase() + key.slice(1)
     setSortOption({ label, key, order })
     setPage(1)
-    setAllRoutes([])
     void refetch()
   }
+
+  // Add this effect to log sorted routes whenever they change
+  createEffect(() => {
+    console.log('Routes at render:', sortedRoutes().map(r => ({ start_time: r.start_time_utc_millis, create_time: r.create_time })))
+  })
 
   let bottomRef: HTMLDivElement | undefined
   const observer = new IntersectionObserver(
