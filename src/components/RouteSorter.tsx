@@ -75,6 +75,8 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
                   {props.currentSort.order === 'asc' ? '↑' : '↓'}
                 </span>
               )}
+              {/* Added div for hover effect since gradient effect is using absolute positioning */}
+              <div class="absolute inset-0 z-20 bg-white opacity-0 mix-blend-soft-light transition-opacity duration-300 ease-in-out hover:opacity-25" />
             </button>
           )}
         </For>
