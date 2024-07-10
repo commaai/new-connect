@@ -1,7 +1,8 @@
-import { createSignal, For } from 'solid-js'
+import { For } from 'solid-js'
 import { createStore } from 'solid-js/store'
+import type { Component } from 'solid-js'
 
-interface SortOption {
+export interface SortOption {
   label: string
   key: string
   order: 'asc' | 'desc' | null
@@ -10,30 +11,41 @@ interface SortOption {
 // ! Make this dynamic if light mode is ready
 const GRADIENT = 'from-cyan-700 via-blue-800 to-purple-900'
 
-export const RouteSorter = () => {
+interface RouteSorterProps {
+  onSortChange: (key: string, order: 'asc' | 'desc' | null) => void
+}
+
+export const RouteSorter: Component<RouteSorterProps> = (props) => {
   const [sortOptions, setSortOptions] = createStore<SortOption[]>([
     { label: 'Date', key: 'date', order: 'desc' },
     { label: 'Duration', key: 'duration', order: null },
     { label: 'Miles', key: 'miles', order: null },
     { label: 'Engaged', key: 'engaged', order: null },
-    { label: 'User Flags', key: 'user-flags', order: null },
+    { label: 'User Flags', key: 'userFlags', order: null },
   ])
-
-  // ? Do I need scrollPosition or this line of code?
-  const [setScrollPosition] = createSignal(0)
 
   // Handles horizontal scrolling with the mouse wheel.
   const handleScroll = (e: WheelEvent) => {
     const container = e.currentTarget as HTMLDivElement
     container.scrollLeft += e.deltaY
-    setScrollPosition(container.scrollLeft)
   }
 
   const handleClick = (clickedIndex: number) => {
-    setSortOptions(option => option.key === sortOptions[clickedIndex].key, 'order', current => 
-      current === 'desc' ? 'asc' : 'desc',
+    const clickedOption = sortOptions[clickedIndex]
+    const newOrder = clickedOption.order === 'desc' ? 'asc' : 'desc'
+
+    setSortOptions(
+      option => option.key === clickedOption.key,
+      'order',
+      newOrder,
     )
-    setSortOptions(option => option.key !== sortOptions[clickedIndex].key, 'order', null)
+    setSortOptions(
+      option => option.key !== clickedOption.key,
+      'order',
+      null,
+    )
+
+    props.onSortChange(clickedOption.key, newOrder)
   }
 
   return (

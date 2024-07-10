@@ -6,7 +6,6 @@ import { getDevice } from '~/api/devices'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import RouteSorter from '../../../components/RouteSorter'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
@@ -36,7 +35,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         </div>
         <div class="flex flex-col gap-2">
           <span class="text-label-sm">Routes</span>
-          <RouteSorter />
           <RouteList dongleId={props.dongleId} />
         </div>
       </div>

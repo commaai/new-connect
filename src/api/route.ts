@@ -1,6 +1,6 @@
 import { fetcher } from '.'
 import { BASE_URL } from './config'
-import type { Device, Route, RouteShareSignature } from '~/types'
+import type { Device, Route, RouteShareSignature, RouteSegments } from '~/types'
 
 export class RouteName {
   // dongle ID        date str
@@ -49,3 +49,21 @@ export const getQCameraStreamUrl = (routeName: Route['fullname']): Promise<strin
   getRouteShareSignature(routeName).then((signature) =>
     createQCameraStreamUrl(routeName, signature),
   )
+
+export const fetchRoutes = async ({
+  dongleId,
+  page,
+  pageSize,
+}: {
+  dongleId: string
+  page: number
+  pageSize: number
+}): Promise<RouteSegments[]> => {
+  const endpoint = `/v1/devices/${dongleId}/routes_segments`
+  const params = new URLSearchParams({
+    limit: pageSize.toString(),
+    offset: ((page - 1) * pageSize).toString(),
+  })
+
+  return fetcher<RouteSegments[]>(`${endpoint}?${params.toString()}`)
+}
