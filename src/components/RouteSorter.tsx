@@ -83,7 +83,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
               </span>
               {option.order && (
                 <span class="relative z-10 ml-3 inline-block w-4 text-white transition-transform duration-300">
-                  {option.order === 'asc' ? '↑' : '↓'}
+                  {option.order === 'asc' ? '↓' : '↑'}
                 </span>
               )}
             </button>
