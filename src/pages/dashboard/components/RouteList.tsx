@@ -17,6 +17,7 @@ const RouteList: Component<RouteListProps> = (props) => {
   const [page, setPage] = createSignal(1)
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
+  const [hasMore, setHasMore] = createSignal(true)
 
   const [routesData, { refetch }] = createResource(
     () => ({ dongleId: props.dongleId, page: page(), pageSize: PAGE_SIZE }),
@@ -30,6 +31,7 @@ const RouteList: Component<RouteListProps> = (props) => {
         const uniqueNewRoutes = newRoutes.filter(newRoute => 
           !prev.some(existingRoute => existingRoute.start_time === newRoute.start_time),
         )
+        setHasMore(newRoutes.length === PAGE_SIZE)
         return [...prev, ...uniqueNewRoutes]
       })
     }
@@ -38,56 +40,36 @@ const RouteList: Component<RouteListProps> = (props) => {
   createEffect(() => {
     const routes = allRoutes()
     const currentSortOption = sortOption()
-    console.log('Current all routes:', routes.map(r => ({ 
-      start_time: r.start_time_utc_millis, 
-      duration: r.duration,
-      miles: r.length,
-      engaged: r.engagedDuration,
-      userFlags: r.userFlags,
-    })))
-    console.log('Current sort option:', currentSortOption)
     if (routes.length > 0) {
       void sortAndSetRoutes(routes, currentSortOption)
     }
   })
 
   const sortAndSetRoutes = async (routes: RouteSegments[], currentSortOption: SortOption) => {
-    console.log('Sorting with option:', currentSortOption)
     const sorted = await sortRoutes(routes, currentSortOption)
-    console.log('Sorted routes before setting state:', sorted.map(r => ({ 
-      start_time: r.start_time_utc_millis, 
-      duration: r.duration,
-      miles: r.length,
-      engaged: r.engagedDuration,
-      userFlags: r.userFlags,
-    })))
     setSortedRoutes(sorted)
-    console.log('Routes after setting state:', sortedRoutes().map(r => ({ 
-      start_time: r.start_time_utc_millis, 
-      duration: r.duration,
-      miles: r.length,
-      engaged: r.engagedDuration,
-      userFlags: r.userFlags,
-    })))
   }
 
   const handleSortChange = (key: SortKey, order: 'asc' | 'desc') => {
     const label = key.charAt(0).toUpperCase() + key.slice(1)
     setSortOption({ label, key, order })
     setPage(1)
+    setAllRoutes([])
+    setHasMore(true)
     void refetch()
   }
 
-  // Add this effect to log sorted routes whenever they change
-  createEffect(() => {
-    console.log('Routes at render:', sortedRoutes().map(r => ({ start_time: r.start_time_utc_millis, create_time: r.create_time })))
-  })
+  const loadMore = () => {
+    if (!routesData.loading && hasMore()) {
+      setPage(p => p + 1)
+    }
+  }
 
   let bottomRef: HTMLDivElement | undefined
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries[0].isIntersecting && !routesData.loading) {
-        setPage(p => p + 1)
+      if (entries[0].isIntersecting) {
+        loadMore()
       }
     },
     { rootMargin: '200px' },
@@ -112,6 +94,8 @@ const RouteList: Component<RouteListProps> = (props) => {
       </For>
       <div ref={bottomRef}>
         {routesData.loading && <div>Loading...</div>}
+        {!routesData.loading && !hasMore() && sortedRoutes().length === 0 && <div>No routes found</div>}
+        {!routesData.loading && !hasMore() && sortedRoutes().length > 0 && <div>All routes loaded</div>}
       </div>
     </div>
   )
