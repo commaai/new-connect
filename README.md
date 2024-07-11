@@ -16,11 +16,29 @@ Try it out at https://new-connect.connect-d5y.pages.dev.
 
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
 
-A few constraints to keep connect light and the dev environment fun:
-- 5k line limit
-- 500KB bundle size limit
-- 1m timeout for all CI
+connect has a demo mode, so no special comma device is needed to develop connect.
 
-Here's the [roadmap](https://github.com/orgs/commaai/projects/32) to get this shipped to https://connect.comma.ai.
+A few constraints to keep connect light and the dev environment fun:
+* 5k line limit
+* 500KB bundle size limit
+* 1m timeout for all CI
+
+References:
+* [API docs](https://api.comma.ai)
+* [openpilot docs](https://docs.comma.ai)
+* [Discord](https://discord.comma.ai)
+* [Bounties](https://comma.ai/bounties) 
+
+## Roadmap
+
+The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
+
+[This project](https://github.com/orgs/commaai/projects/32) tracks that progress.
+
 Most of the issues there are [paid bounties](https://comma.ai/bounties).
-With the demo mode, no comma device is needed for most of this work.
+
+Once we've shipped v1, next up will be:
+* [sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
+* SSH console for openpilot developers
+* Replace snapshot with a live stream
+* openpilot clips, like this [community tool](https://github.com/nelsonjchen/op-replay-clipper)
