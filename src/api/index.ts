@@ -8,8 +8,8 @@ const populateFetchedAt = <T>(item: T): T => {
   }
 }
 
-export async function fetcher<T>(endpoint: string, init?: RequestInit): Promise<T> {
-  const res = await fetch(`${BASE_URL}${endpoint}`, {
+export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: string = BASE_URL): Promise<T> {
+  const res = await fetch(`${apiUrl}${endpoint}`, {
     ...init,
     headers: {
       ...init?.headers,
