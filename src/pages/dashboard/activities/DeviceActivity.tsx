@@ -1,5 +1,6 @@
 import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
+import { useNavigate } from '@solidjs/router'
 
 import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
@@ -25,7 +26,9 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
+  const navigate = useNavigate()
   const { toggleDrawer } = useContext(DashboardContext)!
+  const openPrime = () => navigate(`/${props.dongleId}/prime`)
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
@@ -103,7 +106,10 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
+      <TopAppBar
+        leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+        trailing={<IconButton onClick={openPrime}>settings</IconButton>}
+      >
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">

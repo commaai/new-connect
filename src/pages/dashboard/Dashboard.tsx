@@ -24,6 +24,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
+import PrimeActivity from './activities/PrimeActivity'
 import RouteActivity from './activities/RouteActivity'
 import storage from '~/utils/storage'
 
@@ -113,6 +114,9 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           </Match>
           <Match when={dongleId() === 'pair' || pairToken()}>
             <PairActivity />
+          </Match>
+          <Match when={dateStr() === 'prime'}>
+            <PrimeActivity dongleId={dongleId()} />
           </Match>
           <Match when={dateStr()} keyed>
             <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
