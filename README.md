@@ -2,8 +2,6 @@
 
 This is a rewrite of [comma connect](https://github.com/commaai/connect), the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
 
-Currently, connect makes your comma 3X a dashcam. In the future, we'll build features like sentry mode, 
-
 Try it out at https://new-connect.connect-d5y.pages.dev.
 
 ## Development
@@ -33,12 +31,12 @@ References:
 
 The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
 
-[This project](https://github.com/orgs/commaai/projects/32) tracks that progress.
-
-Most of the issues there are [paid bounties](https://comma.ai/bounties).
+[This project](https://github.com/orgs/commaai/projects/32) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
 
 Once we've shipped v1, next up will be:
-* [sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
+* [Sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
 * SSH console for openpilot developers
 * Replace snapshot with a live stream
 * openpilot clips, like this [community tool](https://github.com/nelsonjchen/op-replay-clipper)
+* Manage the settings on your comma 3X
+* Car mangement: lock doors, EV charge status, etc.
