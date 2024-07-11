@@ -31,7 +31,7 @@ References:
 
 The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
 
-[This project](https://github.com/orgs/commaai/projects/32) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
+[This milestone](https://github.com/commaai/new-connect/milestone/1) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
 
 Once we've shipped v1, next up will be:
 * [Sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
