@@ -24,6 +24,7 @@ type ListItemProps = {
   leading?: JSXElement
   trailing?: JSXElement
   onClick?: () => void
+  isOnline?: boolean
   href?: string
 }
 

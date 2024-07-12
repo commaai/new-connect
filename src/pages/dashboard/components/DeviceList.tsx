@@ -1,15 +1,13 @@
-import { useContext, For } from 'solid-js'
+import { For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import Icon from '~/components/material/Icon'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { DeviceWithFetchedAt } from '~/types'
 import { getDeviceName } from '~/utils/device'
-import storage from '~/utils/storage'
 
-import { DashboardContext } from '../Dashboard'
+import useDeviceList from '~/utils/useDeviceList'
 
 type DeviceListProps = {
   class?: string
@@ -17,23 +15,22 @@ type DeviceListProps = {
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
-  const { setDrawer } = useContext(DashboardContext)!
-  const location = useLocation()
+  const {
+    isSelected,
+    onClick,
+    isOnline,
+  } = useDeviceList()
   return (
     <List variant="nav" class={clsx(props.class)}>
       <For each={props.devices}>
         {(device) => {
-          const isSelected = () => location.pathname.includes(device.dongle_id)
-          const onClick = () => {
-            setDrawer(false)
-            storage.setItem('lastSelectedDongleId', device.dongle_id)
-          }
           return (
             <ListItem
               variant="nav"
               leading={<Icon>directions_car</Icon>}
-              selected={isSelected()}
-              onClick={onClick}
+              selected={isSelected(device)}
+              onClick={onClick(device)}
+              isOnline={isOnline(device)}
               href={`/${device.dongle_id}`}
             >
               <ListItemContent
