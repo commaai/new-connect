@@ -10,11 +10,7 @@
     "allowJs": true,
     "noEmit": true,
     "strict": true,
-    "types": [
-      "vite/client",
-      "@testing-library/jest-dom",
-      "vite-plugin-pwa/client"
-    ],
+    "types": ["vite/client", "@testing-library/jest-dom"],
     "isolatedModules": true,
     "paths": {
       "~/*": ["./src/*"]

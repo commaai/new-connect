@@ -15,7 +15,6 @@
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
-    "generate-pwa-assets": "pwa-assets-generator --preset minimal-2023 public/images/icon-vector.svg",
     "test": "vitest run"
   },
   "packageManager": "bun@1.1.18",
@@ -29,7 +28,6 @@
     "@types/mapbox__polyline": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
-    "@vite-pwa/assets-generator": "^0.2.4",
     "autoprefixer": "^10.4.19",
     "eslint": "^9.4.0",
     "eslint-plugin-solid": "^0.14.0",
@@ -44,10 +42,8 @@
     "typescript": "^5.4.5",
     "typescript-eslint": "^7.13.0",
     "vite": "^5.2.13",
-    "vite-plugin-pwa": "^0.20.0",
     "vite-plugin-solid": "^2.10.2",
     "vitest": "^1.6.0",
-    "workbox-window": "^7.1.0",
     "wrangler": "^3.60.2"
   },
   "dependencies": {
