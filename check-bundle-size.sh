@@ -4,10 +4,17 @@ set -e
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" >/dev/null && pwd )"
 cd $DIR
 
-BUNDLE_SIZE=$(du -sk dist | cut -f1)
+bun vite-bundle-visualizer -t list -o ./bundle.yaml
+
+BUNDLE_SIZE=0
+gzip_values=$(yq eval '.[][]["gzip"]' bundle.yaml)
+for gzip_value in $gzip_values; do
+    BUNDLE_SIZE=$((BUNDLchE_SIZE + gzip_value / 1024))
+done
+
 echo "Bundle size is $BUNDLE_SIZE K"
 
-if [ $BUNDLE_SIZE -gt 1000 ]; then 
+if [ $BUNDLE_SIZE -gt 500 ]; then 
     echo "Exceeded bundle size limit!"
     exit 1
 fi
