@@ -9,18 +9,18 @@ export default function useDeviceList() {
   const { setDrawer } = useContext(DashboardContext)!
   const location = useLocation()
 
-  const isSelected = (device: DeviceWithFetchedAt): boolean => {
+  const isSelected = (device: DeviceWithFetchedAt) => {
     return location.pathname.includes(device.dongle_id)
   }
 
-  const onClick = (device: DeviceWithFetchedAt): () => void => {
+  const onClick = (device: DeviceWithFetchedAt) => {
     return () => {
       setDrawer(false)
       storage.setItem('lastSelectedDongleId', device.dongle_id)
     }
   }
 
-  const isOnline = (device: DeviceWithFetchedAt): boolean => {
+  const isOnline = (device: DeviceWithFetchedAt) => {
     return deviceIsOnline(device)
   }
 

@@ -5,7 +5,7 @@ export function getDeviceName(device: DeviceWithFetchedAt) {
   return `comma ${device.device_type}`
 }
 
-export function deviceIsOnline(device: DeviceWithFetchedAt): boolean {
+export function deviceIsOnline(device: DeviceWithFetchedAt) {
   if (!device.last_athena_ping) return false
   return device.last_athena_ping >= (device.fetched_at - 120)
 }
