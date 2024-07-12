@@ -10,10 +10,8 @@ export default defineConfig({
       ssr: false,
     }),
     VitePWA({
-      selfDestroying: true,
-
-      // registerType: 'autoUpdate',
-      // injectRegister: 'auto',
+      registerType: 'autoUpdate',
+      injectRegister: 'auto',
 
       pwaAssets: {
         disabled: false,
@@ -28,7 +26,11 @@ export default defineConfig({
         background_color: '#1B1B1F',
       },
 
-      workbox: undefined,
+      workbox: {
+        globPatterns: ['**/*.{js,css,html,svg,png,ico}'],
+        cleanupOutdatedCaches: true,
+        clientsClaim: true,
+      },
 
       devOptions: {
         enabled: true,
