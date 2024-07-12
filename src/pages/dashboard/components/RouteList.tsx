@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, For, onCleanup } from 'solid-js'
+import { createEffect, createResource, createSignal, For, onCleanup, createMemo } from 'solid-js'
 import type { Component } from 'solid-js'
 import { RouteSegments } from '~/types'
 import { SortOption, SortKey, sortRoutes } from '~/utils/sorting'
@@ -6,6 +6,7 @@ import { fetchRoutes } from '~/api/route'
 import RouteCard from '~/components/RouteCard'
 import RouteSorter from '~/components/RouteSorter'
 
+// Define the number of routes to fetch per page
 const PAGE_SIZE = 10
 
 interface RouteListProps {
@@ -13,19 +14,22 @@ interface RouteListProps {
 }
 
 const RouteList: Component<RouteListProps> = (props) => {
-  // Initialize state signals
+  // State management using Solid.js signals
   const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'asc' })
   const [page, setPage] = createSignal(1)
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
   const [hasMore, setHasMore] = createSignal(true)
 
+  // Memoize resource parameters to optimize refetching
+  const resourceParams = createMemo(() => ({
+    dongleId: props.dongleId,
+    page: page(),
+    pageSize: PAGE_SIZE,
+  }))
+
   // Create a resource for fetching routes
-  // ! This might refetch unnecessarily if any of the dependencies change
-  const [routesData, { refetch }] = createResource(
-    () => ({ dongleId: props.dongleId, page: page(), pageSize: PAGE_SIZE }),
-    fetchRoutes,
-  )
+  const [routesData, { refetch }] = createResource(resourceParams, fetchRoutes)
 
   // Effect to update allRoutes when new data is fetched
   createEffect(() => {
@@ -76,6 +80,7 @@ const RouteList: Component<RouteListProps> = (props) => {
     if (!routesData.loading && hasMore()) {
       console.log('Incrementing page')
       setPage(p => p + 1)
+      void refetch() // Trigger refetch when loading more
     }
   }
 
@@ -99,13 +104,6 @@ const RouteList: Component<RouteListProps> = (props) => {
     return () => {
       if (bottomRef) observer.unobserve(bottomRef)
     }
-  })
-
-  // Effect to refetch routes when page changes
-  // ! This might cause unnecessary refetches if other dependencies of routesData change
-  createEffect(() => {
-    page()
-    void refetch()
   })
 
   // Cleanup function to disconnect the observer
