@@ -2,8 +2,7 @@ import { For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import Icon from '~/components/material/Icon'
-import List, { ListItem, ListItemContent } from '~/components/material/List'
+import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
 import type { DeviceWithFetchedAt } from '~/types'
 import { getDeviceName } from '~/utils/device'
 
@@ -27,10 +26,9 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           return (
             <ListItem
               variant="nav"
-              leading={<Icon>directions_car</Icon>}
+              leading={<IconWithStatusIndicator isOnline={isOnline(device)} iconName="directions_car" />}
               selected={isSelected(device)}
               onClick={onClick(device)}
-              isOnline={isOnline(device)}
               href={`/${device.dongle_id}`}
             >
               <ListItemContent

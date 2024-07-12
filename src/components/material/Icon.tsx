@@ -1,9 +1,9 @@
-import { Component } from 'solid-js'
+import { Component, JSXElement } from 'solid-js'
 import clsx from 'clsx'
 
 export type IconProps = {
   class?: string
-  children: string
+  children: JSXElement | string
   filled?: boolean
   size?: '20' | '24' | '40' | '48'
 }
