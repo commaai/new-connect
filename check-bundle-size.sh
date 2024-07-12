@@ -9,7 +9,7 @@ bun vite-bundle-visualizer -t list -o ./bundle.yaml
 BUNDLE_SIZE=0
 gzip_values=$(yq eval '.[][]["gzip"]' bundle.yaml)
 for gzip_value in $gzip_values; do
-    BUNDLE_SIZE=$((BUNDLchE_SIZE + gzip_value / 1024))
+    BUNDLE_SIZE=$((BUNDLE_SIZE + gzip_value / 1024))
 done
 
 echo "Bundle size is $BUNDLE_SIZE K"
