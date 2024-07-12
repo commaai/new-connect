@@ -17,8 +17,19 @@ const RouteHeader = (props: { route?: RouteSegments }) => {
   const startTime = () => props?.route?.start_time_utc_millis ? dayjs(props.route.start_time_utc_millis) : null
   const endTime = () => props?.route?.end_time_utc_millis ? dayjs(props.route.end_time_utc_millis) : null
 
-  const headline = () => startTime()?.format('ddd, MMM D, YYYY')
-  const subhead = () => `${startTime()?.format('h:mm A')} to ${endTime()?.format('h:mm A')}`
+  const headline = () => {
+    if (!startTime() && !endTime()) {
+      return 'No time info'
+    }
+    return startTime()?.format('ddd, MMM D, YYYY') || 'No Time Info'
+  }
+
+  const subhead = () => {
+    if (!startTime() && !endTime()) {
+      return ''
+    }
+    return `${startTime()?.format('h:mm A') || 'No start time'} to ${endTime()?.format('h:mm A') || 'No end time'}`
+  }
 
   return (
     <CardHeader

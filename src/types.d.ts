@@ -54,8 +54,8 @@ export interface Route {
   start_lat?: number
   end_lat?: number
   end_lng?: number
-  end_time: string
-  fullname?: string
+  end_time?: string
+  fullname: string
   git_branch?: string
   git_commit?: string
   git_dirty?: boolean
@@ -77,7 +77,7 @@ export interface Route {
   procqcamera: number
   procqlog: number
   radar?: boolean
-  start_time: string
+  start_time?: string
   url: string
   user_id: string | null
   version?: string
