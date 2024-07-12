@@ -2,14 +2,17 @@ import { BILLING_URL } from './config'
 
 import { fetcher } from '.'
 
-interface SubscriptionStatus {
+export interface SubscriptionStatus {
   amount: number
+  cancel_at: number | null
   is_prime_sim: boolean
   next_charge_at: number
+  plan: string
+  requires_migration: boolean
   sim_id: string | null
   subscribed_at: number
-  trial_claim_end: number | null
-  trial_claimable: boolean
+  // trial_claim_end: number | null
+  // trial_claimable: boolean
   trial_end: number
   user_id: string
 }
@@ -20,7 +23,7 @@ export const getSubscriptionStatus = async (dongleId: string) => {
   return fetcher<SubscriptionStatus>(`/v1/prime/subscription?${params.toString()}`, undefined, BILLING_URL)
 }
 
-interface SubscribeInfo {
+export interface SubscribeInfo {
   data_connected: boolean | null
   device_online: boolean
   has_prime: boolean
