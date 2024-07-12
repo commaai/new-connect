@@ -28,7 +28,16 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
-      - run: bun run build
+      - run: bun vite-bundle-visualizer -o ./bundle-visualizer.html
+      - run: ./check-bundle-size.sh
+
+      - name: Upload Bundle Visualizer
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./bundle-visualizer.html
+          overwrite: true
+          retention-days: 1
+          name: bundle-visualizer-${{ github.run_id }}
 
       - name: Upload built project
         uses: actions/upload-artifact@v4
