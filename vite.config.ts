@@ -10,10 +10,10 @@ export default defineConfig({
       ssr: false,
     }),
     VitePWA({
-      base: '/',
+      selfDestroying: true,
 
-      registerType: 'autoUpdate',
-      injectRegister: false,
+      // registerType: 'autoUpdate',
+      // injectRegister: 'auto',
 
       pwaAssets: {
         disabled: false,
@@ -21,10 +21,11 @@ export default defineConfig({
       },
 
       manifest: {
-        name: 'Connect',
-        short_name: 'Connect',
-        description: 'Connect for Comma AI',
-        start_url: '/',
+        name: 'connect',
+        short_name: 'conect',
+        description: 'manage your openpilot experience',
+        theme_color: '#1B1B1F',
+        background_color: '#1B1B1F',
       },
 
       workbox: undefined,
