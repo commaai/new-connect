@@ -16,18 +16,22 @@ const sortDevices = (devices: Device[]): Device[] => {
   })
 }
 
-const populateFetchedAt = (devices: Device[]): DeviceWithFetchedAt[] => {
-  return devices.map(d => ({
-    ...d,
-    fetched_at: Math.floor(Date.now() / 1000)
-  }));
+const populateFetchedAt = (device: Device): DeviceWithFetchedAt => {
+  return {
+    ...device,
+    fetched_at: Math.floor(Date.now() / 1000),
+  }
 }
 
 export const getDevice = async (dongleId: string) =>
-  fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+  fetcher<DeviceWithFetchedAt>(`/v1.1/devices/${dongleId}/`)
+    .then(populateFetchedAt)
 
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
 
 export const getDevices = async () =>
-  fetcher<DeviceWithFetchedAt[]>('/v1/me/devices/').then(sortDevices).then(populateFetchedAt).catch(() => [])
+  fetcher<DeviceWithFetchedAt[]>('/v1/me/devices/')
+    .then(sortDevices)
+    .then(sortedDevices => sortedDevices.map(populateFetchedAt))
+    .catch(() => [])

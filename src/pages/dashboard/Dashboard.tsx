@@ -13,7 +13,7 @@ import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import type { Device, DeviceWithFetchedAt } from '~/types'
+import type { DeviceWithFetchedAt } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
@@ -37,8 +37,6 @@ const DashboardDrawer = (props: {
   onClose: () => void
   devices: DeviceWithFetchedAt[] | undefined
 }) => {
-  console.log("the devices are", props.devices);
-
   return (
     <>
       <TopAppBar
@@ -51,7 +49,7 @@ const DashboardDrawer = (props: {
         Devices
       </h2>
       <Show when={props.devices} keyed>
-        {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
+        {devices => <DeviceList class="p-2" devices={devices} />}
       </Show>
       <div class="grow" />
       <hr class="mx-4 opacity-20" />

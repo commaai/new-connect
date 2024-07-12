@@ -5,7 +5,7 @@ import clsx from 'clsx'
 
 import Icon from '~/components/material/Icon'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
-import type { Device } from '~/types'
+import type { DeviceWithFetchedAt } from '~/types'
 import { getDeviceName } from '~/utils/device'
 import storage from '~/utils/storage'
 
@@ -13,13 +13,12 @@ import { DashboardContext } from '../Dashboard'
 
 type DeviceListProps = {
   class?: string
-  devices: Device[]
+  devices: DeviceWithFetchedAt[]
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const { setDrawer } = useContext(DashboardContext)!
   const location = useLocation()
-
   return (
     <List variant="nav" class={clsx(props.class)}>
       <For each={props.devices}>
