@@ -16,12 +16,21 @@ type DeviceActivityProps = {
   dongleId: string
 }
 
+interface SnapshotResponse {
+  result?: {
+    jpegFront?: string;
+    jpegBack?: string;
+  };
+}
+
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const { toggleDrawer } = useContext(DashboardContext)!
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
-  const [snapshot, setSnapshot] = createSignal({ error: null, fetching: false, image: null })
+  const [snapshot, setSnapshot] = createSignal<{
+    error: string | null, fetching: boolean, image: string | null }>({
+    error: null, fetching: false, image: null })
 
   const takeSnapshot = async () => {
     console.log('Starting snapshot process...')
@@ -47,7 +56,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
   
-      const resp = await response.json()
+      const resp: SnapshotResponse = await response.json() as SnapshotResponse
       const image = resp.result?.jpegFront || resp.result?.jpegBack
   
       if (image) {
@@ -58,16 +67,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       }
     } catch (err) {
       console.error('Error fetching snapshot:', err)
-      let error = err.message
+      let error = (err as Error).message
   
       if (error.includes('Device not registered')) {
         error = 'Device offline'
-      } else if (error.length > 5 && error[5] === '{') {
-        try {
-          error = JSON.parse(error.substring(5)).error
-        } catch {
-          // pass
-        }
+      } else {
+        error = 'Unknown Error'
       }
   
       setSnapshot({ error, fetching: false, image: null })
@@ -76,34 +81,15 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <style>
-        {`
-          .spin {
-            animation: spin 1s linear infinite;
-          }
-          @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-          }
-          .thumbnail img {
-            width: 100%;
-            height: auto;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-          }
-          .loading, .error {
-            text-align: center;
-            margin-top: 20px;
-          }
-        `}
-      </style>
       <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
         {deviceName()}
-        <IconButton onClick={takeSnapshot} class={snapshot().fetching ? 'spin' : ''}>camera</IconButton>
+        <IconButton onClick={() => {
+          void takeSnapshot()
+        }}>camera</IconButton>
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="flex gap-4">
-          <div class="flex-1 h-[72px] overflow-hidden rounded-lg bg-surface-container-low">
+          <div class="h-[72px] overflow-hidden rounded-lg bg-surface-container-low">
             <Suspense fallback={<div class="skeleton-loader size-full" />}>
               <div class="p-4">
                 <DeviceStatistics dongleId={props.dongleId} />
@@ -112,13 +98,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </div>
           {snapshot().image && (
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4 thumbnail">
+              <div class="p-4">
                 <img src={`data:image/jpeg;base64,${snapshot().image}`} alt="Device Snapshot" />
               </div>
             </div>
           )}
-          {snapshot().fetching && <div class="loading">Loading snapshot...</div>}
-          {snapshot().error && <div class="error">Error: {snapshot().error}</div>}
+          {snapshot().fetching && <div>Loading snapshot...</div>}
+          {snapshot().error && <div>Error: {snapshot().error}</div>}
         </div>
         <div class="flex flex-col gap-2">
           <span class="text-label-sm">Routes</span>
