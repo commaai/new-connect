@@ -46,6 +46,6 @@ export const sortRoutes = async (routes: RouteSegments[], option: SortOption): P
         break
     }
 
-    return order === 'asc' ? comparison : -comparison
+    return order === 'desc' ? comparison : -comparison
   })
 }

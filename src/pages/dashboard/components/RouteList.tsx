@@ -15,7 +15,7 @@ interface RouteListProps {
 
 const RouteList: Component<RouteListProps> = (props) => {
   // State management using Solid.js signals
-  const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'asc' })
+  const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
   const [page, setPage] = createSignal(1)
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
