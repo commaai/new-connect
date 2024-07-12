@@ -49,7 +49,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           )
         }}
       </For>
-    </List>
+    </List >
   )
 }
 

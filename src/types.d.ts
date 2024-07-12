@@ -23,6 +23,10 @@ export interface Device {
   sim_id: string
 }
 
+export interface DeviceWithFetchedAt extends Device {
+  fetched_at: number;
+}
+
 export interface DrivingStatisticsAggregation {
   distance: number
   minutes: number
@@ -126,9 +130,9 @@ export interface DoneClip extends Clip {
 export interface FailedClip extends Clip {
   status: 'failed'
   error_status:
-    | 'upload_failed_request'
-    | 'upload_failed'
-    | 'upload_failed_dcam'
-    | 'upload_failed_timeout'
-    | 'export_failed'
+  | 'upload_failed_request'
+  | 'upload_failed'
+  | 'upload_failed_dcam'
+  | 'upload_failed_timeout'
+  | 'export_failed'
 }

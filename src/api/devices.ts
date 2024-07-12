@@ -1,4 +1,4 @@
-import type { Device, DrivingStatistics } from '~/types'
+import type { Device, DeviceWithFetchedAt, DrivingStatistics } from '~/types'
 
 import { fetcher } from '.'
 
@@ -16,6 +16,13 @@ const sortDevices = (devices: Device[]): Device[] => {
   })
 }
 
+const populateFetchedAt = (devices: Device[]): DeviceWithFetchedAt[] => {
+  return devices.map(d => ({
+    ...d,
+    fetched_at: Math.floor(Date.now() / 1000)
+  }));
+}
+
 export const getDevice = async (dongleId: string) =>
   fetcher<Device>(`/v1.1/devices/${dongleId}/`)
 
@@ -23,4 +30,4 @@ export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
 
 export const getDevices = async () =>
-  fetcher<Device[]>('/v1/me/devices/').then(sortDevices).catch(() => [])
+  fetcher<DeviceWithFetchedAt[]>('/v1/me/devices/').then(sortDevices).then(populateFetchedAt).catch(() => [])
