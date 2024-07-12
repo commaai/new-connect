@@ -13,7 +13,7 @@ interface RouteListProps {
 }
 
 const RouteList: Component<RouteListProps> = (props) => {
-  const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
+  const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'asc' })
   const [page, setPage] = createSignal(1)
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
@@ -60,7 +60,9 @@ const RouteList: Component<RouteListProps> = (props) => {
   }
 
   const loadMore = () => {
+    console.log('loadMore called', { loading: routesData.loading, hasMore: hasMore() })
     if (!routesData.loading && hasMore()) {
+      console.log('Incrementing page')
       setPage(p => p + 1)
     }
   }
@@ -69,6 +71,7 @@ const RouteList: Component<RouteListProps> = (props) => {
   const observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting) {
+        console.log('Bottom of list visible')
         loadMore()
       }
     },
@@ -84,6 +87,11 @@ const RouteList: Component<RouteListProps> = (props) => {
     }
   })
 
+  createEffect(() => {
+    page()
+    void refetch()
+  })
+
   onCleanup(() => observer.disconnect())
 
   return (
@@ -92,11 +100,12 @@ const RouteList: Component<RouteListProps> = (props) => {
       <For each={sortedRoutes()}>
         {(route: RouteSegments) => <RouteCard route={route} />}
       </For>
-      <div ref={bottomRef}>
+      <div>
         {routesData.loading && <div>Loading...</div>}
         {!routesData.loading && !hasMore() && sortedRoutes().length === 0 && <div>No routes found</div>}
         {!routesData.loading && !hasMore() && sortedRoutes().length > 0 && <div>All routes loaded</div>}
       </div>
+      <div ref={bottomRef} style={{ height: '1px' }} />
     </div>
   )
 }

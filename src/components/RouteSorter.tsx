@@ -12,11 +12,11 @@ interface RouteSorterProps {
 
 export const RouteSorter: Component<RouteSorterProps> = (props) => {
   const [sortOptions] = createStore<SortOption[]>([
-    { label: 'Date', key: 'date', order: null },
-    { label: 'Duration', key: 'duration', order: null },
-    { label: 'Miles', key: 'miles', order: null },
-    { label: 'Engaged', key: 'engaged', order: null },
-    { label: 'User Flags', key: 'userFlags', order: null },
+    { label: 'Date', key: 'date', order: 'asc' },
+    { label: 'Duration', key: 'duration', order: 'asc' },
+    { label: 'Miles', key: 'miles', order: 'asc' },
+    { label: 'Engaged', key: 'engaged', order: 'asc' },
+    { label: 'User Flags', key: 'userFlags', order: 'asc' },
   ])
 
   // Allows mouse wheel to scroll through filters
@@ -31,8 +31,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
       // If the same button is clicked, toggle the order
       newOrder = props.currentSort.order === 'desc' ? 'asc' : 'desc'
     } else {
-      // If a new button is clicked, always start with descending order
-      newOrder = 'desc'
+      newOrder = 'asc' // ! Changed to 'asc' so it descends by default... TEMP Solution find out why not working
     }
     props.onSortChange(clickedOption.key, newOrder)
   }

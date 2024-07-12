@@ -2,8 +2,7 @@ import { RouteSegments } from '~/types'
 import { getTimelineStatistics, TimelineStatistics } from '~/api/derived'
 
 export type SortKey = 'date' | 'miles' | 'duration' | 'engaged' | 'userFlags'
-export type SortOrder = 'asc' | 'desc' | null // ? Do I need null?
-
+export type SortOrder = 'asc' | 'desc'
 export interface SortOption {
   label: string
   key: SortKey
