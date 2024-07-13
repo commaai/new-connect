@@ -2,6 +2,7 @@ import { createResource, Suspense, useContext, createSignal } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
+import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
@@ -43,7 +44,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         id: 0,
       }
   
-      const response = await fetch(`https://athena.comma.ai/${props.dongleId}`, {
+      const response = await fetch(`${ATHENA_URL}/${props.dongleId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -83,17 +84,23 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     <>
       <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
         {deviceName()}
-        <IconButton onClick={() => {
-          void takeSnapshot()
-        }}>camera</IconButton>
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-[72px] overflow-hidden rounded-lg bg-surface-container-low">
-          <Suspense fallback={<div class="skeleton-loader size-full" />}>
-            <div class="p-4">
-              <DeviceStatistics dongleId={props.dongleId} />
+          <div class="flex">
+            <div class="flex-auto">
+              <Suspense fallback={<div class="skeleton-loader size-full" />}>
+                <div class="p-4">
+                  <DeviceStatistics dongleId={props.dongleId} />
+                </div>
+              </Suspense>
             </div>
-          </Suspense>
+            <div class="p-4">
+              <IconButton onClick={() => {
+                void takeSnapshot()
+              }}>camera</IconButton>
+            </div>
+          </div>
         </div>
         <div class="flex flex-col gap-2">
           {snapshot().image && (
