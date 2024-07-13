@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
 import type { DeviceWithFetchedAt } from '~/types'
-import { getDeviceName } from '~/utils/device'
+import { getDeviceName, deviceIsOnline } from '~/utils/device'
 
 import useDeviceList from '~/utils/useDeviceList'
 
@@ -17,7 +17,6 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const {
     isSelected,
     onClick,
-    isOnline,
   } = useDeviceList()
   return (
     <List variant="nav" class={clsx(props.class)}>
@@ -26,7 +25,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           return (
             <ListItem
               variant="nav"
-              leading={<IconWithStatusIndicator isOnline={isOnline(device)} iconName="directions_car" />}
+              leading={<IconWithStatusIndicator isOnline={deviceIsOnline(device)} iconName="directions_car" />}
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}
@@ -43,7 +42,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           )
         }}
       </For>
-    </List >
+    </List>
   )
 }
 

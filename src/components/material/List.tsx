@@ -4,12 +4,12 @@ import clsx from 'clsx'
 import ButtonBase from '~/components/material/ButtonBase'
 import Icon from './Icon'
 
-type CarWithStatusIndicatorProps = {
+type IconWithStatusIndicatorProps = {
   isOnline: boolean
   iconName: string
 }
 
-export const IconWithStatusIndicator: VoidComponent<CarWithStatusIndicatorProps> = (props) => {
+export const IconWithStatusIndicator: VoidComponent<IconWithStatusIndicatorProps> = (props) => {
   return (
     <div class="flex items-center">
       <span

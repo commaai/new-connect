@@ -2,7 +2,6 @@ import { DeviceWithFetchedAt } from '~/types'
 import { useLocation } from '@solidjs/router'
 import { useContext } from 'solid-js'
 import storage from './storage'
-import { deviceIsOnline } from './device'
 import { DashboardContext } from '~/pages/dashboard/Dashboard'
 
 export default function useDeviceList() {
@@ -20,13 +19,8 @@ export default function useDeviceList() {
     }
   }
 
-  const isOnline = (device: DeviceWithFetchedAt) => {
-    return deviceIsOnline(device)
-  }
-
   return {
     isSelected,
     onClick,
-    isOnline,
   }
 }
