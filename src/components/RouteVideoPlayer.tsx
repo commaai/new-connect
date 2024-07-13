@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-return, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call */
 import { createEffect, createResource, onCleanup, onMount } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
-import Hls from 'hls.js/dist/hls.light.min.js';
+import Hls from 'hls.js/dist/hls.light.min.js'
 import { getQCameraStreamUrl } from '~/api/route'
 
 type RouteVideoPlayerProps = {
@@ -19,7 +20,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('timeupdate', timeUpdate)
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
   })
-
   let hls = new Hls()
   createEffect(() => {
     hls?.destroy()
