@@ -92,8 +92,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     document.body.removeChild(link)
   }
 
-  const clearImages = () => {
-    setSnapshot({ ...snapshot(), images: [] })
+  const clearImage = (index: number) => {
+    const newImages = snapshot().images.filter((_, i) => i !== index)
+    setSnapshot({ ...snapshot(), images: newImages })
+  }
+
+  const clearError = () => {
+    setSnapshot({ ...snapshot(), error: null })
   }
 
   return (
@@ -102,7 +107,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
-        <div class="h-min overflow-auto rounded-lg bg-surface-container-low">
+        <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <div class="flex">
             <div class="flex-auto">
               <Suspense fallback={<div class="skeleton-loader size-full" />}>
@@ -114,26 +119,18 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <div class="flex p-4">
               <IconButton onClick={() => void takeSnapshot() }>camera</IconButton>
             </div>
-            <For each={snapshot().images}>
-              {(image, index) => (
-                <div class="p-4">
-                  <IconButton onClick={() => downloadSnapshot(image, index())}>download</IconButton>
-                </div>
-              )}
-            </For>
-            {snapshot().images.length > 0 && (
-              <div class="flex p-4">
-                <IconButton onClick={clearImages}>clear</IconButton>
-              </div>
-            )}
           </div>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-                <div class="p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
+                <div class="relative p-4">
+                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`}/>
+                  <div class="absolute right-4 top-4 p-4">
+                    <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
+                    <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
+                  </div>
                 </div>
               </div>
             )}
@@ -147,8 +144,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           )}
           {snapshot().error && (
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <div>Error: {snapshot().error}</div>
+              <div class="flex items-center p-4">
+                <IconButton onClick={clearError} class="text-white">Clear</IconButton>
+                <span>Error: {snapshot().error}</span>
               </div>
             </div>
           )}
