@@ -47,7 +47,7 @@ type UserFlagDriveEvent = IDriveEvent & {
   data: Record<string, never>
 }
 
-type DriveEvent = EventDriveEvent | StateDriveEvent | UserFlagDriveEvent
+export type DriveEvent = EventDriveEvent | StateDriveEvent | UserFlagDriveEvent
 
 type EngagedTimelineEvent = {
   type: 'engaged'
@@ -151,7 +151,8 @@ const generateTimelineEvents = (
         lastAlert = ev
       }
 
-      if (lastOverride && !isOverriding(ev.data.state)) {
+      // Modified overriding logic
+      if (lastOverride && !isOverriding(state)) {
         res.push({
           type: 'overriding',
           route_offset_millis: lastOverride.route_offset_millis,
@@ -161,6 +162,16 @@ const generateTimelineEvents = (
       }
       if (!lastOverride && isOverriding(state)) {
         lastOverride = ev
+      }
+
+      // If we're overriding, end the current engagement
+      if (isOverriding(state) && lastEngaged) {
+        res.push({
+          type: 'engaged',
+          route_offset_millis: lastEngaged.route_offset_millis,
+          end_route_offset_millis: ev.route_offset_millis,
+        } as EngagedTimelineEvent)
+        lastEngaged = undefined
       }
     } else if (ev.type === 'user_flag') {
       res.push({
