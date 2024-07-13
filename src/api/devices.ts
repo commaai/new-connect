@@ -33,5 +33,5 @@ export const getDeviceStats = async (dongleId: string) =>
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
-    .then(sortedDevice => sortedDevice.map(populateFetchedAt))
+    .then(sortedDevices => sortedDevices.map(populateFetchedAt))
     .catch(() => [])
