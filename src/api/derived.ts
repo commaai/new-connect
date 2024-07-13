@@ -103,7 +103,7 @@ export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
 export const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
 
-const generateTimelineEvents = (
+export const generateTimelineEvents = (
   route: Route,
   events: DriveEvent[],
 ): TimelineEvent[] => {
@@ -151,27 +151,28 @@ const generateTimelineEvents = (
         lastAlert = ev
       }
 
-      // Modified overriding logic
-      if (lastOverride && !isOverriding(state)) {
+      if (isOverriding(state)) {
+        if (lastEngaged) {
+          res.push({
+            type: 'engaged',
+            route_offset_millis: lastEngaged.route_offset_millis,
+            end_route_offset_millis: ev.route_offset_millis,
+          } as EngagedTimelineEvent)
+          lastEngaged = undefined
+        }
+        if (!lastOverride) {
+          lastOverride = ev
+        }
+      } else if (lastOverride) {
         res.push({
           type: 'overriding',
           route_offset_millis: lastOverride.route_offset_millis,
           end_route_offset_millis: ev.route_offset_millis,
         } as OverridingTimelineEvent)
         lastOverride = undefined
-      }
-      if (!lastOverride && isOverriding(state)) {
-        lastOverride = ev
-      }
-
-      // If we're overriding, end the current engagement
-      if (isOverriding(state) && lastEngaged) {
-        res.push({
-          type: 'engaged',
-          route_offset_millis: lastEngaged.route_offset_millis,
-          end_route_offset_millis: ev.route_offset_millis,
-        } as EngagedTimelineEvent)
-        lastEngaged = undefined
+        if (enabled) {
+          lastEngaged = ev
+        }
       }
     } else if (ev.type === 'user_flag') {
       res.push({
@@ -211,7 +212,7 @@ const generateTimelineEvents = (
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-const generateTimelineStatistics = (
+export const generateTimelineStatistics = (
   route: Route,
   timeline: TimelineEvent[],
 ): TimelineStatistics => {
