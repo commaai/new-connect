@@ -29,7 +29,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    const lastSegmentEndTime = previousPageData.at(-1)!.segment_start_times.at(-1)!
+    const lastSegmentEndTime = previousPageData.at(-1)!.segment_end_times.at(-1)!
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
   const getPage = (page: number): Promise<RouteSegments[]> => {
