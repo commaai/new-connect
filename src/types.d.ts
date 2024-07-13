@@ -130,9 +130,9 @@ export interface DoneClip extends Clip {
 export interface FailedClip extends Clip {
   status: 'failed'
   error_status:
-  | 'upload_failed_request'
-  | 'upload_failed'
-  | 'upload_failed_dcam'
-  | 'upload_failed_timeout'
-  | 'export_failed'
+    | 'upload_failed_request'
+    | 'upload_failed'
+    | 'upload_failed_dcam'
+    | 'upload_failed_timeout'
+    | 'export_failed'
 }
