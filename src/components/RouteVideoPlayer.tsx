@@ -1,8 +1,7 @@
 import { createEffect, createResource, onCleanup, onMount } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
-import Hls from '@mistweaverco/hls.js-light'
-
+import Hls from 'hls.js/dist/hls.light.min.js';
 import { getQCameraStreamUrl } from '~/api/route'
 
 type RouteVideoPlayerProps = {
@@ -21,7 +20,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
   })
 
-  let hls: Hls | undefined = undefined
+  let hls = new Hls()
   createEffect(() => {
     hls?.destroy()
     if (streamUrl()) {
