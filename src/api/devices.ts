@@ -1,4 +1,4 @@
-import type { Device, DeviceWithFetchedAt, DrivingStatistics } from '~/types'
+import type { Device, DrivingStatistics, WithFetchedAt } from '~/types'
 
 import { fetcher } from '.'
 
@@ -16,22 +16,22 @@ const sortDevices = (devices: Device[]): Device[] => {
   })
 }
 
-const populateFetchedAt = (device: Device): DeviceWithFetchedAt => {
+const populateFetchedAt = <T>(item: T): WithFetchedAt<T> => {
   return {
-    ...device,
+    ...item,
     fetched_at: Math.floor(Date.now() / 1000),
   }
 }
 
 export const getDevice = async (dongleId: string) =>
-  fetcher<DeviceWithFetchedAt>(`/v1.1/devices/${dongleId}/`)
+  fetcher<Device>(`/v1.1/devices/${dongleId}/`)
     .then(populateFetchedAt)
 
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
 
 export const getDevices = async () =>
-  fetcher<DeviceWithFetchedAt[]>('/v1/me/devices/')
+  fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
-    .then(sortedDevices => sortedDevices.map(populateFetchedAt))
+    .then(sortedDevice => sortedDevice.map(populateFetchedAt))
     .catch(() => [])

@@ -21,11 +21,11 @@ export interface Device {
   device_type: string
   openpilot_version: string
   sim_id: string
+  // not populated by api
+  fetched_at: number
 }
 
-export interface DeviceWithFetchedAt extends Device {
-  fetched_at: number;
-}
+export type WithFetchedAt<T> = T & { fetched_at: number }
 
 export interface DrivingStatisticsAggregation {
   distance: number
@@ -130,9 +130,9 @@ export interface DoneClip extends Clip {
 export interface FailedClip extends Clip {
   status: 'failed'
   error_status:
-    | 'upload_failed_request'
-    | 'upload_failed'
-    | 'upload_failed_dcam'
-    | 'upload_failed_timeout'
-    | 'export_failed'
+  | 'upload_failed_request'
+  | 'upload_failed'
+  | 'upload_failed_dcam'
+  | 'upload_failed_timeout'
+  | 'export_failed'
 }

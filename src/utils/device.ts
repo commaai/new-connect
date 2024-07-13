@@ -1,11 +1,10 @@
-import type { DeviceWithFetchedAt } from '~/types'
+import type { Device } from '~/types'
 
-export function getDeviceName(device: DeviceWithFetchedAt) {
+export function getDeviceName(device: Device) {
   if (device.alias) return device.alias
   return `comma ${device.device_type}`
 }
 
-export function deviceIsOnline(device: DeviceWithFetchedAt) {
-  if (!device.last_athena_ping) return false
-  return device.last_athena_ping >= (device.fetched_at - 120)
+export function deviceIsOnline(device: Device) {
+  return !!(device.last_athena_ping) && (device.last_athena_ping >= (device.fetched_at - 120))
 }

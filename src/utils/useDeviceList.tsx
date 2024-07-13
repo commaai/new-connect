@@ -1,4 +1,4 @@
-import { DeviceWithFetchedAt } from '~/types'
+import { Device } from '~/types'
 import { useLocation } from '@solidjs/router'
 import { useContext } from 'solid-js'
 import storage from './storage'
@@ -8,11 +8,11 @@ export default function useDeviceList() {
   const { setDrawer } = useContext(DashboardContext)!
   const location = useLocation()
 
-  const isSelected = (device: DeviceWithFetchedAt) => {
+  const isSelected = (device: Device) => {
     return location.pathname.includes(device.dongle_id)
   }
 
-  const onClick = (device: DeviceWithFetchedAt) => {
+  const onClick = (device: Device) => {
     return () => {
       setDrawer(false)
       storage.setItem('lastSelectedDongleId', device.dongle_id)

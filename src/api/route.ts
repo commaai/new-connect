@@ -1,6 +1,6 @@
 import { fetcher } from '.'
 import { BASE_URL } from './config'
-import type { DeviceWithFetchedAt, Route, RouteShareSignature } from '~/types'
+import type { Device, Route, RouteShareSignature } from '~/types'
 
 export class RouteName {
   // dongle ID        date str
@@ -20,10 +20,10 @@ export class RouteName {
     return new RouteName(match[RouteName.regexGroup.dongleId], match[RouteName.regexGroup.dateStr])
   }
 
-  readonly dongleId: DeviceWithFetchedAt['dongle_id']
+  readonly dongleId: Device['dongle_id']
   readonly dateStr: string
 
-  constructor(dongleId: DeviceWithFetchedAt['dongle_id'], dateStr: string) {
+  constructor(dongleId: Device['dongle_id'], dateStr: string) {
     this.dongleId = dongleId
     this.dateStr = dateStr
   }

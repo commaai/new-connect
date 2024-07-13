@@ -13,7 +13,7 @@ import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import type { DeviceWithFetchedAt } from '~/types'
+import type { Device } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
@@ -35,7 +35,7 @@ export const DashboardContext = createContext<DashboardState>()
 
 const DashboardDrawer = (props: {
   onClose: () => void
-  devices: DeviceWithFetchedAt[] | undefined
+  devices: Device[] | undefined
 }) => {
   return (
     <>

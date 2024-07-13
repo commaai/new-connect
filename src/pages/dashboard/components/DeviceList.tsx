@@ -3,14 +3,14 @@ import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
-import type { DeviceWithFetchedAt } from '~/types'
+import type { Device } from '~/types'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
 
 import useDeviceList from '~/utils/useDeviceList'
 
 type DeviceListProps = {
   class?: string
-  devices: DeviceWithFetchedAt[]
+  devices: Device[]
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
