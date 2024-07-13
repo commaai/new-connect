@@ -8,15 +8,15 @@ const mapFiles = fs.readdirSync(dir).filter(fn => fn.endsWith(extension));
 
 report = [];
 for (const mapFile of mapFiles) {
-    var mapFileData = JSON.parse(fs.readFileSync(dir + mapFile, 'utf8'));
-    assetFile = mapFile.replace(extension, "");
-    sources = mapFileData.sources.filter(source => source.includes("node_modules")).map(source => source.split("node_modules/")[1]);
-    report.push({ "asset": assetFile, "size": fs.statSync(dir + assetFile).size, "sources": sources});
-    fs.unlinkSync(dir + mapFile);
+  var mapFileData = JSON.parse(fs.readFileSync(dir + mapFile, 'utf8'));
+  assetFile = mapFile.replace(extension, "");
+  sources = mapFileData.sources.filter(source => source.includes("node_modules")).map(source => source.split("node_modules/")[1]);
+  report.push({ "asset": assetFile, "size": fs.statSync(dir + assetFile).size, "sources": sources});
+  fs.unlinkSync(dir + mapFile);
 }
 report.sort((b, a) => a.size - b.size).forEach(entry => {
-    console.log(entry.asset + ":" + (entry.size / 1024).toFixed(2) + "KB");
-    for (const source of entry.sources) {
-        console.log("   " + source);
-    }
+  console.log(entry.asset + ":" + (entry.size / 1024).toFixed(2) + "KB");
+  for (const source of entry.sources) {
+    console.log("   " + source);
+  }
 });
