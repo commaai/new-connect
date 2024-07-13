@@ -26,12 +26,25 @@ const pages: Promise<RouteSegments[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
+  
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData) return endpoint()
-    if (previousPageData.length === 0) return undefined
-    const lastSegmentEndTime = previousPageData.at(-1)!.segment_start_times.at(-1)!
-    return `${endpoint()}&end=${lastSegmentEndTime - 1}`
+    if (!previousPageData || previousPageData.length === 0) {
+      return undefined
+    }
+
+    const lastSegment = previousPageData[previousPageData.length - 1]
+    if (!lastSegment || !lastSegment.segment_start_times || lastSegment.segment_start_times.length === 0) {
+      return endpoint()
+    }
+
+    const lastSegmentEndTime = lastSegment.segment_start_times[lastSegment.segment_start_times.length - 1]
+    if (lastSegmentEndTime) {
+      return `${endpoint()}&end=${lastSegmentEndTime - 1}`
+    } else {
+      return endpoint()
+    }
   }
+
   const getPage = (page: number): Promise<RouteSegments[]> => {
     if (!pages[page]) {
       // eslint-disable-next-line no-async-promise-executor
