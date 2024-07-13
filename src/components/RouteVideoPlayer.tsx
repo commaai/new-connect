@@ -1,7 +1,7 @@
 import { createEffect, createResource, onCleanup, onMount } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
-import Hls from 'hls.js'
+import Hls from '@mistweaverco/hls.js-light'
 
 import { getQCameraStreamUrl } from '~/api/route'
 
