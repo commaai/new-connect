@@ -1,4 +1,4 @@
-import { createResource, Suspense, useContext, createSignal } from 'solid-js'
+import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -30,54 +30,70 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
   const [snapshot, setSnapshot] = createSignal<{
-    error: string | null, fetching: boolean, image: string | null }>({
-    error: null, fetching: false, image: null })
+    error: string | null
+    fetching: boolean
+    images: string[]
+  }>({
+    error: null,
+    fetching: false,
+    images: [],
+  })
 
   const takeSnapshot = async () => {
-    console.log('Starting snapshot process...')
-    setSnapshot({ error: null, fetching: true, image: null })
-  
+    setSnapshot({ error: null, fetching: true, images: [] })
+
     try {
       const payload = {
         method: 'takeSnapshot',
         jsonrpc: '2.0',
         id: 0,
       }
-  
+
       const response = await fetch(`${ATHENA_URL}/${props.dongleId}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `JWT ${getAccessToken()}`,
+          Authorization: `JWT ${getAccessToken()}`,
         },
         body: JSON.stringify(payload),
       })
-  
+
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-  
-      const resp: SnapshotResponse = await response.json() as SnapshotResponse
-      const image = resp.result?.jpegFront || resp.result?.jpegBack
-  
-      if (image) {
-        console.log('Snapshot fetched successfully:', image)
-        setSnapshot({ error: null, fetching: false, image })
+
+      const resp: SnapshotResponse = (await response.json()) as SnapshotResponse
+      const images = []
+
+      if (resp.result?.jpegFront) images.push(resp.result.jpegFront)
+      if (resp.result?.jpegBack) images.push(resp.result.jpegBack)
+
+      if (images.length > 0) {
+        setSnapshot({ error: null, fetching: false, images })
       } else {
-        throw new Error('No image found.')
+        throw new Error('No images found.')
       }
+
     } catch (err) {
-      console.error('Error fetching snapshot:', err)
       let error = (err as Error).message
-  
       if (error.includes('Device not registered')) {
         error = 'Device offline'
-      } else {
-        error = 'Unknown Error'
       }
-  
-      setSnapshot({ error, fetching: false, image: null })
+      setSnapshot({ error, fetching: false, images: [] })
     }
+  }
+
+  const downloadSnapshot = (image: string, index: number) => {
+    const link = document.createElement('a')
+    link.href = `data:image/jpeg;base64,${image}`
+    link.download = `snapshot${index + 1}.jpg`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+  }
+
+  const clearImages = () => {
+    setSnapshot({ ...snapshot(), images: [] })
   }
 
   return (
@@ -86,7 +102,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
-        <div class="h-[72px] overflow-hidden rounded-lg bg-surface-container-low">
+        <div class="h-min overflow-auto rounded-lg bg-surface-container-low">
           <div class="flex">
             <div class="flex-auto">
               <Suspense fallback={<div class="skeleton-loader size-full" />}>
@@ -95,25 +111,37 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                 </div>
               </Suspense>
             </div>
-            <div class="p-4">
-              <IconButton onClick={() => {
-                void takeSnapshot()
-              }}>camera</IconButton>
+            <div class="flex p-4">
+              <IconButton onClick={() => void takeSnapshot() }>camera</IconButton>
             </div>
+            <For each={snapshot().images}>
+              {(image, index) => (
+                <div class="p-4">
+                  <IconButton onClick={() => downloadSnapshot(image, index())}>download</IconButton>
+                </div>
+              )}
+            </For>
+            {snapshot().images.length > 0 && (
+              <div class="flex p-4">
+                <IconButton onClick={clearImages}>clear</IconButton>
+              </div>
+            )}
           </div>
         </div>
         <div class="flex flex-col gap-2">
-          {snapshot().image && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <img src={`data:image/jpeg;base64,${snapshot().image}`} alt="Device Snapshot" />
+          <For each={snapshot().images}>
+            {(image, index) => (
+              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+                <div class="p-4">
+                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </For>
           {snapshot().fetching && (
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
               <div class="p-4">
-                <div>Loading snapshot...</div>
+                <div>Loading snapshots...</div>
               </div>
             </div>
           )}
