@@ -28,21 +28,11 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
   
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData || previousPageData.length === 0) {
-      return undefined
-    }
-
-    const lastSegment = previousPageData[previousPageData.length - 1]
-    if (!lastSegment || !lastSegment.segment_start_times || lastSegment.segment_start_times.length === 0) {
-      return endpoint()
-    }
-
-    const lastSegmentEndTime = lastSegment.segment_start_times[lastSegment.segment_start_times.length - 1]
-    if (lastSegmentEndTime) {
-      return `${endpoint()}&end=${lastSegmentEndTime - 1}`
-    } else {
-      return endpoint()
-    }
+    if (!previousPageData) return endpoint()
+    if (previousPageData.length === 0) return undefined
+    const lastSegment = previousPageData.at(-1)!
+    const lastSegmentEndTime = lastSegment.segment_start_times ? lastSegment.segment_start_times.at(-1) : undefined
+    return lastSegmentEndTime ? `${endpoint()}&end=${lastSegmentEndTime - 1}` : undefined
   }
 
   const getPage = (page: number): Promise<RouteSegments[]> => {
