@@ -47,7 +47,7 @@ type UserFlagDriveEvent = IDriveEvent & {
   data: Record<string, never>
 }
 
-export type DriveEvent = EventDriveEvent | StateDriveEvent | UserFlagDriveEvent
+type DriveEvent = EventDriveEvent | StateDriveEvent | UserFlagDriveEvent
 
 type EngagedTimelineEvent = {
   type: 'engaged'
@@ -103,7 +103,7 @@ export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
 export const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
 
-export const generateTimelineEvents = (
+const generateTimelineEvents = (
   route: Route,
   events: DriveEvent[],
 ): TimelineEvent[] => {
@@ -212,7 +212,7 @@ export const generateTimelineEvents = (
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-export const generateTimelineStatistics = (
+const generateTimelineStatistics = (
   route: Route,
   timeline: TimelineEvent[],
 ): TimelineStatistics => {
