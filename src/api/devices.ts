@@ -1,8 +1,8 @@
-import type { Device, DrivingStatistics, WithFetchedAt } from '~/types'
+import type { Device, DrivingStatistics } from '~/types'
 
 import { fetcher } from '.'
 
-const sortDevices = (devices: WithFetchedAt<Device[]>) => {
+const sortDevices = (devices: Device[]) => {
   return devices.sort((a, b) => {
     if (a.is_owner !== b.is_owner) {
       return a.is_owner ? -1 : 1
