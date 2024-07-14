@@ -53,7 +53,7 @@ jobs:
   
   preview:
     needs: build
-    if: github.event_name == 'pull_request'
-    uses: signed-long/new-connect/.github/workflows/preview.yaml@master
+    if: github.event_name == 'pull_request' && github.repository == 'commaai/new-connect'
+    uses: commaai/new-connect/.github/workflows/preview.yaml@master
     with:
       pr_number: ${{ github.event.number }}
