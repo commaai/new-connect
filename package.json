@@ -12,7 +12,7 @@
     "build": "vite build",
     "dev": "vite",
     "serve": "vite prefix",
-    "lint": "eslint --cache --cache-location node_modules/.eslintcache --ignore-pattern dist",
+    "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
     "test": "vitest run"
