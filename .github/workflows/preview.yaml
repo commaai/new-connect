@@ -16,6 +16,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
+      # set status on PR
+      - uses: haya14busa/action-workflow_run-status@967ed83efa565c257675ed70cfe5231f062ddd94
+
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
