@@ -43,12 +43,6 @@ export interface DeviceUser {
   permission: 'read_access' | 'owner'
 }
 
-export enum SegmentDataSource {
-  EON = 3,
-  TWO = 6,
-  THREE = 7,
-}
-
 export interface Route extends ApiResponseBase {
   can?: boolean
   create_time: number
@@ -97,39 +91,4 @@ export interface RouteSegments extends Route {
   share_exp: RouteShareSignature['exp']
   share_sig: RouteShareSignature['sig']
   start_time_utc_millis: number
-}
-
-export interface Clip {
-  id: number
-  create_time: number
-  dongle_id: string
-  route_name: string
-  start_time: number
-  end_time: number
-  title: string
-  video_type: 'q' | 'f' | 'e' | 'd' | '360'
-  is_public: boolean
-  status?: 'pending' | 'done' | 'failed'
-}
-
-export interface PendingClip extends Clip {
-  status: 'pending'
-  pending_status: 'waiting_jobs' | 'processing'
-  pending_progress: number
-}
-
-export interface DoneClip extends Clip {
-  status: 'done'
-  url: string
-  thumbnail: string
-}
-
-export interface FailedClip extends Clip {
-  status: 'failed'
-  error_status:
-    | 'upload_failed_request'
-    | 'upload_failed'
-    | 'upload_failed_dcam'
-    | 'upload_failed_timeout'
-    | 'export_failed'
 }
