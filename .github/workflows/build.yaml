@@ -52,6 +52,7 @@ jobs:
           command: pages deploy dist --project-name=connect --branch=new-connect --commit-dirty=true
   
   preview:
+    needs: build
     if: github.event_name == 'pull_request'
     uses: signed-long/new-connect/.github/workflows/preview.yaml@master
     with:
