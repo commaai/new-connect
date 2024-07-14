@@ -21,7 +21,7 @@ const RouteHeader = (props: { route?: RouteSegments }) => {
     if (!startTime() && !endTime()) {
       return 'No time info'
     }
-    return startTime()?.format('ddd, MMM D, YYYY') || 'No Time Info'
+    return startTime()?.format('ddd, MMM D, YYYY') || 'No Time Info!'
   }
 
   const subhead = () => {
