@@ -49,7 +49,7 @@ const DashboardDrawer = (props: {
         Devices
       </h2>
       <Show when={props.devices} keyed>
-        {(devices: Device[]) => <DeviceList class="p-2" devices={devices} />}
+        {devices => <DeviceList class="p-2" devices={devices} />}
       </Show>
       <div class="grow" />
       <hr class="mx-4 opacity-20" />
