@@ -10,6 +10,18 @@ Try it out at https://new-connect.connect-d5y.pages.dev.
 - Install dependencies: `bun install`
 - Start dev server: `bun dev --open`
 
+For a full fresh setup in `$HOME`:
+```bash
+curl -fsSL https://bun.sh/install | bash
+
+cd ~
+git clone git@github.com:commaai/new-connect.git
+
+cd new-connect
+bun install
+bun dev
+```
+
 ## Contributing
 
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
