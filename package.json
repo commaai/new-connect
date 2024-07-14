@@ -51,10 +51,8 @@
     "@solidjs/router": "^0.13.5",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.11",
-    "hls.js": "^1.5.11",
-    "mapbox-gl": "^3.5.1",
-    "solid-js": "^1.8.17",
-    "solid-map-gl": "^1.11.3"
+    "hls.js": "^1.5.13",
+    "solid-js": "^1.8.17"
   },
   "engines": {
     "node": ">=20.11.0"
