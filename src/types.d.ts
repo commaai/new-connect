@@ -1,3 +1,7 @@
+export interface ApiResponseBase {
+  fetched_at: number
+}
+
 export interface Profile {
   email: string
   id: string
@@ -6,7 +10,7 @@ export interface Profile {
   user_id: string
 }
 
-export interface Device {
+export interface Device extends ApiResponseBase {
   dongle_id: string
   alias: string
   serial: string
@@ -45,7 +49,7 @@ export enum SegmentDataSource {
   THREE = 7,
 }
 
-export interface Route {
+export interface Route extends ApiResponseBase {
   can?: boolean
   create_time: number
   devicetype: number
