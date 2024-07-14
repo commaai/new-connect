@@ -25,6 +25,6 @@ export async function fetcher<T>(endpoint: string): Promise<WithFetchedAt<T>> {
   } else if (typeof json === 'object') {
     return populateFetchedAt(json)
   } else {
-    throw new Error('Unexpected response type')
+    throw new Error(`Unexpected response type: ${typeof json}. Expected either type array or object.`)
   }
 }
