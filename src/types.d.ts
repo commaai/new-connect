@@ -21,8 +21,6 @@ export interface Device {
   device_type: string
   openpilot_version: string
   sim_id: string
-  // not populated by api
-  fetched_at: number
 }
 
 export type WithFetchedAt<T> = T & { fetched_at: number }
