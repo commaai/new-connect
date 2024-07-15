@@ -42,7 +42,7 @@ const PopUp: VoidComponent<PopUpProps> = (props) => {
 }
 
 type Props = {
-  device: Device | undefined
+  device: Device
 }
 
 const DeviceMap: VoidComponent<Props> = (props) => {
@@ -66,8 +66,8 @@ const DeviceMap: VoidComponent<Props> = (props) => {
   })
 
   createEffect(() => {
-    const lat = device()?.last_gps_lat
-    const lng = device()?.last_gps_lng
+    const lat = device().last_gps_lat
+    const lng = device().last_gps_lng
     if(lng && lat) {
       setViewport({ center: [lng, lat], zoom: 15 } as Viewport)
       getPlaceFromCoords(lng, lat)
