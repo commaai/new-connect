@@ -109,7 +109,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-[300px] overflow-hidden rounded-lg bg-surface-container-low">
-          <DeviceMap device={device.latest} />
+          {device.latest && <DeviceMap device={device.latest} />}
           <Suspense fallback={<div class="skeleton-loader h-1/4 w-full" />}>
             <div class="p-4">
               <DeviceStatistics dongleId={props.dongleId} />
