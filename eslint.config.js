@@ -9,6 +9,8 @@ import stylistic from '@stylistic/eslint-plugin'
 export default [
   {
     languageOptions: { globals: globals.browser },
+  },
+  {
     ignores: ['.github', '.husky', '.vscode', 'node_modules', 'dist'],
   },
   js.configs.recommended,

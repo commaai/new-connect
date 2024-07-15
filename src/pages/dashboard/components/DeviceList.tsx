@@ -1,14 +1,12 @@
-import { useContext, For } from 'solid-js'
+import { For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import Icon from '~/components/material/Icon'
-import List, { ListItem, ListItemContent } from '~/components/material/List'
+import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/types'
-import { getDeviceName } from '~/utils/device'
+import { getDeviceName, deviceIsOnline } from '~/utils/device'
 
-import { DashboardContext } from '../Dashboard'
+import useDeviceList from '~/utils/useDeviceList'
 
 type DeviceListProps = {
   class?: string
@@ -16,21 +14,20 @@ type DeviceListProps = {
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
-  const { setDrawer } = useContext(DashboardContext)!
-  const location = useLocation()
-
+  const {
+    isSelected,
+    onClick,
+  } = useDeviceList()
   return (
     <List variant="nav" class={clsx(props.class)}>
       <For each={props.devices}>
         {(device) => {
-          const isSelected = () => location.pathname.includes(device.dongle_id)
-          const onClick = () => setDrawer(false)
           return (
             <ListItem
               variant="nav"
-              leading={<Icon>directions_car</Icon>}
-              selected={isSelected()}
-              onClick={onClick}
+              leading={<IconWithStatusIndicator isOnline={deviceIsOnline(device)} iconName="directions_car" />}
+              selected={isSelected(device)}
+              onClick={onClick(device)}
               href={`/${device.dongle_id}`}
             >
               <ListItemContent

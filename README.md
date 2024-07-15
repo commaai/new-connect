@@ -1,8 +1,8 @@
 # connect
 
-This is an experimental rewrite of [comma connect](https://github.com/commaai/connect), the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
+This is a rewrite of [comma connect](https://github.com/commaai/connect), the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
 
-Try out new-connect at https://new-connect.connect-d5y.pages.dev.
+Try it out at https://new-connect.connect-d5y.pages.dev.
 
 ## Development
 
@@ -10,40 +10,45 @@ Try out new-connect at https://new-connect.connect-d5y.pages.dev.
 - Install dependencies: `bun install`
 - Start dev server: `bun dev --open`
 
+For a full fresh setup in `$HOME`:
+```bash
+curl -fsSL https://bun.sh/install | bash
+
+cd ~
+git clone git@github.com:commaai/new-connect.git
+
+cd new-connect
+bun install
+bun dev
+```
+
 ## Contributing
 
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
 
-A few constraints:
-- 5k line limit
-- 500KB bundle size limit
-- 1m timeout for all CI; a fast development environment is a delightful one
+connect has a demo mode, so no special comma device is needed to develop connect.
 
-## Features
+A few constraints to keep connect light and the dev environment fun:
+* 5k line limit
+* 500KB bundle size limit
+* 1m timeout for all CI
 
-These are the minimum features for parity with connect.
+References:
+* [API docs](https://api.comma.ai)
+* [openpilot docs](https://docs.comma.ai)
+* [Discord](https://discord.comma.ai)
+* [Bounties](https://comma.ai/bounties) 
 
-Drives
-- [x] list
-- [x] show map
-- [x] play qcams
-- [x] engagement timeline
-- [ ] file uploads
+## Roadmap
 
-Map
-- [ ] show user and car location
+The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
 
-Misc
-- [x] demo mode
-- [ ] snapshot
-- [ ] comma prime sign up + management
-- [ ] pairing to a new device
-- [ ] PWA: splash, icon, offline mode, etc.
+[This milestone](https://github.com/commaai/new-connect/milestone/1) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
 
-And some eventual features beyond connect's current feature set:
-- [ ] SSH console
-- [ ] sentry mode
-- [ ] dashcam clips
-- [ ] manage openpilot settings
-- [ ] replace all of useradmin.comma.ai
-- [ ] car mangement: lock doors, EV charge status, etc.
+Once we've shipped v1, next up will be:
+* [Sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
+* SSH console for openpilot developers
+* Replace snapshot with a live stream
+* openpilot clips, like this [community tool](https://github.com/nelsonjchen/op-replay-clipper)
+* Manage the settings on your comma 3X
+* Car mangement: lock doors, EV charge status, etc.
