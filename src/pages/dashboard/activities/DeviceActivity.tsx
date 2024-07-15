@@ -113,48 +113,46 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <Suspense fallback={<div class="skeleton-loader h-1/4 w-full" />}>
             <div class="p-4">
               <DeviceStatistics dongleId={props.dongleId} />
-                </div>
-              </Suspense>
             </div>
-            <div class="flex p-4">
-              <IconButton onClick={() => void takeSnapshot() }>camera</IconButton>
+          </Suspense>
+        </div>
+        <div class="flex p-4">
+          <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
+        </div>
+      </div>
+      <div class="flex flex-col gap-2">
+        <For each={snapshot().images}>
+          {(image, index) => (
+            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+              <div class="relative p-4">
+                <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
+                <div class="absolute right-4 top-4 p-4">
+                  <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
+                  <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
+                </div>
+              </div>
+            </div>
+          )}
+        </For>
+        {snapshot().fetching && (
+          <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+            <div class="p-4">
+              <div>Loading snapshots...</div>
             </div>
           </div>
-        </div>
-        <div class="flex flex-col gap-2">
-          <For each={snapshot().images}>
-            {(image, index) => (
-              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-                <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`}/>
-                  <div class="absolute right-4 top-4 p-4">
-                    <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
-                    <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
-                  </div>
-                </div>
-              </div>
-            )}
-          </For>
-          {snapshot().fetching && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <div>Loading snapshots...</div>
-              </div>
+        )}
+        {snapshot().error && (
+          <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+            <div class="flex items-center p-4">
+              <IconButton onClick={clearError} class="text-white">Clear</IconButton>
+              <span>Error: {snapshot().error}</span>
             </div>
-          )}
-          {snapshot().error && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="flex items-center p-4">
-                <IconButton onClick={clearError} class="text-white">Clear</IconButton>
-                <span>Error: {snapshot().error}</span>
-              </div>
-            </div>
-          )}
-        </div>
-        <div class="flex flex-col gap-2">
-          <span class="text-label-sm">Routes</span>
-          <RouteList dongleId={props.dongleId} />
-        </div>
+          </div>
+        )}
+      </div>
+      <div class="flex flex-col gap-2">
+        <span class="text-label-sm">Routes</span>
+        <RouteList dongleId={props.dongleId} />
       </div>
     </>
   )
