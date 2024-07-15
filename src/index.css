@@ -198,6 +198,23 @@
       --font-filled: 1;
     }
   }
+
+  .custom-icon {
+    background: none !important;
+    border: none;
+    box-shadow: none !important;
+  }
+  
+  .custom-icon-inner {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background-color: var(--color-primary-container);
+    color: var(--color-on-primary-container);
+  }
 }
 
 @layer utilities {

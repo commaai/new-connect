@@ -25,6 +25,8 @@ export interface Device extends ApiResponseBase {
   device_type: string
   openpilot_version: string
   sim_id: string
+  last_gps_lat: number
+  last_gps_lng: number
 }
 
 export interface DrivingStatisticsAggregation {
