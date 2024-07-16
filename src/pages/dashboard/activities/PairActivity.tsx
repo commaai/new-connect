@@ -1,5 +1,5 @@
 import { createEffect, onCleanup, onMount, type JSX, type VoidComponent } from 'solid-js'
-import { useNavigate } from '@solidjs/router'
+import { useLocation, useNavigate } from '@solidjs/router'
 import { createMachine } from '@solid-primitives/state-machine'
 import QrScanner from 'qr-scanner'
 
@@ -12,6 +12,8 @@ import TopAppBar from '~/components/material/TopAppBar'
 import './PairActivity.css'
 
 const PairActivity: VoidComponent = () => {
+  const { pair: pairToken } = useLocation().query
+
   const state = createMachine<{
     scanning: {
       value: JSX.Element,
@@ -28,7 +30,10 @@ const PairActivity: VoidComponent = () => {
       to: 'scanning'
     }
   }>({
-    initial: 'scanning',
+    initial: pairToken ? {
+      type: 'pairing',
+      input: { pairToken },
+    } : 'scanning',
     states: {
       scanning(_input, to) {
         let videoRef: HTMLVideoElement

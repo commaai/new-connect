@@ -73,6 +73,8 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
 
+  const pairToken = () => !!location.query['pair']
+
   const [drawer, setDrawer] = createSignal(false)
   const onOpen = () => setDrawer(true)
   const onClose = () => setDrawer(false)
@@ -110,7 +112,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <Match when={!!profile.error}>
             <Navigate href="/login" />
           </Match>
-          <Match when={dongleId() === 'pair'}>
+          <Match when={dongleId() === 'pair' || pairToken()}>
             <PairActivity />
           </Match>
           <Match when={dateStr()} keyed>

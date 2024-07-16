@@ -62,7 +62,7 @@ const validatePairToken = (input: string): {
 export const pairDevice = async (pairToken: string): Promise<string> => {
   const token = validatePairToken(pairToken)
   if (!token) {
-    throw new Error('invalid qr code')
+    throw new Error('invalid pair code or QR code')
   }
 
   const body = new FormData()
