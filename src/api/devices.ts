@@ -34,35 +34,45 @@ const PairTokenPayloadSchema = z.object({
   identity: z.string().regex(/^[0-9a-f]{16}$/),
 })
 
-const validatePairToken = (input: string): string | false => {
-  if (!input) return false
-  const parts = input.split('.')
-  if (parts.length !== 3) return false
+const validatePairToken = (input: string): {
+  identity: string
+  token: string
+} | null => {
+  let token: string | null = input
+  try {
+    const url = new URL(input)
+    token = url.searchParams.get('pair')
+  } catch (_) { /* empty */ }
+  if (!token) return null
+
+  const parts = token.split('.')
+  if (parts.length !== 3) return null
+
   try {
     // jwt is base64url encoded
     const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
     const { identity } = PairTokenPayloadSchema.parse(JSON.parse(payload))
-    return identity
+    return { identity, token }
   } catch (error) {
     console.error(error instanceof Error ? error.message : error)
-    return false
+    return null
   }
 }
 
-export const pairDevice = async (pairToken: string) => {
-  let dongleId
-  if (!(dongleId = validatePairToken(pairToken))) {
+export const pairDevice = async (pairToken: string): Promise<string> => {
+  const token = validatePairToken(pairToken)
+  if (!token) {
     throw new Error('invalid qr code')
   }
 
   const body = new FormData()
-  body.append('pair_token', pairToken)
+  body.append('pair_token', token.token)
   try {
     await fetcher('/v2/pilotpair/', {
       method: 'POST',
       body,
     })
-    return dongleId
+    return token.identity
   } catch (error) {
     if (!(error instanceof Error) || !(error.cause instanceof Response)) {
       throw error

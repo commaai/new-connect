@@ -58,11 +58,10 @@ const PairActivity: VoidComponent = () => {
         return (
           <div id="video-container" class="absolute size-full overflow-hidden bg-black text-white">
             <video class="left-1/2 top-1/2 h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover" ref={videoRef!} />
-            <div class="prose absolute inset-0 flex flex-col justify-between p-4">
-              <div class="flex items-center">
-                <h1 class="grow text-title-lg">Pair new device</h1>
-                <IconButton href="/">close</IconButton>
-              </div>
+            <div class="prose absolute inset-0 flex flex-col justify-between">
+              <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
+                Add new device
+              </TopAppBar>
               <h2 class="text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
             </div>
           </div>
@@ -85,32 +84,32 @@ const PairActivity: VoidComponent = () => {
           })
 
         return (
-          <div class="flex flex-col items-center justify-center">
-            <TopAppBar class="w-screen" trailing={<IconButton href="/">close</IconButton>}>
-              Device pairing
-            </TopAppBar>
+          <>
+            <TopAppBar>Add new device</TopAppBar>
 
-            <CircularProgress class="m-4" color="primary" size={64} />
+            <div class="flex flex-col items-center gap-4">
+              <CircularProgress class="m-4" color="primary" size={64} />
 
-            <div>Pairing your device...</div>
-          </div>
+              Pairing your device...
+            </div>
+          </>
         )
       },
       error(input, to) {
         return (
-          <div class="flex flex-col items-center justify-center gap-4">
-            <TopAppBar class="w-screen" trailing={<IconButton href="/">close</IconButton>}>
-              Device pairing
+          <>
+            <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
+              Add new device
             </TopAppBar>
 
-            <div>
+            <div class="flex flex-col items-center gap-4">
               An error occurred: {input.error.message}
-            </div>
 
-            <Button color="primary" onClick={() => to.scanning()}>
-              Retry
-            </Button>
-          </div>
+              <Button color="primary" onClick={() => to.scanning()}>
+                Retry
+              </Button>
+            </div>
+          </>
         )
       },
     },
