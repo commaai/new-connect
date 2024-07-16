@@ -13,7 +13,6 @@ type DeviceListProps = {
   devices: Device[]
 }
 
-
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const {
     isSelected,
