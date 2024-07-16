@@ -56,7 +56,6 @@ const DashboardDrawer = (props: {
         {devices => <DeviceList class="p-2" devices={devices} />}
       </Show>
       <div class="grow" />
-      {/* TODO: hide button if no camera */}
       <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={props.onClose}>
         Add new device
       </Button>
