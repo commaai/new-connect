@@ -55,5 +55,6 @@ jobs:
     needs: build
     if: github.event_name == 'pull_request' && github.repository == 'commaai/new-connect'
     uses: commaai/new-connect/.github/workflows/preview.yaml@master
+    secrets: inherit
     with:
       pr_number: ${{ github.event.number }}
