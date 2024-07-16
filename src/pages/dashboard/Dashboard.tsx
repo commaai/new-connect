@@ -45,11 +45,11 @@ const DashboardDrawer: Component<{
       >
         comma connect
       </TopAppBar>
-      <h2 class="mb-2 text-label-sm mx-4">
+      <h2 class="mx-4 mb-2 text-label-sm">
         Devices
       </h2>
       <hr class="opacity-20" />
-      <div class="flex-grow overflow-y-auto pt-2 mx-2">
+      <div class="hide-scrollbar mx-2 grow overflow-y-auto pt-2">
         <Show when={props.devices} keyed>
           {devices => <DeviceList devices={devices} />}
         </Show>

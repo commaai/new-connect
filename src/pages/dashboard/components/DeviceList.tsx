@@ -19,14 +19,9 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
     isSelected,
     onClick,
   } = useDeviceList()
-
-  const newDevices: Device[] = []
-  for (let i = 0; i < 1; i++) {
-    newDevices.push(props.devices[0])
-  }
   return (
     <List variant="nav" class={clsx(props.class)}>
-      <For each={newDevices}>
+      <For each={props.devices}>
         {(device) => (
           <ListItem
             variant="nav"
@@ -34,7 +29,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
             selected={isSelected(device)}
             onClick={onClick(device)}
             href={`/${device.dongle_id}`}
-            class="rounded-lg mb-2"
+            class="mb-2 rounded-lg"
           >
             <ListItemContent
               headline={getDeviceName(device)}
