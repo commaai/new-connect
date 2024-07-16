@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import type { Device, DrivingStatistics } from '~/types'
 
 import { fetcher } from '.'
@@ -27,14 +29,40 @@ export const getDevices = async () =>
     .then(devices => sortDevices(devices))
     .catch(() => [])
 
+const PairTokenPayloadSchema = z.object({
+  pair: z.literal(true),
+  identity: z.string().regex(/^[0-9a-f]{16}$/),
+})
+
+const validatePairToken = (input: string): string | false => {
+  if (!input) return false
+  const parts = input.split('.')
+  if (parts.length !== 3) return false
+  try {
+    // jwt is base64url encoded
+    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+    const { identity } = PairTokenPayloadSchema.parse(JSON.parse(payload))
+    return identity
+  } catch (error) {
+    console.error(error instanceof Error ? error.message : error)
+    return false
+  }
+}
+
 export const pairDevice = async (pairToken: string) => {
+  let dongleId
+  if (!(dongleId = validatePairToken(pairToken))) {
+    throw new Error('invalid qr code')
+  }
+
   const body = new FormData()
   body.append('pair_token', pairToken)
   try {
-    return await fetcher<{ first_pair: boolean }>('/v2/pilotpair/', {
+    await fetcher('/v2/pilotpair/', {
       method: 'POST',
       body,
     })
+    return dongleId
   } catch (error) {
     if (!(error instanceof Error) || !(error.cause instanceof Response)) {
       throw error

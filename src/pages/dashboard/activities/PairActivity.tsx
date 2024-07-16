@@ -2,7 +2,6 @@ import { createEffect, onCleanup, onMount, type JSX, type VoidComponent } from '
 import { useNavigate } from '@solidjs/router'
 import { createMachine } from '@solid-primitives/state-machine'
 import QrScanner from 'qr-scanner'
-import { z } from 'zod'
 
 import { pairDevice } from '~/api/devices'
 import Button from '~/components/material/Button'
@@ -11,26 +10,6 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
-
-const PairTokenPayloadSchema = z.object({
-  pair: z.literal(true),
-  identity: z.string().regex(/^[0-9a-f]{16}$/),
-})
-
-const validatePairToken = (input: string): string | false => {
-  if (!input) return false
-  const parts = input.split('.')
-  if (parts.length !== 3) return false
-  try {
-    // jwt is base64url encoded
-    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    const { identity } = PairTokenPayloadSchema.parse(JSON.parse(payload))
-    return identity
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
-    return false
-  }
-}
 
 const PairActivity: VoidComponent = () => {
   const state = createMachine<{
@@ -92,29 +71,18 @@ const PairActivity: VoidComponent = () => {
       pairing(input, to) {
         const navigate = useNavigate()
 
-        onMount(() => {
-          const { pairToken } = input
-
-          let dongleId
-          if (!(dongleId = validatePairToken(pairToken))) {
-            // TODO: redirect to scanner
-            to.error({ error: new Error('Invalid QR code') })
-            return
-          }
-
-          pairDevice(input.pairToken)
-            .then(() => navigate(`/${dongleId}`))
-            .catch((reason) => {
-              let error
-              if (reason instanceof Error) {
-                error = reason
-              } else {
-                error = new Error('An unknown error occurred', { cause: reason })
-              }
-              console.error('Error pairing device', error, error.cause)
-              to.error({ error })
-            })
-        })
+        pairDevice(input.pairToken)
+          .then((dongleId) => navigate(`/${dongleId}`))
+          .catch((reason) => {
+            let error
+            if (reason instanceof Error) {
+              error = reason
+            } else {
+              error = new Error('An unknown error occurred', { cause: reason })
+            }
+            console.error('Error pairing device', error, error.cause)
+            to.error({ error })
+          })
 
         return (
           <div class="flex flex-col items-center justify-center">
