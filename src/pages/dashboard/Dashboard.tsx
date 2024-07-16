@@ -121,8 +121,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           </Match>
           <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
             <Navigate href={`/${defaultDongleId}`} />
-          )}
-          </Match>
+          )}</Match>
         </Switch>
       </Drawer>
     </DashboardContext.Provider>
