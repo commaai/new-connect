@@ -50,6 +50,19 @@ export default [
       '@stylistic/no-extra-semi': 'error',
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'never'],
+
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'args': 'all',
+          'argsIgnorePattern': '^_',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'ignoreRestSiblings': true,
+        },
+      ],
     },
   },
 ]
