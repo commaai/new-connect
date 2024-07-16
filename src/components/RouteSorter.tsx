@@ -37,7 +37,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
   }
 
   return (
-    <div class="max-w-md pt-2.5">
+    <div class="w-full pt-2.5">
       <div 
         class="hide-scrollbar flex overflow-x-auto pb-1" 
         style={{ 'scroll-behavior': 'smooth' }}
