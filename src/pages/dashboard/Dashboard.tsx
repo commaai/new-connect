@@ -33,10 +33,10 @@ type DashboardState = {
 
 export const DashboardContext = createContext<DashboardState>()
 
-const DashboardDrawer: Component<{
+const DashboardDrawer = (props: {
   onClose: () => void
   devices: Device[] | undefined
-}> = (props) => {
+}) => {
   return (
     <>
       <TopAppBar
@@ -54,11 +54,9 @@ const DashboardDrawer: Component<{
           {devices => <DeviceList devices={devices} />}
         </Show>
       </div>
-      <div class="mt-auto">
-        <hr class="opacity-20" />
-        <div class="p-4">
-          <Button class="w-full" href="/logout">Sign out</Button>
-        </div>
+      <hr class="opacity-20" />
+      <div class="p-4">
+        <Button class="w-full" href="/logout">Sign out</Button>
       </div>
     </>
   )
