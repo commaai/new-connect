@@ -33,10 +33,10 @@ type DashboardState = {
 
 export const DashboardContext = createContext<DashboardState>()
 
-const DashboardDrawer = (props: {
+const DashboardDrawer: Component<{
   onClose: () => void
   devices: Device[] | undefined
-}) => {
+}> = (props) => {
   return (
     <>
       <TopAppBar
@@ -45,15 +45,21 @@ const DashboardDrawer = (props: {
       >
         comma connect
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
+      <h2 class="mb-2 text-label-sm mx-4">
         Devices
       </h2>
-      <Show when={props.devices} keyed>
-        {devices => <DeviceList class="p-2" devices={devices} />}
-      </Show>
-      <div class="grow" />
-      <hr class="mx-4 opacity-20" />
-      <Button class="m-4" href="/logout">Sign out</Button>
+      <hr class="opacity-20" />
+      <div class="flex-grow overflow-y-auto pt-2 mx-2">
+        <Show when={props.devices} keyed>
+          {devices => <DeviceList devices={devices} />}
+        </Show>
+      </div>
+      <div class="mt-auto">
+        <hr class="opacity-20" />
+        <div class="p-4">
+          <Button class="w-full" href="/logout">Sign out</Button>
+        </div>
+      </div>
     </>
   )
 }
