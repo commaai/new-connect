@@ -48,7 +48,6 @@ const PairActivity: VoidComponent = () => {
             },
             {
               highlightScanRegion: true,
-              highlightCodeOutline: true,
             },
           )
           void qrScanner.start()
@@ -63,7 +62,7 @@ const PairActivity: VoidComponent = () => {
         return (
           <div id="video-container" class="absolute size-full overflow-hidden bg-black text-white">
             <video class="left-1/2 top-1/2 h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover" ref={videoRef!} />
-            <div class="prose absolute inset-0 flex flex-col justify-between">
+            <div class="prose absolute inset-0 flex flex-col justify-between pb-4">
               <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
                 Add new device
               </TopAppBar>
