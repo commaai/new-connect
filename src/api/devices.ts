@@ -1,5 +1,3 @@
-import { z } from 'zod'
-
 import type { Device, DrivingStatistics } from '~/types'
 
 import { fetcher } from '.'
@@ -29,11 +27,6 @@ export const getDevices = async () =>
     .then(devices => sortDevices(devices))
     .catch(() => [])
 
-const PairTokenPayloadSchema = z.object({
-  pair: z.literal(true),
-  identity: z.string().regex(/^[0-9a-f]{16}$/),
-})
-
 const validatePairToken = (input: string): {
   identity: string
   token: string
@@ -51,7 +44,8 @@ const validatePairToken = (input: string): {
   try {
     // jwt is base64url encoded
     const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
-    const { identity } = PairTokenPayloadSchema.parse(JSON.parse(payload))
+    const { identity, pair } = JSON.parse(payload) as Record<string, unknown>
+    if (pair !== true || typeof identity !== 'string') return null
     return { identity, token }
   } catch (_) {
     return null
