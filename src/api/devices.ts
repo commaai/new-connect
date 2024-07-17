@@ -31,8 +31,7 @@ const validatePairToken = (input: string): {
 } | null => {
   let token: string | null = input
   try {
-    const url = new URL(input)
-    token = url.searchParams.get('pair')
+    token = new URL(input).searchParams.get('pair')
   } catch (_) { /* empty */ }
   if (!token) return null
 
