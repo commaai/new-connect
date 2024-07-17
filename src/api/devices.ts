@@ -23,9 +23,7 @@ export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
 
 export const getDevices = async () =>
-  fetcher<Device[]>('/v1/me/devices/')
-    .then(devices => sortDevices(devices))
-    .catch(() => [])
+  fetcher<Device[]>('/v1/me/devices/').then(sortDevices).catch(() => [])
 
 const validatePairToken = (input: string): {
   identity: string
@@ -54,17 +52,12 @@ const validatePairToken = (input: string): {
 
 export const pairDevice = async (pairToken: string): Promise<string> => {
   const token = validatePairToken(pairToken)
-  if (!token) {
-    throw new Error('invalid pair code or QR code')
-  }
+  if (!token) throw new Error('invalid pair code or QR code')
 
   const body = new FormData()
   body.append('pair_token', token.token)
   try {
-    await fetcher('/v2/pilotpair/', {
-      method: 'POST',
-      body,
-    })
+    await fetcher('/v2/pilotpair/', { method: 'POST', body })
     return token.identity
   } catch (error) {
     if (!(error instanceof Error) || !(error.cause instanceof Response)) {
