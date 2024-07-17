@@ -79,10 +79,12 @@
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
+    "@solid-primitives/state-machine": "^0.0.3",
     "@solidjs/router": "^0.13.5",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.11",
     "hls.js": "^1.5.13",
+    "qr-scanner": "^1.4.2",
     "solid-js": "^1.8.17"
   },
   "engines": {
