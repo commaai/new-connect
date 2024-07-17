@@ -9,6 +9,8 @@ import stylistic from '@stylistic/eslint-plugin'
 export default [
   {
     languageOptions: { globals: globals.browser },
+  },
+  {
     ignores: ['.github', '.husky', '.vscode', 'node_modules', 'dist'],
   },
   js.configs.recommended,
@@ -48,6 +50,19 @@ export default [
       '@stylistic/no-extra-semi': 'error',
       '@stylistic/quotes': ['error', 'single', { avoidEscape: true }],
       '@stylistic/semi': ['error', 'never'],
+
+      '@typescript-eslint/no-unused-vars': [
+        'error',
+        {
+          'args': 'all',
+          'argsIgnorePattern': '^_',
+          'caughtErrors': 'all',
+          'caughtErrorsIgnorePattern': '^_',
+          'destructuredArrayIgnorePattern': '^_',
+          'varsIgnorePattern': '^_',
+          'ignoreRestSiblings': true,
+        },
+      ],
     },
   },
 ]

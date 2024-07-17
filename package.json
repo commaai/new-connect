@@ -19,11 +19,34 @@
   },
   "packageManager": "bun@1.1.18",
   "type": "module",
+  "//devDependencies": {
+    "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
+    "@stylistic/eslint-plugin": "enforce stylistic rules beyond standard ESLint",
+    "@types/eslint__js": "types for linting engine",
+    "@types/mapbox__polyline": "types for mapbox elements",
+    "@typescript-eslint/eslint-plugin": "ESLint rules for TS",
+    "@typescript-eslint/parser": "allows ESLint to parse TS",
+    "autoprefixer": "adds css vendor prefixes automatically",
+    "eslint": "linting engine",
+    "eslint-plugin-solid": "ESLint rules specific to solid",
+    "eslint-plugin-tailwindcss": "ESLint rules specific to tailwind",
+    "globals": "defines global identifiers for ESLint",
+    "husky": "git hooks tool, used here for pre-commit linting",
+    "jsdom": "js implementation of the dom (used in testing env which we don't really make use of)",
+    "playwright": "take screenshots to post on PRs",
+    "postcss": "transforms css with js; autoprefixer and tailwind get plugged into this",
+    "solid-devtools": "visualize reactivity graph (consider if necessary)",
+    "tailwindcss": "css framework",
+    "typescript": "js with types",
+    "typescript-eslint": "lets ESLint support TS",
+    "vite": "builds and serves app",
+    "vite-plugin-solid": "allows vite to properly compile solid components",
+    "vitest": "testing framework compatible with vite (only used for App.jsx component)",
+    "wrangler": "used for deploying assets to cloudflare"
+  },
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.8",
     "@stylistic/eslint-plugin": "^2.1.0",
-    "@testing-library/jest-dom": "^6.4.6",
-    "@testing-library/user-event": "^14.5.2",
     "@types/eslint__js": "^8.42.3",
     "@types/mapbox__polyline": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
@@ -46,12 +69,20 @@
     "vitest": "^1.6.0",
     "wrangler": "^3.60.2"
   },
+  "//dependencies": {
+    "@mapbox/polyline": "display series of map coordinates as a line",
+    "@solidjs/router": "changes view based on browser url",
+    "clsx": "construct className strings conditionally",
+    "dayjs": "work with dates (e.g., parse, validate, etc.)",
+    "hls.js": "stream video data",
+    "solid-js": "JS ui framework"
+  },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
     "@solidjs/router": "^0.13.5",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.11",
-    "hls.js": "^1.5.11",
+    "hls.js": "^1.5.13",
     "solid-js": "^1.8.17"
   },
   "engines": {
