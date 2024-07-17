@@ -53,8 +53,7 @@ const validatePairToken = (input: string): {
     const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
     const { identity } = PairTokenPayloadSchema.parse(JSON.parse(payload))
     return { identity, token }
-  } catch (error) {
-    console.error(error instanceof Error ? error.message : error)
+  } catch (_) {
     return null
   }
 }

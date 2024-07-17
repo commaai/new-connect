@@ -1,4 +1,4 @@
-import { createEffect, onCleanup, onMount, type JSX, type VoidComponent } from 'solid-js'
+import { onCleanup, onMount, type JSX, type VoidComponent } from 'solid-js'
 import { useLocation, useNavigate } from '@solidjs/router'
 import { createMachine } from '@solid-primitives/state-machine'
 import QrScanner from 'qr-scanner'
@@ -118,10 +118,6 @@ const PairActivity: VoidComponent = () => {
         )
       },
     },
-  })
-
-  createEffect(() => {
-    console.log({ state: state.type })
   })
 
   return <div>{state.value}</div>
