@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
   createSignal,
@@ -52,19 +53,24 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
   const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
-  const [loading, setLoading] = createSignal(false)
+  const [loading, setLoading] = createSignal(true)
   const [days, setDays] = createSignal(DEFAULT_DAYS)
+
+  const loadRoutes = async () => {
+    setLoading(true)
+    try {
+      const routes = await fetchRoutesWithinDays(props.dongleId, days())
+      setAllRoutes(routes)
+    } catch (error) {
+      console.error('Error fetching routes:', error)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   createEffect(() => {
     if (props.dongleId) {
-      setLoading(true)
-      fetchRoutesWithinDays(props.dongleId, days()).then(routes => {
-        setAllRoutes(routes)
-        setLoading(false)
-      }).catch(error => {
-        console.error('Error fetching routes:', error)
-        setLoading(false)
-      })
+      void loadRoutes()
     }
   })
 
@@ -87,12 +93,14 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   // Handler for sort option changes
   const handleSortChange = (key: SortKey, order: 'asc' | 'desc' | null) => {
+    setLoading(true)
     if (order === null) {
       setSortOption({ label: 'Date', key: 'date', order: 'desc' })
     } else {
       const label = key.charAt(0).toUpperCase() + key.slice(1)
       setSortOption({ label, key, order })
     }
+    void loadRoutes().finally(() => setLoading(false))
   }
 
   // Infinite scrolling observer
@@ -135,16 +143,24 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           </>
         }
       >
-        <For each={sortedRoutes()}>
-          {(route) => <RouteCard route={route} />}
-        </For>
+        {loading() ? (
+          <>
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+          </>
+        ) : (
+          <For each={sortedRoutes()}>
+            {(route) => <RouteCard route={route} />}
+          </For>
+        )}
       </Suspense>
       <div ref={bottomRef} class="flex justify-center">
-        {loading() && <div>Loading more...</div>}
+        {loading() && <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />}
       </div>
       <div>
-        {sortedRoutes().length === 0 && !loading() && <div>No routes found</div>}
-        {sortedRoutes().length > 0 && !loading() && <div>All routes loaded</div>}
+        {!loading() && sortedRoutes().length === 0 && <div>No routes found</div>}
+        {!loading() && sortedRoutes().length > 0 && <div>All routes loaded</div>}
       </div>
     </div>
   )
