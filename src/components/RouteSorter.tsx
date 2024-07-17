@@ -6,13 +6,12 @@ import { SortKey, SortOption, SortOrder } from '~/utils/sorting'
 const GRADIENT = 'from-cyan-700 via-blue-800 to-purple-900'
 
 interface RouteSorterProps {
-  onSortChange: (key: SortKey, order: SortOrder) => void
+  onSortChange: (key: SortKey, order: SortOrder | null) => void
   currentSort: SortOption
 }
 
 export const RouteSorter: Component<RouteSorterProps> = (props) => {
   const [sortOptions] = createStore<SortOption[]>([
-    { label: 'Date', key: 'date', order: 'desc' },
     { label: 'Duration', key: 'duration', order: 'desc' },
     { label: 'Miles', key: 'miles', order: 'desc' },
     { label: 'Engaged', key: 'engaged', order: 'desc' },
@@ -26,10 +25,16 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
   }
 
   const handleClick = (clickedOption: SortOption) => {
-    let newOrder: SortOrder
+    let newOrder: SortOrder | null
     if (props.currentSort.key === clickedOption.key) {
-      // If the same button is clicked, toggle the order
-      newOrder = props.currentSort.order === 'desc' ? 'asc' : 'desc'
+      // If the same button is clicked, toggle the order or deactivate the filter
+      if (props.currentSort.order === 'desc') {
+        newOrder = 'asc'
+      } else if (props.currentSort.order === 'asc') {
+        newOrder = null
+      } else {
+        newOrder = 'desc'
+      }
     } else {
       newOrder = 'desc'
     }
@@ -71,7 +76,7 @@ export const RouteSorter: Component<RouteSorterProps> = (props) => {
               </span>
               {props.currentSort.key === option.key && (
                 <span class="relative z-10 ml-3 inline-block w-4 text-white transition-transform duration-300">
-                  {props.currentSort.order === 'asc' ? '↑' : '↓'}
+                  {props.currentSort.order === 'asc' ? '↑' : props.currentSort.order === 'desc' ? '↓' : ''}
                 </span>
               )}
               {/* Added div for hover effect since gradient effect is using absolute positioning */}
