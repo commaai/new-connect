@@ -1,11 +1,10 @@
 name: preview
 
 on:
-  workflow_call:
-    inputs:
-      pr_number:
-        required: true
-        type: number
+  workflow_run:
+    workflows: ["build"]
+    types:
+      - completed
 
 permissions:
   contents: read
@@ -13,6 +12,7 @@ permissions:
 
 jobs:
   preview:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
@@ -22,16 +22,36 @@ jobs:
       - name: Download build artifacts
         uses: actions/download-artifact@v4
         with:
-          name: build-artifacts-${{ github.run_id }}
+          name: build-artifacts-${{ github.event.workflow_run.id }}
           path: ./dist
+          run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Find PR number
+        id: pr
+        uses: actions/github-script@v7
+        with:
+          retries: 3
+          script: |
+            const response = await github.rest.search.issuesAndPullRequests({
+              q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
+              per_page: 1,
+            })
+            const items = response.data.items
+            if (items.length < 1) {
+              console.error('No PRs found')
+              return
+            }
+            const pullRequestNumber = items[0].number
+            console.info('Pull request number is', pullRequestNumber)
+            return pullRequestNumber
 
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ inputs.pr_number }} --commit-dirty=true
+          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
@@ -44,17 +64,17 @@ jobs:
       - name: take screenshots
         run: |
           bun install --frozen-lockfile
-          node src/ci/screenshots.cjs https://${{ inputs.pr_number }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
-          git checkout -b new-connect/pr-${{ inputs.pr_number }}
+          git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add .
-          git commit -m "screenshots for PR #${{ inputs.pr_number }}"
-          git push origin new-connect/pr-${{ inputs.pr_number }} --force
+          git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
+          git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v2
@@ -62,7 +82,7 @@ jobs:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-            # deployed preview: https://${{ inputs.pr_number }}.connect-d5y.pages.dev
+            # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
 
             Welcome to new-connect! Make sure to:
             * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
@@ -72,20 +92,20 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/RouteActivity-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ inputs.pr_number }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
-          pr_number: ${{ inputs.pr_number }}
+          pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
