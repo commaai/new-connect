@@ -3,7 +3,7 @@ import type { Component, JSX } from 'solid-js'
 import { A } from '@solidjs/router'
 import clsx from 'clsx'
 
-export type ButtonBaseProps = JSX.HTMLAttributes<HTMLButtonElement> & {
+export type ButtonBaseProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
   class?: string
   onClick?: (e: MouseEvent) => void
   href?: string
