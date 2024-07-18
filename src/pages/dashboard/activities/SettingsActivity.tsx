@@ -18,7 +18,11 @@ const NoPrime: VoidComponent<{
   device: Device
   subscribeInfo: SubscribeInfo
 }> = (props) => {
-  return <>Trial end (no data): {props.subscribeInfo.trial_end_nodata}</>
+  return <>
+    <p>This device doesn't have a prime subscription.</p>
+    <p>Trial end (no data): {props.subscribeInfo.trial_end_nodata}</p>
+    <p>Trial end (data): {props.subscribeInfo.trial_end_data}</p>
+  </>
 }
 
 const currency = new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD' })
@@ -49,7 +53,7 @@ const Prime: VoidComponent<{ device: Device; subscription: SubscriptionStatus }>
   </div>
 }
 
-const PrimeActivity: VoidComponent<PrimeActivityProps> = (props) => {
+const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const dongleId = () => props.dongleId
 
   const [device] = createResource(dongleId, getDevice)
@@ -57,32 +61,33 @@ const PrimeActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [subscription] = createResource(dongleId, getSubscriptionStatus)
 
   return (
-    <div class="prose grid max-w-lg gap-4 px-4">
+    <>
       <TopAppBar leading={<IconButton href={`/${dongleId()}`}>arrow_back</IconButton>}>
         Device settings
       </TopAppBar>
+      <div class="prose grid max-w-lg gap-4 px-4">
+        <Show when={device()} keyed>{device => <span class="text-body-md">
+          Device: {getDeviceName(device)} <span class="text-body-sm text-white/70">({device.dongle_id})</span>
+        </span>}</Show>
 
-      <Show when={device()} keyed>{device => <span class="text-body-md">
-        Device: {getDeviceName(device)} <span class="text-body-sm text-white/70">({device.dongle_id})</span>
-      </span>}</Show>
+        <hr />
 
-      <hr />
+        <h2 class="text-headline-sm">comma prime</h2>
 
-      <h2 class="text-headline-sm">comma prime</h2>
+        <Suspense fallback="Loading...">
+          <Switch>
+            <Match when={device()?.prime === false && !subscribeInfo.loading}>
+              <NoPrime device={device()!} subscribeInfo={subscribeInfo()!} />
+            </Match>
 
-      <Suspense fallback="Loading...">
-        <Switch>
-          <Match when={device()?.prime === false}>
-            <NoPrime device={device()!} subscribeInfo={subscribeInfo()} />
-          </Match>
-
-          <Match when={device()?.prime === true}>
-            <Prime device={device()!} subscription={subscription()} />
-          </Match>
-        </Switch>
-      </Suspense>
-    </div>
+            <Match when={device()?.prime === true && !subscription.loading}>
+              <Prime device={device()!} subscription={subscription()!} />
+            </Match>
+          </Switch>
+        </Suspense>
+      </div>
+    </>
   )
 }
 
-export default PrimeActivity
+export default SettingsActivity
