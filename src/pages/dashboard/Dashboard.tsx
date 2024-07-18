@@ -3,6 +3,7 @@ import {
   createContext,
   createResource,
   createSignal,
+  lazy,
   Match,
   Setter,
   Show,
@@ -17,6 +18,7 @@ import type { Device } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
@@ -24,6 +26,8 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import storage from '~/utils/storage'
+
+const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 type DashboardState = {
   drawer: Accessor<boolean>
@@ -52,8 +56,11 @@ const DashboardDrawer = (props: {
         {devices => <DeviceList class="p-2" devices={devices} />}
       </Show>
       <div class="grow" />
+      <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={props.onClose}>
+        Add new device
+      </Button>
       <hr class="mx-4 opacity-20" />
-      <Button class="m-4" href="/logout">Sign out</Button>
+      <Button class="m-4" color="error" href="/logout">Sign out</Button>
     </>
   )
 }
@@ -64,6 +71,8 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
+
+  const pairToken = () => !!location.query['pair']
 
   const [drawer, setDrawer] = createSignal(false)
   const onOpen = () => setDrawer(true)
@@ -101,6 +110,9 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
         >
           <Match when={!!profile.error}>
             <Navigate href="/login" />
+          </Match>
+          <Match when={dongleId() === 'pair' || pairToken()}>
+            <PairActivity />
           </Match>
           <Match when={dateStr()} keyed>
             <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />

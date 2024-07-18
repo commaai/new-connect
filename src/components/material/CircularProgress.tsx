@@ -43,7 +43,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
     <span
       class={clsx(
         'inline-block',
-        colorClass,
+        colorClass(),
         props.progress === undefined
           ? 'animate-circular-rotate'
           : 'transition-transform',
