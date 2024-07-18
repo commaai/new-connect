@@ -1,6 +1,5 @@
 import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import { useNavigate } from '@solidjs/router'
 
 import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
@@ -26,9 +25,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const navigate = useNavigate()
   const { toggleDrawer } = useContext(DashboardContext)!
-  const openPrime = () => navigate(`/${props.dongleId}/prime`)
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
@@ -108,7 +105,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     <>
       <TopAppBar
         leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-        trailing={<IconButton onClick={openPrime}>settings</IconButton>}
+        trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
       >
         {deviceName()}
       </TopAppBar>
@@ -123,7 +120,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </Suspense>
             </div>
             <div class="flex p-4">
-              <IconButton onClick={() => void takeSnapshot() }>camera</IconButton>
+              <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
             </div>
           </div>
         </div>
@@ -132,7 +129,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
                 <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`}/>
+                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
                   <div class="absolute right-4 top-4 p-4">
                     <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
                     <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
