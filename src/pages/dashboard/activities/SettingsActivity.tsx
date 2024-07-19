@@ -2,7 +2,7 @@ import { createResource, Match, type ParentComponent, Show, Suspense, Switch, ty
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { getSubscribeInfo, getSubscriptionStatus, SubscribeInfo } from '~/api/prime'
+import { getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
 import { getDeviceName } from '~/utils/device'
 
@@ -11,7 +11,6 @@ import Button from '~/components/material/Button'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import Icon from '~/components/material/Icon'
-import { Device } from '~/types'
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 == 0 ? 0 : 2)}`
 
@@ -68,10 +67,8 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
   const [selectedPlan, setSelectedPlan] = createSignal<PrimePlan>()
 
   const dongleId = () => props.dongleId
-  const [device] = createResource<Device | null, string>(dongleId, getDevice)
-  const [subscribeInfo] = createResource<SubscribeInfo | null, string>(dongleId, getSubscribeInfo, {
-    initialValue: null,
-  })
+  const [device] = createResource(dongleId, getDevice)
+  const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
 
   const [uiState] = createResource(
     () => ({ device: device(), subscribeInfo: subscribeInfo(), selectedPlan: selectedPlan() }),
@@ -200,33 +197,27 @@ const Prime: VoidComponent<{ dongleId: string }> = (props) => {
   </div>
 }
 
-const PrimeSubscriptionDetails: VoidComponent<{ dongleId: string }> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-  return <Suspense>
-    <h2 class="mb-4 text-headline-sm">Plan and Billing</h2>
-    <Switch>
-      <Match when={device()?.prime === false}>
-        <NoPrime dongleId={props.dongleId} />
-      </Match>
-
-      <Match when={device()?.prime === true}>
-        <Prime dongleId={props.dongleId} />
-      </Match>
-    </Switch>
-  </Suspense>
-}
-
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const dongleId = () => props.dongleId
   const [device] = createResource(dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
   return (
     <>
       <TopAppBar leading={<IconButton href={`/${dongleId()}`}>arrow_back</IconButton>}>
-        {deviceName()}
+        <Show when={device()} keyed>{device => getDeviceName(device)}</Show>
       </TopAppBar>
       <div class="max-w-lg px-4">
-        <PrimeSubscriptionDetails dongleId={dongleId()} />
+        <h2 class="mb-4 text-headline-sm">Plan and Billing</h2>
+        <Suspense>
+          <Switch>
+            <Match when={device()?.prime === false}>
+              <NoPrime dongleId={props.dongleId} />
+            </Match>
+
+            <Match when={device()?.prime === true}>
+              <Prime dongleId={props.dongleId} />
+            </Match>
+          </Switch>
+        </Suspense>
       </div>
     </>
   )
