@@ -47,7 +47,7 @@ const PlanSelector: ParentComponent<{
       <For each={plans()}>
         {(plan) => <ButtonBase
           class={clsx(
-            'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 py-1 text-center',
+            'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
             'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
             (props.plan() === plan.name) && 'ring-4 ring-on-tertiary',
             plan.disabled && 'cursor-not-allowed opacity-50',
