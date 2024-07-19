@@ -90,18 +90,17 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
         trialClaimable = Boolean(source.subscribeInfo.trial_end_data && source.subscribeInfo.trial_end_nodata)
       }
 
+      let checkoutText
+      if (source.selectedPlan) {
+        checkoutText = trialClaimable ? 'Claim trial' : 'Go to checkout'
+      } else {
+        checkoutText = 'Select a plan'
+        if (trialClaimable) checkoutText += ' to claim trial'
+      }
+
       let chargeText
       if (source.selectedPlan && trialClaimable) {
         chargeText = `Your first charge will be on ${formatDate(trialEndDate)}, then monthly thereafter.`
-      }
-
-      let checkoutText
-      if (!source.selectedPlan) {
-        checkoutText = 'Select a plan'
-        if (trialClaimable) checkoutText += ' to claim trial'
-      } else {
-        checkoutText = trialClaimable ? 'Claim trial' : 'Go to checkout'
-        checkoutText += ` for ${source.selectedPlan} plan`
       }
 
       let disabledDataPlanText
