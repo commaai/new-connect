@@ -54,3 +54,11 @@ export const formatRouteDuration = (route: Route | undefined): string => {
 export const parseDateStr = (dateStr: string): Dayjs => {
   return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
 }
+
+export const formatDate = (input: dayjs.ConfigType) => {
+  // Assume number is unix timestamp
+  const date = typeof input === 'number' ? dayjs.unix(input) : dayjs(input)
+  // Hide current year
+  const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
+  return date.format('MMMM Do' + yearStr)
+}
