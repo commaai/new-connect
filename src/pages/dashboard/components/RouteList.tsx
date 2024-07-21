@@ -38,7 +38,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegmentsWithStats[]>([])
   const [days, setDays] = createSignal(DEFAULT_DAYS)
   const [hasMore, setHasMore] = createSignal(true)
-  const [loading, setLoading] = createSignal(true)
+  const [loading, setLoading] = createSignal(false)
 
   const [routesResource, { refetch }] = createResource(
     () => `${props.dongleId}-${days()}`,
@@ -58,9 +58,11 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
     if (routes.length < PAGE_SIZE) {
       setHasMore(false)
+    } else {
+      setHasMore(true)
     }
 
-    setAllRoutes(routes)
+    setAllRoutes(prevRoutes => [...prevRoutes, ...routes])
     console.log('Updated allRoutes:', routes.length)
   })
 
@@ -77,24 +79,13 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   })
 
-  const handleSortChange = (key: SortKey) => {
-    let newOrder: SortOrder | null = 'desc'
-    const currentSort = sortOption()
-
-    if (currentSort.key === key) {
-      if (currentSort.order === 'desc') {
-        newOrder = 'asc'
-      } else if (currentSort.order === 'asc') {
-        newOrder = null
-      }
-    }
-
-    if (newOrder === null) {
+  const handleSortChange = (key: SortKey, order: SortOrder | null) => {
+    if (order === null) {
       console.log('Reverting to default sort')
       setSortOption({ label: 'Date', key: 'date', order: 'desc' })
     } else {
-      console.log(`Changing sort to ${key} ${newOrder}`)
-      setSortOption({ label: key.charAt(0).toUpperCase() + key.slice(1), key, order: newOrder })
+      console.log(`Changing sort to ${key} ${order}`)
+      setSortOption({ label: key.charAt(0).toUpperCase() + key.slice(1), key, order })
     }
   }
 
@@ -102,7 +93,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting && hasMore() && !loading()) {
-        setLoading(true)
         setDays((days) => days + DEFAULT_DAYS)
         void refetch()
       }
