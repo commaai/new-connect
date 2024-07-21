@@ -62,8 +62,17 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       setHasMore(true)
     }
 
-    setAllRoutes(prevRoutes => [...prevRoutes, ...routes])
-    console.log('Updated allRoutes:', routes.length)
+    // Use a Map to filter out duplicate routes based on 'fullname'
+    const routeMap = new Map<string, RouteSegmentsWithStats>()
+    allRoutes().forEach(route => routeMap.set(route.fullname, route))
+    routes.forEach(route => routeMap.set(route.fullname, route))
+
+    const uniqueRoutes = Array.from(routeMap.values())
+    
+    if (uniqueRoutes.length !== allRoutes().length) {
+      setAllRoutes(uniqueRoutes)
+      console.log('Updated allRoutes:', uniqueRoutes.length)
+    }
   })
 
   createEffect(() => {
@@ -90,11 +99,15 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   }
 
   let bottomRef: HTMLDivElement | undefined
+  let debounceTimeout: number | undefined
   const observer = new IntersectionObserver(
     (entries) => {
       if (entries[0].isIntersecting && hasMore() && !loading()) {
-        setDays((days) => days + DEFAULT_DAYS)
-        void refetch()
+        clearTimeout(debounceTimeout)
+        debounceTimeout = setTimeout(() => {
+          setDays((days) => days + DEFAULT_DAYS)
+          void refetch()
+        }, 200) as unknown as number
       }
     },
     { rootMargin: '200px' },
