@@ -42,12 +42,13 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   const [routesResource, { refetch }] = createResource(
     () => `${props.dongleId}-${days()}`,
-    () => fetchRoutes(props.dongleId, days()),
+    async () => {
+      setLoading(true)
+      const routes = await fetchRoutes(props.dongleId, days())
+      setLoading(false)
+      return routes
+    },
   )
-
-  createEffect(() => {
-    void refetch()
-  })
 
   createEffect(() => {
     const routes: RouteSegmentsWithStats[] = routesResource()?.map(route => ({
@@ -60,7 +61,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
 
     setAllRoutes(routes)
-    setLoading(false)
     console.log('Updated allRoutes:', routes.length)
   })
 
@@ -104,6 +104,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       if (entries[0].isIntersecting && hasMore() && !loading()) {
         setLoading(true)
         setDays((days) => days + DEFAULT_DAYS)
+        void refetch()
       }
     },
     { rootMargin: '200px' },
@@ -123,18 +124,28 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   return (
     <div class={clsx('flex w-full flex-col justify-items-stretch gap-4', props.class)}>
       <RouteSorter onSortChange={handleSortChange} currentSort={sortOption()} />
-      <Suspense fallback={
-        <>
-          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-        </>
-      }>
-        <For each={sortedRoutes()}>
-          {(route) => (
-            <RouteCard route={route} sortKey={sortOption().key} />
-          )}
-        </For>
+      <Suspense
+        fallback={
+          <>
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+          </>
+        }
+      >
+        {loading() ? (
+          <>
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+          </>
+        ) : (
+          <For each={sortedRoutes()}>
+            {(route) => (
+              <RouteCard route={route} sortKey={sortOption().key} />
+            )}
+          </For>
+        )}
       </Suspense>
       <div ref={bottomRef} class="flex justify-center">
         {hasMore() && (
