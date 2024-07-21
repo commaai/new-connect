@@ -1,115 +1,109 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
   createSignal,
   For,
   Suspense,
+  createResource,
   onCleanup,
 } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
-import dayjs from 'dayjs'
 
 import type { RouteSegments } from '~/types'
-
 import RouteCard from '~/components/RouteCard'
-import { fetcher } from '~/api'
 import RouteSorter from '~/components/RouteSorter'
-import { SortOption, SortKey, sortRoutes } from '~/utils/sorting'
+import { SortOption, SortKey, sortRoutes, SortOrder } from '~/utils/sorting'
+import { fetchRoutesWithStats, PAGE_SIZE, DEFAULT_DAYS } from '~/api/derived'
 
-const PAGE_SIZE = 7
-const DEFAULT_DAYS = 7
+interface RouteSegmentsWithStats extends RouteSegments {
+  timelineStatistics: {
+    duration: number
+    engagedDuration: number
+    userFlags: number
+  }
+}
 
 type RouteListProps = {
   class?: string
   dongleId: string
 }
 
-const fetchRoutesWithinDays = async (dongleId: string, days: number): Promise<RouteSegments[]> => {
-  const now = dayjs().valueOf()
-  const pastDate = dayjs().subtract(days, 'day').valueOf()
-  const endpoint = (end: number) => `/v1/devices/${dongleId}/routes_segments?limit=${PAGE_SIZE}&end=${end}`
-  
-  let allRoutes: RouteSegments[] = []
-  let end = now
-
-  while (true) {
-    const key = `${endpoint(end)}`
-    try {
-      const routes = await fetcher<RouteSegments[]>(key)
-      if (routes.length === 0) break
-      allRoutes = [...allRoutes, ...routes]
-      end = routes.at(-1)!.end_time_utc_millis - 1
-      if (end < pastDate) break
-    } catch (error) {
-      console.error('Error fetching routes:', error)
-      break
-    }
-  }
-  return allRoutes.filter(route => route.end_time_utc_millis >= pastDate)
+const fetchRoutes = async (dongleId: string, days: number): Promise<RouteSegmentsWithStats[]> => {
+  return await fetchRoutesWithStats(dongleId, days)
 }
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
-  const [allRoutes, setAllRoutes] = createSignal<RouteSegments[]>([])
-  const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegments[]>([])
-  const [loading, setLoading] = createSignal(true)
+  const [allRoutes, setAllRoutes] = createSignal<RouteSegmentsWithStats[]>([])
+  const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegmentsWithStats[]>([])
   const [days, setDays] = createSignal(DEFAULT_DAYS)
+  const [hasMore, setHasMore] = createSignal(true)
+  const [loading, setLoading] = createSignal(true)
 
-  const loadRoutes = async () => {
-    setLoading(true)
-    try {
-      const routes = await fetchRoutesWithinDays(props.dongleId, days())
-      setAllRoutes(routes)
-    } catch (error) {
-      console.error('Error fetching routes:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const [routesResource, { refetch }] = createResource(
+    () => `${props.dongleId}-${days()}`,
+    () => fetchRoutes(props.dongleId, days()),
+  )
 
   createEffect(() => {
-    if (props.dongleId) {
-      void loadRoutes()
+    void refetch()
+  })
+
+  createEffect(() => {
+    const routes: RouteSegmentsWithStats[] = routesResource()?.map(route => ({
+      ...route,
+      timelineStatistics: route.timelineStatistics || { duration: 0, engagedDuration: 0, userFlags: 0 },
+    })) || []
+
+    if (routes.length < PAGE_SIZE) {
+      setHasMore(false)
+    }
+
+    setAllRoutes(routes)
+    setLoading(false)
+    console.log('Updated allRoutes:', routes.length)
+  })
+
+  createEffect(() => {
+    const routes = allRoutes()
+    const currentSortOption = sortOption()
+    console.log('Sorting effect triggered:', { routesCount: routes.length, currentSortOption })
+    if (routes.length > 0) {
+      const sorted = sortRoutes(routes, currentSortOption)
+      setSortedRoutes(sorted)
+      console.log('Sorted routes:', sorted.length)
+    } else {
+      setSortedRoutes(routes)
     }
   })
 
-  // Effect to sort routes when allRoutes or sortOption changes
-  createEffect(() => {
-    const sortAndSetRoutes = async () => {
-      const routes = allRoutes()
-      const currentSortOption = sortOption()
-      if (routes.length > 0) {
-        try {
-          const sorted = await sortRoutes(routes, currentSortOption)
-          setSortedRoutes(sorted)
-        } catch (error) {
-          console.error('Error sorting routes:', error)
-        }
+  const handleSortChange = (key: SortKey) => {
+    let newOrder: SortOrder | null = 'desc'
+    const currentSort = sortOption()
+
+    if (currentSort.key === key) {
+      if (currentSort.order === 'desc') {
+        newOrder = 'asc'
+      } else if (currentSort.order === 'asc') {
+        newOrder = null
       }
     }
-    void sortAndSetRoutes()
-  })
 
-  // Handler for sort option changes
-  const handleSortChange = (key: SortKey, order: 'asc' | 'desc' | null) => {
-    setLoading(true)
-    if (order === null) {
+    if (newOrder === null) {
+      console.log('Reverting to default sort')
       setSortOption({ label: 'Date', key: 'date', order: 'desc' })
     } else {
-      const label = key.charAt(0).toUpperCase() + key.slice(1)
-      setSortOption({ label, key, order })
+      console.log(`Changing sort to ${key} ${newOrder}`)
+      setSortOption({ label: key.charAt(0).toUpperCase() + key.slice(1), key, order: newOrder })
     }
-    void loadRoutes().finally(() => setLoading(false))
   }
 
-  // Infinite scrolling observer
   let bottomRef: HTMLDivElement | undefined
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries[0].isIntersecting && !loading()) {
+      if (entries[0].isIntersecting && hasMore() && !loading()) {
         setLoading(true)
-        setDays(days => days + DEFAULT_DAYS)
+        setDays((days) => days + DEFAULT_DAYS)
       }
     },
     { rootMargin: '200px' },
@@ -127,40 +121,29 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   onCleanup(() => observer.disconnect())
 
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
-    >
+    <div class={clsx('flex w-full flex-col justify-items-stretch gap-4', props.class)}>
       <RouteSorter onSortChange={handleSortChange} currentSort={sortOption()} />
-      <Suspense
-        fallback={
-          <>
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-          </>
-        }
-      >
-        {loading() ? (
-          <>
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-            <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-          </>
-        ) : (
-          <For each={sortedRoutes()}>
-            {(route) => <RouteCard route={route} />}
-          </For>
-        )}
+      <Suspense fallback={
+        <>
+          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+        </>
+      }>
+        <For each={sortedRoutes()}>
+          {(route) => (
+            <RouteCard route={route} sortKey={sortOption().key} />
+          )}
+        </For>
       </Suspense>
       <div ref={bottomRef} class="flex justify-center">
-        {loading() && <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />}
+        {hasMore() && (
+          <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+        )}
       </div>
       <div>
-        {!loading() && sortedRoutes().length === 0 && <div>No routes found</div>}
-        {!loading() && sortedRoutes().length > 0 && <div>All routes loaded</div>}
+        {!hasMore() && sortedRoutes().length === 0 && <div>No routes found</div>}
+        {!hasMore() && sortedRoutes().length > 0 && <div>All routes loaded</div>}
       </div>
     </div>
   )

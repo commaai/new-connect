@@ -6,8 +6,8 @@ import { SortKey, SortOption, SortOrder } from '~/utils/sorting'
 const GRADIENT = 'from-cyan-700 via-blue-800 to-purple-900'
 
 interface RouteSorterProps {
-  onSortChange: (key: SortKey, order: SortOrder | null) => void
-  currentSort: SortOption
+  onSortChange: (key: SortKey, order: SortOrder | null) => void;
+  currentSort: SortOption;
 }
 
 export const RouteSorter: Component<RouteSorterProps> = (props) => {

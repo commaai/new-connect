@@ -1,5 +1,4 @@
-import { RouteSegments } from '~/types'
-import { getTimelineStatistics, TimelineStatistics } from '~/api/derived'
+import { RouteSegmentsWithStats } from '~/api/derived'
 
 export type SortKey = 'date' | 'miles' | 'duration' | 'engaged' | 'userFlags'
 export type SortOrder = 'asc' | 'desc'
@@ -9,43 +8,35 @@ export interface SortOption {
   order: SortOrder
 }
 
-export const sortRoutes = async (routes: RouteSegments[], option: SortOption): Promise<RouteSegments[]> => {
-  const { key, order } = option
+export const sortRoutes = (routes: RouteSegmentsWithStats[], option: SortOption): RouteSegmentsWithStats[] => {
+  console.log('Sorting routes with option:', option)
 
-  const statisticsPromises = routes.map(route => getTimelineStatistics(route))
-  const statistics = await Promise.all(statisticsPromises)
-
-  const statsMap = new Map<RouteSegments, TimelineStatistics>()
-  routes.forEach((route, index) => statsMap.set(route, statistics[index]))
-
-  const routesWithData = routes.map(route => ({
-    ...route,
-    duration: statsMap.get(route)?.duration || 0,
-    engagedDuration: statsMap.get(route)?.engagedDuration || 0,
-    userFlags: statsMap.get(route)?.userFlags || 0,
-  }))
-
-  return routesWithData.sort((a, b) => {
-    let comparison = 0
-
+  const getSortValue = (route: RouteSegmentsWithStats, key: SortKey): number => {
     switch (key) {
-      case 'date':
-        comparison = b.start_time_utc_millis - a.start_time_utc_millis
-        break
-      case 'miles':
-        comparison = (b.length || 0) - (a.length || 0)
-        break
-      case 'duration':
-        comparison = b.duration - a.duration
-        break
-      case 'engaged':
-        comparison = b.engagedDuration - a.engagedDuration
-        break
-      case 'userFlags':
-        comparison = b.userFlags - a.userFlags
-        break
+      case 'date': return route.start_time_utc_millis
+      case 'miles': return route.length || 0
+      case 'duration': return route.timelineStatistics?.duration || 0
+      case 'engaged': return route.timelineStatistics?.engagedDuration || 0
+      case 'userFlags': return route.timelineStatistics?.userFlags || 0
+      default: return 0
     }
+  }
 
-    return order === 'desc' ? comparison : -comparison
+  console.log('First 5 routes before sorting:', routes.slice(0, 5).map(r => ({
+    id: r.fullname,
+    sortValue: getSortValue(r, option.key),
+  })))
+
+  const sortedRoutes = [...routes].sort((a, b) => {
+    const aValue = getSortValue(a, option.key)
+    const bValue = getSortValue(b, option.key)
+    return option.order === 'desc' ? bValue - aValue : aValue - bValue
   })
+
+  console.log('First 5 routes after sorting:', sortedRoutes.slice(0, 5).map(r => ({
+    id: r.fullname,
+    sortValue: getSortValue(r, option.key),
+  })))
+
+  return sortedRoutes
 }
