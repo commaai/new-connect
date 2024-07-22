@@ -8,10 +8,10 @@ import { getDeviceName } from '~/utils/device'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
+import CircularProgress from '~/components/material/CircularProgress'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
-import Icon from '~/components/material/Icon'
-import CircularProgress from '~/components/material/CircularProgress'
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 == 0 ? 0 : 2)}`
 
