@@ -11,6 +11,7 @@ import Button from '~/components/material/Button'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import Icon from '~/components/material/Icon'
+import CircularProgress from '~/components/material/CircularProgress'
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 == 0 ? 0 : 2)}`
 
@@ -179,20 +180,32 @@ const PrimeType: Record<string, string> = {
 
 const Prime: VoidComponent<{ dongleId: string }> = (props) => {
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
-  const [plan] = createResource(subscription, (subscription) => PrimeType[subscription.plan] ?? 'unknown')
-  const [amount] = createResource(subscription, (subscription) => formatCurrency(subscription.amount))
 
   return <div class="flex flex-col gap-4">
-    <div class="flex flex-col">
-      <li>Plan: {plan()}</li>
-      <li>Joined: {formatDate(subscription()?.subscribed_at)}</li>
-      <li>Next payment: {formatDate(subscription()?.next_charge_at)}</li>
-      <li>Amount: {amount()}</li>
-    </div>
+    <Suspense
+      fallback={<div class="my-2 flex flex-col items-center gap-4">
+        <CircularProgress />
+        Loading...
+      </div>}
+    >
+      <Switch>
+        <Match when={subscription.state === 'errored'}>
+          An error occurred: {subscription.error}
+        </Match>
+        <Match when={subscription()} keyed>{subscription =>
+          <div class="flex flex-col">
+            <li>Plan: {PrimeType[subscription.plan] ?? 'unknown'}</li>
+            <li>Joined: {formatDate(subscription.subscribed_at)}</li>
+            <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
+            <li>Amount: {formatCurrency(subscription.amount)}</li>
+          </div>
+        }</Match>
+      </Switch>
+    </Suspense>
 
-    <div class="flex gap-4">
-      <Button color="secondary">Update payment method</Button>
-      <Button color="error">Cancel subscription</Button>
+    <div class="flex justify-between">
+      <Button color="error" disabled={subscription.loading}>Cancel subscription</Button>
+      <Button color="secondary" disabled={subscription.loading}>Update payment method</Button>
     </div>
   </div>
 }
