@@ -1,8 +1,8 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal } from 'solid-js'
+import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource } from 'solid-js'
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
+import { cancelSubscription, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
 import { getDeviceName } from '~/utils/device'
 
@@ -178,8 +178,18 @@ const PrimeType: Record<string, string> = {
   data: 'Standard (with data plan)',
 }
 
+const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
+  const [source, setSource] = createSignal(false)
+  const [data] = createResource(source, action)
+  const trigger = () => setSource(true)
+  return [trigger, data]
+}
+
 const Prime: VoidComponent<{ dongleId: string }> = (props) => {
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
+
+  const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
+  const loading = () => subscription.loading || cancelData.loading
 
   return <div class="flex flex-col gap-4">
     <Suspense
@@ -204,8 +214,8 @@ const Prime: VoidComponent<{ dongleId: string }> = (props) => {
     </Suspense>
 
     <div class="flex justify-between">
-      <Button color="error" disabled={subscription.loading}>Cancel subscription</Button>
-      <Button color="secondary" disabled={subscription.loading}>Update payment method</Button>
+      <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={cancel}>Cancel subscription</Button>
+      <Button color="secondary" disabled={loading()}>Update payment method</Button>
     </div>
   </div>
 }
