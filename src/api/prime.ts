@@ -47,22 +47,27 @@ interface ActivateSubscriptionRequest {
   stripe_token: string
 }
 
-export const activateSubscription = async (body: ActivateSubscriptionRequest) =>
-  fetcher('/v1/prime/pay', {
+const postBilling = <T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T> => {
+  return fetcher(endpoint, {
+    ...init,
     method: 'POST',
     headers: {
+      ...init?.headers,
       'Content-Type': 'application/json',
     },
     body: JSON.stringify(body),
   }, BILLING_URL)
+}
+
+export const activateSubscription = async (body: ActivateSubscriptionRequest) =>
+  postBilling('/v1/prime/pay', body)
 
 export const cancelSubscription = async (dongleId: string) =>
-  fetcher('/v1/prime/cancel', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      dongle_id: dongleId,
-    }),
-  }, BILLING_URL)
+  postBilling('/v1/prime/cancel', { dongle_id: dongleId })
+
+export const getStripeCheckout = async (dongleId: string, simId: string, plan: string) =>
+  postBilling('/v1/prime/stripe_checkout', {
+    dongle_id: dongleId,
+    sim_id: simId,
+    plan,
+  })
