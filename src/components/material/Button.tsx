@@ -47,8 +47,9 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       disabled={disabled()}
     >
       {props.leading}
-      <Show when={props.loading} fallback={<span class="text-label-lg">{props.children}</span>}>
-        <CircularProgress color="inherit" size={20} />
+      <span class={clsx('text-label-lg', props.loading && 'invisible')}>{props.children}</span>
+      <Show when={props.loading}>
+        <CircularProgress class="absolute left-1/2 top-1/2 ml-[-10px] mt-[-10px]" color="inherit" size={20} />
       </Show>
       {props.trailing}
     </ButtonBase>
