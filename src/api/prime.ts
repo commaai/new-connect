@@ -83,7 +83,7 @@ export const setPaymentSource = async (stripeToken: string) =>
   postBilling<PaymentSource>('/v1/prime/payment_source', { stripe_token: stripeToken })
 
 export const getStripeCheckout = async (dongleId: string, simId: string, plan: string) =>
-  postBilling('/v1/prime/stripe_checkout', {
+  postBilling<{ url: string }>('/v1/prime/stripe_checkout', {
     dongle_id: dongleId,
     sim_id: simId,
     plan,
