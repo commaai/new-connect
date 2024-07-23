@@ -32,13 +32,26 @@ const fetchRoutes = async (dongleId: string, days: number): Promise<RouteSegment
   return await fetchRoutesWithStats(dongleId, days)
 }
 
+const debounce = <F extends (...args: Parameters<F>) => void>(
+  func: F,
+  delay: number,
+): ((...args: Parameters<F>) => void) => {
+  let debounceTimeout: number
+  return (...args: Parameters<F>) => {
+    clearTimeout(debounceTimeout)
+    debounceTimeout = window.setTimeout(() => func(...args), delay)
+  }
+}
+
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const [sortOption, setSortOption] = createSignal<SortOption>({ label: 'Date', key: 'date', order: 'desc' })
   const [allRoutes, setAllRoutes] = createSignal<RouteSegmentsWithStats[]>([])
   const [sortedRoutes, setSortedRoutes] = createSignal<RouteSegmentsWithStats[]>([])
   const [days, setDays] = createSignal(DEFAULT_DAYS)
   const [hasMore, setHasMore] = createSignal(true)
-  const [loading, setLoading] = createSignal(false)
+  const [loading, setLoading] = createSignal(true)
+  const [fetchingMore, setFetchingMore] = createSignal(false)
+  let bottomRef: HTMLDivElement | undefined
 
   const [routesResource, { refetch }] = createResource(
     () => `${props.dongleId}-${days()}`,
@@ -56,23 +69,23 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       timelineStatistics: route.timelineStatistics || { duration: 0, engagedDuration: 0, userFlags: 0 },
     })) || []
 
-    if (routes.length < PAGE_SIZE) {
-      setHasMore(false)
-    } else {
-      setHasMore(true)
-    }
+    setHasMore(routes.length >= PAGE_SIZE)
 
-    // Use a Map to filter out duplicate routes based on 'fullname'
     const routeMap = new Map<string, RouteSegmentsWithStats>()
     allRoutes().forEach(route => routeMap.set(route.fullname, route))
     routes.forEach(route => routeMap.set(route.fullname, route))
 
     const uniqueRoutes = Array.from(routeMap.values())
-    
-    if (uniqueRoutes.length !== allRoutes().length) {
-      setAllRoutes(uniqueRoutes)
-      console.log('Updated allRoutes:', uniqueRoutes.length)
-    }
+
+    setAllRoutes(prevRoutes => {
+      if (uniqueRoutes.length !== prevRoutes.length) {
+        console.log('Updated allRoutes:', uniqueRoutes.length)
+        return uniqueRoutes
+      }
+      return prevRoutes
+    })
+
+    setFetchingMore(false)
   })
 
   createEffect(() => {
@@ -98,31 +111,24 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   }
 
-  let bottomRef: HTMLDivElement | undefined
-  let debounceTimeout: number | undefined
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting && hasMore() && !loading()) {
-        clearTimeout(debounceTimeout)
-        debounceTimeout = setTimeout(() => {
+  createEffect(() => {
+    const observer = new IntersectionObserver(
+      debounce((entries: IntersectionObserverEntry[]) => {
+        if (entries[0].isIntersecting && hasMore() && !loading() && !fetchingMore()) {
+          setFetchingMore(true)
           setDays((days) => days + DEFAULT_DAYS)
           void refetch()
-        }, 200) as unknown as number
-      }
-    },
-    { rootMargin: '200px' },
-  )
+        }
+      }, 200),
+      { rootMargin: '200px' },
+    )
 
-  createEffect(() => {
     if (bottomRef) {
       observer.observe(bottomRef)
     }
-    return () => {
-      if (bottomRef) observer.unobserve(bottomRef)
-    }
-  })
 
-  onCleanup(() => observer.disconnect())
+    onCleanup(() => observer.disconnect())
+  })
 
   return (
     <div class={clsx('flex w-full flex-col justify-items-stretch gap-4', props.class)}>
@@ -136,7 +142,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           </>
         }
       >
-        {loading() ? (
+        {loading() && allRoutes().length === 0 ? (
           <>
             <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
             <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
@@ -151,7 +157,12 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         )}
       </Suspense>
       <div ref={bottomRef} class="flex justify-center">
-        {hasMore() && (
+        {fetchingMore() && (
+          <div class="flex h-12 items-center justify-center">
+            <div class="size-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
+          </div>
+        )}
+        {hasMore() && !fetchingMore() && (
           <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
         )}
       </div>
