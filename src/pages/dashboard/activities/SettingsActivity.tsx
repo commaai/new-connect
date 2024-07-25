@@ -2,7 +2,7 @@ import { createResource, Match, type ParentComponent, Show, Suspense, Switch, ty
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { cancelSubscription, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
+import { cancelSubscription, getStripePortal, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
 import { getDeviceName } from '~/utils/device'
 
@@ -12,6 +12,13 @@ import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+
+const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
+  const [source, setSource] = createSignal(false)
+  const [data] = createResource(source, action)
+  const trigger = () => setSource(true)
+  return [trigger, data]
+}
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 == 0 ? 0 : 2)}`
 
@@ -178,18 +185,17 @@ const PrimeType: Record<string, string> = {
   data: 'Standard (with data plan)',
 }
 
-const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
-  const [source, setSource] = createSignal(false)
-  const [data] = createResource(source, action)
-  const trigger = () => setSource(true)
-  return [trigger, data]
-}
-
 const Prime: VoidComponent<{ dongleId: string }> = (props) => {
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
 
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
-  const loading = () => subscription.loading || cancelData.loading
+  const [update, updateData] = useAction(async () => {
+    const { url } = await getStripePortal(props.dongleId)
+    if (url) {
+      window.location.href = url
+    }
+  })
+  const loading = () => subscription.loading || cancelData.loading || updateData.loading
 
   return <div class="flex flex-col gap-4">
     <Suspense
@@ -215,7 +221,7 @@ const Prime: VoidComponent<{ dongleId: string }> = (props) => {
 
     <div class="flex justify-between">
       <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={cancel}>Cancel subscription</Button>
-      <Button color="secondary" disabled={loading()}>Update payment method</Button>
+      <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
     </div>
   </div>
 }

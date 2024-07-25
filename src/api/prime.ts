@@ -88,3 +88,6 @@ export const getStripeCheckout = async (dongleId: string, simId: string, plan: s
     sim_id: simId,
     plan,
   })
+
+export const getStripePortal = async (dongleId: string) =>
+  getBilling<{ url: string }>(`/v1/prime/stripe_portal?dongle_id=${dongleId}`)

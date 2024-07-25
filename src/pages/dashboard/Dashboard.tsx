@@ -115,7 +115,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <Match when={dongleId() === 'pair' || pairToken()}>
             <PairActivity />
           </Match>
-          <Match when={dateStr() === 'settings'}>
+          <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
             <SettingsActivity dongleId={dongleId()} />
           </Match>
           <Match when={dateStr()} keyed>
