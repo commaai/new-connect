@@ -2,7 +2,7 @@ import { createResource, Match, type ParentComponent, Show, Suspense, Switch, ty
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { cancelSubscription, getStripePortal, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
+import { cancelSubscription, getStripeCheckout, getStripePortal, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
 import { getDeviceName } from '~/utils/device'
 
@@ -26,13 +26,18 @@ type PrimeActivityProps = {
   dongleId: string
 }
 
-type PrimePlan = 'lite' | 'standard'
+type PrimePlan = 'nodata' | 'data'
 
 type PlanProps = {
   name: PrimePlan
   amount: number
   description: string
   disabled?: boolean
+}
+
+const PrimePlanName: Record<PrimePlan, string> = {
+  nodata: 'Lite',
+  data: 'Standard',
 }
 
 const Plan = (props: PlanProps) => {
@@ -42,6 +47,7 @@ const Plan = (props: PlanProps) => {
 const PlanSelector: ParentComponent<{
   plan: Accessor<PrimePlan | undefined>
   setPlan: Setter<PrimePlan | undefined>
+  disabled?: boolean
 }> = (props) => {
   const plansAccessor = children(() => props.children)
   const plans = createMemo<PlanProps[]>(() => {
@@ -60,9 +66,9 @@ const PlanSelector: ParentComponent<{
             plan.disabled && 'cursor-not-allowed opacity-50',
           )}
           onClick={() => props.setPlan(plan.name)}
-          disabled={plan.disabled}
+          disabled={plan.disabled || props.disabled}
         >
-          <span class="text-body-lg">{plan.name}</span>
+          <span class="text-body-lg">{PrimePlanName[plan.name].toLowerCase()}</span>
           <span class="text-title-lg font-bold">{formatCurrency(plan.amount)}/month</span>
           <span class="text-label-md">{plan.description}</span>
         </ButtonBase>}
@@ -78,16 +84,25 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
   const [device] = createResource(dongleId, getDevice)
   const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
 
+  const [checkout, checkoutData] = useAction(async () => {
+    const { url } = await getStripeCheckout(dongleId(), subscribeInfo()!.sim_id!, selectedPlan()!)
+    if (url) {
+      window.location.href = url
+    }
+  })
+
+  const isLoading = () => subscribeInfo.loading || checkoutData.loading
+
   const [uiState] = createResource(
     () => ({ device: device(), subscribeInfo: subscribeInfo(), selectedPlan: selectedPlan() }),
     (source) => {
       if (!source.device || !source.subscribeInfo) return null
 
       let trialEndDate, trialClaimable
-      if (source.selectedPlan === 'standard') {
+      if (source.selectedPlan === 'data') {
         trialEndDate = source.subscribeInfo.trial_end_data
         trialClaimable = !!trialEndDate
-      } else if (source.selectedPlan === 'lite') {
+      } else if (source.selectedPlan === 'nodata') {
         trialEndDate = source.subscribeInfo.trial_end_nodata
         trialClaimable = !!trialEndDate
       } else {
@@ -153,14 +168,14 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
       Learn more from our <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank">FAQ</a>.
     </p>
 
-    <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan}>
+    <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
       <Plan
-        name="lite"
+        name="nodata"
         amount={1000}
         description="bring your own sim card"
       />
       <Plan
-        name="standard"
+        name="data"
         amount={2400}
         description="including data plan, only offered in the U.S."
         disabled={!!uiState()?.disabledDataPlanText}
@@ -172,17 +187,19 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
       {text}
     </div>}</Show>
 
-    <Show when={uiState()?.checkoutText} keyed>{text => <Button color="tertiary" disabled={uiState()?.trialClaimable === false}>
-      {text}
-    </Button>}</Show>
+    <Show when={uiState()?.checkoutText} keyed>{text =>
+      <Button
+        color="tertiary"
+        disabled={uiState()?.trialClaimable === false}
+        loading={checkoutData.loading}
+        onClick={checkout}
+      >
+        {text}
+      </Button>
+    }</Show>
 
     <Show when={uiState()?.chargeText} keyed>{text => <p class="text-label-lg">{text}</p>}</Show>
   </div>
-}
-
-const PrimeType: Record<string, string> = {
-  nodata: 'Lite (without data plan)',
-  data: 'Standard (with data plan)',
 }
 
 const Prime: VoidComponent<{ dongleId: string }> = (props) => {
@@ -210,7 +227,7 @@ const Prime: VoidComponent<{ dongleId: string }> = (props) => {
         </Match>
         <Match when={subscription()} keyed>{subscription =>
           <div class="flex flex-col">
-            <li>Plan: {PrimeType[subscription.plan] ?? 'unknown'}</li>
+            <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
             <li>Joined: {formatDate(subscription.subscribed_at)}</li>
             <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
             <li>Amount: {formatCurrency(subscription.amount)}</li>
