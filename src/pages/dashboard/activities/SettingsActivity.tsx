@@ -12,6 +12,7 @@ import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import { useLocation } from '@solidjs/router'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -83,6 +84,8 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
   const [device] = createResource(dongleId, getDevice)
   const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
+
+  const stripeCancelled = () => new URLSearchParams(useLocation().search).has('stripe_cancelled')
 
   const [checkout, checkoutData] = useAction(async () => {
     const { url } = await getStripeCheckout(dongleId(), subscribeInfo()!.sim_id!, selectedPlan()!)
@@ -168,6 +171,13 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       Learn more from our <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank">FAQ</a>.
     </p>
 
+    <Show when={stripeCancelled()}>
+      <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+        <Icon class="text-error" size="20">warning</Icon>
+        Checkout cancelled.
+      </div>
+    </Show>
+
     <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
       <Plan
         name="nodata"
@@ -182,7 +192,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       />
     </PlanSelector>
 
-    <Show when={uiState()?.disabledDataPlanText} keyed>{text => <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-sm">
+    <Show when={uiState()?.disabledDataPlanText} keyed>{text => <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
       <Icon size="20">info</Icon>
       {text}
     </div>}</Show>
