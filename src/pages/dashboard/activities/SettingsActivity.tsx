@@ -77,7 +77,7 @@ const PlanSelector: ParentComponent<{
   </div>
 }
 
-const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
+const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   const [selectedPlan, setSelectedPlan] = createSignal<PrimePlan>()
 
   const dongleId = () => props.dongleId
@@ -202,7 +202,7 @@ const NoPrime: VoidComponent<{ dongleId: string }> = (props) => {
   </div>
 }
 
-const Prime: VoidComponent<{ dongleId: string }> = (props) => {
+const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
 
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
@@ -256,11 +256,11 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         <Suspense>
           <Switch>
             <Match when={device()?.prime === false}>
-              <NoPrime dongleId={props.dongleId} />
+              <PrimeCheckout dongleId={props.dongleId} />
             </Match>
 
             <Match when={device()?.prime === true}>
-              <Prime dongleId={props.dongleId} />
+              <PrimeManage dongleId={props.dongleId} />
             </Match>
           </Switch>
         </Suspense>
