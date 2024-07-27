@@ -1,4 +1,5 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource, createEffect, onCleanup } from 'solid-js'
+import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource } from 'solid-js'
+import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
@@ -12,7 +13,7 @@ import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
-import { useLocation } from '@solidjs/router'
+import { createQuery } from '~/utils/createQuery'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -210,48 +211,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
     <Show when={uiState()?.chargeText} keyed>{text => <p class="text-label-lg">{text}</p>}</Show>
   </div>
-}
-
-const createQuery = <TSource, TResult>(options: {
-  source: Accessor<TSource | null>,
-  fetcher: (source: TSource) => Promise<TResult>,
-  refetchInterval?: number,
-  stopCondition?: (result?: TResult) => boolean,
-  retryInterval?: number,
-}) => {
-  const [counter, setCounter] = createSignal(0)
-  const invalidate = () => setCounter(counter() + 1)
-
-  const [data] = createResource(() => {
-    const source = options.source()
-    return source !== null ? [source, counter()] as [TSource, number] : null
-  }, async ([source]) => options.fetcher(source))
-
-  const { refetchInterval, stopCondition } = options
-  if (refetchInterval) {
-    const interval = setInterval(() => {
-      if (data.loading) return
-      invalidate()
-    }, refetchInterval)
-
-    if (stopCondition) createEffect(() => {
-      if (!stopCondition(data())) return
-      clearInterval(interval)
-    })
-
-    onCleanup(() => clearInterval(interval))
-  }
-
-  const { retryInterval } = options
-  if (retryInterval) createEffect(() => {
-    if (data.state !== 'errored') return
-    setTimeout(() => {
-      if (data.state !== 'errored') return
-      invalidate()
-    }, retryInterval)
-  })
-
-  return data
 }
 
 const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
