@@ -215,8 +215,9 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 const createQuery = <TSource, TResult>(options: {
   source: Accessor<TSource | null>,
   fetcher: (source: TSource) => Promise<TResult>,
-  refetchInterval: number,
-  stopCondition: (result?: TResult) => boolean,
+  refetchInterval?: number,
+  stopCondition?: (result?: TResult) => boolean,
+  retryInterval?: number,
 }) => {
   const [counter, setCounter] = createSignal(0)
   const invalidate = () => setCounter(counter() + 1)
@@ -226,18 +227,29 @@ const createQuery = <TSource, TResult>(options: {
     return source !== null ? [source, counter()] as [TSource, number] : null
   }, async ([source]) => options.fetcher(source))
 
-  const interval = setInterval(() => {
-    if (data.loading) return
-    invalidate()
-  }, options.refetchInterval)
+  const { refetchInterval, stopCondition } = options
+  if (refetchInterval) {
+    const interval = setInterval(() => {
+      if (data.loading) return
+      invalidate()
+    }, refetchInterval)
 
-  createEffect(() => {
-    if (options.stopCondition(data())) {
+    if (stopCondition) createEffect(() => {
+      if (!stopCondition(data())) return
       clearInterval(interval)
-    }
-  })
+    })
 
-  onCleanup(() => clearInterval(interval))
+    onCleanup(() => clearInterval(interval))
+  }
+
+  const { retryInterval } = options
+  if (retryInterval) createEffect(() => {
+    if (data.state !== 'errored') return
+    setTimeout(() => {
+      if (data.state !== 'errored') return
+      invalidate()
+    }, retryInterval)
+  })
 
   return data
 }
@@ -257,8 +269,12 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     stopCondition: (session) => session?.payment_status === 'paid',
   })
 
-  // TODO: re-fetch subscription?
-  const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
+  // TODO: we should wait for the session to be paid before fetching subscription
+  const subscription = createQuery({
+    source: () => props.dongleId,
+    fetcher: getSubscriptionStatus,
+    retryInterval: 10_000,
+  })
 
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
   const [update, updateData] = useAction(async () => {
