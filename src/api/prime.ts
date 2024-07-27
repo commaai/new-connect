@@ -91,3 +91,6 @@ export const getStripeCheckout = async (dongleId: string, simId: string, plan: s
 
 export const getStripePortal = async (dongleId: string) =>
   getBilling<{ url: string }>(`/v1/prime/stripe_portal?dongle_id=${dongleId}`)
+
+export const getStripeSession = async (dongleId: string, sessionId: string) =>
+  getBilling<{ payment_status: 'no_payment_required' | 'paid' | 'unpaid' }>(`/v1/prime/stripe_session?dongle_id=${dongleId}&session_id=${sessionId}`)

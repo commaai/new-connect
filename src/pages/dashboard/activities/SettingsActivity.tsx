@@ -1,8 +1,8 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource } from 'solid-js'
+import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource, createEffect, onCleanup } from 'solid-js'
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { cancelSubscription, getStripeCheckout, getStripePortal, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
+import { cancelSubscription, getStripeCheckout, getStripePortal, getStripeSession, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
 import { getDeviceName } from '~/utils/device'
 
@@ -212,7 +212,37 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   </div>
 }
 
+const createStripeSessionState = (dongleId: Accessor<string>, stripeSessionId: Accessor<string | null>) => {
+  const [counter, setCounter] = createSignal(0)
+  const invalidate = () => setCounter(counter() + 1)
+
+  const [session] = createResource(() => {
+    const source = [dongleId(), stripeSessionId(), counter()]
+    if (source.some((param) => param === null)) return null
+    return source as [string, string]
+  }, ([dongleId, stripeSessionId]) => getStripeSession(dongleId, stripeSessionId))
+
+  const interval = setInterval(() => {
+    if (session.loading) return
+    invalidate()
+  }, 10_000)
+
+  createEffect(() => {
+    if (session()?.payment_status === 'paid') {
+      clearInterval(interval)
+    }
+  })
+
+  onCleanup(() => clearInterval(interval))
+
+  return session
+}
+
 const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
+  const dongleId = () => props.dongleId
+  const stripeSessionId = () => new URLSearchParams(useLocation().search).get('stripe_success')
+
+  const stripeSession = createStripeSessionState(dongleId, stripeSessionId)
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
 
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
@@ -222,7 +252,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       window.location.href = url
     }
   })
-  const loading = () => subscription.loading || cancelData.loading || updateData.loading
+  const loading = () => subscription.loading || cancelData.loading || updateData.loading || stripeSession.loading
 
   return <div class="flex flex-col gap-4">
     <Suspense
@@ -231,6 +261,44 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         Loading...
       </div>}
     >
+      <Switch>
+        <Match when={stripeSession.state === 'errored'}>
+          An error occurred: {stripeSession.error}
+        </Match>
+        <Match when={stripeSession()?.payment_status} keyed>{paymentStatus => <Show when={paymentStatus === 'paid'}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon class="text-tertiary" size="20">check</Icon>
+            <div class="flex flex-col gap-2">
+              <p class="font-semibold">comma prime activated</p>
+              Connectivity will be enabled as soon as activation propogates to your local cell tower.
+              Rebooting your device may help.
+            </div>
+          </div>
+        </Show>}</Match>
+        <Match when={stripeSession()?.payment_status === 'unpaid'}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon size="20">hourglass</Icon>
+            Waiting for confirmed payment.
+          </div>
+        </Match>
+        <Match when={stripeSession()?.payment_status !== 'unpaid' && !subscription()}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon size="20">hourglass</Icon>
+            Processing subscription...
+          </div>
+        </Match>
+        <Match when={stripeSession()?.payment_status !== 'unpaid' && subscription()}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon class="text-tertiary" size="20">check</Icon>
+            <div class="flex flex-col gap-2">
+              <p class="font-semibold">comma prime activated</p>
+              Connectivity will be enabled as soon as activation propogates to your local cell tower.
+              Rebooting your device may help.
+            </div>
+          </div>
+        </Match>
+      </Switch>
+
       <Switch>
         <Match when={subscription.state === 'errored'}>
           An error occurred: {subscription.error}
