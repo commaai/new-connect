@@ -201,7 +201,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
     <Show when={uiState()?.checkoutText} keyed>{text =>
       <Button
         color="tertiary"
-        disabled={uiState()?.trialClaimable === false}
+        disabled={!selectedPlan()}
         loading={checkoutData.loading}
         onClick={checkout}
       >
@@ -275,8 +275,10 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                 <Icon class="text-tertiary" size="20">check</Icon>
                 <div class="flex flex-col gap-2">
                   <p class="font-semibold">comma prime activated</p>
-                  Connectivity will be enabled as soon as activation propogates to your local cell tower.
-                  Rebooting your device may help.
+                  <Show when={subscription()?.is_prime_sim} keyed>
+                    Connectivity will be enabled as soon as activation propogates to your local cell tower.
+                    Rebooting your device may help.
+                  </Show>
                 </div>
               </div>
             </Match>
