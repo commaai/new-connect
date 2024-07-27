@@ -212,37 +212,50 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   </div>
 }
 
-const createStripeSessionState = (dongleId: Accessor<string>, stripeSessionId: Accessor<string | null>) => {
+const createQuery = <TSource, TResult>(options: {
+  source: Accessor<TSource | null>,
+  fetcher: (source: TSource) => Promise<TResult>,
+  refetchInterval: number,
+  stopCondition: (result?: TResult) => boolean,
+}) => {
   const [counter, setCounter] = createSignal(0)
   const invalidate = () => setCounter(counter() + 1)
 
-  const [session] = createResource(() => {
-    const source = [dongleId(), stripeSessionId(), counter()]
-    if (source.some((param) => param === null)) return null
-    return source as [string, string]
-  }, ([dongleId, stripeSessionId]) => getStripeSession(dongleId, stripeSessionId))
+  const [data] = createResource(() => {
+    const source = options.source()
+    return source !== null ? [source, counter()] as [TSource, number] : null
+  }, async ([source]) => options.fetcher(source))
 
   const interval = setInterval(() => {
-    if (session.loading) return
+    if (data.loading) return
     invalidate()
-  }, 10_000)
+  }, options.refetchInterval)
 
   createEffect(() => {
-    if (session()?.payment_status === 'paid') {
+    if (options.stopCondition(data())) {
       clearInterval(interval)
     }
   })
 
   onCleanup(() => clearInterval(interval))
 
-  return session
+  return data
 }
 
 const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
   const stripeSessionId = () => new URLSearchParams(useLocation().search).get('stripe_success')
 
-  const stripeSession = createStripeSessionState(dongleId, stripeSessionId)
+  const stripeSession = createQuery<[string, string], { payment_status: string }>({
+    source: () => {
+      const source = [dongleId(), stripeSessionId()]
+      if (source.some((param) => param === null)) return null
+      return source as [string, string]
+    },
+    fetcher: ([dongleId, stripeSessionId]) => getStripeSession(dongleId, stripeSessionId),
+    refetchInterval: 10_000,
+    stopCondition: (session) => session?.payment_status === 'paid',
+  })
 
   // TODO: re-fetch subscription?
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
