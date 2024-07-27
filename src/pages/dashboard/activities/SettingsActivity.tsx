@@ -246,7 +246,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
   const stripeSessionId = () => new URLSearchParams(useLocation().search).get('stripe_success')
 
-  const stripeSession = createQuery<[string, string], { payment_status: string }>({
+  const stripeSession = createQuery({
     source: () => {
       const source = [dongleId(), stripeSessionId()]
       if (source.some((param) => param === null)) return null
