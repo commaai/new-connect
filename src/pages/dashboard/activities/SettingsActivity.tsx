@@ -246,7 +246,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       </Switch>
     </Suspense>
 
-    <div class="flex justify-between">
+    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
       <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={cancel}>Cancel subscription</Button>
       <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
     </div>
