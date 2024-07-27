@@ -173,8 +173,8 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
     <Show when={stripeCancelled()}>
       <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-        <Icon class="text-error" size="20">warning</Icon>
-        Checkout cancelled.
+        <Icon class="text-error" size="20">error</Icon>
+        Checkout cancelled
       </div>
     </Show>
 
@@ -243,6 +243,8 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   const stripeSessionId = () => new URLSearchParams(useLocation().search).get('stripe_success')
 
   const stripeSession = createStripeSessionState(dongleId, stripeSessionId)
+
+  // TODO: re-fetch subscription?
   const [subscription] = createResource(() => props.dongleId, getSubscriptionStatus)
 
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
@@ -265,38 +267,34 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         <Match when={stripeSession.state === 'errored'}>
           An error occurred: {stripeSession.error}
         </Match>
-        <Match when={stripeSession()?.payment_status} keyed>{paymentStatus => <Show when={paymentStatus === 'paid'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-            <Icon class="text-tertiary" size="20">check</Icon>
-            <div class="flex flex-col gap-2">
-              <p class="font-semibold">comma prime activated</p>
-              Connectivity will be enabled as soon as activation propogates to your local cell tower.
-              Rebooting your device may help.
-            </div>
-          </div>
-        </Show>}</Match>
-        <Match when={stripeSession()?.payment_status === 'unpaid'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-            <Icon size="20">hourglass</Icon>
-            Waiting for confirmed payment.
-          </div>
-        </Match>
-        <Match when={stripeSession()?.payment_status !== 'unpaid' && !subscription()}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-            <Icon size="20">hourglass</Icon>
-            Processing subscription...
-          </div>
-        </Match>
-        <Match when={stripeSession()?.payment_status !== 'unpaid' && subscription()}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-            <Icon class="text-tertiary" size="20">check</Icon>
-            <div class="flex flex-col gap-2">
-              <p class="font-semibold">comma prime activated</p>
-              Connectivity will be enabled as soon as activation propogates to your local cell tower.
-              Rebooting your device may help.
-            </div>
-          </div>
-        </Match>
+        <Match when={stripeSession()?.payment_status} keyed>{paymentStatus =>
+          <Switch>
+            <Match when={paymentStatus === 'unpaid'}>
+              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+                <Icon size="20">payments</Icon>
+                Waiting for confirmed payment...
+              </div>
+            </Match>
+
+            <Match when={paymentStatus === 'paid' && !subscription()}>
+              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+                <Icon size="20">sync</Icon>
+                Processing subscription...
+              </div>
+            </Match>
+
+            <Match when={paymentStatus === 'paid' && subscription()}>
+              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+                <Icon class="text-tertiary" size="20">check</Icon>
+                <div class="flex flex-col gap-2">
+                  <p class="font-semibold">comma prime activated</p>
+                  Connectivity will be enabled as soon as activation propogates to your local cell tower.
+                  Rebooting your device may help.
+                </div>
+              </div>
+            </Match>
+          </Switch>
+        }</Match>
       </Switch>
 
       <Switch>
