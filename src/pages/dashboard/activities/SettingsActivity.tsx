@@ -284,6 +284,23 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         }</Match>
       </Switch>
 
+      {/* TODO: move to popup */}
+      <Switch>
+        <Match when={cancelData.state === 'errored'}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon class="text-error" size="20">error</Icon>
+            Failed to cancel subscription: {cancelData.error}
+          </div>
+        </Match>
+
+        <Match when={cancelData.state === 'ready'}>
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+            <Icon size="20">check</Icon>
+            Subscription cancelled
+          </div>
+        </Match>
+      </Switch>
+
       <Switch>
         <Match when={subscription.state === 'errored'}>
           An error occurred: {subscription.error}
