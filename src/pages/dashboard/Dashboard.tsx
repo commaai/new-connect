@@ -3,6 +3,7 @@ import {
   createContext,
   createResource,
   createSignal,
+  lazy,
   Match,
   Setter,
   Show,
@@ -17,6 +18,7 @@ import type { Device } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
@@ -24,6 +26,8 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import storage from '~/utils/storage'
+
+const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 type DashboardState = {
   drawer: Accessor<boolean>
@@ -69,6 +73,8 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
 
+  const pairToken = () => !!location.query['pair']
+
   const [drawer, setDrawer] = createSignal(false)
   const onOpen = () => setDrawer(true)
   const onClose = () => setDrawer(false)
@@ -106,6 +112,9 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <Match when={!!profile.error}>
             <Navigate href="/login" />
           </Match>
+          <Match when={dongleId() === 'pair' || pairToken()}>
+            <PairActivity />
+          </Match>
           <Match when={dateStr()} keyed>
             <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
           </Match>
@@ -114,8 +123,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           </Match>
           <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
             <Navigate href={`/${defaultDongleId}`} />
-          )}
-          </Match>
+          )}</Match>
         </Switch>
       </Drawer>
     </DashboardContext.Provider>
