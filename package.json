@@ -15,7 +15,8 @@
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
-    "test": "vitest run"
+    "test": "vitest run",
+    "preview": "vite preview"
   },
   "packageManager": "bun@1.1.18",
   "type": "module",

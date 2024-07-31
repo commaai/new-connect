@@ -9,15 +9,15 @@ const Auth = lazy(() => import('./pages/auth/auth'))
 const Dashboard = lazy(() => import('./pages/dashboard'))
 
 const App: VoidComponent = () => {
+  console.log('offline?')
   return (
     <OfflineIndicator>
       <Router root={(props) => <Suspense>{props.children}</Suspense>}>
         <Route path="/login" component={Login} />
         <Route path="/logout" component={Logout} />
         <Route path="/auth" component={Auth} />
-
         <Route path="/*dongleId" component={Dashboard} />
-      </Router>
+      </Router >
     </OfflineIndicator>
   )
 }

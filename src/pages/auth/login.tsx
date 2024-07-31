@@ -4,7 +4,7 @@ import { setAccessToken } from '~/api/auth/client'
 import Button from '~/components/material/Button'
 
 export default function Login() {
-  const loginAsDemoUser = function () {
+  const loginAsDemoUser = function() {
     setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw')
     window.location.href = window.location.origin
   }
