@@ -18,7 +18,6 @@ import type { Device } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
-import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
