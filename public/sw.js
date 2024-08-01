@@ -30,7 +30,7 @@ self.addEventListener('fetch', (event) => {
           return response
         }
         return fetch(event.request).then((fetchResponse) => {
-          if (fetchResponse && fetchResponse.status === 200) {
+          if (fetchResponse.status === 200) {
             const responseToCache = fetchResponse.clone()
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache)
