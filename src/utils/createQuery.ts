@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, onCleanup, type Accessor } from 'solid-js'
+import { createEffect, createResource, createSignal, onCleanup, type Accessor, type ResourceReturn } from 'solid-js'
 
 export const createQuery = <TSource, TResult>(options: {
   source: Accessor<TSource | null>,
@@ -6,11 +6,11 @@ export const createQuery = <TSource, TResult>(options: {
   refetchInterval?: number,
   stopCondition?: (result?: TResult) => boolean,
   retryInterval?: number,
-}) => {
+}): ResourceReturn<TResult, TSource> => {
   const [counter, setCounter] = createSignal(0)
   const invalidate = () => setCounter(counter() + 1)
 
-  const [data] = createResource(() => {
+  const [data, actions] = createResource(() => {
     const source = options.source()
     return source !== null ? [source, counter()] as [TSource, number] : null
   }, async ([source]) => options.fetcher(source))
@@ -39,5 +39,5 @@ export const createQuery = <TSource, TResult>(options: {
     }, retryInterval)
   })
 
-  return data
+  return [data, actions]
 }

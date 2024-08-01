@@ -1,4 +1,4 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource } from 'solid-js'
+import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource, createEffect } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
@@ -216,7 +216,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   const stripeSessionId = () => new URLSearchParams(useLocation().search).get('stripe_success')
 
-  const stripeSession = createQuery({
+  const [stripeSession] = createQuery({
     source: () => {
       const source = [props.dongleId, stripeSessionId()]
       if (source.some((param) => !param)) return null
@@ -228,12 +228,13 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   })
 
   // TODO: we should wait for the session to be paid before fetching subscription
-  const subscription = createQuery({
+  const [subscription] = createQuery({
     source: () => props.dongleId,
     fetcher: getSubscriptionStatus,
     retryInterval: 10_000,
   })
 
+  const [cancelDialog, setCancelDialog] = createSignal(false)
   const [cancel, cancelData] = useAction(() => cancelSubscription(props.dongleId))
   const [update, updateData] = useAction(async () => {
     const { url } = await getStripePortal(props.dongleId)
@@ -242,6 +243,11 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     }
   })
   const loading = () => subscription.loading || cancelData.loading || updateData.loading || stripeSession.loading
+
+  createEffect(() => {
+    if (cancelData.state !== 'ready') return
+    setTimeout(() => window.location.reload(), 5000)
+  })
 
   return <div class="flex flex-col gap-4">
     <Suspense
@@ -289,7 +295,6 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         }</Match>
       </Switch>
 
-      {/* TODO: move to popup */}
       <Switch>
         <Match when={cancelData.state === 'errored'}>
           <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
@@ -322,9 +327,25 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     </Suspense>
 
     <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={cancel}>Cancel subscription</Button>
+      <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>Cancel subscription</Button>
       <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
     </div>
+
+    <Show when={cancelDialog()}>
+      <div class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" onClick={() => setCancelDialog(false)}>
+        <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
+          <h2 class="text-headline-sm">Cancel subscription</h2>
+          <p class="text-body-md">Are you sure you want to cancel your subscription?</p>
+          <div class="mt-4 flex flex-wrap justify-stretch gap-4">
+            <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => {
+              cancel()
+              setCancelDialog(false)
+            }}>Yes, cancel subscription</Button>
+            <Button color="secondary" disabled={loading()} onClick={() => setCancelDialog(false)}>No, keep subscription</Button>
+          </div>
+        </div>
+      </div>
+    </Show>
   </div>
 }
 
