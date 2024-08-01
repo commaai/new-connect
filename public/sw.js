@@ -2,7 +2,6 @@ const CACHE_NAME = 'connect-cache'
 const URLS_TO_CACHE = [
   '/index.html',
   '/manifest.json',
-  '/src/index.tsx',
   '/offline.html',
 ]
 
