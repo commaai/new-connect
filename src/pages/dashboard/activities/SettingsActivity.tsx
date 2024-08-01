@@ -252,7 +252,10 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     >
       <Switch>
         <Match when={stripeSession.state === 'errored'}>
-          An error occurred: {stripeSession.error}
+          <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-body-md font-semibold text-error-container">
+            <Icon size="20">error</Icon>
+            Unable to check payment status: {stripeSession.error}
+          </div>
         </Match>
         <Match when={stripeSession()?.payment_status} keyed>{paymentStatus =>
           <Switch>
@@ -305,7 +308,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
       <Switch>
         <Match when={subscription.state === 'errored'}>
-          An error occurred: {subscription.error}
+          Unable to fetch subscription details: {subscription.error}
         </Match>
         <Match when={subscription()} keyed>{subscription =>
           <div class="flex flex-col">
