@@ -4,7 +4,6 @@ const urlsToCache = [
   '/',
   '/index.html',
   '/manifest.json',
-  // Add other assets you want to cache
 ]
 
 self.addEventListener('install', (event) => {
