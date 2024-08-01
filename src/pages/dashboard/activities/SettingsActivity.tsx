@@ -274,8 +274,8 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
             </Match>
 
             <Match when={paymentStatus === 'paid' && subscription()}>
-              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
-                <Icon class="text-tertiary" size="20">check</Icon>
+              <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-body-md text-on-tertiary-container">
+                <Icon size="20">check</Icon>
                 <div class="flex flex-col gap-2">
                   <p class="font-semibold">comma prime activated</p>
                   <Show when={subscription()?.is_prime_sim} keyed>
