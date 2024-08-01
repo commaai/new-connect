@@ -34,17 +34,17 @@ self.addEventListener('fetch', (event) => {
             const responseToCache = fetchResponse.clone()
             caches.open(CACHE_NAME).then((cache) => {
               cache.put(event.request, responseToCache)
-            });
+            })
           }
-          return fetchResponse;
+          return fetchResponse
         })
       }).catch(handleError))
   } else {
     event.respondWith(
       fetch(event.request).catch(handleError)
-    );
+    )
   }
-});
+})
 
 function handleError(err) {
   if (!navigator.onLine) {
