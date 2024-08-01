@@ -158,8 +158,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   )
 
   return <div class="grid gap-4">
-    <p>comma prime subscriptions include the following features:</p>
-
     <ul class="ml-8 list-disc">
       <li>24/7 connectivity</li>
       <li>Take pictures remotely</li>
@@ -253,7 +251,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     <Suspense
       fallback={<div class="my-2 flex flex-col items-center gap-4">
         <CircularProgress />
-        Loading...
+        Fetching subscription status...
       </div>}
     >
       <Switch>
@@ -316,11 +314,11 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           Unable to fetch subscription details: {subscription.error}
         </Match>
         <Match when={subscription()} keyed>{subscription =>
-          <div class="flex flex-col">
+          <div class="flex list-none flex-col">
             <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
+            <li>Amount: {formatCurrency(subscription.amount)}</li>
             <li>Joined: {formatDate(subscription.subscribed_at)}</li>
             <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
-            <li>Amount: {formatCurrency(subscription.amount)}</li>
           </div>
         }</Match>
       </Switch>
@@ -358,7 +356,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         <Show when={device()} keyed>{device => getDeviceName(device)}</Show>
       </TopAppBar>
       <div class="max-w-lg px-4">
-        <h2 class="mb-4 text-headline-sm">Plan and Billing</h2>
+        <h2 class="mb-4 text-headline-sm">comma prime</h2>
         <Suspense>
           <Switch>
             <Match when={device()?.prime === false}>
