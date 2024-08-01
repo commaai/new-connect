@@ -173,7 +173,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
     </p>
 
     <Show when={stripeCancelled()}>
-      <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+      <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
         <Icon class="text-error" size="20">error</Icon>
         Checkout cancelled
       </div>
@@ -193,7 +193,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       />
     </PlanSelector>
 
-    <Show when={uiState()?.disabledDataPlanText} keyed>{text => <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+    <Show when={uiState()?.disabledDataPlanText} keyed>{text => <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
       <Icon size="20">info</Icon>
       {text}
     </div>}</Show>
@@ -257,14 +257,14 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         <Match when={stripeSession()?.payment_status} keyed>{paymentStatus =>
           <Switch>
             <Match when={paymentStatus === 'unpaid'}>
-              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
                 <Icon size="20">payments</Icon>
                 Waiting for confirmed payment...
               </div>
             </Match>
 
             <Match when={paymentStatus === 'paid' && !subscription()}>
-              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
                 <Icon size="20">sync</Icon>
                 Processing subscription...
               </div>
@@ -289,14 +289,14 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       {/* TODO: move to popup */}
       <Switch>
         <Match when={cancelData.state === 'errored'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
             <Icon class="text-error" size="20">error</Icon>
             Failed to cancel subscription: {cancelData.error}
           </div>
         </Match>
 
         <Match when={cancelData.state === 'ready'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md">
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
             <Icon size="20">check</Icon>
             Subscription cancelled
           </div>
