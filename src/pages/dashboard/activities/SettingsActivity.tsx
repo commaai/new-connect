@@ -314,20 +314,22 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           Unable to fetch subscription details: {subscription.error}
         </Match>
         <Match when={subscription()} keyed>{subscription =>
-          <div class="flex list-none flex-col">
-            <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
-            <li>Amount: {formatCurrency(subscription.amount)}</li>
-            <li>Joined: {formatDate(subscription.subscribed_at)}</li>
-            <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
-          </div>
+          <>
+            <div class="flex list-none flex-col">
+              <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
+              <li>Amount: {formatCurrency(subscription.amount)}</li>
+              <li>Joined: {formatDate(subscription.subscribed_at)}</li>
+              <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
+            </div>
+
+            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>Cancel subscription</Button>
+              <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
+            </div>
+          </>
         }</Match>
       </Switch>
     </Suspense>
-
-    <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-      <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>Cancel subscription</Button>
-      <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
-    </div>
 
     <Show when={cancelDialog()}>
       <div class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" onClick={() => setCancelDialog(false)}>
