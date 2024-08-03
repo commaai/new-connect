@@ -39,14 +39,6 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         style={{ left: props.open ? `${drawerWidth}px` : 0 }}
       >
         {props.children}
-        <div
-          class="absolute inset-0 bg-background transition-drawer duration-500"
-          style={{
-            'pointer-events': props.open ? undefined : 'none',
-            opacity: props.open ? 0.5 : 0,
-          }}
-          onClick={onClose}
-        />
       </main>
     </>
   )

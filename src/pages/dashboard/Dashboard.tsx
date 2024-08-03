@@ -26,6 +26,7 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import storage from '~/utils/storage'
+import { useDimensions } from '~/utils/window'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -67,6 +68,7 @@ const DashboardDrawer = (props: {
 
 const DashboardLayout: Component<RouteSectionProps> = () => {
   const location = useLocation()
+  const dimensions = useDimensions()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
@@ -74,7 +76,8 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query['pair']
 
-  const [drawer, setDrawer] = createSignal(false)
+  // Initialize with open if screen size is large
+  const [drawer, setDrawer] = createSignal(dimensions().width >= 1024)
   const onOpen = () => setDrawer(true)
   const onClose = () => setDrawer(false)
   const toggleDrawer = () => setDrawer((prev) => !prev)
