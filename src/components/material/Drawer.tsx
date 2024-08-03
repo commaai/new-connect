@@ -17,8 +17,6 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const isMobile = dimensions().width < 500
   const drawerWidth = isMobile ? dimensions().width - PEEK : 350
 
-  const onClose = () => props.onClose?.()
-
   return (
     <>
       <nav
