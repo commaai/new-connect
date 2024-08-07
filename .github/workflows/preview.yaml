@@ -77,7 +77,7 @@ jobs:
 
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
-        with: 
+        with:
           repository: commaai/ci-artifacts
           ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
           path: ${{ github.workspace }}/ci-artifacts
@@ -116,7 +116,10 @@ jobs:
               <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+              <tr/>
+              <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
             </table>
 
@@ -125,13 +128,16 @@ jobs:
               <tr>
                 <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
                 <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+              </tr>
+              <tr>
                 <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  
+
   update_pr_check:
     needs: preview
     if: always() && github.event.workflow_run.event == 'pull_request'

@@ -1,11 +1,15 @@
 import dayjs, { type Dayjs } from 'dayjs'
+import advanced from 'dayjs/plugin/advancedFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration, { type Duration } from 'dayjs/plugin/duration'
 
 import type { Route } from '~/types'
 
+dayjs.extend(advanced)
 dayjs.extend(customParseFormat)
 dayjs.extend(duration)
+
+export { dayjs }
 
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
@@ -49,4 +53,12 @@ export const formatRouteDuration = (route: Route | undefined): string => {
 
 export const parseDateStr = (dateStr: string): Dayjs => {
   return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
+}
+
+export const formatDate = (input: dayjs.ConfigType) => {
+  // Assume number is unix timestamp
+  const date = typeof input === 'number' ? dayjs.unix(input) : dayjs(input)
+  // Hide current year
+  const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
+  return date.format('MMMM Do' + yearStr)
 }

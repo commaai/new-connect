@@ -25,6 +25,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
+import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
@@ -113,6 +114,9 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           </Match>
           <Match when={dongleId() === 'pair' || pairToken()}>
             <PairActivity />
+          </Match>
+          <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+            <SettingsActivity dongleId={dongleId()} />
           </Match>
           <Match when={dateStr()} keyed>
             <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />

@@ -103,7 +103,10 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}>
+      <TopAppBar
+        leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+        trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
+      >
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
@@ -117,7 +120,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </Suspense>
             </div>
             <div class="flex p-4">
-              <IconButton onClick={() => void takeSnapshot() }>camera</IconButton>
+              <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
             </div>
           </div>
         </div>
@@ -126,7 +129,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
                 <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`}/>
+                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
                   <div class="absolute right-4 top-4 p-4">
                     <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
                     <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>

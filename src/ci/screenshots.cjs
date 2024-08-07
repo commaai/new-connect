@@ -7,6 +7,7 @@ const endpoints = {
   Login: 'login',
   RouteList: '1d3dc3e03047b0c7',
   RouteActivity: '1d3dc3e03047b0c7/000000dd--455f14369d',
+  SettingsActivity: '1d3dc3e03047b0c7/000000dd--455f14369d/settings',
 };
 
 async function takeScreenshots(deviceType, context) {

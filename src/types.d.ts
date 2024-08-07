@@ -15,7 +15,7 @@ export interface Device extends ApiResponseBase {
   alias: string
   serial: string
   last_athena_ping: number
-  ignore_uploads: boolean
+  ignore_uploads: boolean | null
   is_paired: boolean
   is_owner: boolean
   public_key: string
@@ -25,6 +25,12 @@ export interface Device extends ApiResponseBase {
   device_type: string
   openpilot_version: string
   sim_id: string
+  sim_type: number
+  eligible_features: {
+    prime: boolean
+    prime_data: boolean
+    nav: boolean
+  }
 }
 
 export interface DrivingStatisticsAggregation {
