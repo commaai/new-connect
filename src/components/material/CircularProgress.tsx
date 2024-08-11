@@ -4,7 +4,7 @@ import clsx from 'clsx'
 type CircularProgressProps = {
   class?: string
   progress?: number
-  color?: 'primary' | 'secondary' | 'tertiary' | 'error'
+  color?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'inherit'
   size?: number
   thickness?: number
 }
@@ -18,6 +18,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
       secondary: 'text-secondary',
       tertiary: 'text-tertiary',
       error: 'text-error',
+      inherit: '',
     }[props.color || 'primary'])
 
   const size = () => `${props.size || 40}px`
@@ -43,7 +44,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
     <span
       class={clsx(
         'inline-block',
-        colorClass,
+        colorClass(),
         props.progress === undefined
           ? 'animate-circular-rotate'
           : 'transition-transform',

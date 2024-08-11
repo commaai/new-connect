@@ -88,7 +88,7 @@ export interface TimelineStatistics {
 const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
   let urls: string[] = []
   if (route) {
-    const segmentNumbers = Array.from({ length: route.maxqlog }, (x, i) => i)
+    const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
     urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
   }
   const results = urls.map((url) => fetch(url).then((res) => res.json() as T))

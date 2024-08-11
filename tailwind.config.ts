@@ -196,6 +196,9 @@ export default {
           },
         },
       },
+      screens: {
+        xs: '425px',
+      },
       animation: {
         indeterminate1: 'indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite',
         indeterminate2: 'indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite',
