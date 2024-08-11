@@ -6,6 +6,26 @@ import RouteStatistics from '~/components/RouteStatistics'
 
 import type { RouteSegments } from '~/types'
 
+const RouteHeader = (props: { route: RouteSegments }) => {
+  const startTime = () => dayjs(props.route.start_time_utc_millis)
+  const endTime = () => dayjs(props.route.end_time_utc_millis)
+
+  const headline = () => startTime().format('ddd, MMM D, YYYY')
+  const subhead = () => `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
+
+  return (
+    <CardHeader
+      headline={headline()}
+      subhead={subhead()}
+      leading={
+        <Avatar>
+          <Icon>directions_car</Icon>
+        </Avatar>
+      }
+    />
+  )
+}
+
 interface RouteCardProps {
   route: RouteSegments
 }

@@ -130,7 +130,7 @@
 
 @layer components {
   .state-layer {
-    @apply relative before:absolute before:inset-0 before:transition before:opacity-0 before:overflow-hidden sm:before:hover:opacity-[.08] sm:before:focus:opacity-[.12] before:active:opacity-[.12];
+    @apply relative before:absolute before:inset-0 before:transition before:opacity-0 before:overflow-hidden sm:before:hover:opacity-[.08] sm:before:focus:opacity-[.12] before:active:opacity-[.12] disabled:before:opacity-0 disabled:before:hover:opacity-0;
   }
 
   .skeleton-loader {
