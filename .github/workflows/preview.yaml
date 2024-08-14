@@ -21,6 +21,7 @@ jobs:
       check_id: ${{ steps.check.outputs.result }}
     steps:
       - name: Create PR check
+        if: github.repo == 'commaai/new-connect'
         uses: actions/github-script@v7
         id: check
         with:
@@ -42,6 +43,7 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - name: Download build artifacts
+        if: github.repo == 'commaai/new-connect'
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.workflow_run.id }}
@@ -50,6 +52,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Find PR number
+        if: github.repo == 'commaai/new-connect'
         id: pr
         uses: actions/github-script@v7
         with:
@@ -69,6 +72,7 @@ jobs:
             return pullRequestNumber
 
       - name: Deploy to Cloudflare Pages
+        if: github.repo == 'commaai/new-connect'
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
@@ -78,8 +82,8 @@ jobs:
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
         with:
-          repository: commaai/ci-artifacts
-          ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          repository: ${{ github.repository_owner }}/ci-artifacts
+          # ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
           path: ${{ github.workspace }}/ci-artifacts
           ref: master
 
@@ -126,12 +130,12 @@ jobs:
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
               </tr>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/${{ github.repository_owner }}/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
               </tr>
             </table>
           comment_tag: run_id
@@ -140,7 +144,7 @@ jobs:
 
   update_pr_check:
     needs: preview
-    if: always() && github.event.workflow_run.event == 'pull_request'
+    if: always() && github.event.workflow_run.event == 'pull_request' && github.repository == 'commaai/new-connect'
     runs-on: ubuntu-latest
     steps:
     - name: Update PR check
