@@ -1,11 +1,9 @@
 import {
-  Accessor,
   createContext,
   createResource,
   createSignal,
   lazy,
   Match,
-  Setter,
   Show,
   Switch,
 } from 'solid-js'
@@ -27,13 +25,16 @@ import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
 import TopHeader from '~/components/TopHeader'
 import TopAppBar from '~/components/material/TopAppBar'
+import { useDimensions } from '~/utils/window'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
+const DESKTOP_THRESHOLD = 768
+
 type DashboardState = {
-  drawer: Accessor<boolean>
-  setDrawer: Setter<boolean>
+  isDrawerOpen: () => boolean
   toggleDrawer: () => void
+  isDesktop: () => boolean
 }
 
 export const DashboardContext = createContext<DashboardState>()
@@ -62,6 +63,7 @@ const DashboardDrawer = (props: {
 
 const DashboardLayout: Component<RouteSectionProps> = () => {
   const location = useLocation()
+  const dimensions = useDimensions()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
@@ -69,10 +71,14 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query['pair']
 
-  const [drawer, setDrawer] = createSignal(true) // ! Change to only be true if Desktop
-  const onOpen = () => setDrawer(true)
-  const onClose = () => setDrawer(false)
-  const toggleDrawer = () => setDrawer((prev) => !prev)
+  const isDesktop = () => dimensions().width >= DESKTOP_THRESHOLD
+  const [isDrawerOpen, setIsDrawerOpen] = createSignal(isDesktop())
+  
+  const toggleDrawer = () => {
+    if (!isDesktop()) {
+      setIsDrawerOpen(prev => !prev)
+    }
+  }
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
@@ -87,13 +93,12 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
+    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop }}>
       <TopHeader />
       <Drawer
-        open={drawer()}
-        onOpen={onOpen}
-        onClose={onClose}
-        drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
+        open={isDrawerOpen() || isDesktop()}
+        onClose={() => setIsDrawerOpen(false)}
+        drawer={<DashboardDrawer onClose={() => setIsDrawerOpen(false)} devices={devices()} />}
       >
         <Switch
           fallback={
