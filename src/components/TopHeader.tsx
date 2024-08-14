@@ -15,7 +15,7 @@ const TopHeader: Component = () => {
             menu
           </IconButton>
         )}
-        <h1 class="ml-4 text-3xl font-bold">connect</h1>
+        <h1 class="ml-2 text-3xl font-bold">connect</h1>
       </div>
       <IconButton href={`/${params.dongleId}/settings`} class="text-white">
         settings
