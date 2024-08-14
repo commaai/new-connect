@@ -35,6 +35,7 @@ type DashboardState = {
   isDrawerOpen: () => boolean
   toggleDrawer: () => void
   isDesktop: () => boolean
+  showHeader: () => boolean
 }
 
 export const DashboardContext = createContext<DashboardState>()
@@ -80,6 +81,8 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
     }
   }
 
+  const showHeader = () => isDesktop() || (!dateStr() && dongleId() !== 'pair')
+
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
 
@@ -93,8 +96,10 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop }}>
-      <TopHeader />
+    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop, showHeader }}>
+      <Show when={showHeader()}>
+        <TopHeader />
+      </Show>
       <Drawer
         open={isDrawerOpen() || isDesktop()}
         onClose={() => setIsDrawerOpen(false)}
