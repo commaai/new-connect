@@ -45,7 +45,7 @@ const DashboardDrawer = (props: {
 }) => {
   return (
     <>
-      <h2 class="mx-4 mb-2 mt-6 text-label-sm">
+      <h2 class="mx-4 mb-2 mt-4 text-label-sm">
         Devices
       </h2>
       <Show when={props.devices} keyed>
