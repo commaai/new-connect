@@ -73,7 +73,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   const pairToken = () => !!location.query['pair']
 
   const isDesktop = () => dimensions().width >= DESKTOP_THRESHOLD
-  const [isDrawerOpen, setIsDrawerOpen] = createSignal(isDesktop())
+  const [isDrawerOpen, setIsDrawerOpen] = createSignal(false)
   
   const toggleDrawer = () => {
     if (!isDesktop()) {
