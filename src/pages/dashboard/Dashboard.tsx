@@ -19,8 +19,6 @@ import type { Device } from '~/types'
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
@@ -28,6 +26,7 @@ import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
 import TopHeader from '~/components/TopHeader'
+import TopAppBar from '~/components/material/TopAppBar'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -45,13 +44,7 @@ const DashboardDrawer = (props: {
 }) => {
   return (
     <>
-      <TopAppBar
-        component="h1"
-        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
-      >
-        comma connect
-      </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
+      <h2 class="mx-4 mb-2 mt-6 text-label-sm">
         Devices
       </h2>
       <Show when={props.devices} keyed>
@@ -105,7 +98,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
         <Switch
           fallback={
             <TopAppBar
-              leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+              leading={<Icon class="text-yellow-400">warning</Icon>}
             >
               No device
             </TopAppBar>
