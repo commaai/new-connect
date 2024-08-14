@@ -96,7 +96,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <div class="mt-6 flex flex-col gap-4 px-4 pb-4">
+      <div class="mt-6 flex flex-col gap-4 px-6 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <div class="flex">
             <div class="flex-auto">
