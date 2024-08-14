@@ -22,21 +22,28 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <>
       <nav
-        class="hide-scrollbar fixed inset-y-0 left-0 h-full w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
+        class="hide-scrollbar fixed left-0 w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
           left: props.open ? 0 : `${-PEEK}px`,
           opacity: props.open ? 1 : 0.5,
           width: `${drawerWidth}px`,
+          top: 'var(--top-header-height)',
+          bottom: 0,
         }}
       >
-        <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
+        <div class="flex h-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
           {props.drawer}
         </div>
       </nav>
 
       <main
-        class="absolute inset-y-0 w-screen overflow-y-auto bg-background transition-drawer duration-500"
-        style={{ left: props.open ? `${drawerWidth}px` : 0 }}
+        class="absolute overflow-y-auto bg-background transition-drawer duration-500"
+        style={{ 
+          left: props.open ? `${drawerWidth}px` : 0,
+          right: 0,
+          top: 'var(--top-header-height)',
+          bottom: 0, 
+        }}
       >
         {props.children}
         <div

@@ -27,6 +27,7 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
+import TopHeader from '~/components/TopHeader'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -75,7 +76,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query['pair']
 
-  const [drawer, setDrawer] = createSignal(false)
+  const [drawer, setDrawer] = createSignal(true) // ! Change to only be true if Desktop
   const onOpen = () => setDrawer(true)
   const onClose = () => setDrawer(false)
   const toggleDrawer = () => setDrawer((prev) => !prev)
@@ -94,6 +95,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   return (
     <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
+      <TopHeader />
       <Drawer
         open={drawer()}
         onOpen={onOpen}
