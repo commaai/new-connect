@@ -57,7 +57,6 @@ jobs:
           script: |
             const response = await github.rest.search.issuesAndPullRequests({
               q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
-              per_page: 1,
             })
             const items = response.data.items
             if (items.length < 1) {
@@ -84,9 +83,7 @@ jobs:
           ref: master
 
       - name: take screenshots
-        run: |
-          bun install --frozen-lockfile
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+        run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
