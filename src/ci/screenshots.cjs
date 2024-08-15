@@ -1,37 +1,49 @@
 /* eslint-disable */
-const { chromium, devices } = require('playwright');
+const fs = require('node:fs')
+const { chromium, devices } = require('playwright')
 
-const base_url = process.argv[2];
-const out_dir = process.argv[3] ? process.argv[3] : 'screenshots';
+const baseUrl = process.argv[2]
+const outDir = process.argv[3] || 'screenshots'
 const endpoints = {
   Login: 'login',
   RouteList: '1d3dc3e03047b0c7',
   RouteActivity: '1d3dc3e03047b0c7/000000dd--455f14369d',
-  SettingsActivity: '1d3dc3e03047b0c7/000000dd--455f14369d/settings',
-};
+  SettingsActivity: '1d3dc3e03047b0c7/settings',
+}
 
 async function takeScreenshots(deviceType, context) {
-  let page = await context.newPage()
-  await page.goto(`${base_url}`)
-  await page.click(`button:has-text('Try the demo')`)
-  for (const endpoint in endpoints) {
-    await page.goto(`${base_url}/${endpoints[endpoint]}`)
+  const page = await context.newPage()
+  for (const [route, path] of Object.entries(endpoints)) {
+    await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' })
     await page.waitForTimeout(2000)
-    await page.screenshot({path: `${out_dir}/${endpoint}-${deviceType}.playwright.png`})
-    console.log(`${endpoint}-${deviceType}.playwright.png`)
+    await page.screenshot({ path: `${outDir}/${route}-${deviceType}.playwright.png` })
+    console.log(`${route}-${deviceType}.playwright.png`)
+
+    if (route === 'Login') {
+      await page.click(`button:has-text('Try the demo')`, { waitUntil: 'networkidle' })
+      await page.waitForTimeout(1000)
+    }
   }
   await page.close()
 }
 
-(async () => {
-  const mobile_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
-  const iphone_13 = devices['iPhone 13']
-  const mobile_context = await mobile_browser.newContext(iphone_13)
-  await takeScreenshots('mobile', mobile_context)
-  await mobile_browser.close()
+async function main() {
+  let executablePath = '/usr/bin/chromium'
+  if (!fs.existsSync(executablePath)) executablePath = undefined
 
-  const desktop_browser = await chromium.launch({ executablePath: "/usr/bin/chromium"})
-  const desktop_context = await desktop_browser.newContext({viewport: { width: 1920, height: 1080 }})
-  await takeScreenshots('desktop', desktop_context)
-  await desktop_browser.close()
-})()
+  const browser = await chromium.launch({ executablePath, headless: true })
+
+  const contexts = [
+    ['mobile', devices['iPhone 13']],
+    ['desktop', { viewport: { width: 1920, height: 1080 }}],
+  ]
+  await Promise.all(contexts.map(async ([deviceType, options]) => {
+    const context = await browser.newContext(options)
+    await takeScreenshots(deviceType, context)
+    await context.close()
+  }))
+
+  await browser.close()
+}
+
+void main()

@@ -15,7 +15,7 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 2
     outputs:
       pr: ${{ steps.pr.outputs.result }}
       check_id: ${{ steps.check.outputs.result }}
@@ -57,7 +57,6 @@ jobs:
           script: |
             const response = await github.rest.search.issuesAndPullRequests({
               q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
-              per_page: 1,
             })
             const items = response.data.items
             if (items.length < 1) {
