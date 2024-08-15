@@ -54,6 +54,8 @@
     --color-surface-container: rgb(239 237 244);
     --color-surface-container-high: rgb(233 231 239);
     --color-surface-container-highest: rgb(228 225 233);
+
+    --top-header-height: 64px;
   }
 
   .dark,
