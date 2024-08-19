@@ -1,33 +1,12 @@
 import { Suspense, type VoidComponent } from 'solid-js'
-import dayjs from 'dayjs'
 
-import Avatar from '~/components/material/Avatar'
-import Card, { CardContent, CardHeader } from '~/components/material/Card'
-import Icon from '~/components/material/Icon'
+import Card, { CardContent } from '~/components/material/Card'
+
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
+import { RouteHeader } from './RouteHeader'
 
 import type { RouteSegments } from '~/types'
-
-const RouteHeader = (props: { route: RouteSegments }) => {
-  const startTime = () => dayjs(props.route.start_time_utc_millis)
-  const endTime = () => dayjs(props.route.end_time_utc_millis)
-
-  const headline = () => startTime().format('ddd, MMM D, YYYY')
-  const subhead = () => `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
-
-  return (
-    <CardHeader
-      headline={headline()}
-      subhead={subhead()}
-      leading={
-        <Avatar>
-          <Icon>directions_car</Icon>
-        </Avatar>
-      }
-    />
-  )
-}
 
 interface RouteCardProps {
   route: RouteSegments
@@ -45,10 +24,11 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           <RouteStaticMap route={props.route} />
         </Suspense>
       </div>
-
-      <CardContent>
-        <RouteStatistics route={props.route} />
-      </CardContent>
+      {!!props.route.end_time_utc_millis && (
+        <CardContent>
+          <RouteStatistics route={props.route} />
+        </CardContent>
+      )}
     </Card>
   )
 }
