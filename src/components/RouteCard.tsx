@@ -1,4 +1,4 @@
-import { Suspense, type VoidComponent } from 'solid-js'
+import { Suspense, type VoidComponent, createSignal, Show } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
@@ -6,6 +6,7 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
+import RouteCardExpanded from '~/components/RouteCardExpanded'
 
 import type { RouteSegments } from '~/types'
 
@@ -34,22 +35,65 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
+  const [expanded, setExpanded] = createSignal(false)
+  // eslint-disable-next-line solid/reactivity
+  const routeUrl = `/${props.route.dongle_id}/${props.route.fullname.slice(17)}` // TODO: Should this be a constant??
+
+  const handleClick = (e: MouseEvent) => {
+    const target = e.target as HTMLElement
+    if (target.closest('.expand-button')) {
+      e.preventDefault()
+      setExpanded(!expanded())
+    }
+  }
+
   return (
-    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}>
-      <RouteHeader route={props.route} />
+    <div onClick={handleClick} class="flex max-w-md flex-col">
+      <Card href={routeUrl} class="rounded-b-none">
+        <RouteHeader route={props.route} />
+        <RouteMap route={props.route} />
+        <CardContent>
+          <RouteStatistics route={props.route} />
+        </CardContent>
+      </Card>
+      <Show when={expanded()}>
+        <div class="rounded-b-none bg-surface">
+          <RouteCardExpanded routeId={props.route.fullname.slice(17)} />
+        </div>
+      </Show>
+      <ExpandButton expanded={expanded} />
+    </div>
+  )
+}
 
-      <div class="mx-2 h-48 overflow-hidden rounded-lg">
-        <Suspense
-          fallback={<div class="skeleton-loader size-full bg-surface" />}
-        >
-          <RouteStaticMap route={props.route} />
-        </Suspense>
-      </div>
+const RouteMap: VoidComponent<{ route: RouteSegments }> = (props) => (
+  <div class="mx-2 h-48 overflow-hidden rounded-lg">
+    <Suspense
+      fallback={<div class="skeleton-loader size-full bg-surface" />}
+    >
+      <RouteStaticMap route={props.route} />
+    </Suspense>
+  </div>
+)
 
-      <CardContent>
-        <RouteStatistics route={props.route} />
-      </CardContent>
-    </Card>
+const ExpandButton: VoidComponent<{ expanded: () => boolean }> = (props) => {
+
+  return (
+    <button 
+      // eslint-disable-next-line tailwindcss/no-custom-classname
+      class="expand-button flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/35"
+      style={{
+        'border': props.expanded() ? '2px solid' : '1px solid',
+        'border-color': props.expanded() ? 'rgb(38,38,43)' : 'var(--color-surface-container-lowest)',
+        // 'transition': 'border-color 0.5s ease-out',
+      }}
+    >
+      <Icon
+        class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}
+      >
+        {props.expanded() ? 'expand_less' : 'expand_more'}
+      </Icon>
+    </button>
   )
 }
 
