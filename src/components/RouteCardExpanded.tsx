@@ -2,6 +2,7 @@ import { createSignal, Show, type VoidComponent } from 'solid-js'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import { setRoutePublic, setRoutePreserved } from '~/api/route'
+import { USERADMIN_URL_ROOT } from '~/api/config'
 
 interface RouteCardExpandedProps {
   dongleId: string
@@ -61,6 +62,12 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
     }
   }
 
+  const openInUseradmin = () => {
+    const params = new URLSearchParams({ onebox: props.routeName })
+    const url = `${USERADMIN_URL_ROOT}?${params.toString()}`
+    window.open(url, '_blank')?.focus()
+  }
+
   return (
     <div class="flex flex-col border-x-2 border-[rgb(38,38,43)] bg-surface-container-lowest p-4">
       {/* Route ID */}
@@ -112,10 +119,10 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         {/* Share OR USERADMIN ?? */}
         <Button 
           class="w-full rounded-sm border-2 border-[rgb(38,38,43)] bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
-          href="#" 
-          leading={<Icon>share</Icon>}
+          onClick={openInUseradmin}
+          leading={<Icon>open_in_new</Icon>}
         >
-          Share
+          View in useradmin
         </Button>
       </div>
     </div>
