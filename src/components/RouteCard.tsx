@@ -36,8 +36,6 @@ interface RouteCardProps {
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const [expanded, setExpanded] = createSignal(false)
-  // eslint-disable-next-line solid/reactivity
-  const routeUrl = `/${props.route.dongle_id}/${props.route.fullname.slice(17)}` // TODO: Should this be a constant??
 
   const handleClick = (e: MouseEvent) => {
     const target = e.target as HTMLElement
@@ -49,7 +47,10 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 
   return (
     <div onClick={handleClick} class="flex max-w-md flex-col">
-      <Card href={routeUrl} class="rounded-b-none">
+      <Card 
+        href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} 
+        class="rounded-b-none"
+      >
         <RouteHeader route={props.route} />
         <RouteMap route={props.route} />
         <CardContent>
@@ -58,7 +59,12 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       </Card>
       <Show when={expanded()}>
         <div class="rounded-b-none bg-surface">
-          <RouteCardExpanded routeId={props.route.fullname.slice(17)} />
+          <RouteCardExpanded
+            dongleId={props.route.dongle_id}
+            routeName={props.route.fullname}
+            initialPublic={props.route.is_public}
+            initialPreserved={props.route.is_preserved}
+          />
         </div>
       </Show>
       <ExpandButton expanded={expanded} />

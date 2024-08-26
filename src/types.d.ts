@@ -97,4 +97,6 @@ export interface RouteSegments extends Route {
   share_exp: RouteShareSignature['exp']
   share_sig: RouteShareSignature['sig']
   start_time_utc_millis: number
+  is_public: boolean
+  is_preserved: boolean
 }

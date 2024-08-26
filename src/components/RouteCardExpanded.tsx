@@ -1,93 +1,115 @@
 import { createSignal, Show, type VoidComponent } from 'solid-js'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
+import { setRoutePublic, setRoutePreserved } from '~/api/route'
 
 interface RouteCardExpandedProps {
-  routeId: string
+  dongleId: string
+  routeName: string
+  initialPublic: boolean
+  initialPreserved: boolean
 }
 
 const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
-  const [preserveRoute, setPreserveRoute] = createSignal(false)
-  const [makePublic, setMakePublic] = createSignal(false)
+  const [preserveRoute, setPreserveRoute] = createSignal(props.initialPreserved)
+  const [makePublic, setMakePublic] = createSignal(props.initialPublic)
   const [copied, setCopied] = createSignal(false)
+  const [error, setError] = createSignal<string | null>(null)
 
-  const copyRouteId = () => {
-    void navigator.clipboard.writeText(props.routeId)
-    setCopied(true)
-    setTimeout(() => setCopied(false), 2000)
+  const setTemporaryError = (message: string | null) => {
+    setError(message)
+    if (message) {
+      setTimeout(() => setError(null), 3000)
+    }
+  }
+
+  const copyCurrentRouteId = async () => {
+    if (!props.routeName || !navigator.clipboard) {
+      return
+    }
+
+    const currentRouteId = props.routeName.replace('|', '/')
+    try {
+      await navigator.clipboard.writeText(currentRouteId)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch (err) {
+      console.error('Failed to copy route ID: ', err)
+      setTemporaryError('Failed to copy route ID')
+    }
+  }
+
+  const togglePreserveRoute = async () => {
+    try {
+      const newValue = !preserveRoute()
+      await setRoutePreserved(props.routeName, newValue)
+      setPreserveRoute(newValue)
+    } catch (err) {
+      setTemporaryError('Failed to update Preserve Route toggle')
+      console.error(err)
+    }
+  }
+
+  const toggleMakePublic = async () => {
+    try {
+      const newValue = !makePublic()
+      await setRoutePublic(props.routeName, newValue)
+      setMakePublic(newValue)
+    } catch (err) {
+      setTemporaryError('Failed to update Public Access toggle')
+      console.error(err)
+    }
   }
 
   return (
     <div class="flex flex-col border-x-2 border-[rgb(38,38,43)] bg-surface-container-lowest p-4">
       {/* Route ID */}
-      <div class="mb-3 ml-2 text-body-sm text-zinc-500" style={{'font-family':"'JetBrains Mono', monospace"}}>Route ID: {props.routeId}</div>
-      {/* Preserve Route */}
+      {/* TODO: Should I create a variable for the route name that has the | replaced with /? */}
+      <div class="mb-3 ml-2 text-body-sm text-zinc-500" style={{'font-family':"'JetBrains Mono', monospace"}}>Route ID: {props.routeName.replace('|', '/')}</div>
 
-      {/* TODO: Create error function */}
-      <Show when={false}> 
-        <div class="mb-4 rounded-md bg-[rgb(150,51,51)] bg-opacity-[0.31] p-4 text-red-500">
-          Error: {'This is a test error'}
+      <Show when={error()}>
+        <div class="mb-4 flex items-center rounded-md bg-[rgb(150,51,51)] bg-opacity-[0.31] p-4 text-red-500">
+          <Icon class="mr-4 text-yellow-300">warning</Icon>
+          <span style={{'font-family': "'JetBrains Mono', monospace"}}>{error()}</span>
         </div>
       </Show>
       
+      {/* Preserve Route */}
       <button
         class="flex w-full items-center justify-between rounded-t-md border-2 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
-        onClick={() => setPreserveRoute(!preserveRoute())}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={togglePreserveRoute}
       >
         <span class="text-body-lg">Preserve Route</span>
-
-        {/* TODO: Toggle flashes white border UI bug */}
-        {/* Toggle Button */}
-        <div
-          class={`relative h-9 w-16 rounded-full transition-colors ${
-            preserveRoute() ? 'bg-green-300' : 'border-4 border-[rgb(38,38,43)]'
-          }`}
-        >
-          <div
-            class={`absolute top-1 size-5 rounded-full bg-[rgb(38,38,43)] transition-transform duration-500 ease-in-out ${
-              preserveRoute() ? 'top-2 translate-x-9' : 'translate-x-1'
-            }`}
-          />
-        </div>
+        <ToggleButton active={preserveRoute()} />
       </button>
+
       {/* Make Public */}
       <button
         class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
-        onClick={() => setMakePublic(!makePublic())}
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onClick={toggleMakePublic}
       >
         <span class="text-body-lg">Public Access</span>
-
-        {/* TODO: Make toggle button into own component?? */}
-        {/* Toggle Button */}
-        <div
-          class={`relative h-9 w-16 rounded-full transition-colors ${
-            makePublic() ? 'bg-green-300' : 'border-4 border-[rgb(38,38,43)]'
-          }`}
-        >
-          <div
-            class={`absolute top-1 size-5 rounded-full bg-[rgb(38,38,43)] transition-transform duration-500 ease-in-out ${
-              makePublic() ? 'top-2 translate-x-9' : 'translate-x-1'
-            }`}
-          />
-        </div>
+        <ToggleButton active={makePublic()} />
       </button>
+
       <div class="mt-4 flex gap-2">
         {/* Copy Route ID */}
         <Button
           // TODO: Make this into a component and wierd rendering of hover since it has previous compoonent styles
           class="w-full rounded-sm border-2 border-[rgb(38,38,43)] bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low"
-          onClick={copyRouteId}
+          // eslint-disable-next-line @typescript-eslint/no-misused-promises
+          onClick={copyCurrentRouteId}
           leading={
-            <Icon 
-              class={copied() ? 'text-green-300' : ''}
-            >
+            <Icon class={copied() ? 'text-green-300' : ''}>
               {copied() ? 'check' : 'file_copy'}
             </Icon>
           }
         >
           {copied() ? 'Copied!' : 'Route ID'}
         </Button>
-        {/* Share */}
+        {/* Share OR USERADMIN ?? */}
         <Button 
           class="w-full rounded-sm border-2 border-[rgb(38,38,43)] bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
           href="#" 
@@ -99,5 +121,19 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
     </div>
   )
 }
+
+const ToggleButton: VoidComponent<{ active: boolean }> = (props) => (
+  <div
+    class={`relative h-9 w-16 rounded-full transition-colors ${
+      props.active ? 'bg-green-300' : 'border-4 border-[rgb(38,38,43)]'
+    }`}
+  >
+    <div
+      class={`absolute top-1 size-5 rounded-full bg-[rgb(38,38,43)] transition-transform duration-500 ease-in-out ${
+        props.active ? 'top-2 translate-x-9' : 'translate-x-1'
+      }`}
+    />
+  </div>
+)
 
 export default RouteCardExpanded
