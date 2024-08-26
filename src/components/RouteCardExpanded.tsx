@@ -1,4 +1,4 @@
-import { createSignal, type VoidComponent } from 'solid-js'
+import { createSignal, Show, type VoidComponent } from 'solid-js'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 
@@ -22,6 +22,14 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       {/* Route ID */}
       <div class="mb-3 ml-2 text-body-sm text-zinc-500" style={{'font-family':"'JetBrains Mono', monospace"}}>Route ID: {props.routeId}</div>
       {/* Preserve Route */}
+
+      {/* TODO: Create error function */}
+      <Show when={false}> 
+        <div class="mb-4 rounded-md bg-[rgb(150,51,51)] bg-opacity-[0.31] p-4 text-red-500">
+          Error: {'This is a test error'}
+        </div>
+      </Show>
+      
       <button
         class="flex w-full items-center justify-between rounded-t-md border-2 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
         onClick={() => setPreserveRoute(!preserveRoute())}
@@ -47,7 +55,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
         onClick={() => setMakePublic(!makePublic())}
       >
-        <span class="text-body-lg">Make Public</span>
+        <span class="text-body-lg">Public Access</span>
 
         {/* TODO: Make toggle button into own component?? */}
         {/* Toggle Button */}
