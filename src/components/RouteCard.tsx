@@ -87,10 +87,10 @@ const ExpandButton: VoidComponent<{ expanded: () => boolean }> = (props) => {
   return (
     <button 
       // eslint-disable-next-line tailwindcss/no-custom-classname
-      class="expand-button flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/35"
+      class="expand-button flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
       style={{
         'border': props.expanded() ? '2px solid' : '1px solid',
-        'border-color': props.expanded() ? 'rgb(38,38,43)' : 'var(--color-surface-container-lowest)',
+        'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
         // 'transition': 'border-color 0.5s ease-out',
       }}
     >

@@ -69,7 +69,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col border-x-2 border-[rgb(38,38,43)] bg-surface-container-lowest p-4">
+    <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
       {/* Route ID */}
       {/* TODO: Should I create a variable for the route name that has the | replaced with /? */}
       <div class="mb-3 ml-2 text-body-sm text-zinc-500" style={{'font-family':"'JetBrains Mono', monospace"}}>Route ID: {props.routeName.replace('|', '/')}</div>
@@ -83,7 +83,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       
       {/* Preserve Route */}
       <button
-        class="flex w-full items-center justify-between rounded-t-md border-2 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
+        class="flex w-full items-center justify-between rounded-t-md border-2 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={togglePreserveRoute}
       >
@@ -93,7 +93,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
 
       {/* Make Public */}
       <button
-        class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-[rgb(38,38,43)] px-5 py-3 transition-colors hover:bg-surface-container-low"
+        class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
         // eslint-disable-next-line @typescript-eslint/no-misused-promises
         onClick={toggleMakePublic}
       >
@@ -105,7 +105,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         {/* Copy Route ID */}
         <Button
           // TODO: Make this into a component and wierd rendering of hover since it has previous compoonent styles
-          class="w-full rounded-sm border-2 border-[rgb(38,38,43)] bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low"
+          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low"
           // eslint-disable-next-line @typescript-eslint/no-misused-promises
           onClick={copyCurrentRouteId}
           leading={
@@ -118,7 +118,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         </Button>
         {/* Share OR USERADMIN ?? */}
         <Button 
-          class="w-full rounded-sm border-2 border-[rgb(38,38,43)] bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
+          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
           onClick={openInUseradmin}
           leading={<Icon>open_in_new</Icon>}
         >
@@ -132,11 +132,11 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
 const ToggleButton: VoidComponent<{ active: boolean }> = (props) => (
   <div
     class={`relative h-9 w-16 rounded-full transition-colors ${
-      props.active ? 'bg-green-300' : 'border-4 border-[rgb(38,38,43)]'
+      props.active ? 'bg-green-300' : 'border-4 border-surface-container-high'
     }`}
   >
     <div
-      class={`absolute top-1 size-5 rounded-full bg-[rgb(38,38,43)] transition-transform duration-500 ease-in-out ${
+      class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
         props.active ? 'top-2 translate-x-9' : 'translate-x-1'
       }`}
     />
