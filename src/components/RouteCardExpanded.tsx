@@ -16,6 +16,8 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   const [copied, setCopied] = createSignal(false)
   const [error, setError] = createSignal<string | null>(null)
 
+  const currentRouteId = () => props.routeName.replace('|', '/')
+
   const setTemporaryError = (message: string | null) => {
     setError(message)
     if (message) {
@@ -24,13 +26,10 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   }
 
   const copyCurrentRouteId = async () => {
-    if (!props.routeName || !navigator.clipboard) {
-      return
-    }
+    if (!props.routeName || !navigator.clipboard) return
 
-    const currentRouteId = props.routeName.replace('|', '/')
     try {
-      await navigator.clipboard.writeText(currentRouteId)
+      await navigator.clipboard.writeText(currentRouteId())
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
@@ -74,7 +73,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         class="mb-3 ml-2 text-body-sm text-zinc-500" 
         style={{'font-family':"'JetBrains Mono', monospace"}}
       >
-        Route ID: {props.routeName.replace('|', '/')}
+        Route ID: {currentRouteId()}
       </div>
 
       <Show when={error()}>
