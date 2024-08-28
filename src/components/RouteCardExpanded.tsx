@@ -5,7 +5,6 @@ import { setRoutePublic, setRoutePreserved } from '~/api/route'
 import { USERADMIN_URL_ROOT } from '~/api/config'
 
 interface RouteCardExpandedProps {
-  dongleId: string
   routeName: string
   initialPublic: boolean
   initialPreserved: boolean
@@ -72,7 +71,12 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
     <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
       {/* Route ID */}
       {/* TODO: Should I create a variable for the route name that has the | replaced with /? */}
-      <div class="mb-3 ml-2 text-body-sm text-zinc-500" style={{'font-family':"'JetBrains Mono', monospace"}}>Route ID: {props.routeName.replace('|', '/')}</div>
+      <div 
+        class="mb-3 ml-2 text-body-sm text-zinc-500" 
+        style={{'font-family':"'JetBrains Mono', monospace"}}
+      >
+        Route ID: {props.routeName.replace('|', '/')}
+      </div>
 
       <Show when={error()}>
         <div class="mb-4 flex items-center rounded-md bg-[rgb(150,51,51)] bg-opacity-[0.31] p-4 text-red-500">
