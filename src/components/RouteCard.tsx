@@ -60,7 +60,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <Show when={expanded()}>
         <div class="rounded-b-none bg-surface">
           <RouteCardExpanded
-            dongleId={props.route.dongle_id}
             routeName={props.route.fullname}
             initialPublic={props.route.is_public}
             initialPreserved={props.route.is_preserved}
