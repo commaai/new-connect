@@ -37,16 +37,10 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const [expanded, setExpanded] = createSignal(false)
 
-  const handleClick = (e: MouseEvent) => {
-    const target = e.target as HTMLElement
-    if (target.closest('.expand-button')) {
-      e.preventDefault()
-      setExpanded(!expanded())
-    }
-  }
+  const toggleExpanded = () => setExpanded(prev => !prev)
 
   return (
-    <div onClick={handleClick} class="flex max-w-md flex-col">
+    <div class="flex max-w-md flex-col">
       <Card 
         href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} 
         class="rounded-b-none"
@@ -66,7 +60,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           />
         </div>
       </Show>
-      <ExpandButton expanded={expanded} />
+      <ExpandButton expanded={expanded} onToggle={toggleExpanded} />
     </div>
   )
 }
@@ -81,12 +75,12 @@ const RouteMap: VoidComponent<{ route: RouteSegments }> = (props) => (
   </div>
 )
 
-const ExpandButton: VoidComponent<{ expanded: () => boolean }> = (props) => {
-
+const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => void }> = (props) => {
   return (
     <button 
-      // eslint-disable-next-line tailwindcss/no-custom-classname
-      class="expand-button flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
+      class="flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
+      onClick={() => props.onToggle()}
+      aria-expanded={props.expanded()}
       style={{
         'border': props.expanded() ? '2px solid' : '1px solid',
         'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
