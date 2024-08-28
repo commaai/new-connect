@@ -62,8 +62,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   }
 
   const openInUseradmin = () => {
-    const params = new URLSearchParams({ onebox: props.routeName })
-    const url = `${USERADMIN_URL_ROOT}?${params.toString()}`
+    const url = `${USERADMIN_URL_ROOT}?${new URLSearchParams({ onebox: props.routeName }).toString()}`
     window.open(url, '_blank')?.focus()
   }
 
