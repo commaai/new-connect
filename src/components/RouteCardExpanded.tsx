@@ -10,20 +10,39 @@ interface RouteCardExpandedProps {
   initialPreserved: boolean
 }
 
+function createToggle<T>(initialValue: boolean, apiCall: (routeName: string, value: boolean) => Promise<T>) {
+  const [value, setValue] = createSignal(initialValue)
+
+  const toggle = (routeName: string) => {
+    const newValue = !value()
+    apiCall(routeName, newValue)
+      .then(() => setValue(newValue))
+      .catch((err) => {
+        console.error(err)
+        throw new Error('Failed to update toggle')
+      })
+  }
+
+  return [value, toggle] as const
+}
+
 const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
-  const [preserveRoute, setPreserveRoute] = createSignal(props.initialPreserved)
-  const [makePublic, setMakePublic] = createSignal(props.initialPublic)
-  const [copied, setCopied] = createSignal(false)
+  const [preserveRoute, togglePreserveRoute] = createToggle(props.initialPreserved, setRoutePreserved)
+  const [makePublic, toggleMakePublic] = createToggle(props.initialPublic, setRoutePublic)
   const [error, setError] = createSignal<string | null>(null)
 
-  const currentRouteId = () => props.routeName.replace('|', '/')
-
-  const setTemporaryError = (message: string | null) => {
-    setError(message)
-    if (message) {
-      setTimeout(() => setError(null), 3000)
+  const handleToggle = (toggleFn: (routeName: string) => void) => {
+    setError(null)
+    try {
+      toggleFn(props.routeName)
+    } catch (err) {
+      setError((err as Error).message)
     }
   }
+
+  const [copied, setCopied] = createSignal(false)
+
+  const currentRouteId = () => props.routeName.replace('|', '/')
 
   const copyCurrentRouteId = async () => {
     if (!props.routeName || !navigator.clipboard) return
@@ -34,29 +53,6 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       setTimeout(() => setCopied(false), 2000)
     } catch (err) {
       console.error('Failed to copy route ID: ', err)
-      setTemporaryError('Failed to copy route ID')
-    }
-  }
-
-  const togglePreserveRoute = async () => {
-    try {
-      const newValue = !preserveRoute()
-      await setRoutePreserved(props.routeName, newValue)
-      setPreserveRoute(newValue)
-    } catch (err) {
-      setTemporaryError('Failed to update Preserve Route toggle')
-      console.error(err)
-    }
-  }
-
-  const toggleMakePublic = async () => {
-    try {
-      const newValue = !makePublic()
-      await setRoutePublic(props.routeName, newValue)
-      setMakePublic(newValue)
-    } catch (err) {
-      setTemporaryError('Failed to update Public Access toggle')
-      console.error(err)
     }
   }
 
@@ -86,21 +82,19 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       {/* Preserve Route */}
       <button
         class="flex w-full items-center justify-between rounded-t-md border-2 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={togglePreserveRoute}
+        onClick={() => handleToggle(togglePreserveRoute)}
       >
         <span class="text-body-lg">Preserve Route</span>
-        <ToggleButton active={preserveRoute()} />
+        <ToggleSwitchButton active={preserveRoute()} />
       </button>
 
       {/* Make Public */}
       <button
         class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
-        // eslint-disable-next-line @typescript-eslint/no-misused-promises
-        onClick={toggleMakePublic}
+        onClick={() => handleToggle(toggleMakePublic)}
       >
         <span class="text-body-lg">Public Access</span>
-        <ToggleButton active={makePublic()} />
+        <ToggleSwitchButton active={makePublic()} />
       </button>
 
       <div class="mt-4 flex gap-2">
@@ -108,8 +102,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         <Button
           // TODO: Make this into a component and wierd rendering of hover since it has previous compoonent styles
           class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low"
-          // eslint-disable-next-line @typescript-eslint/no-misused-promises
-          onClick={copyCurrentRouteId}
+          onClick={() => void copyCurrentRouteId()}
           leading={
             <Icon class={copied() ? 'text-green-300' : ''}>
               {copied() ? 'check' : 'file_copy'}
@@ -131,7 +124,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   )
 }
 
-const ToggleButton: VoidComponent<{ active: boolean }> = (props) => (
+const ToggleSwitchButton: VoidComponent<{ active: boolean }> = (props) => (
   <div
     class={`relative h-9 w-16 rounded-full transition-colors ${
       props.active ? 'bg-green-300' : 'border-4 border-surface-container-high'
