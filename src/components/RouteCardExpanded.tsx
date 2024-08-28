@@ -30,6 +30,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   const [preserveRoute, togglePreserveRoute] = createToggle(props.initialPreserved, setRoutePreserved)
   const [makePublic, toggleMakePublic] = createToggle(props.initialPublic, setRoutePublic)
   const [error, setError] = createSignal<string | null>(null)
+  const [copied, setCopied] = createSignal(false)
 
   const handleToggle = (toggleFn: (routeName: string) => void) => {
     setError(null)
@@ -39,8 +40,6 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       setError((err as Error).message)
     }
   }
-
-  const [copied, setCopied] = createSignal(false)
 
   const currentRouteId = () => props.routeName.replace('|', '/')
 
@@ -63,8 +62,6 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
 
   return (
     <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
-      {/* Route ID */}
-      {/* TODO: Should I create a variable for the route name that has the | replaced with /? */}
       <div 
         class="mb-3 ml-2 text-body-sm text-zinc-500" 
         style={{'font-family':"'JetBrains Mono', monospace"}}
@@ -111,7 +108,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         >
           {copied() ? 'Copied!' : 'Route ID'}
         </Button>
-        {/* Share OR USERADMIN ?? */}
+        {/* USERADMIN*/}
         <Button 
           class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
           onClick={openInUseradmin}

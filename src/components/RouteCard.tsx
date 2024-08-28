@@ -84,7 +84,6 @@ const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => voi
       style={{
         'border': props.expanded() ? '2px solid' : '1px solid',
         'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
-        // 'transition': 'border-color 0.5s ease-out',
       }}
     >
       <Icon
