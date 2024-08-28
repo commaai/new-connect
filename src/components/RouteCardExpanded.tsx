@@ -2,7 +2,7 @@ import { createSignal, Show, type VoidComponent } from 'solid-js'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import { setRoutePublic, setRoutePreserved } from '~/api/route'
-import { USERADMIN_URL_ROOT } from '~/api/config'
+import { USERADMIN_URL } from '~/api/config'
 
 interface RouteCardExpandedProps {
   routeName: string
@@ -56,7 +56,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   }
 
   const openInUseradmin = () => {
-    const url = `${USERADMIN_URL_ROOT}?${new URLSearchParams({ onebox: props.routeName }).toString()}`
+    const url = `${USERADMIN_URL}?${new URLSearchParams({ onebox: props.routeName }).toString()}`
     window.open(url, '_blank')?.focus()
   }
 
