@@ -55,30 +55,18 @@ const ToggleButton: VoidComponent<{
 const ActionButton: VoidComponent<{
   onClick: () => void
   icon: string
-  activeIcon?: string
   label: string
-  activeLabel?: string
-  isActive?: () => boolean
-}> = (props) => {
-  const isActive = () => props.isActive?.() || false
-
-  return (
-    <Button
-      class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
-      onClick={props.onClick}
-      leading={
-        <Icon size="34" class={isActive() ? 'text-green-300' : ''}>
-          {isActive() ? props.activeIcon || props.icon : props.icon}
-        </Icon>
-      }
-      noPadding
-    >
-      <span class="whitespace-pre-line">
-        {isActive() ? props.activeLabel || props.label : props.label}
-      </span>
-    </Button>
-  )
-}
+  iconClass?: string
+}> = (props) => (
+  <Button
+    class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
+    onClick={props.onClick}
+    leading={<Icon size="34" class={props.iconClass}>{props.icon}</Icon>}
+    noPadding
+  >
+    <span class="whitespace-pre-line">{props.label}</span>
+  </Button>
+)
 
 const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   const [preserveRoute, togglePreserveRoute] = createToggle(props.initialPreserved, setRoutePreserved)
@@ -149,11 +137,9 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       <div class="mt-4 flex gap-[.75rem]">
         <ActionButton
           onClick={() => void copyCurrentRouteId()}
-          icon="file_copy"
-          activeIcon="check"
-          label="Route ID"
-          activeLabel="Copied!"
-          isActive={copied}
+          icon={copied() ? 'check' : 'file_copy'}
+          label={copied() ? 'Copied!' : 'Route ID'}
+          iconClass={copied() ? 'text-green-300' : ''}
         />
         <ActionButton
           onClick={openInUseradmin}
