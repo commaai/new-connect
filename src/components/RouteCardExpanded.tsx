@@ -10,22 +10,6 @@ interface RouteCardExpandedProps {
   initialPreserved: boolean
 }
 
-function createToggle<T>(initialValue: boolean, apiCall: (routeName: string, value: boolean) => Promise<T>) {
-  const [value, setValue] = createSignal(initialValue)
-
-  const toggle = (routeName: string) => {
-    const newValue = !value()
-    apiCall(routeName, newValue)
-      .then(() => setValue(newValue))
-      .catch((err) => {
-        console.error(err)
-        throw new Error('Failed to update toggle')
-      })
-  }
-
-  return [value, toggle] as const
-}
-
 const ToggleButton: VoidComponent<{
   label: string
   active: () => boolean
@@ -69,17 +53,24 @@ const ActionButton: VoidComponent<{
 )
 
 const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
-  const [preserveRoute, togglePreserveRoute] = createToggle(props.initialPreserved, setRoutePreserved)
-  const [makePublic, toggleMakePublic] = createToggle(props.initialPublic, setRoutePublic)
+  const [preserveRoute, setPreserveRoute] = createSignal(props.initialPreserved)
+  const [makePublic, setMakePublic] = createSignal(props.initialPublic)
   const [error, setError] = createSignal<string | null>(null)
   const [copied, setCopied] = createSignal(false)
 
-  const handleToggle = (toggleFn: (routeName: string) => void) => {
+  const handleToggle = async (
+    apiCall: (routeName: string, value: boolean) => Promise<unknown>,
+    getter: () => boolean,
+    setter: (value: boolean) => void,
+  ) => {
     setError(null)
     try {
-      toggleFn(props.routeName)
+      const newValue = !getter()
+      await apiCall(props.routeName, newValue)
+      setter(newValue)
     } catch (err) {
-      setError((err as Error).message)
+      console.error(err)
+      setError('Failed to update toggle')
     }
   }
 
@@ -122,15 +113,15 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       <div class="flex flex-col overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
-          active={preserveRoute}
-          onToggle={() => handleToggle(togglePreserveRoute)}
+          active={() => preserveRoute()}
+          onToggle={() => void handleToggle(setRoutePreserved, preserveRoute, setPreserveRoute)}
         />
         {/* Horizontal Divider */}
         <div class="h-[2px] bg-surface-container-high" />
         <ToggleButton
           label="Public Access"
-          active={makePublic}
-          onToggle={() => handleToggle(toggleMakePublic)}
+          active={() => makePublic()}
+          onToggle={() => void handleToggle(setRoutePublic, makePublic, setMakePublic)}
         />
       </div>
 
