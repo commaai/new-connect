@@ -45,7 +45,6 @@ const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => voi
     <button 
       class="flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
       onClick={() => props.onToggle()}
-      aria-expanded={props.expanded()}
       style={{
         'border': props.expanded() ? '2px solid' : '1px solid',
         'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
