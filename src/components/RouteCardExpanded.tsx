@@ -60,6 +60,20 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
     window.open(url, '_blank')?.focus()
   }
 
+  const ToggleButton: VoidComponent<{
+    label: string
+    active: () => boolean
+    onToggle: () => void
+  }> = (props) => (
+    <button
+      class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
+      onClick={() => props.onToggle()}
+    >
+      <span class="text-body-lg">{props.label}</span>
+      <ToggleSwitchButton active={props.active()} />
+    </button>
+  )
+
   return (
     <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
       <div 
@@ -76,23 +90,20 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         </div>
       </Show>
       
-      {/* Preserve Route */}
-      <button
-        class="flex w-full items-center justify-between rounded-t-md border-2 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
-        onClick={() => handleToggle(togglePreserveRoute)}
-      >
-        <span class="text-body-lg">Preserve Route</span>
-        <ToggleSwitchButton active={preserveRoute()} />
-      </button>
-
-      {/* Make Public */}
-      <button
-        class="flex w-full items-center justify-between rounded-b-md border-2 border-t-0 border-surface-container-high px-5 py-3 transition-colors hover:bg-surface-container-low"
-        onClick={() => handleToggle(toggleMakePublic)}
-      >
-        <span class="text-body-lg">Public Access</span>
-        <ToggleSwitchButton active={makePublic()} />
-      </button>
+      <div class="flex flex-col overflow-hidden rounded-md border-2 border-surface-container-high">
+        <ToggleButton
+          label="Preserve Route"
+          active={preserveRoute}
+          onToggle={() => handleToggle(togglePreserveRoute)}
+        />
+        {/* Horizontal Divider */}
+        <div class="h-[2px] bg-surface-container-high" />
+        <ToggleButton
+          label="Public Access"
+          active={makePublic}
+          onToggle={() => handleToggle(toggleMakePublic)}
+        />
+      </div>
 
       <div class="mt-4 flex gap-2">
         {/* Copy Route ID */}
