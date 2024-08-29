@@ -52,13 +52,11 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         </CardContent>
       </Card>
       <Show when={expanded()}>
-        <div class="rounded-b-none bg-surface">
-          <RouteCardExpanded
-            routeName={props.route.fullname}
-            initialPublic={props.route.is_public}
-            initialPreserved={props.route.is_preserved}
-          />
-        </div>
+        <RouteCardExpanded
+          routeName={props.route.fullname}
+          initialPublic={props.route.is_public}
+          initialPreserved={props.route.is_preserved}
+        />
       </Show>
       <ExpandButton expanded={expanded} onToggle={toggleExpanded} />
     </div>
