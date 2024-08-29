@@ -105,27 +105,29 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         />
       </div>
 
-      <div class="mt-4 flex gap-2">
+      <div class="mt-4 flex gap-[.75rem]">
         {/* Copy Route ID */}
         <Button
           // TODO: Make this into a component and wierd rendering of hover since it has previous compoonent styles
-          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low"
+          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
           onClick={() => void copyCurrentRouteId()}
           leading={
-            <Icon class={copied() ? 'text-green-300' : ''}>
+            <Icon size="34" class={copied() ? 'text-green-300' : ''}>
               {copied() ? 'check' : 'file_copy'}
             </Icon>
           }
+          noPadding
         >
           {copied() ? 'Copied!' : 'Route ID'}
         </Button>
         {/* USERADMIN*/}
         <Button 
-          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-6 text-on-surface-variant hover:bg-surface-container-low" 
+          class="w-full whitespace-pre-line rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
           onClick={openInUseradmin}
-          leading={<Icon>open_in_new</Icon>}
+          leading={<Icon size="34">open_in_new</Icon>}
+          noPadding
         >
-          View in useradmin
+          {'View in\nuseradmin'}
         </Button>
       </div>
     </div>
