@@ -77,10 +77,11 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   return (
     <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
       <div 
-        class="mb-3 ml-2 text-body-sm text-zinc-500" 
+        class="mb-4 ml-2 text-body-sm text-zinc-500" 
         style={{'font-family':"'JetBrains Mono', monospace"}}
       >
-        Route ID: {currentRouteId()}
+        <div>Route ID:</div>
+        <div class="mt-1 break-all md:text-body-md">{currentRouteId()}</div>
       </div>
 
       <Show when={error()}>
