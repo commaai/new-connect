@@ -51,7 +51,7 @@ const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => voi
       }}
     >
       <Icon class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}>
-        {props.expanded() ? 'expand_less' : 'expand_more'}
+        {props.expanded() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
       </Icon>
     </button>
   )
