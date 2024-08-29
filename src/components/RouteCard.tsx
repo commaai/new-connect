@@ -30,6 +30,36 @@ const RouteHeader = (props: { route: RouteSegments }) => {
   )
 }
 
+const RouteMap: VoidComponent<{ route: RouteSegments }> = (props) => (
+  <div class="mx-2 h-48 overflow-hidden rounded-lg">
+    <Suspense
+      fallback={<div class="skeleton-loader size-full bg-surface" />}
+    >
+      <RouteStaticMap route={props.route} />
+    </Suspense>
+  </div>
+)
+
+const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => void }> = (props) => {
+  return (
+    <button 
+      class="flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
+      onClick={() => props.onToggle()}
+      aria-expanded={props.expanded()}
+      style={{
+        'border': props.expanded() ? '2px solid' : '1px solid',
+        'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
+      }}
+    >
+      <Icon
+        class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}
+      >
+        {props.expanded() ? 'expand_less' : 'expand_more'}
+      </Icon>
+    </button>
+  )
+}
+
 interface RouteCardProps {
   route: RouteSegments
 }
@@ -60,36 +90,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       </Show>
       <ExpandButton expanded={expanded} onToggle={toggleExpanded} />
     </div>
-  )
-}
-
-const RouteMap: VoidComponent<{ route: RouteSegments }> = (props) => (
-  <div class="mx-2 h-48 overflow-hidden rounded-lg">
-    <Suspense
-      fallback={<div class="skeleton-loader size-full bg-surface" />}
-    >
-      <RouteStaticMap route={props.route} />
-    </Suspense>
-  </div>
-)
-
-const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => void }> = (props) => {
-  return (
-    <button 
-      class="flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45"
-      onClick={() => props.onToggle()}
-      aria-expanded={props.expanded()}
-      style={{
-        'border': props.expanded() ? '2px solid' : '1px solid',
-        'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
-      }}
-    >
-      <Icon
-        class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}
-      >
-        {props.expanded() ? 'expand_less' : 'expand_more'}
-      </Icon>
-    </button>
   )
 }
 
