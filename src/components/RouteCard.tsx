@@ -50,9 +50,7 @@ const ExpandButton: VoidComponent<{ expanded: () => boolean, onToggle: () => voi
         'border-color': props.expanded() ? 'var(--color-surface-container-high)' : 'var(--color-surface-container-lowest)',
       }}
     >
-      <Icon
-        class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}
-      >
+      <Icon class={props.expanded() ? 'text-yellow-400' : 'text-zinc-500'}>
         {props.expanded() ? 'expand_less' : 'expand_more'}
       </Icon>
     </button>
@@ -66,8 +64,6 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const [expanded, setExpanded] = createSignal(false)
 
-  const toggleExpanded = () => setExpanded(prev => !prev)
-
   return (
     <div class="flex max-w-md flex-col">
       <Card 
@@ -80,6 +76,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           <RouteStatistics route={props.route} />
         </CardContent>
       </Card>
+      
       <Show when={expanded()}>
         <RouteCardExpanded
           routeName={props.route.fullname}
@@ -87,7 +84,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           initialPreserved={props.route.is_preserved}
         />
       </Show>
-      <ExpandButton expanded={expanded} onToggle={toggleExpanded} />
+      <ExpandButton expanded={expanded} onToggle={() => setExpanded(prev => !prev)} />
     </div>
   )
 }
