@@ -26,20 +26,6 @@ function createToggle<T>(initialValue: boolean, apiCall: (routeName: string, val
   return [value, toggle] as const
 }
 
-const ToggleSwitchButton: VoidComponent<{ active: boolean }> = (props) => (
-  <div
-    class={`relative h-9 w-16 rounded-full border-4 transition-colors ${
-      props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
-    }`}
-  >
-    <div
-      class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-        props.active ? 'top-1 translate-x-8' : 'translate-x-1'
-      }`}
-    />
-  </div>
-)
-
 const ToggleButton: VoidComponent<{
   label: string
   active: () => boolean
@@ -50,7 +36,19 @@ const ToggleButton: VoidComponent<{
     onClick={() => props.onToggle()}
   >
     <span class="text-body-lg">{props.label}</span>
-    <ToggleSwitchButton active={props.active()} />
+    
+    {/* Toggle Switch */}
+    <div
+      class={`relative h-9 w-16 rounded-full border-4 transition-colors ${
+        props.active() ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
+      }`}
+    >
+      <div
+        class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
+          props.active() ? 'top-1 translate-x-8' : 'translate-x-1'
+        }`}
+      />
+    </div>
   </button>
 )
 
