@@ -134,13 +134,13 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
 
 const ToggleSwitchButton: VoidComponent<{ active: boolean }> = (props) => (
   <div
-    class={`relative h-9 w-16 rounded-full transition-colors ${
-      props.active ? 'bg-green-300' : 'border-4 border-surface-container-high'
+    class={`relative h-9 w-16 rounded-full border-4 transition-colors ${
+      props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
     }`}
   >
     <div
       class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-        props.active ? 'top-2 translate-x-9' : 'translate-x-1'
+        props.active ? 'top-1 translate-x-8' : 'translate-x-1'
       }`}
     />
   </div>
