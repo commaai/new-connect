@@ -127,7 +127,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       </div>
 
       <Show when={error()}>
-        <div class="mb-4 flex items-center rounded-md bg-[rgb(150,51,51)] bg-opacity-[0.31] p-4 text-red-500">
+        <div class="mb-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
           <Icon class="mr-4 text-yellow-300">warning</Icon>
           <span style={{'font-family': "'JetBrains Mono', monospace"}}>{error()}</span>
         </div>
