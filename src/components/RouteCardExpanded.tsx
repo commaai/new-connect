@@ -26,6 +26,62 @@ function createToggle<T>(initialValue: boolean, apiCall: (routeName: string, val
   return [value, toggle] as const
 }
 
+const ToggleSwitchButton: VoidComponent<{ active: boolean }> = (props) => (
+  <div
+    class={`relative h-9 w-16 rounded-full border-4 transition-colors ${
+      props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
+    }`}
+  >
+    <div
+      class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
+        props.active ? 'top-1 translate-x-8' : 'translate-x-1'
+      }`}
+    />
+  </div>
+)
+
+const ToggleButton: VoidComponent<{
+  label: string
+  active: () => boolean
+  onToggle: () => void
+}> = (props) => (
+  <button
+    class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
+    onClick={() => props.onToggle()}
+  >
+    <span class="text-body-lg">{props.label}</span>
+    <ToggleSwitchButton active={props.active()} />
+  </button>
+)
+
+const ActionButton: VoidComponent<{
+  onClick: () => void
+  icon: string
+  activeIcon?: string
+  label: string
+  activeLabel?: string
+  isActive?: () => boolean
+}> = (props) => {
+  const isActive = () => props.isActive?.() || false
+
+  return (
+    <Button
+      class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
+      onClick={props.onClick}
+      leading={
+        <Icon size="34" class={isActive() ? 'text-green-300' : ''}>
+          {isActive() ? props.activeIcon || props.icon : props.icon}
+        </Icon>
+      }
+      noPadding
+    >
+      <span class="whitespace-pre-line">
+        {isActive() ? props.activeLabel || props.label : props.label}
+      </span>
+    </Button>
+  )
+}
+
 const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   const [preserveRoute, togglePreserveRoute] = createToggle(props.initialPreserved, setRoutePreserved)
   const [makePublic, toggleMakePublic] = createToggle(props.initialPublic, setRoutePublic)
@@ -60,20 +116,6 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
     window.open(url, '_blank')?.focus()
   }
 
-  const ToggleButton: VoidComponent<{
-    label: string
-    active: () => boolean
-    onToggle: () => void
-  }> = (props) => (
-    <button
-      class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
-      onClick={() => props.onToggle()}
-    >
-      <span class="text-body-lg">{props.label}</span>
-      <ToggleSwitchButton active={props.active()} />
-    </button>
-  )
-
   return (
     <div class="flex flex-col border-x-2 border-surface-container-high bg-surface-container-lowest p-4">
       <div 
@@ -107,46 +149,22 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
       </div>
 
       <div class="mt-4 flex gap-[.75rem]">
-        {/* Copy Route ID */}
-        <Button
-          // TODO: Make this into a component and wierd rendering of hover since it has previous compoonent styles
-          class="w-full rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
+        <ActionButton
           onClick={() => void copyCurrentRouteId()}
-          leading={
-            <Icon size="34" class={copied() ? 'text-green-300' : ''}>
-              {copied() ? 'check' : 'file_copy'}
-            </Icon>
-          }
-          noPadding
-        >
-          {copied() ? 'Copied!' : 'Route ID'}
-        </Button>
-        {/* USERADMIN*/}
-        <Button 
-          class="w-full whitespace-pre-line rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
+          icon="file_copy"
+          activeIcon="check"
+          label="Route ID"
+          activeLabel="Copied!"
+          isActive={copied}
+        />
+        <ActionButton
           onClick={openInUseradmin}
-          leading={<Icon size="34">open_in_new</Icon>}
-          noPadding
-        >
-          {'View in\nuseradmin'}
-        </Button>
+          icon="open_in_new"
+          label={'View in\nuseradmin'}
+        />
       </div>
     </div>
   )
 }
-
-const ToggleSwitchButton: VoidComponent<{ active: boolean }> = (props) => (
-  <div
-    class={`relative h-9 w-16 rounded-full border-4 transition-colors ${
-      props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
-    }`}
-  >
-    <div
-      class={`absolute top-1 size-5 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-        props.active ? 'top-1 translate-x-8' : 'translate-x-1'
-      }`}
-    />
-  </div>
-)
 
 export default RouteCardExpanded
