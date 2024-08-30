@@ -110,14 +110,12 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         </div>
       </Show>
       
-      <div class="flex flex-col overflow-hidden rounded-md border-2 border-surface-container-high">
+      <div class="divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
           active={() => preserveRoute()}
           onToggle={() => void handleToggle(setRoutePreserved, preserveRoute, setPreserveRoute)}
         />
-        {/* Horizontal Divider */}
-        <div class="h-[2px] bg-surface-container-high" />
         <ToggleButton
           label="Public Access"
           active={() => makePublic()}
