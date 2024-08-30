@@ -17,6 +17,7 @@ const IconButton: Component<IconButtonProps> = (props) => {
     ({
       '20': 'min-w-[28px] min-h-[28px]',
       '24': 'min-w-[32px] min-h-[32px]',
+      '34': 'min-w-[42px] min-h-[42px]',
       '40': 'min-w-[48px] min-h-[48px]',
       '48': 'min-w-[56px] min-h-[56px]',
     }[size()])
