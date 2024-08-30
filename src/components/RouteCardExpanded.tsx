@@ -129,7 +129,7 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
         <ActionButton
           onClick={() => void copyCurrentRouteId()}
           icon={copied() ? 'check' : 'file_copy'}
-          label={copied() ? 'Copied!' : 'Route ID'}
+          label={copied() ? 'Copied!' : 'Copy \nRoute ID'}
           iconClass={copied() ? 'text-green-300' : ''}
         />
         <ActionButton
