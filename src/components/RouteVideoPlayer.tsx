@@ -9,6 +9,7 @@ type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   onProgress?: (seekTime: number) => void
+  ref?: (el: HTMLVideoElement) => void
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
@@ -19,6 +20,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const timeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', timeUpdate)
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
+    if (props.ref) {
+      props.ref(video)
+    }
   })
   let hls = new Hls()
   createEffect(() => {
