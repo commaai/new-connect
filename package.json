@@ -12,6 +12,7 @@
     "build": "vite build",
     "dev": "vite",
     "serve": "vite prefix",
+    "start": "vite preview",
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
