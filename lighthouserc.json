@@ -2,7 +2,7 @@
     "ci": {
       "collect": {
         "url": ["http://localhost:3000"],
-        "startServerCommand": "npm start",
+        "startServerCommand": "bun serve",
         "numberOfRuns": 1,
         "settings": {
           "chromeFlags": "--no-sandbox"
@@ -15,4 +15,5 @@
       }
     }
   }
+
   
