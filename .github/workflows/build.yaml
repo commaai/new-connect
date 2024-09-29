@@ -26,17 +26,17 @@ jobs:
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
       - run: ./check-bundle-size.sh
 
-      - name: Start server
-        run: bun run dev &
-        env:
-          PORT: 3000
+      # - name: Start server
+      #   run: bun run dev &
+      #   env:
+      #     PORT: 3000
 
-      - name: Wait for server to start
-        run: |
-          echo "Waiting for server to start..."
-          until curl -s http://localhost:3000 > /dev/null; do
-            sleep 1
-          done
+      # - name: Wait for server to start
+      #   run: |
+      #     echo "Waiting for server to start..."
+      #     until curl -s http://localhost:3000 > /dev/null; do
+      #       sleep 1
+      #     done
 
       - name: Run Lighthouse CI
         run: npx @lhci/cli@0.11.x autorun --config=./lighthouserc.json
