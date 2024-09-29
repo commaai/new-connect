@@ -19,7 +19,7 @@ jobs:
       - run: timeout 12s bun pre-commit
       - run: bun run test
       - run: ./check-lines.sh
-      
+
       - name: Bundle size breakdown
         run: |
           bun run build --sourcemap true
@@ -27,7 +27,7 @@ jobs:
       - run: ./check-bundle-size.sh
 
       - name: Start server
-        run: bun run start &
+        run: bun run dev &
         env:
           PORT: 3000
 
