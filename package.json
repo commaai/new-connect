@@ -78,6 +78,7 @@
     "solid-js": "JS ui framework"
   },
   "dependencies": {
+    "@lhci/cli": "^0.14.0",
     "@mapbox/polyline": "^1.2.1",
     "@solid-primitives/state-machine": "^0.0.3",
     "@solidjs/router": "^0.13.5",

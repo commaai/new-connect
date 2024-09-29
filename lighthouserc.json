@@ -1,0 +1,18 @@
+{
+    "ci": {
+      "collect": {
+        "url": ["http://localhost:3000"],
+        "startServerCommand": "npm start",
+        "numberOfRuns": 1,
+        "settings": {
+          "chromeFlags": "--no-sandbox"
+        }
+      },
+      "assert": {
+        "assertions": {
+          "categories:pwa": ["error", { "minScore": 1 }]
+        }
+      }
+    }
+  }
+  

@@ -19,20 +19,43 @@ jobs:
       - run: timeout 12s bun pre-commit
       - run: bun run test
       - run: ./check-lines.sh
+      
       - name: Bundle size breakdown
         run: |
           bun run build --sourcemap true
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
       - run: ./check-bundle-size.sh
 
+      - name: Start server
+        run: bun run start &
+        env:
+          PORT: 3000
+
+      - name: Wait for server to start
+        run: |
+          echo "Waiting for server to start..."
+          until curl -s http://localhost:3000 > /dev/null; do
+            sleep 1
+          done
+
+      - name: Run Lighthouse CI
+        run: npx @lhci/cli@0.11.x autorun --config=./lighthouserc.json
+        env:
+          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Stop server
+        run: kill $(jobs -p)
+
   build:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
+
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
+
       - run: bun run build
 
       - name: Upload built project
