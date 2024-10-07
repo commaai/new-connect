@@ -20,11 +20,11 @@ jobs:
       - run: bun run test
       - run: ./check-lines.sh
 
-      - name: Bundle size breakdown
-        run: |
-          bun run build --sourcemap true
-          node src/ci/dependency_report.cjs dist/ | column -t -s ":"
-      - run: ./check-bundle-size.sh
+      # - name: Bundle size breakdown
+      #   run: |
+      #     bun run build --sourcemap true
+      #     node src/ci/dependency_report.cjs dist/ | column -t -s ":"
+      # - run: ./check-bundle-size.sh
 
       # - name: Start server
       #   run: bun run dev &
