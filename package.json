@@ -13,6 +13,7 @@
     "dev": "vite",
     "serve": "vite prefix",
     "start": "vite preview",
+    "serve-prod": "vite preview --host",
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
