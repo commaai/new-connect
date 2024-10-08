@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 1 
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -38,26 +38,28 @@ jobs:
       #       sleep 1
       #     done
 
+      - name: Build for Lighthouse
+        run: bun run build
+
       - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
         id: lighthouse
-        continue-on-error: true
-        run: |
-          npx @lhci/cli@0.11.x autorun --config=./lighthouserc.json --verbose
-          echo "LHCI_EXIT_CODE=$?" >> $GITHUB_OUTPUT
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
 
       - name: Upload Lighthouse reports
-        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: lighthouse-reports
-          path: .lighthouseci
+          path: ${{ steps.lighthouse.outputs.resultsPath }}
 
       - name: Check Lighthouse CI status
-        if: steps.lighthouse.outputs.LHCI_EXIT_CODE != '0'
-        run: exit 1
-
-      - name: Stop server
-        run: kill $(jobs -p)
+        if: steps.lighthouse.outputs.assertionResults != '[]'
+        run: |
+          echo "Lighthouse CI assertions failed. Check the report for details."
+          exit 1
 
   build:
     runs-on: ubuntu-latest
