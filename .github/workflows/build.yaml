@@ -39,9 +39,22 @@ jobs:
       #     done
 
       - name: Run Lighthouse CI
-        run: npx @lhci/cli@0.11.x autorun --config=./lighthouserc.json
-        env:
-          LHCI_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: lighthouse
+        continue-on-error: true
+        run: |
+          npx @lhci/cli@0.11.x autorun --config=./lighthouserc.json --verbose
+          echo "LHCI_EXIT_CODE=$?" >> $GITHUB_OUTPUT
+
+      - name: Upload Lighthouse reports
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: .lighthouseci
+
+      - name: Check Lighthouse CI status
+        if: steps.lighthouse.outputs.LHCI_EXIT_CODE != '0'
+        run: exit 1
 
       - name: Stop server
         run: kill $(jobs -p)
