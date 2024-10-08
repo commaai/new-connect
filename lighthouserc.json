@@ -1,7 +1,7 @@
 {
     "ci": {
       "collect": {
-        "url": ["http://localhost:3000"],
+        "url": ["http://localhost:4173"],
         "startServerCommand": "bun run serve-prod",
         "numberOfRuns": 1,
         "settings": {
