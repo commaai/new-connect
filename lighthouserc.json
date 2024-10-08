@@ -2,7 +2,7 @@
     "ci": {
       "collect": {
         "url": ["http://localhost:3000"],
-        "startServerCommand": "bun run dev",
+        "startServerCommand": "bun run serve-prod",
         "numberOfRuns": 1,
         "settings": {
           "chromeFlags": "--no-sandbox"
