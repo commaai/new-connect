@@ -25,7 +25,7 @@ jobs:
         run: |
           bun run build --sourcemap true
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
-      - run: ./check-bundle-size.sh
+          ./check-bundle-size.sh
 
       - name: Start server
         run: bun run dev &
