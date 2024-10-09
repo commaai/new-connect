@@ -21,6 +21,7 @@ jobs:
       - run: ./check-lines.sh
 
       - name: Bundle size breakdown
+        continue-on-error: true
         run: |
           bun run build --sourcemap true
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
