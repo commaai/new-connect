@@ -20,23 +20,23 @@ jobs:
       - run: bun run test
       - run: ./check-lines.sh
 
-      # - name: Bundle size breakdown
-      #   run: |
-      #     bun run build --sourcemap true
-      #     node src/ci/dependency_report.cjs dist/ | column -t -s ":"
-      # - run: ./check-bundle-size.sh
+      - name: Bundle size breakdown
+        run: |
+          bun run build --sourcemap true
+          node src/ci/dependency_report.cjs dist/ | column -t -s ":"
+      - run: ./check-bundle-size.sh
 
-      # - name: Start server
-      #   run: bun run dev &
-      #   env:
-      #     PORT: 3000
+      - name: Start server
+        run: bun run dev &
+        env:
+          PORT: 3000
 
-      # - name: Wait for server to start
-      #   run: |
-      #     echo "Waiting for server to start..."
-      #     until curl -s http://localhost:3000 > /dev/null; do
-      #       sleep 1
-      #     done
+      - name: Wait for server to start
+        run: |
+          echo "Waiting for server to start..."
+          until curl -s http://localhost:3000 > /dev/null; do
+            sleep 1
+          done
 
       - name: Build for Lighthouse
         run: bun run build
