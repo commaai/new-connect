@@ -27,6 +27,7 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
+import { useScreen } from '~/utils/window'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -42,11 +43,12 @@ const DashboardDrawer = (props: {
   onClose: () => void
   devices: Device[] | undefined
 }) => {
+  const screen = useScreen()
   return (
     <>
       <TopAppBar
         component="h1"
-        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
+        leading={(screen().mobile() && <IconButton onClick={props.onClose}>arrow_back</IconButton>)}
       >
         comma connect
       </TopAppBar>

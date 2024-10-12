@@ -12,6 +12,7 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
+import { useScreen } from '~/utils/window'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -25,6 +26,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
+  const screen = useScreen()
   const { toggleDrawer } = useContext(DashboardContext)!
 
   const [device] = createResource(() => props.dongleId, getDevice)
@@ -104,7 +106,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar
-        leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+        leading={(screen().mobile() && <IconButton onClick={toggleDrawer}>menu</IconButton>)}
         trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
       >
         {deviceName()}
