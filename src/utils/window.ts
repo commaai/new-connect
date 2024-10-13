@@ -6,6 +6,7 @@ type Dimensions = { width: number; height: number }
 
 const match = (query: string): boolean => {
   if (typeof window === 'undefined') return true
+  if (typeof window.matchMedia !== 'function') return true
   const media = window.matchMedia(query.replace(/^@media( ?)/m, ''))
   return media.matches
 }
