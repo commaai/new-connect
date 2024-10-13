@@ -68,9 +68,9 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
       <main
         style={getContainerStyles()}
-        class="flex-1 absolute inset-y-0 overflow-hidden bg-background transition-drawer duration-500 w-screen">
+        class="flex-1 flex flex-col absolute inset-y-0 overflow-hidden bg-background transition-drawer duration-500 w-screen">
         {props.children}
-        {isMobile() && (<Overlay open={isOpen()} onClose={props.onClose}/>)}
+        {isMobile() && isOpen() && (<Overlay open={isOpen()} onClose={props.onClose}/>)}
       </main>
     </div>
   )
