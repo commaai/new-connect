@@ -11,6 +11,7 @@
   "scripts": {
     "build": "vite build",
     "dev": "vite",
+    "generate-pwa-assets": "npx pwa-asset-generator ./public/images/icon-vector.svg ./public/pwa-assets -m public/manifest.json -i ./index.html --sizes \"72x72,96x96,128x128,144x144,152x152,192x192,384x384,512x512\" --quality 75 --background \"#ffffff\" --padding \"10%\" --platform android,ios --opaque false",
     "serve": "vite prefix",
     "start": "vite preview",
     "serve-prod": "vite preview --host",
