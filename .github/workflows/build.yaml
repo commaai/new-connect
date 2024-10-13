@@ -10,7 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    timeout-minutes: 1 
+    timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
@@ -21,11 +21,10 @@ jobs:
       - run: ./check-lines.sh
 
       - name: Bundle size breakdown
-        continue-on-error: true
         run: |
           bun run build --sourcemap true
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
-          ./check-bundle-size.sh
+      - run: ./check-bundle-size.sh
 
       - name: Start server
         run: bun run dev &
@@ -67,11 +66,8 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
-
       - uses: oven-sh/setup-bun@v1
-
       - run: bun install --frozen-lockfile
-
       - run: bun run build
 
       - name: Upload built project
