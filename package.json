@@ -14,7 +14,7 @@
     "generate-pwa-assets": "npx pwa-asset-generator ./public/images/icon-vector.svg ./public/pwa-assets -m public/manifest.json -i ./index.html --sizes \"72x72,96x96,128x128,144x144,152x152,192x192,384x384,512x512\" --quality 75 --background \"#ffffff\" --padding \"10%\" --platform android,ios --opaque false",
     "serve": "vite prefix",
     "start": "vite preview",
-    "serve-prod": "vite preview --host",
+    "serve-prod": "vite preview --port 4173 | sed -u 's/^/[server] /' & pid=$!; sleep 2; echo 'Server is ready'; wait $pid",
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "prepare": "husky",
     "pre-commit": "bun lint",
