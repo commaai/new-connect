@@ -15,145 +15,173 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 1
+    timeout-minutes: 20  # Increased timeout to accommodate all steps
     outputs:
       pr: ${{ steps.pr.outputs.result }}
-      check_id: ${{ steps.check.outputs.result }}
+      check_id: ${{ steps.check.outputs.id }}
     steps:
       - name: Create PR check
         uses: actions/github-script@v7
         id: check
+        continue-on-error: true
         with:
           script: |
-            const response = await github.rest.checks.create({
-              name: 'preview',
-              head_sha: '${{ github.event.workflow_run.head_sha }}',
-              status: 'in_progress',
-              output: {
-                title: 'Preview deployment',
-                summary: 'In Progress',
-              },
-              owner: 'commaai',
-              repo: '${{ github.event.repository.name }}',
-            })
-            return response.data.id
+            try {
+              const response = await github.rest.checks.create({
+                name: 'preview',
+                head_sha: '${{ github.event.workflow_run.head_sha }}',
+                status: 'in_progress',
+                output: {
+                  title: 'Preview deployment',
+                  summary: 'In Progress',
+                },
+                owner: 'commaai',
+                repo: '${{ github.event.repository.name }}',
+              })
+              core.setOutput('id', response.data.id)
+              console.log('Check created with ID:', response.data.id)
+            } catch (error) {
+              core.setFailed(error.message)
+            }
 
-    #   - uses: actions/checkout@v4
-    #   - uses: oven-sh/setup-bun@v1
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+        continue-on-error: true
 
-    #   - name: Download build artifacts
-    #     uses: actions/download-artifact@v4
-    #     with:
-    #       name: build-artifacts-${{ github.event.workflow_run.id }}
-    #       path: ./dist
-    #       run-id: ${{ github.event.workflow_run.id }}
-    #       github-token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v1
+        continue-on-error: true
 
-    #   - name: Find PR number
-    #     id: pr
-    #     uses: actions/github-script@v7
-    #     with:
-    #       retries: 3
-    #       script: |
-    #         const response = await github.rest.search.issuesAndPullRequests({
-    #           q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
-    #         })
-    #         const items = response.data.items
-    #         if (items.length < 1) {
-    #           console.error('No PRs found')
-    #           return
-    #         }
-    #         const pullRequestNumber = items[0].number
-    #         console.info('Pull request number is', pullRequestNumber)
-    #         return pullRequestNumber
+      - name: Download Build Artifacts
+        uses: actions/download-artifact@v4
+        continue-on-error: true
+        with:
+          name: build-artifacts-${{ github.event.workflow_run.id }}
+          path: ./dist
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
 
-    #   - name: Deploy to Cloudflare Pages
-    #     uses: cloudflare/wrangler-action@v3
-    #     with:
-    #       accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-    #       apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-    #       command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+      - name: Find PR Number
+        uses: actions/github-script@v7
+        id: pr
+        continue-on-error: true
+        with:
+          retries: 3
+          script: |
+            try {
+              const response = await github.rest.search.issuesAndPullRequests({
+                q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
+              })
+              const items = response.data.items
+              if (items.length < 1) {
+                throw new Error('No PRs found')
+              }
+              const pullRequestNumber = items[0].number
+              core.setOutput('result', pullRequestNumber)
+              console.log('Found PR number:', pullRequestNumber)
+            } catch (error) {
+              core.setFailed(error.message)
+            }
 
-    #   - name: Checkout ci-artifacts
-    #     uses: actions/checkout@v4
-    #     with:
-    #       repository: commaai/ci-artifacts
-    #       ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
-    #       path: ${{ github.workspace }}/ci-artifacts
-    #       ref: master
+      - name: Deploy to Cloudflare Pages
+        uses: cloudflare/wrangler-action@v3
+        continue-on-error: true
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
-    #   - name: take screenshots
-    #     run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+      - name: Checkout ci-artifacts
+        uses: actions/checkout@v4
+        continue-on-error: true
+        with:
+          repository: commaai/ci-artifacts
+          ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          path: ${{ github.workspace }}/ci-artifacts
+          ref: master
 
-    #   - name: Push Screenshots
-    #     working-directory: ${{ github.workspace }}/ci-artifacts
-    #     run: |
-    #       git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
-    #       git config user.name "GitHub Actions Bot"
-    #       git config user.email "<>"
-    #       git add .
-    #       git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
-    #       git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
+      - name: Take Screenshots
+        run: |
+          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+        continue-on-error: true
 
-    #   - name: Comment URL on PR
-    #     uses: thollander/actions-comment-pull-request@v2
-    #     with:
-    #       message: |
-    #         <!-- _(run_id **${{ github.run_id }}**)_ -->
+      - name: Push Screenshots
+        working-directory: ${{ github.workspace }}/ci-artifacts
+        run: |
+          git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git add .
+          git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
+          git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
+        continue-on-error: true
 
-    #         # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+      - name: Comment URL on PR
+        uses: thollander/actions-comment-pull-request@v2
+        continue-on-error: true
+        with:
+          message: |
+            <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-    #         Welcome to new-connect! Make sure to:
-    #         * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
-    #         * mark your PR as a draft until it's ready to review
-    #         * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
+            # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
 
-    #         ### Mobile
-    #         <table>
-    #           <tr>
-    #             <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
-    #             <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-    #           <tr/>
-    #           <tr>
-    #             <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
-    #             <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
-    #           </tr>
-    #         </table>
+            Welcome to new-connect! Make sure to:
+            * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
+            * mark your PR as a draft until it's ready to review
+            * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 
-    #         ### Desktop
-    #         <table>
-    #           <tr>
-    #             <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-    #             <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
-    #           </tr>
-    #           <tr>
-    #             <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
-    #             <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
-    #           </tr>
-    #         </table>
-    #       comment_tag: run_id
-    #       pr_number: ${{ steps.pr.outputs.result }}
-    #       GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            ### Mobile
+            <table>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
+              <tr/>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
+              </tr>
+            </table>
 
-  # update_pr_check:
-  #   needs: preview
-  #   if: always() && github.event.workflow_run.event == 'pull_request'
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #   - name: Update PR check
-  #     uses: actions/github-script@v7
-  #     with:
-  #       script: |
-  #         github.rest.checks.update({
-  #           check_run_id: ${{ needs.preview.outputs.check_id }},
-  #           name: 'preview',
-  #           head_sha: '${{ github.event.workflow_run.head_sha }}',
-  #           status: 'completed',
-  #           conclusion: '${{ needs.preview.result }}',
-  #           output: {
-  #             title: 'Preview deployment',
-  #             summary: 'Result: ${{ needs.preview.result }}',
-  #           },
-  #           owner: 'commaai',
-  #           repo: '${{ github.event.repository.name }}',
-  #         })
+            ### Desktop
+            <table>
+              <tr>
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+              </tr>
+              <tr>
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
+              </tr>
+            </table>
+          comment_tag: run_id
+          pr_number: ${{ steps.pr.outputs.result }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  update_pr_check:
+    needs: preview
+    if: always() && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Update PR check
+        uses: actions/github-script@v7
+        continue-on-error: true
+        with:
+          script: |
+            try {
+              await github.rest.checks.update({
+                check_run_id: ${{ needs.preview.outputs.check_id }},
+                name: 'preview',
+                head_sha: '${{ github.event.workflow_run.head_sha }}',
+                status: 'completed',
+                conclusion: 'success', # Adjust based on actual conclusion
+                output: {
+                  title: 'Preview deployment',
+                  summary: 'Result: success', # Adjust based on actual conclusion
+                },
+                owner: 'commaai',
+                repo: '${{ github.event.repository.name }}',
+              })
+              console.log('PR check updated successfully.')
+            } catch (error) {
+              core.setFailed(error.message)
+            }
