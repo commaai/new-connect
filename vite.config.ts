@@ -44,20 +44,20 @@ export default defineConfig({
         {
           name: 'copy-pwa-assets',
           generateBundle() {
-            const pwaAssetsDir = path.resolve(__dirname, 'pwa-assets');
+            const pwaAssetsDir = path.resolve(__dirname, 'pwa-assets')
             if (fs.existsSync(pwaAssetsDir)) {
-              const files = fs.readdirSync(pwaAssetsDir);
+              const files = fs.readdirSync(pwaAssetsDir)
               for (const file of files) {
                 this.emitFile({
                   type: 'asset',
                   fileName: `pwa-assets/${file}`,
-                  source: fs.readFileSync(path.resolve(pwaAssetsDir, file))
-                });
+                  source: fs.readFileSync(path.resolve(pwaAssetsDir, file)),
+                })
               }
             }
-          }
-        }
-      ]
+          },
+        },
+      ],
     },
   },
   resolve: {
