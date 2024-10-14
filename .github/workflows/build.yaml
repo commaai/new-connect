@@ -26,6 +26,9 @@ jobs:
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
       - run: ./check-bundle-size.sh
 
+      - name: Build for Lighthouse
+        run: bun run build
+
       - name: Run Lighthouse CI
         uses: treosh/lighthouse-ci-action@v10
         id: lighthouse
