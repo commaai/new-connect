@@ -19,53 +19,53 @@ jobs:
     outputs:
       pr: ${{ steps.pr.outputs.result }}
       check_id: ${{ steps.check.outputs.result }}
-    steps:
-      - name: Create PR check
-        uses: actions/github-script@v7
-        id: check
-        with:
-          script: |
-            const response = await github.rest.checks.create({
-              name: 'preview',
-              head_sha: '${{ github.event.workflow_run.head_sha }}',
-              status: 'in_progress',
-              output: {
-                title: 'Preview deployment',
-                summary: 'In Progress',
-              },
-              owner: 'commaai',
-              repo: '${{ github.event.repository.name }}',
-            })
-            return response.data.id
+    # steps:
+    #   - name: Create PR check
+    #     uses: actions/github-script@v7
+    #     id: check
+    #     with:
+    #       script: |
+    #         const response = await github.rest.checks.create({
+    #           name: 'preview',
+    #           head_sha: '${{ github.event.workflow_run.head_sha }}',
+    #           status: 'in_progress',
+    #           output: {
+    #             title: 'Preview deployment',
+    #             summary: 'In Progress',
+    #           },
+    #           owner: 'commaai',
+    #           repo: '${{ github.event.repository.name }}',
+    #         })
+    #         return response.data.id
 
-      - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+    #   - uses: actions/checkout@v4
+    #   - uses: oven-sh/setup-bun@v1
 
-      - name: Download build artifacts
-        uses: actions/download-artifact@v4
-        with:
-          name: build-artifacts-${{ github.event.workflow_run.id }}
-          path: ./dist
-          run-id: ${{ github.event.workflow_run.id }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+    #   - name: Download build artifacts
+    #     uses: actions/download-artifact@v4
+    #     with:
+    #       name: build-artifacts-${{ github.event.workflow_run.id }}
+    #       path: ./dist
+    #       run-id: ${{ github.event.workflow_run.id }}
+    #       github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Find PR number
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          retries: 3
-          script: |
-            const response = await github.rest.search.issuesAndPullRequests({
-              q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
-            })
-            const items = response.data.items
-            if (items.length < 1) {
-              console.error('No PRs found')
-              return
-            }
-            const pullRequestNumber = items[0].number
-            console.info('Pull request number is', pullRequestNumber)
-            return pullRequestNumber
+    #   - name: Find PR number
+    #     id: pr
+    #     uses: actions/github-script@v7
+    #     with:
+    #       retries: 3
+    #       script: |
+    #         const response = await github.rest.search.issuesAndPullRequests({
+    #           q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
+    #         })
+    #         const items = response.data.items
+    #         if (items.length < 1) {
+    #           console.error('No PRs found')
+    #           return
+    #         }
+    #         const pullRequestNumber = items[0].number
+    #         console.info('Pull request number is', pullRequestNumber)
+    #         return pullRequestNumber
 
   #     - name: Deploy to Cloudflare Pages
   #       uses: cloudflare/wrangler-action@v3
