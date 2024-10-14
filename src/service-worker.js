@@ -14,8 +14,6 @@ const CACHEABLE_URL_PATTERNS = [
   /\/fonts\.gstatic\.com\//,
 ];
 
-console.log(CACHE_NAME);
-
 self.addEventListener('install', (installEvent) => {
   installEvent.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
