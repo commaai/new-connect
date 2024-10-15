@@ -95,7 +95,7 @@ jobs:
                 summary: 'In Progress',
               },
               owner: context.repo.owner,
-              repo: context.repo.name,
+              repo: context.repo.repo,
             })
             return response.data.id
 
@@ -139,7 +139,7 @@ jobs:
             github.rest.issues.createComment({
               issue_number: context.issue.number,
               owner: context.repo.owner,
-              repo: context.repo.name,
+              repo: context.repo.repo,
               body: `
             <!-- _(run_id **${process.env.GITHUB_RUN_ID}**)_ -->
 
@@ -192,5 +192,5 @@ jobs:
                 summary: 'Completed successfully',
               },
               owner: context.repo.owner,
-              repo: context.repo.name,
+              repo: context.repo.repo,
             })
