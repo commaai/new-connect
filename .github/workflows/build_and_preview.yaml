@@ -1,0 +1,196 @@
+name: Build and Preview
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+
+      - run: bun install --frozen-lockfile
+      - run: timeout 12s bun pre-commit
+      - run: bun run test
+      - run: ./check-lines.sh
+
+      - name: Bundle size breakdown
+        run: |
+          bun run build --sourcemap true
+          node src/ci/dependency_report.cjs dist/ | column -t -s ":"
+      - run: ./check-bundle-size.sh
+
+      - name: Build for Lighthouse
+        run: bun run build
+
+      - name: Run Lighthouse CI
+        uses: treosh/lighthouse-ci-action@v10
+        id: lighthouse
+        with:
+          configPath: './lighthouserc.json'
+          uploadArtifacts: true
+          temporaryPublicStorage: true
+
+      - name: Upload Lighthouse reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: lighthouse-reports
+          path: ${{ steps.lighthouse.outputs.resultsPath }}
+
+      - name: Check Lighthouse CI status
+        if: steps.lighthouse.outputs.assertionResults != '[]'
+        run: |
+          echo "Lighthouse CI assertions failed. Check the report for details."
+          exit 1
+
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v1
+      - run: bun install --frozen-lockfile
+      - run: bun run build
+
+      - name: Upload built project
+        uses: actions/upload-artifact@v4
+        with:
+          path: ./dist
+          overwrite: true
+          retention-days: 1
+          name: build-artifacts-${{ github.run_id }}
+
+      - name: Deploy to Cloudflare Pages
+        if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          command: pages deploy dist --project-name=connect --branch=new-connect --commit-dirty=true
+
+      # Preview steps start here
+      - name: Create PR check
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        id: check
+        with:
+          script: |
+            const response = await github.rest.checks.create({
+              name: 'preview',
+              head_sha: '${{ github.event.pull_request.head.sha }}',
+              status: 'in_progress',
+              output: {
+                title: 'Preview deployment',
+                summary: 'In Progress',
+              },
+              owner: context.repo.owner,
+              repo: context.repo.name,
+            })
+            return response.data.id
+
+      - name: Deploy to Cloudflare Pages (PR)
+        if: github.event_name == 'pull_request'
+        uses: cloudflare/wrangler-action@v3
+        with:
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
+          command: pages deploy dist --project-name=connect --branch=${{ github.event.pull_request.number }} --commit-dirty=true
+
+      - name: Checkout ci-artifacts
+        if: github.event_name == 'pull_request'
+        uses: actions/checkout@v4
+        with:
+          repository: commaai/ci-artifacts
+          ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
+          path: ${{ github.workspace }}/ci-artifacts
+          ref: master
+
+      - name: Take screenshots
+        if: github.event_name == 'pull_request'
+        run: node src/ci/screenshots.cjs https://${{ github.event.pull_request.number }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+
+      - name: Push Screenshots
+        if: github.event_name == 'pull_request'
+        working-directory: ${{ github.workspace }}/ci-artifacts
+        run: |
+          git checkout -b new-connect/pr-${{ github.event.pull_request.number }}
+          git config user.name "GitHub Actions Bot"
+          git config user.email "<>"
+          git add .
+          git commit -m "screenshots for PR #${{ github.event.pull_request.number }}"
+          git push origin new-connect/pr-${{ github.event.pull_request.number }} --force
+
+      - name: Comment URL on PR
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.name,
+              body: `
+            <!-- _(run_id **${process.env.GITHUB_RUN_ID}**)_ -->
+
+            # deployed preview: https://${context.issue.number}.connect-d5y.pages.dev
+
+            Welcome to new-connect! Make sure to:
+            * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
+            * mark your PR as a draft until it's ready to review
+            * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
+
+            ### Mobile
+            <table>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/RouteActivity-mobile.playwright.png"></td>
+              <tr/>
+              <tr>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/SettingsActivity-mobile.playwright.png"></td>
+              </tr>
+            </table>
+
+            ### Desktop
+            <table>
+              <tr>
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/Login-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/RouteActivity-desktop.playwright.png">
+              </tr>
+              <tr>
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/RouteList-desktop.playwright.png">
+                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${context.issue.number}/SettingsActivity-desktop.playwright.png">
+              </tr>
+            </table>
+            `
+            })
+
+      - name: Update PR check
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.checks.update({
+              check_run_id: ${{ steps.check.outputs.result }},
+              name: 'preview',
+              head_sha: '${{ github.event.pull_request.head.sha }}',
+              status: 'completed',
+              conclusion: 'success',
+              output: {
+                title: 'Preview deployment',
+                summary: 'Completed successfully',
+              },
+              owner: context.repo.owner,
+              repo: context.repo.name,
+            })
