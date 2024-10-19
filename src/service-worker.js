@@ -76,10 +76,9 @@ self.addEventListener('fetch', (fetchEvent) => {
   // }
 
 function handleFetchError(error) {
-  // Commenting out no-connection handling as the file might not exist
-  // if (!navigator.onLine) {
-  //   return caches.match('/no-connection.html');
-  // }
+  if (!navigator.onLine) {
+    return caches.match('/no-connection.html');
+  }
   throw error;
 }
 
