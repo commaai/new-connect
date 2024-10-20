@@ -1,61 +1,80 @@
-const SERVICE_WORKER_VERSION = 1;
-const CACHE_NAME = `comma-connect-cache-v${SERVICE_WORKER_VERSION}`;
+function isCloudflareEnvironment() {
+  return typeof caches !== 'undefined' && 'default' in caches;
+}
 
-const STATIC_ASSETS = [
-  '/index.html',
-  '/manifest.json',
-  '/no-connection.html',
-  '/images/icon-256.png',
-];
+console.log('Is Cloudflare environment:', isCloudflareEnvironment());
+console.log('Standard caches.open exists:', typeof caches !== 'undefined' && 'open' in caches);
+console.log('Cloudflare caches.default exists:', typeof caches !== 'undefined' && 'default' in caches);
 
-const CACHEABLE_URL_PATTERNS = [
-  /\/images\/.*\.(png|jpg|svg)$/,
-  /\/fonts\.googleapis\.com\//,
-  /\/fonts\.gstatic\.com\//,
-];
+addEventListener('fetch', event => {
+  event.respondWith(handleRequest(event.request, event))
+})
 
-self.addEventListener('install', (installEvent) => {
-  installEvent.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(STATIC_ASSETS);
-    })
-  );
-});
-
-self.addEventListener('fetch', (fetchEvent) => {
-  if (fetchEvent.request.method !== 'GET') {
-    return;
-  }
-
-  if (shouldCacheUrl(fetchEvent.request.url)) {
-    fetchEvent.respondWith(
-      caches.match(fetchEvent.request).then((cachedResponse) => {
-        if (cachedResponse) {
-          return cachedResponse;
-        }
-        return fetch(fetchEvent.request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
-            const clonedResponse = networkResponse.clone();
-            caches.open(CACHE_NAME).then((cache) => {
-              cache.put(fetchEvent.request, clonedResponse);
-            });
-          }
-          return networkResponse;
-        });
-      }).catch(handleFetchError)
-    );
+async function handleRequest(request, event) {
+  const shouldCache = shouldCacheUrl(request.url)
+  
+  if (shouldCache) {
+    return isCloudflareEnvironment() 
+      ? handleCloudflareRequest(request, event)
+      : handleStandardRequest(request);
   } else {
-    fetchEvent.respondWith(
-      fetch(fetchEvent.request).catch(handleFetchError)
-    );
+    console.log('Not caching, fetching from origin');
+    return fetch(request);
   }
-});
+}
 
-function handleFetchError(error) {
-  return caches.match('/no-connection.html');
+async function handleCloudflareRequest(request, event) {
+  console.log('Using Cloudflare cache');
+  const cache = caches.default;
+  let response = await cache.match(request);
+
+  if (response) {
+    console.log('Cache hit');
+    return response;
+  }
+
+  console.log('Cache miss, fetching from origin');
+  response = await fetch(request);
+
+  if (response.status === 200) {
+    console.log('Caching response in Cloudflare cache');
+    const cacheKey = new Request(request.url, request);
+    const cacheOptions = {
+      expirationTtl: 3600,
+      cacheTags: ['my-tag']
+    };
+    event.waitUntil(cache.put(cacheKey, response.clone(), cacheOptions));
+  }
+
+  return response;
+}
+
+async function handleStandardRequest(request) {
+  console.log('Using standard Cache API');
+  const cachedResponse = await caches.match(request);
+
+  if (cachedResponse) {
+    console.log('Cache hit');
+    return cachedResponse;
+  }
+
+  console.log('Cache miss, fetching from network');
+  const networkResponse = await fetch(request);
+
+  if (networkResponse.status === 200) {
+    console.log('Caching response in standard cache');
+    const cache = await caches.open('my-cache');
+    cache.put(request, networkResponse.clone());
+  }
+
+  return networkResponse;
 }
 
 function shouldCacheUrl(url) {
-  const urlPath = new URL(url).pathname;
-  return CACHEABLE_URL_PATTERNS.some((pattern) => pattern.test(urlPath));
+  return url.endsWith('.jpg') || url.endsWith('.png') || url.endsWith('.css') || url.endsWith('.js');
 }
+
+// Log additional API existence checks
+console.log('event.waitUntil exists:', typeof addEventListener !== 'undefined' && 'waitUntil' in (addEventListener('fetch', e => e) || {}));
+console.log('fetch exists:', typeof fetch !== 'undefined');
+console.log('Request constructor exists:', typeof Request !== 'undefined');
