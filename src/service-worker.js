@@ -52,6 +52,7 @@ self.addEventListener('fetch', (fetchEvent) => {
 });
 
 function handleFetchError(error) {
+  console.log('test');
   // return caches.match('/no-connection.html');
 }
 
