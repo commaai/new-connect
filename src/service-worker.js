@@ -52,7 +52,10 @@ self.addEventListener('fetch', (fetchEvent) => {
 });
 
 function handleFetchError(error) {
-  return caches.match('/no-connection.html');
+  if (!navigator.onLine) {
+    return caches.match('/no-connection.html');
+  }
+  throw error;
 }
 
 function shouldCacheUrl(url) {
