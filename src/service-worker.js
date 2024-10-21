@@ -52,8 +52,9 @@ self.addEventListener('fetch', (fetchEvent) => {
 });
 
 function handleFetchError(error) {
-  console.log('test');
-  // return caches.match('/no-connection.html');
+  console.error(error);
+  console.log({ navigatorOnline: navigator.onLine });
+  return caches.match('/no-connection.html');
 }
 
 function shouldCacheUrl(url) {
