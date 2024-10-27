@@ -51,10 +51,25 @@ self.addEventListener('fetch', (fetchEvent) => {
   }
 });
 
-function handleFetchError(error) {
+async function handleFetchError(error) {
   console.error(error);
   console.log({ navigatorOnline: navigator.onLine });
-  return caches.match('/no-connection.html');
+  try {
+    const cachedResponse = await caches.match('/no-connection.html');
+    if (cachedResponse) {
+      const body = await cachedResponse.blob();
+      return new Response(body, {
+        status: 200,
+        headers: cachedResponse.headers
+      });
+    }
+  } catch (cacheError) {
+    console.error('Cache error:', cacheError);
+    return new Response('An error occurred.', {
+      status: 503,
+      headers: { 'Content-Type': 'text/html' }
+    });
+  }
 }
 
 function shouldCacheUrl(url) {
