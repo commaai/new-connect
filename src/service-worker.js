@@ -52,8 +52,6 @@ self.addEventListener('fetch', (fetchEvent) => {
 });
 
 async function handleFetchError(error) {
-  console.error(error);
-  console.log({ navigatorOnline: navigator.onLine });
   try {
     const cachedResponse = await caches.match('/no-connection.html');
     if (cachedResponse) {

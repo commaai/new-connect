@@ -15,17 +15,14 @@ jobs:
   preview:
     if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 1
     outputs:
       pr: ${{ steps.pr.outputs.result }}
       check_id: ${{ steps.check.outputs.result }}
-      deployment_status: ${{ steps.deploy.outputs.status }}
-      error_message: ${{ steps.deploy.outputs.error_message }}
     steps:
       - name: Create PR check
-        id: check
-        continue-on-error: true
         uses: actions/github-script@v7
+        id: check
         with:
           script: |
             const response = await github.rest.checks.create({
@@ -42,12 +39,9 @@ jobs:
             return response.data.id
 
       - uses: actions/checkout@v4
-        continue-on-error: true
       - uses: oven-sh/setup-bun@v1
-        continue-on-error: true
 
       - name: Download build artifacts
-        continue-on-error: true
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.workflow_run.id }}
@@ -57,7 +51,6 @@ jobs:
 
       - name: Find PR number
         id: pr
-        continue-on-error: true
         uses: actions/github-script@v7
         with:
           retries: 3
@@ -75,33 +68,13 @@ jobs:
             return pullRequestNumber
 
       - name: Deploy to Cloudflare Pages
-        id: deploy
-        continue-on-error: true
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
-      - name: Check deployment status
-        id: check_deploy
-        if: always()
-        run: |
-          if [[ "${{ steps.deploy.outcome }}" == "failure" ]]; then
-            echo "status=failed" >> $GITHUB_OUTPUT
-            if [[ "${{ steps.deploy.outputs.error }}" == *"rate limit"* ]]; then
-              echo "error_message=Deployment failed due to rate limiting. Please try again later." >> $GITHUB_OUTPUT
-            else
-              echo "error_message=Deployment failed. Please check the logs for more information." >> $GITHUB_OUTPUT
-            fi
-          else
-            echo "status=success" >> $GITHUB_OUTPUT
-            echo "error_message=" >> $GITHUB_OUTPUT
-          fi
-
       - name: Checkout ci-artifacts
-        if: steps.check_deploy.outputs.status == 'success'
-        continue-on-error: true
         uses: actions/checkout@v4
         with:
           repository: commaai/ci-artifacts
@@ -109,14 +82,10 @@ jobs:
           path: ${{ github.workspace }}/ci-artifacts
           ref: master
 
-      - name: Take screenshots
-        if: steps.check_deploy.outputs.status == 'success'
-        continue-on-error: true
+      - name: take screenshots
         run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
-        if: steps.check_deploy.outputs.status == 'success'
-        continue-on-error: true
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
           git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
@@ -127,8 +96,6 @@ jobs:
           git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
 
       - name: Comment URL on PR
-        if: steps.check_deploy.outputs.status == 'success'
-        continue-on-error: true
         uses: thollander/actions-comment-pull-request@v2
         with:
           message: |
@@ -174,38 +141,19 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - name: Update PR check
-      continue-on-error: true
       uses: actions/github-script@v7
       with:
         script: |
-          const status = '${{ needs.preview.outputs.deployment_status }}' === 'failed' ? 'failure' : '${{ needs.preview.result }}';
-          const summary = '${{ needs.preview.outputs.deployment_status }}' === 'failed' 
-            ? 'Deployment failed: ${{ needs.preview.outputs.error_message }}'
-            : 'Result: ${{ needs.preview.result }}';
-          
           github.rest.checks.update({
             check_run_id: ${{ needs.preview.outputs.check_id }},
             name: 'preview',
             head_sha: '${{ github.event.workflow_run.head_sha }}',
             status: 'completed',
-            conclusion: status,
+            conclusion: '${{ needs.preview.result }}',
             output: {
               title: 'Preview deployment',
-              summary: summary,
+              summary: 'Result: ${{ needs.preview.result }}',
             },
             owner: 'commaai',
             repo: '${{ github.event.repository.name }}',
-          })
-
-    - name: Comment on PR if deployment failed
-      if: needs.preview.outputs.deployment_status == 'failed'
-      continue-on-error: true
-      uses: actions/github-script@v7
-      with:
-        script: |
-          github.rest.issues.createComment({
-            issue_number: ${{ needs.preview.outputs.pr }},
-            owner: context.repo.owner,
-            repo: context.repo.name,
-            body: '⚠️ Deployment failed: ${{ needs.preview.outputs.error_message }}'
           })

@@ -5,7 +5,7 @@ cd $DIR
 
 gzip -r -9 dist
 
-# Calculate bundle size excluding specific assets
+# Calculate bundle size excluding PWA assets
 BUNDLE_SIZE=$(find dist -type f \
     ! -name "apple-splash-*" \
     ! -name "apple-icon-*" \
