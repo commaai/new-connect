@@ -40,7 +40,7 @@ export const formatDuration = (minutes: number | undefined): string => {
 
 export const getRouteDuration = (route: Route): Duration | undefined => {
   if (!route || !route.end_time) return undefined
-  const startTime = dayjs(route.start_time)
+  const startTime = dayjs(route.start_time ?? route.create_time * 1000)
   const endTime = dayjs(route.end_time)
   return dayjs.duration(endTime.diff(startTime))
 }
