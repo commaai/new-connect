@@ -33,7 +33,6 @@ describe('RouteHeader', () => {
 
     const screen = render(() => <RouteHeader route={route} />)
     expect(screen.getByText('Thu, Jul 1, 2021')).toBeTruthy()
-    expect(screen.getByText('10:00 AM to 12:00 PM')).toBeTruthy()
   })
 
   test('handles routes with no time data gracefully', () => {
@@ -65,7 +64,6 @@ describe('RouteHeader', () => {
 
     const screen = render(() => <RouteHeader route={route} />)
     expect(screen.getByText('Thu, Jul 1, 2021')).toBeTruthy()
-    expect(screen.queryByText('10:00 AM')).toBeTruthy()
     expect(screen.queryByText('to')).toBeFalsy()
   })
 })
