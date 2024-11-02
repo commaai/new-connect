@@ -7,6 +7,10 @@ on:
   pull_request:
   workflow_dispatch:
 
+env:
+  ACTIONS_RUNNER_DEBUG: true
+  ACTIONS_STEP_DEBUG: true
+
 jobs:
   test:
     runs-on: ubuntu-latest
@@ -15,15 +19,36 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
-      - run: bun install --frozen-lockfile
-      - run: timeout 12s bun pre-commit
-      - run: bun run test
-      - run: ./check-lines.sh
-      - name: Bundle size breakdown
+      - name: Install Dependencies
         run: |
+          set -x
+          bun install --frozen-lockfile --verbose
+
+      - name: Run Pre-Commit Hooks
+        run: |
+          set -x
+          timeout 12s bun pre-commit
+
+      - name: Execute Tests
+        run: |
+          set -x
+          bun run test
+
+      - name: Check Code Lines
+        run: |
+          set -x
+          ./check-lines.sh
+
+      - name: Bundle Size Breakdown
+        run: |
+          set -x
           bun run build --sourcemap true
           node src/ci/dependency_report.cjs dist/ | column -t -s ":"
-      - run: ./check-bundle-size.sh
+
+      - name: Verify Bundle Size
+        run: |
+          set -x
+          ./check-bundle-size.sh
 
   build:
     runs-on: ubuntu-latest
@@ -32,10 +57,17 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
-      - run: bun install --frozen-lockfile
-      - run: bun run build
+      - name: Install Dependencies
+        run: |
+          set -x
+          bun install --frozen-lockfile --verbose
 
-      - name: Upload built project
+      - name: Build Project
+        run: |
+          set -x
+          bun run build
+
+      - name: Upload Built Project
         uses: actions/upload-artifact@v4
         with:
           path: ./dist
@@ -49,4 +81,4 @@ jobs:
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=new-connect --commit-dirty=true
+          command: pages deploy dist --project-name=connect --branch=new-connect --commit-dirty=true --verbose
