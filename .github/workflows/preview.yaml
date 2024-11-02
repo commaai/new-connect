@@ -29,7 +29,6 @@ jobs:
         id: check
         with:
           script: |
-            console.log('Creating PR check...')
             const response = await github.rest.checks.create({
               name: 'preview',
               head_sha: '${{ github.event.workflow_run.head_sha }}',
@@ -41,7 +40,6 @@ jobs:
               owner: 'commaai',
               repo: '${{ github.event.repository.name }}',
             })
-            console.log('PR check created with ID:', response.data.id)
             return response.data.id
 
       - uses: actions/checkout@v4
@@ -61,7 +59,6 @@ jobs:
         with:
           retries: 3
           script: |
-            console.log('Searching for PR associated with SHA:', '${{ github.event.workflow_run.head_sha }}')
             const response = await github.rest.search.issuesAndPullRequests({
               q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
             })
@@ -79,7 +76,7 @@ jobs:
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true --verbose
+          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true tail
 
       - name: Checkout CI Artifacts
         uses: actions/checkout@v4
@@ -90,14 +87,11 @@ jobs:
           ref: master
 
       - name: Take Screenshots
-        run: |
-          set -x
-          node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+        run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
-          set -x
           git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
@@ -150,21 +144,20 @@ jobs:
     if: always() && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-      - name: Update PR Check
-        uses: actions/github-script@v7
-        with:
-          script: |
-            console.log('Updating PR check with conclusion:', '${{ needs.preview.result }}')
-            await github.rest.checks.update({
-              check_run_id: ${{ needs.preview.outputs.check_id }},
-              name: 'preview',
-              head_sha: '${{ github.event.workflow_run.head_sha }}',
-              status: 'completed',
-              conclusion: '${{ needs.preview.result }}',
-              output: {
-                title: 'Preview Deployment',
-                summary: 'Result: ${{ needs.preview.result }}',
-              },
-              owner: 'commaai',
-              repo: '${{ github.event.repository.name }}',
-            })
+    - name: Update PR Check
+      uses: actions/github-script@v7
+      with:
+        script: |
+          github.rest.checks.update({
+            check_run_id: ${{ needs.preview.outputs.check_id }},
+            name: 'preview',
+            head_sha: '${{ github.event.workflow_run.head_sha }}',
+            status: 'completed',
+            conclusion: '${{ needs.preview.result }}',
+            output: {
+              title: 'Preview Deployment',
+              summary: 'Result: ${{ needs.preview.result }}',
+            },
+            owner: 'commaai',
+            repo: '${{ github.event.repository.name }}',
+          })
