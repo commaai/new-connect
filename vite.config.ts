@@ -10,17 +10,6 @@ export default defineConfig({
     solid({
       ssr: false,
     }),
-    {
-      name: 'log-server-start',
-      configureServer(server) {
-        server.httpServer?.once('listening', () => {
-          const address = server.httpServer?.address()
-          if (typeof address === 'object' && address !== null) {
-            console.log(`Server listening on port ${address.port}`)
-          }
-        })
-      },
-    },
   ],
   server: {
     port: 3000,
