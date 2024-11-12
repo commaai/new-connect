@@ -113,8 +113,6 @@ jobs:
               <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-              <tr/>
-              <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
