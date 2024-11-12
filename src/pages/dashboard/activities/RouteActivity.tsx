@@ -6,6 +6,8 @@ import {
   type VoidComponent,
 } from 'solid-js'
 
+import dayjs from 'dayjs'
+
 import { getRoute } from '~/api/route'
 
 import IconButton from '~/components/material/IconButton'
@@ -28,7 +30,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
+  const [startTime] = createResource(route, (route) => {
+    if (route?.start_time) {
+      return parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY')
+    }
+    return dayjs(route?.create_time * 1000).format('ddd, MMM D, YYYY')
+  })
 
   return (
     <>

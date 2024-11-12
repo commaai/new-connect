@@ -20,7 +20,7 @@ jobs:
       pr: ${{ steps.pr.outputs.result }}
       check_id: ${{ steps.check.outputs.result }}
     steps:
-      - name: Create PR check
+      - name: Create PR Check
         uses: actions/github-script@v7
         id: check
         with:
@@ -30,8 +30,8 @@ jobs:
               head_sha: '${{ github.event.workflow_run.head_sha }}',
               status: 'in_progress',
               output: {
-                title: 'Preview deployment',
-                summary: 'In Progress',
+                title: 'Preview Deployment',
+                summary: 'Deployment is in progress.',
               },
               owner: 'commaai',
               repo: '${{ github.event.repository.name }}',
@@ -41,7 +41,7 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
-      - name: Download build artifacts
+      - name: Download Build Artifacts
         uses: actions/download-artifact@v4
         with:
           name: build-artifacts-${{ github.event.workflow_run.id }}
@@ -49,7 +49,7 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Find PR number
+      - name: Find PR Number
         id: pr
         uses: actions/github-script@v7
         with:
@@ -60,7 +60,7 @@ jobs:
             })
             const items = response.data.items
             if (items.length < 1) {
-              console.error('No PRs found')
+              console.error('No PRs found for the provided SHA.')
               return
             }
             const pullRequestNumber = items[0].number
@@ -74,7 +74,7 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
 
-      - name: Checkout ci-artifacts
+      - name: Checkout CI Artifacts
         uses: actions/checkout@v4
         with:
           repository: commaai/ci-artifacts
@@ -82,7 +82,7 @@ jobs:
           path: ${{ github.workspace }}/ci-artifacts
           ref: master
 
-      - name: take screenshots
+      - name: Take Screenshots
         run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
@@ -101,7 +101,7 @@ jobs:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-            # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+            # Deployed Preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
 
             Welcome to new-connect! Make sure to:
             * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
@@ -113,7 +113,7 @@ jobs:
               <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-              <tr/>
+              </tr>
               <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
@@ -123,12 +123,12 @@ jobs:
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png"></td>
               </tr>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png"></td>
               </tr>
             </table>
           comment_tag: run_id
@@ -140,7 +140,7 @@ jobs:
     if: always() && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
-    - name: Update PR check
+    - name: Update PR Check
       uses: actions/github-script@v7
       with:
         script: |
@@ -151,7 +151,7 @@ jobs:
             status: 'completed',
             conclusion: '${{ needs.preview.result }}',
             output: {
-              title: 'Preview deployment',
+              title: 'Preview Deployment',
               summary: 'Result: ${{ needs.preview.result }}',
             },
             owner: 'commaai',
