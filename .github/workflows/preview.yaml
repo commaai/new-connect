@@ -113,8 +113,6 @@ jobs:
               <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-              <tr/>
-              <tr>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
                 <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
@@ -123,12 +121,10 @@ jobs:
             ### Desktop
             <table>
               <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png">
-              </tr>
-              <tr>
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png">
-                <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png"></td>
               </tr>
             </table>
           comment_tag: run_id
