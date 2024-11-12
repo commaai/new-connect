@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
+  createMemo,
   createResource,
   createSignal,
   For,
@@ -29,7 +30,9 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    const lastSegmentEndTime = previousPageData.at(-1)!.end_time_utc_millis
+    // if route has no end time, fall back to create_time
+    const lastSegmentEndTime = 
+      previousPageData.at(-1)!.end_time_utc_millis ?? previousPageData.at(-1)!.create_time
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
   const getPage = (page: number): Promise<RouteSegments[]> => {
@@ -38,7 +41,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       pages[page] = new Promise(async (resolve) => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
+        resolve(key ? fetcher<RouteSegments[]>(key) : [])        
       })
     }
     return pages[page]
@@ -65,6 +68,15 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       <For each={pageNumbers()}>
         {(i) => {
           const [routes] = createResource(() => i, getPage)
+          const sortedRoutes = createMemo(() => {
+            const currentRoutes = routes() ?? []
+            // if route doesn't have start time, fall back to create_time
+            return currentRoutes.sort((a, b) => {
+              const startTimeA = a.start_time_utc_millis ?? a.create_time * 1000
+              const startTimeB = b.start_time_utc_millis ?? b.create_time * 1000
+              return startTimeB - startTimeA
+            })
+          })
           return (
             <Suspense
               fallback={
@@ -75,7 +87,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
                 </>
               }
             >
-              <For each={routes()}>
+              <For each={sortedRoutes()}>
                 {(route) => <RouteCard route={route} />}
               </For>
             </Suspense>
