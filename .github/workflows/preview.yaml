@@ -118,7 +118,8 @@ jobs:
               </tr>
             </table>
 
-            ### Desktop
+            <details>
+            <summary> ### Desktop </summary>
             <table>
               <tr>
                 <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png">
@@ -129,6 +130,7 @@ jobs:
                 <img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png">
               </tr>
             </table>
+            </details>
           comment_tag: run_id
           pr_number: ${{ steps.pr.outputs.result }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
