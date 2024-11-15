@@ -26,6 +26,8 @@ bun dev
 
 This project uses pwa-asset-generator to generate PWA assets: https://github.com/elegantapp/pwa-asset-generator. 
 
+Modify our npm generate-pwa-assets script to modify our pwa asset generation settings.
+
 ## Contributing
 
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
