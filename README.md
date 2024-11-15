@@ -24,9 +24,7 @@ bun dev
 
 ## PWA Setup
 
-This project uses pwa-asset-generator to generate PWA assets: https://github.com/elegantapp/pwa-asset-generator. 
-
-Modify our npm generate-pwa-assets script to modify our pwa asset generation settings.
+PWA icons and splash screens are automatically generated using [pwa-asset-generator]([url](https://github.com/elegantapp/pwa-asset-generator)), which also updates the HTML metadata tags accordingly. Asset generation settings can be configured in the generate-pwa-assets script in package.json.
 
 ## Contributing
 
