@@ -24,10 +24,12 @@ bun dev
 
 ## PWA Setup
 
-This project uses pwa-asset-generator to generate PWA assets: https://github.com/elegantapp/pwa-asset-generator. Since these assets aren't saved in the workspace by default, you'll need to generate them before running the PWA locally:
+This project uses pwa-asset-generator to generate PWA assets: https://github.com/elegantapp/pwa-asset-generator. 
 
-```bash 
-npm run pwa-setup
+```
+"generate-pwa-assets": "npx pwa-asset-generator ./public/images/icon-vector.svg ./pwa-assets -m ./public/manifest.json -i ./index.html --sizes \"72x72,96x96,128x128,144x144,152x152,192x192,384x384,512x512\" --quality 75 --padding \"10%\" --platform android,ios --opaque false",
+"move-pwa-assets": "rm -rf ./public/pwa-assets && mv ./pwa-assets ./public/",
+"pwa-setup": "npm run generate-pwa-assets && npm run move-pwa-assets",
 ```
 
 ## Contributing
