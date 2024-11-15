@@ -22,6 +22,14 @@ bun install
 bun dev
 ```
 
+## PWA Setup
+
+The project uses pwa-asset-generator to generate PWA assets: https://github.com/elegantapp/pwa-asset-generator. Since these assets aren't saved in the workspace by default, you'll need to generate them before running the PWA locally:
+
+```bash 
+npm run pwa-setup
+```
+
 ## Contributing
 
 Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
