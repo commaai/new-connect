@@ -1,36 +1,45 @@
-import { Suspense, type VoidComponent } from 'solid-js'
-import dayjs from 'dayjs'
+import { Suspense, type VoidComponent } from "solid-js";
+import dayjs from "dayjs";
 
-import Avatar from '~/components/material/Avatar'
-import Card, { CardContent, CardHeader } from '~/components/material/Card'
-import Icon from '~/components/material/Icon'
-import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
+import Avatar from "~/components/material/Avatar";
+import Card, { CardContent, CardHeader } from "~/components/material/Card";
+import Icon from "~/components/material/Icon";
+import RouteStaticMap from "~/components/RouteStaticMap";
+import RouteStatistics from "~/components/RouteStatistics";
 
-import type { RouteSegments } from '~/types'
+import type { RouteSegments } from "~/types";
 
 const RouteHeader = (props: { route: RouteSegments }) => {
-  const startTime = () => dayjs(props.route.start_time_utc_millis)
-  const endTime = () => dayjs(props.route.end_time_utc_millis)
+  const startTime = () => dayjs(props.route.start_time_utc_millis);
+  const endTime = () => dayjs(props.route.end_time_utc_millis);
 
-  const headline = () => startTime().format('ddd, MMM D, YYYY')
-  const subhead = () => `${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`
+  const headline = () => startTime().format("ddd, MMM D, YYYY");
+  const subhead = () =>
+    `${startTime().format("h:mm A")} to ${endTime().format("h:mm A")}`;
 
   return (
-    <CardHeader
-      headline={headline()}
-      subhead={subhead()}
-      leading={
-        <Avatar>
-          <Icon>directions_car</Icon>
-        </Avatar>
-      }
-    />
-  )
-}
+    <>
+      {props.route.start_time_utc_millis ? (
+        <CardHeader
+          headline={headline()}
+          subhead={subhead()}
+          leading={
+            <>
+              <Avatar>
+                <Icon>directions_car</Icon>
+              </Avatar>
+            </>
+          }
+        />
+      ) : (
+        <div class="flex h-[10px] items-center gap-4 px-4 py-3" />
+      )}
+    </>
+  );
+};
 
 interface RouteCardProps {
-  route: RouteSegments
+  route: RouteSegments;
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
@@ -50,7 +59,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         <RouteStatistics route={props.route} />
       </CardContent>
     </Card>
-  )
-}
+  );
+};
 
-export default RouteCard
+export default RouteCard;
