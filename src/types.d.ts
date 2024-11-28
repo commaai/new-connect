@@ -46,7 +46,7 @@ export interface DrivingStatistics {
 
 export interface DeviceUser {
   email: string;
-  permission: "read_access" | "owner";
+  permission: 'read_access' | 'owner';
 }
 
 export interface Route extends ApiResponseBase {
@@ -94,7 +94,7 @@ export interface RouteShareSignature extends Record<string, string> {
 export interface RouteSegments extends Route {
   end_time_utc_millis?: number;
   is_preserved: boolean;
-  share_exp: RouteShareSignature["exp"];
-  share_sig: RouteShareSignature["sig"];
+  share_exp: RouteShareSignature['exp'];
+  share_sig: RouteShareSignature['sig'];
   start_time_utc_millis?: number;
 }
