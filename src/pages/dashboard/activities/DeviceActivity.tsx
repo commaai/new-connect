@@ -1,4 +1,10 @@
-import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
+import {
+  createResource,
+  Suspense,
+  useContext,
+  createSignal,
+  For,
+} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -14,7 +20,7 @@ import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
 
 type DeviceActivityProps = {
-  dongleId: string
+  dongleId: string;
 }
 
 interface SnapshotResponse {
@@ -30,9 +36,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
   const [snapshot, setSnapshot] = createSignal<{
-    error: string | null
-    fetching: boolean
-    images: string[]
+    error: string | null;
+    fetching: boolean;
+    images: string[];
   }>({
     error: null,
     fetching: false,
@@ -62,7 +68,8 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
 
-      const resp: SnapshotResponse = (await response.json()) as SnapshotResponse
+      const resp: SnapshotResponse =
+        (await response.json()) as SnapshotResponse
       const images = []
 
       if (resp.result?.jpegFront) images.push(resp.result.jpegFront)
@@ -73,7 +80,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       } else {
         throw new Error('No images found.')
       }
-
     } catch (err) {
       let error = (err as Error).message
       if (error.includes('Device not registered')) {
@@ -105,7 +111,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     <>
       <TopAppBar
         leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-        trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
+        trailing={
+          <IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>
+        }
       >
         {deviceName()}
       </TopAppBar>
@@ -120,7 +128,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </Suspense>
             </div>
             <div class="flex p-4">
-              <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
+              <IconButton onClick={() => void takeSnapshot()}>
+                camera
+              </IconButton>
             </div>
           </div>
         </div>
@@ -129,10 +139,23 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
                 <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
+                  <img
+                    src={`data:image/jpeg;base64,${image}`}
+                    alt={`Device Snapshot ${index() + 1}`}
+                  />
                   <div class="absolute right-4 top-4 p-4">
-                    <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
-                    <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
+                    <IconButton
+                      onClick={() => downloadSnapshot(image, index())}
+                      class="text-white"
+                    >
+                      download
+                    </IconButton>
+                    <IconButton
+                      onClick={() => clearImage(index())}
+                      class="text-white"
+                    >
+                      clear
+                    </IconButton>
                   </div>
                 </div>
               </div>
@@ -148,13 +171,15 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           {snapshot().error && (
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
               <div class="flex items-center p-4">
-                <IconButton onClick={clearError} class="text-white">Clear</IconButton>
+                <IconButton onClick={clearError} class="text-white">
+                  Clear
+                </IconButton>
                 <span>Error: {snapshot().error}</span>
               </div>
             </div>
           )}
         </div>
-        <div class="flex flex-col gap-2">
+        <div class="flex flex-col gap-4">
           <span class="text-label-sm">Routes</span>
           <RouteList dongleId={props.dongleId} />
         </div>
