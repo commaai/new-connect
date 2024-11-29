@@ -18,14 +18,15 @@ import Button from '~/components/material/Button'
 const PAGE_SIZE = 3
 
 type RouteListProps = {
-  class?: string
-  dongleId: string
+  class?: string;
+  dongleId: string;
 }
 
 const pages: Promise<RouteSegments[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
+  const endpoint = () =>
+    `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
@@ -56,36 +57,38 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   const pageNumbers = () => Array.from(Array(size()).keys())
 
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
-    >
-      <For each={pageNumbers()}>
-        {(i) => {
-          const [routes] = createResource(() => i, getPage)
-          return (
-            <Suspense
-              fallback={
-                <>
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                </>
-              }
-            >
-              <For each={routes()}>
-                {(route) => <RouteCard route={route} />}
-              </For>
-            </Suspense>
-          )
-        }}
-      </For>
+    <>
+      <div
+        class={clsx(
+          'flex w-full flex-wrap justify-center justify-items-stretch gap-2',
+          props.class,
+        )}
+      >
+        <For each={pageNumbers()}>
+          {(i) => {
+            const [routes] = createResource(() => i, getPage)
+            return (
+              <Suspense
+                fallback={
+                  <>
+                    <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md rounded-lg bg-surface-container-low" />
+                    <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+                    <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+                  </>
+                }
+              >
+                <For each={routes()}>
+                  {(route) => <RouteCard route={route} />}
+                </For>
+              </Suspense>
+            )
+          }}
+        </For>
+      </div>
       <div class="flex justify-center">
         <Button onClick={onLoadMore}>Load more</Button>
       </div>
-    </div>
+    </>
   )
 }
 
