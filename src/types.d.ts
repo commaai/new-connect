@@ -26,6 +26,8 @@ export interface Device extends ApiResponseBase {
   openpilot_version: string
   sim_id: string
   sim_type: number
+  last_gps_lat: number | null
+  last_gps_lng: number | null
   eligible_features: {
     prime: boolean
     prime_data: boolean

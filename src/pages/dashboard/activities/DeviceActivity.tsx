@@ -1,4 +1,4 @@
-import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
+import { createResource, Suspense, useContext, createSignal, For, Switch, Match } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -12,6 +12,7 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
+import DeviceLocation from '~/components/DeviceLocation'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -111,6 +112,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
+          <Switch>
+            <Match when={device() && deviceName()}>
+              <DeviceLocation device={device()!} deviceName={deviceName()!} />
+            </Match>
+            <Match when={true}>
+              <div class="skeleton-loader size-full" />
+            </Match>
+          </Switch>
           <div class="flex">
             <div class="flex-auto">
               <Suspense fallback={<div class="skeleton-loader size-full" />}>
