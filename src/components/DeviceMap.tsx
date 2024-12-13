@@ -79,13 +79,12 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
 
     locateUser()
 
-    setTimeout(() => {
-      requestAnimationFrame(() => {
-        mapInstance?.whenReady(() => {
-          mapInstance?.invalidateSize()
-        })
+    // Bug in leaflet that won't load tiles initially without a timeout invalidate cache
+    setTimeout(function () {
+      mapInstance?.whenReady(() => {
+        mapInstance?.invalidateSize()
       })
-    }, 100)
+    }, 700)
 
     const handleResize = () => mapInstance?.invalidateSize()
     window.addEventListener('resize', handleResize)

@@ -14,6 +14,14 @@ export function getDeviceLastSeen(device: Device) {
   return 'Never'
 }
 
+class EsriAddress {
+  Match_addr?: string
+}
+
+class EsriGeocodeResponse {
+  address?: EsriAddress
+}
+
 export async function reverseGeocode (lat: number, lng: number) {
   const response = await fetch(
     `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=${lng},${lat}&f=json`,
@@ -23,7 +31,7 @@ export async function reverseGeocode (lat: number, lng: number) {
     throw new Error(`Error fetching address: ${response.status}`)
   }
 
-  const data: {address: {Match_addr: string}} = await response.json()
+  const data: EsriGeocodeResponse = await response.json() as EsriGeocodeResponse
   return data.address?.Match_addr || 'Unknown address'
 }
 

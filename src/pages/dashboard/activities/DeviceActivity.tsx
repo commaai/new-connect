@@ -1,9 +1,9 @@
-import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
+import type {VoidComponent} from 'solid-js'
+import {createResource, createSignal, For, Suspense, useContext} from 'solid-js'
 
-import { getDevice } from '~/api/devices'
-import { ATHENA_URL } from '~/api/config'
-import { getAccessToken } from '~/api/auth/client'
+import {getDevice} from '~/api/devices'
+import {ATHENA_URL} from '~/api/config'
+import {getAccessToken} from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -12,7 +12,7 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 import {getDeviceLastSeen, getDeviceName, reverseGeocode} from '~/utils/device'
 
 import RouteList from '../components/RouteList'
-import { DashboardContext } from '../Dashboard'
+import {DashboardContext} from '../Dashboard'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -26,7 +26,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const { toggleDrawer } = useContext(DashboardContext)!
+  const {toggleDrawer} = useContext(DashboardContext)!
 
   const [isInfoVisible, setInfoVisible] = createSignal(false)
   const [device] = createResource(() => props.dongleId, getDevice)
@@ -35,7 +35,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [deviceAddress] = createResource(
     () =>
       device() && device()?.last_gps_lat && device()?.last_gps_lng
-        ? { lat: device()!.last_gps_lat, lng: device()!.last_gps_lng }
+        ? {lat: device()!.last_gps_lat, lng: device()!.last_gps_lng}
         : null,
     (coords) => reverseGeocode(coords.lat, coords.lng),
   )
@@ -160,12 +160,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                 </div>
               )}
             </div>
-
-            <Suspense fallback={<div class="skeleton-loader size-full"/>}>
-              <div class="p-4">
+            <div class="flex items-center justify-between p-4">
+              <Suspense fallback={<div class="skeleton-loader size-full"/>}>
                 <DeviceStatistics dongleId={props.dongleId}/>
-              </div>
-            </Suspense>
+              </Suspense>
+              <IconButton onClick={() => void takeSnapshot()} class="ml-4">camera</IconButton>
+            </div>
           </div>
         </div>
         <div class="flex flex-col gap-2">
