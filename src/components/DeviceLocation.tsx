@@ -65,6 +65,7 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
     map: map(),
     device: props.device,
     deviceName: props.deviceName,
+    locationPermission: locationPermission(),
   }), async (args) => {
     if (!args.map) {
       return []
@@ -86,7 +87,6 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
     }
 
     const permission = await navigator.permissions.query({ name: 'geolocation' })
-
     if (permission.state === 'granted') {
       const position = await getUserPosition().catch(() => null)
 
