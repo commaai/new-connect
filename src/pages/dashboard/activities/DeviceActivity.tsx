@@ -126,7 +126,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <div class="relative h-64">
               <Suspense fallback={<div class="skeleton-loader size-full bg-surface"/>}>
                 <DeviceMap
-                  center={[-122.4194, 37.7749]}
+                  center={[37.7749, -122.4194]}
                   zoom={12}
                   device={device}
                   onMapClick={() => setInfoVisible(true)}

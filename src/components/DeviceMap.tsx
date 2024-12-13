@@ -25,7 +25,6 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
   let mapContainer: HTMLDivElement | undefined
   let mapInstance: L.Map | undefined
   let locationMarker: L.CircleMarker | undefined
-  let deviceMarker: L.Marker | undefined
 
   const getTileUrl = () => {
     const themeId = getThemeId()
@@ -81,7 +80,7 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
       mapInstance?.whenReady(() => {
         mapInstance?.invalidateSize()
       })
-    }, 700)
+    }, 500)
 
     const handleResize = () => mapInstance?.invalidateSize()
     window.addEventListener('resize', handleResize)
@@ -136,7 +135,7 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
       iconAnchor: [20, 20],
     })
 
-    deviceMarker = L.marker([location.lat, location.lng], {icon: customIcon})
+    L.marker([location.lat, location.lng], {icon: customIcon})
       .addTo(map)
       .on('click', () => props.onMapClick?.())
   }
