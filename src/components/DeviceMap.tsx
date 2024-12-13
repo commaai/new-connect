@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import { MAPBOX_USERNAME, MAPBOX_TOKEN, MAPBOX_LIGHT_STYLE_ID, MAPBOX_DARK_STYLE_ID } from '~/map/config'
 import { getThemeId } from '~/theme'
 import { Device } from '~/types'
+import Icon from '~/components/material/Icon'
 
 type MapComponentProps = {
   center: [number, number]
@@ -45,9 +46,7 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
         weight: 2,
       }).addTo(mapInstance)
     }
-    if (!deviceMarker) {
-      mapInstance.setView([lat, lng], props.zoom)
-    }
+    mapInstance.setView([lat, lng], props.zoom)
   }
 
   const locateUser = () => {
@@ -76,8 +75,6 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
       tileSize: 512,
       zoomOffset: -1,
     }).addTo(mapInstance)
-
-    locateUser()
 
     // Bug in leaflet that won't load tiles initially without a timeout invalidate cache
     setTimeout(function () {
@@ -139,19 +136,27 @@ const DeviceMap: VoidComponent<MapComponentProps> = (props) => {
       iconAnchor: [20, 20],
     })
 
-    deviceMarker = L.marker([location.lat, location.lng], { icon: customIcon })
+    deviceMarker = L.marker([location.lat, location.lng], {icon: customIcon})
       .addTo(map)
       .on('click', () => props.onMapClick?.())
   }
 
   return (
-    <div
-      class={clsx(
-        'relative z-10 flex size-full max-h-[400px] overflow-hidden rounded-lg',
-        props.class,
-      )}
-      ref={mapContainer}
-    />
+    <div class="relative size-full">
+      <div
+        class={clsx(
+          'relative z-10 flex size-full max-h-[400px] overflow-hidden rounded-lg',
+          props.class,
+        )}
+        ref={mapContainer}
+      />
+      <button
+        class="absolute right-2 top-2 z-10 rounded-full bg-blue-500 p-2 text-white shadow-md transition  hover:bg-blue-600"
+        onClick={() => locateUser()}
+      >
+        <Icon>my_location</Icon>
+      </button>
+    </div>
   )
 }
 

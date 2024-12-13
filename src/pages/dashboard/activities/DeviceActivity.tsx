@@ -7,12 +7,13 @@ import {getAccessToken} from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
-import DeviceMap from '~/components/DeviceMap'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import {getDeviceLastSeen, getDeviceName, reverseGeocode} from '~/utils/device'
+import {getDeviceLastSeen, getDeviceName} from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import {DashboardContext} from '../Dashboard'
+import {openCoordinates, reverseGeocode} from '~/map'
+import DeviceMap from '~/components/DeviceMap'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -144,7 +145,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                     ✕
                   </button>
                   <a
-                    href={`geo:${device()?.last_gps_lat},${device()?.last_gps_lng}`}
+                    onClick={() => openCoordinates(device()!.last_gps_lat, device()!.last_gps_lng)}
                     class="absolute right-4 top-2 rounded-full bg-primary px-4 py-2 text-sm text-on-primary shadow"
                     target="_blank"
                     rel="noopener noreferrer"
