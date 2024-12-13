@@ -18,10 +18,10 @@ type Location = {
   address: string | null
 }
 
-const THE_GUNDO: [number, number] = [33.9153, 118.4041]
+const THE_GUNDO: [number, number] = [33.9192, -118.4165]
 
 const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (props) => {
-  let mapContainer!: HTMLDivElement
+  let mapRef!: HTMLDivElement
 
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
@@ -36,34 +36,37 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
     const tileLayer = L.tileLayer(
       `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`,
     )
-    const instance = L.map(
-      mapContainer,
+
+    const m = L.map(
+      mapRef,
       {
         attributionControl: false,
         zoomControl: false,
         layers: [tileLayer],
       },
     )
-    instance.setView(THE_GUNDO, 10)
-    instance.on('click', () => setSelectedLocation(null))
+    m.setView(THE_GUNDO, 10)
+    m.on('click', () => setSelectedLocation(null))
+
+    setMap(m)
 
     // fix: leaflet sometimes misses resize events
     // and leaves unrendered gray tiles
-    const observer = new ResizeObserver(() => instance.invalidateSize())
-    observer.observe(mapContainer)
-    onCleanup(() => observer.disconnect())
+    const observer = new ResizeObserver(() => m.invalidateSize())
+    observer.observe(mapRef)
 
-    setMap(instance)
+    onCleanup(() => {
+      observer.disconnect()
+      m.remove()
+    })
   })
 
   const [locationData] = createResource(() => ({
-    map,
+    map: map(),
     device: props.device,
     deviceName: props.deviceName,
-    locationPermission,
   }), async (args) => {
-    const _map = args.map()
-    if (!_map) {
+    if (!args.map) {
       return []
     }
 
@@ -78,11 +81,13 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
         address,
       }
 
-      addMarker(_map, deviceLoc, 'directions_car')
+      addMarker(args.map, deviceLoc, 'directions_car')
       foundLocations.push(deviceLoc)
     }
 
-    if (args.locationPermission() === 'granted') {
+    const permission = await navigator.permissions.query({ name: 'geolocation' })
+
+    if (permission.state === 'granted') {
       const position = await getUserPosition().catch(() => null)
 
       if (position) {
@@ -94,15 +99,15 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
           address: addr,
         }
 
-        addMarker(_map, userLoc, 'person', 'bg-primary')
+        addMarker(args.map, userLoc, 'person', 'bg-primary')
         foundLocations.push(userLoc)
       }
     }
 
     if (foundLocations.length > 1) {
-      _map.fitBounds(L.latLngBounds(foundLocations.map(l => [l.lat, l.lng])), { padding: [50, 50] })
+      args.map.fitBounds(L.latLngBounds(foundLocations.map(l => [l.lat, l.lng])), { padding: [50, 50] })
     } else if (foundLocations.length === 1) {
-      _map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
+      args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
     } else {
       throw new Error('Location unavailable')
     }
@@ -146,7 +151,7 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
 
   return (
     <div class="relative">
-      <div ref={mapContainer} class="h-[200px] w-full !bg-surface-container-low" />
+      <div ref={mapRef} class="h-[200px] w-full !bg-surface-container-low" />
 
       <Show when={locationPermission() !== 'granted'}>
         <div class="absolute bottom-2 right-2 z-[9999]">
@@ -154,7 +159,7 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
             title="Show your current location"
             color="secondary"
             class="bg-surface-container-low text-on-surface-variant"
-            onClick={() => void requestLocation()}
+            onClick={() => void requestLocation().catch(() => null)}
             trailing={<span class="pr-2 text-sm">Show my location</span>}
           >
             <Icon size="20">my_location</Icon>
@@ -171,8 +176,8 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
 
       <Show when={(locationData.error as Error)?.message}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
-          <Icon class="mr-2 text-red-500">error</Icon>
-          <span class="text-sm text-red-500">{(locationData.error as Error).message}</span>
+          <Icon class="mr-2" size="20">error</Icon>
+          <span class="text-sm">{(locationData.error as Error).message}</span>
         </div>
       </Show>
 
