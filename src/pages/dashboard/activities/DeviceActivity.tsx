@@ -7,8 +7,9 @@ import { getAccessToken } from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import DeviceMap from '~/components/DeviceMap'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import { getDeviceName } from '~/utils/device'
+import {getDeviceLastSeen, getDeviceName, reverseGeocode} from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
@@ -27,8 +28,17 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const { toggleDrawer } = useContext(DashboardContext)!
 
+  const [isInfoVisible, setInfoVisible] = createSignal(false)
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
+  const [deviceLastSeen] = createResource(device, getDeviceLastSeen)
+  const [deviceAddress] = createResource(
+    () =>
+      device() && device()?.last_gps_lat && device()?.last_gps_lng
+        ? { lat: device()!.last_gps_lat, lng: device()!.last_gps_lng }
+        : null,
+    (coords) => reverseGeocode(coords.lat, coords.lng),
+  )
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -111,17 +121,51 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <div class="flex">
-            <div class="flex-auto">
-              <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                <div class="p-4">
-                  <DeviceStatistics dongleId={props.dongleId} />
-                </div>
+          <div class="relative flex flex-col gap-4 p-4">
+            <div class="relative h-64">
+              <Suspense fallback={<div class="skeleton-loader size-full bg-surface"/>}>
+                <DeviceMap
+                  center={[-122.4194, 37.7749]}
+                  zoom={12}
+                  device={device}
+                  onMapClick={() => setInfoVisible(true)}
+                  class="z-0"
+                />
               </Suspense>
+
+              {isInfoVisible() && (
+                <div
+                  class="pointer-events-auto absolute bottom-4 left-1/2 z-10 w-full max-w-[95%] -translate-x-1/2 rounded-lg bg-surface-container-low p-4 shadow-md"
+                >
+                  <button
+                    class="absolute left-0 top-0 flex size-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-gray-800 text-white"
+                    onClick={() => setInfoVisible(false)}
+                  >
+                    ✕
+                  </button>
+                  <a
+                    href={`geo:${device()?.last_gps_lat},${device()?.last_gps_lng}`}
+                    class="absolute right-4 top-2 rounded-full bg-primary px-4 py-2 text-sm text-on-primary shadow"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Open in Maps
+                  </a>
+
+                  <div class="text-left">
+                    <h3 class="text-lg font-bold">{deviceName()}</h3>
+                    <p class="text-gray-500">{deviceLastSeen()}</p>
+                    <p class="text-secondary">{deviceAddress()}</p>
+                  </div>
+                </div>
+              )}
             </div>
-            <div class="flex p-4">
-              <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
-            </div>
+
+            <Suspense fallback={<div class="skeleton-loader size-full"/>}>
+              <div class="p-4">
+                <DeviceStatistics dongleId={props.dongleId}/>
+              </div>
+            </Suspense>
           </div>
         </div>
         <div class="flex flex-col gap-2">
@@ -129,9 +173,10 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
                 <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
+                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`}/>
                   <div class="absolute right-4 top-4 p-4">
-                    <IconButton onClick={() => downloadSnapshot(image, index())} class="text-white">download</IconButton>
+                    <IconButton onClick={() => downloadSnapshot(image, index())}
+                      class="text-white">download</IconButton>
                     <IconButton onClick={() => clearImage(index())} class="text-white">clear</IconButton>
                   </div>
                 </div>
@@ -156,7 +201,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         </div>
         <div class="flex flex-col gap-2">
           <span class="text-label-sm">Routes</span>
-          <RouteList dongleId={props.dongleId} />
+          <RouteList dongleId={props.dongleId}/>
         </div>
       </div>
     </>
