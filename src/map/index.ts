@@ -28,6 +28,41 @@ function prepareCoords(coords: Coords, sampleSize: number): Coords {
   return sample
 }
 
+export function openCoordinates(latitude: number, longitude: number) {
+  const isAppleDevice = /iPhone|iPad|iPod|Macintosh/.test(navigator.userAgent)
+  let mapUrl
+
+  if (isAppleDevice) {
+    mapUrl = `https://maps.apple.com/?ll=${latitude},${longitude}`
+  } else {
+    mapUrl = `https://www.google.com/maps?q=${latitude},${longitude}`
+  }
+
+  window.open(mapUrl, '_blank')
+}
+
+
+class EsriAddress {
+  Match_addr?: string
+}
+
+class EsriGeocodeResponse {
+  address?: EsriAddress
+}
+
+export async function reverseGeocode (lat: number, lng: number) {
+  const response = await fetch(
+    `https://geocode.arcgis.com/arcgis/rest/services/World/GeocodeServer/reverseGeocode?location=${lng},${lat}&f=json`,
+  )
+
+  if (!response.ok) {
+    throw new Error(`Error fetching address: ${response.status}`)
+  }
+
+  const data: EsriGeocodeResponse = await response.json() as EsriGeocodeResponse
+  return data.address?.Match_addr || 'Unknown address'
+}
+
 // TODO: get path colour from theme
 export function getPathStaticMapUrl(
   themeId: string,
