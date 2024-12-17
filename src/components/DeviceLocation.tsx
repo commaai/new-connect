@@ -109,7 +109,7 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
     } else if (foundLocations.length === 1) {
       args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
     } else {
-      throw new Error('Location unavailable')
+      throw new Error('Offline')
     }
 
     return foundLocations
@@ -159,7 +159,7 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
             title="Show your current location"
             color="secondary"
             class="bg-surface-container-low text-on-surface-variant"
-            onClick={() => void requestLocation().catch(() => null)}
+            onClick={() => void requestLocation()}
             trailing={<span class="pr-2 text-sm">Show my location</span>}
           >
             <Icon size="20">my_location</Icon>
