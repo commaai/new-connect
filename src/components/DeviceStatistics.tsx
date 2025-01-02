@@ -15,18 +15,18 @@ const DeviceStatistics: VoidComponent<DeviceStatisticsProps> = (props) => {
   const allTime = () => statistics()?.all
 
   return (
-    <div class={clsx('flex h-10 w-full gap-8', props.class)}>
-      <div class="flex flex-col justify-between">
+    <div class={clsx('flex h-10 w-full', props.class)}>
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Distance</span>
         <span class="font-mono text-label-lg uppercase">{formatDistance(allTime()?.distance)}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Duration</span>
         <span class="font-mono text-label-lg uppercase">{formatDuration(allTime()?.minutes)}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Routes</span>
         <span class="font-mono text-label-lg uppercase">{allTime()?.routes ?? 0}</span>
       </div>

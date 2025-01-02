@@ -111,15 +111,11 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <div class="flex">
-            <div class="flex-auto">
-              <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                <div class="p-4">
-                  <DeviceStatistics dongleId={props.dongleId} />
-                </div>
-              </Suspense>
-            </div>
-            <div class="flex p-4">
+          <div class="m-4 flex">
+            <Suspense fallback={<div class="skeleton-loader size-full" />}>
+              <DeviceStatistics dongleId={props.dongleId} />
+            </Suspense>
+            <div class="flex items-center">
               <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
             </div>
           </div>
