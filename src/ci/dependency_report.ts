@@ -11,6 +11,7 @@ for (const mapFile of mapFiles) {
   const assetFile = mapFile.replace(extension, '')
   const sources = mapFileData.sources.filter(source => source.includes('node_modules')).map(source => source.split('node_modules/')[1])
   report.push({ 'asset': assetFile, 'size': fs.statSync(dir + assetFile).size, 'sources': sources})
+  fs.unlinkSync(dir + mapFile)
 }
 report.sort((b, a) => a.size - b.size).forEach(entry => {
   console.log(entry.asset + ':' + (entry.size / 1024).toFixed(2) + 'KB')
