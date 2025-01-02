@@ -22,7 +22,7 @@ jobs:
       - name: Bundle size breakdown
         run: |
           bun run build --sourcemap true
-          node src/ci/dependency_report.cjs dist/ | column -t -s ":"
+          bun src/ci/dependency_report.ts dist/ | column -t -s ":"
       - run: ./check-bundle-size.sh
 
   build:
