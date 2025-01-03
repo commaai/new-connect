@@ -151,16 +151,28 @@ const generateTimelineEvents = (
         lastAlert = ev
       }
 
-      if (lastOverride && !isOverriding(ev.data.state)) {
+      if (isOverriding(state)) {
+        if (lastEngaged) {
+          res.push({
+            type: 'engaged',
+            route_offset_millis: lastEngaged.route_offset_millis,
+            end_route_offset_millis: ev.route_offset_millis,
+          } as EngagedTimelineEvent)
+          lastEngaged = undefined
+        }
+        if (!lastOverride) {
+          lastOverride = ev
+        }
+      } else if (lastOverride) {
         res.push({
           type: 'overriding',
           route_offset_millis: lastOverride.route_offset_millis,
           end_route_offset_millis: ev.route_offset_millis,
         } as OverridingTimelineEvent)
         lastOverride = undefined
-      }
-      if (!lastOverride && isOverriding(state)) {
-        lastOverride = ev
+        if (enabled) {
+          lastEngaged = ev
+        }
       }
     } else if (ev.type === 'user_flag') {
       res.push({
