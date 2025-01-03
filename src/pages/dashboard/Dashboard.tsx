@@ -18,7 +18,6 @@ import type { Device } from '~/types'
 
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
-import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
@@ -53,15 +52,16 @@ const DashboardDrawer = (props: {
       <h2 class="mx-4 mb-2 text-label-sm">
         Devices
       </h2>
-      <Show when={props.devices} keyed>
-        {devices => <DeviceList class="p-2" devices={devices} />}
-      </Show>
-      <div class="grow" />
-      <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={props.onClose}>
-        Add new device
-      </Button>
-      <hr class="mx-4 opacity-20" />
-      <Button class="m-4" color="error" href="/logout">Sign out</Button>
+      <hr class="opacity-20" />
+      <div class="hide-scrollbar mx-2 grow overflow-y-auto pt-2">
+        <Show when={props.devices} keyed>
+          {devices => <DeviceList devices={devices} />}
+        </Show>
+      </div>
+      <hr class="opacity-20" />
+      <div class="p-4">
+        <Button class="w-full" href="/logout">Sign out</Button>
+      </div>
     </>
   )
 }
