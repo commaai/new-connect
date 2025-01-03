@@ -14,13 +14,14 @@ async function takeScreenshots(deviceType: string, context: BrowserContext) {
   const page = await context.newPage()
   for (const [route, path] of Object.entries(endpoints)) {
     await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' })
-    await page.waitForTimeout(2000)
+    await page.waitForTimeout(1500)
     await page.screenshot({ path: `${outDir}/${route}-${deviceType}.playwright.png` })
     console.log(`${route}-${deviceType}.playwright.png`)
 
     if (route === 'Login') {
       await page.click('button:has-text(\'Try the demo\')')
       await page.waitForLoadState('networkidle')
+      await page.waitForTimeout(375)
     }
   }
   await page.close()
