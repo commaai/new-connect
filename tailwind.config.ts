@@ -197,7 +197,8 @@ export default {
         },
       },
       screens: {
-        xs: '425px',
+        // Larger screen phones (iPhone Pro/Max, Galaxy Ultra, Pixel XL/Pro...)
+        xs: '411px',
       },
       animation: {
         indeterminate1: 'indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite',
