@@ -4,12 +4,12 @@ import L from 'leaflet'
 import { MAPBOX_USERNAME, MAPBOX_TOKEN } from '~/map/config'
 import { getThemeId } from '~/theme'
 import { getMapStyleId } from '~/map'
-import { Device } from '~/types'
 import { render } from 'solid-js/web'
 import Icon from './material/Icon'
 import clsx from 'clsx'
 import Button from './material/Button'
 import { createResource } from 'solid-js'
+import { getDeviceLocation } from '~/api/devices'
 
 type Location = {
   lat: number
@@ -20,12 +20,21 @@ type Location = {
 
 const THE_GUNDO: [number, number] = [33.9192, -118.4165]
 
-const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (props) => {
+type DeviceLocationProps = {
+  dongleId: string
+  deviceName: string
+}
+
+const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
   let mapRef!: HTMLDivElement
 
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
   const [locationPermission, setLocationPermission] = createSignal<'granted' | 'denied' | 'prompt'>('prompt')
+  const [deviceLocation] = createResource(
+    () => props.dongleId,
+    (dongleId: string) => getDeviceLocation(dongleId).catch(() => null),
+  )
 
   onMount(() => {
     navigator.permissions.query({ name: 'geolocation' }).then(permission => {
@@ -63,8 +72,9 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
 
   const [locationData] = createResource(() => ({
     map: map(),
-    device: props.device,
+    dongleId: props.dongleId,
     deviceName: props.deviceName,
+    deviceLocation: deviceLocation(),
     locationPermission: locationPermission(),
   }), async (args) => {
     if (!args.map) {
@@ -73,11 +83,12 @@ const DeviceLocation: VoidComponent<{ device: Device; deviceName: string }> = (p
 
     const foundLocations: Location[] = []
 
-    if (args.device.last_gps_lat && args.device.last_gps_lng) {
-      const address = await getPlaceName(args.device.last_gps_lat, args.device.last_gps_lng)
+    const location = deviceLocation()
+    if (location) {
+      const address = await getPlaceName(location.lat, location.lng)
       const deviceLoc: Location = {
-        lat: args.device.last_gps_lat,
-        lng: args.device.last_gps_lng,
+        lat: location.lat,
+        lng: location.lng,
         label: args.deviceName,
         address,
       }
