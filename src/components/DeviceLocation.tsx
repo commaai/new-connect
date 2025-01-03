@@ -72,7 +72,6 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   const [locationData] = createResource(() => ({
     map: map(),
-    dongleId: props.dongleId,
     deviceName: props.deviceName,
     deviceLocation: deviceLocation(),
     locationPermission: locationPermission(),
