@@ -30,7 +30,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
-  const [locationPermission, setLocationPermission] = createSignal<'granted' | 'denied' | 'prompt'>('prompt')
+  const [userPosition, setUserPosition] = createSignal<GeolocationPosition | null>(null)
   const [deviceLocation] = createResource(
     () => props.dongleId,
     (dongleId: string) => getDeviceLocation(dongleId).catch(() => null),
@@ -38,9 +38,12 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   onMount(() => {
     navigator.permissions.query({ name: 'geolocation' }).then(permission => {
-      setLocationPermission(permission.state)
-      permission.addEventListener('change', () => setLocationPermission(permission.state))
-    }).catch(() => setLocationPermission('denied'))
+      permission.addEventListener('change', requestUserLocation)
+
+      if (permission.state === 'granted') {
+        requestUserLocation()
+      }
+    }).catch(() => setUserPosition(null))
 
     const tileLayer = L.tileLayer(
       `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`,
@@ -74,7 +77,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     map: map(),
     deviceName: props.deviceName,
     deviceLocation: deviceLocation(),
-    locationPermission: locationPermission(),
+    userPosition: userPosition(),
   }), async (args) => {
     if (!args.map) {
       return []
@@ -96,22 +99,17 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       foundLocations.push(deviceLoc)
     }
 
-    const permission = await navigator.permissions.query({ name: 'geolocation' })
-    if (permission.state === 'granted') {
-      const position = await getUserPosition().catch(() => null)
-
-      if (position) {
-        const addr = await getPlaceName(position.coords.latitude, position.coords.longitude)
-        const userLoc: Location = {
-          lat: position.coords.latitude,
-          lng: position.coords.longitude,
-          label: 'You',
-          address: addr,
-        }
-
-        addMarker(args.map, userLoc, 'person', 'bg-primary')
-        foundLocations.push(userLoc)
+    if (args.userPosition) {
+      const addr = await getPlaceName(args.userPosition.coords.latitude, args.userPosition.coords.longitude)
+      const userLoc: Location = {
+        lat: args.userPosition.coords.latitude,
+        lng: args.userPosition.coords.longitude,
+        label: 'You',
+        address: addr,
       }
+
+      addMarker(args.map, userLoc, 'person', 'bg-primary')
+      foundLocations.push(userLoc)
     }
 
     if (foundLocations.length > 1) {
@@ -146,30 +144,27 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       .on('click', () => setSelectedLocation(loc))
   }
 
-  const getUserPosition = () => {
-    return new Promise<GeolocationPosition>((resolve, reject) =>
-      navigator.geolocation.getCurrentPosition(resolve, reject),
+  const requestUserLocation = () => {
+    navigator.geolocation.getCurrentPosition(
+      setUserPosition,
+      (err) => {
+        console.log('Error getting user\'s position', err)
+        setUserPosition(null)
+      },
     )
-  }
-
-  const requestLocation = async () => {
-    const position = await getUserPosition()
-    if (position) {
-      setLocationPermission('granted')
-    }
   }
 
   return (
     <div class="relative">
       <div ref={mapRef} class="h-[200px] w-full !bg-surface-container-low" />
 
-      <Show when={locationPermission() !== 'granted'}>
+      <Show when={!userPosition()}>
         <div class="absolute bottom-2 right-2 z-[9999]">
           <Button
             title="Show your current location"
             color="secondary"
             class="bg-surface-container-low text-on-surface-variant"
-            onClick={() => void requestLocation()}
+            onClick={() => void requestUserLocation()}
             trailing={<span class="pr-2 text-sm">Show my location</span>}
           >
             <Icon size="20">my_location</Icon>
