@@ -55,7 +55,7 @@ const LocationBanner = (props: LocationBannerProps) => {
         <Icon size="20">close</Icon>
       </button>
       <div class="mx-auto flex max-w-screen-xl items-center justify-between">
-        <div class="flex flex-col gap-1">
+        <div class="flex flex-col gap-0.5">
           <h2 class="text-lg font-medium">{props.locationName}</h2>
           <p class="text-sm text-gray-400">
             {formatDateFromNow(props.locationTimestamp)}
@@ -176,8 +176,13 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
       })
 
       if (locations.length > 1) {
-        const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]))
-        mapInstance.fitBounds(bounds, { padding: [50, 50] })
+        
+        setTimeout(() => {
+          const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]))
+          mapInstance.fitBounds(bounds, { padding: [50, 50] })
+          mapInstance.invalidateSize()
+        }, 200)
+
       } else if (locations.length === 1) {
         mapInstance.setView([locations[0].lat, locations[0].lng], DEFAULT_ZOOM)
       }
@@ -254,7 +259,7 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
             setSelectedLocation(undefined)
           }
         }}
-        class="h-[400px] w-full overflow-hidden rounded-lg !bg-surface-container-low"
+        class="h-[350px] w-full overflow-hidden rounded-lg !bg-surface-container-low"
       />
 
       <Show when={locationData.loading}>
