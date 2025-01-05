@@ -9,23 +9,20 @@ import {
 } from 'solid-js'
 import { createGeolocation } from '@solid-primitives/geolocation'
 import { getDeviceLocation } from '~/api/devices'
-import mapboxgl from 'mapbox-gl'
-import 'mapbox-gl/dist/mapbox-gl.css'
-import { getMapStyleId } from '~/map'
-import { getThemeId } from '~/theme'
-import { MAPBOX_TOKEN, MAPBOX_USERNAME } from '~/map/config'
-import Icon from './material/Icon'
 import { render } from 'solid-js/web'
 import { DeviceLocation } from '~/types'
 import { formatDateFromNow } from '~/utils/date'
-import 'mapbox-gl/dist/mapbox-gl.css'
+import * as L from 'leaflet'
+import 'leaflet/dist/leaflet.css'
+import Icon from './material/Icon'
+import { getMapStyleId } from '~/map'
+import { getThemeId } from '~/theme'
+import { MAPBOX_TOKEN, MAPBOX_USERNAME } from '~/map/config'
 
 
 const PERSON_ICON = 'person'
 const CAR_ICON = 'directions_car'
 
-const MARKER_CLASS = 'marker'
-const MAPBOX_CLASS = 'mapboxgl-canvas'
 
 const VEHICLE_NAME_FALLBACK = 'Car'
 
@@ -50,7 +47,7 @@ type LocationBannerProps = {
 
 const LocationBanner = (props: LocationBannerProps) => {
   return (
-    <div class="absolute bottom-0 left-0 right-0 rounded-lg bg-surface-container-low px-8 py-4 m-2 shadow z-[5000]">
+    <div class="absolute bottom-0 left-0 right-0 rounded-lg bg-surface-container-high px-8 py-4 m-2 shadow z-[5000]">
       <button
         onClick={() => props.onClose()}
         class="absolute top-0 left-0 p-1 bg-surface-container-lowest border border-gray-400/30 rounded-full -translate-y-1/4 -translate-x-1/4"
@@ -83,13 +80,10 @@ const LocationBanner = (props: LocationBannerProps) => {
   )
 }
 
-const getStyleUrl = (): string => {
-  const themeId = getThemeId()
-  const mapStyleId = getMapStyleId(themeId)
-  return `mapbox://styles/${MAPBOX_USERNAME}/${mapStyleId}`
+const getTileUrl = () => {
+  return `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`
 }
-
-async function getPlaceName(lat: number, lng: number) {
+const getPlaceName = async (lat: number, lng: number) => {
   try {
     const response = await fetch(
       `https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`,
@@ -110,7 +104,7 @@ type DeviceLocationProps = {
 
 const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
   let mapContainer!: HTMLDivElement
-  const [map, setMap] = createSignal<mapboxgl.Map>()
+  const [map, setMap] = createSignal<L.Map>()
   const [selectedLocation, setSelectedLocation] = createSignal<Location>()
 
   const [userLocation] = createGeolocation()
@@ -169,66 +163,58 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
   )
 
   createEffect(() => {
-    const mapEntity = map()
+    const mapInstance = map()
 
-    if (mapEntity && !locationData.loading) {
+    if (mapInstance && !locationData.loading) {
       const locations = locationData()
       if (!locations || locations.length === 0) return
 
-      // Remove existing markers
-      const existingMarkers = document.querySelectorAll(`.${MARKER_CLASS}`)
-      existingMarkers.forEach((marker) => marker.remove())
+    
 
       locations.forEach((loc) => {
-        createMarker(
-          loc,
-          loc.type === 'user' ? PERSON_ICON : CAR_ICON,
-          mapEntity,
-        )
+        createMarker(loc, loc.type === 'user' ? PERSON_ICON : CAR_ICON, mapInstance)
       })
 
       if (locations.length > 1) {
-        const bounds = new mapboxgl.LngLatBounds()
-        locations.forEach((loc) => {
-          bounds.extend([loc.lng, loc.lat])
-        })
-        mapEntity.fitBounds(bounds, { padding: 50, animate: false })
+        const bounds = L.latLngBounds(locations.map(loc => [loc.lat, loc.lng]))
+        mapInstance.fitBounds(bounds, { padding: [50, 50] })
       } else if (locations.length === 1) {
-        mapEntity.setCenter([locations?.[0]?.lng, locations?.[0]?.lat])
+        mapInstance.setView([locations[0].lat, locations[0].lng], DEFAULT_ZOOM)
       }
     }
   })
 
   onMount(() => {
-    const mapboxMap = new mapboxgl.Map({
-      container: mapContainer,
-      style: getStyleUrl(),
+    const mapInstance = L.map(mapContainer, {
+      attributionControl: false,
+      zoomControl: false,
       center: SAN_DIEGO,
       zoom: DEFAULT_ZOOM,
-      accessToken: MAPBOX_TOKEN,
-      attributionControl: false,
     })
+    
+    L.tileLayer(getTileUrl()).addTo(mapInstance)
 
-    setMap(mapboxMap)
+    setMap(mapInstance)
+    mapInstance.invalidateSize()
 
     const resizeObserver = new ResizeObserver(() => {
-      mapboxMap.resize()
+      mapInstance.invalidateSize()
     })
     resizeObserver.observe(mapContainer)
 
     onCleanup(() => {
       resizeObserver.disconnect()
-      mapboxMap.remove()
+      mapInstance.remove()
     })
   })
 
   const createMarker = (
     loc: Location,
     iconName: string,
-    mapInstance: mapboxgl.Map,
-  ) => {
+    mapInstance: L.Map,
+  ): L.Marker => {
+
     const el = document.createElement('div')
-    el.className = MARKER_CLASS
 
     render(
       () => (
@@ -238,7 +224,7 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
             setSelectedLocation(loc)
             const mapEntity = map()
             if (mapEntity) {
-              mapEntity.flyTo({ center: [loc.lng, loc.lat] })
+              mapEntity.setView([loc.lat, loc.lng])
             }
           }}
         >
@@ -248,7 +234,15 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
       el,
     )
 
-    new mapboxgl.Marker(el).setLngLat([loc.lng, loc.lat]).addTo(mapInstance)
+    const icon = L.divIcon({
+      html: el,
+      className: 'border-none bg-none',
+      iconSize: [40, 40],
+      iconAnchor: [20, 20],
+    })
+
+
+    return L.marker([loc.lat, loc.lng], { icon }).addTo(mapInstance)
   }
 
   return (
@@ -256,13 +250,11 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
       <div
         ref={mapContainer}
         onClick={(e) => {
-          // If the user clicks the map,
-          // clear the selected location.
-          if (e.target.classList.contains(MAPBOX_CLASS)) {
+          if (e.target === mapContainer) {
             setSelectedLocation(undefined)
           }
         }}
-        class="h-[400px] w-full !bg-surface-container-low rounded-lg overflow-hidden [&_.mapboxgl-ctrl-logo]:hidden"
+        class="h-[400px] w-full !bg-surface-container-low rounded-lg overflow-hidden"
       />
 
       <Show when={locationData.loading}>
@@ -282,5 +274,4 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
     </div>
   )
 }
-
 export default DeviceLocationMap

@@ -114,7 +114,8 @@
     @apply select-none selection:bg-transparent;
   }
 
-  html, body {
+  html,
+  body {
     /*
      * fill visible viewport
      * https://developers.google.com/web/updates/2016/12/url-bar-resizing
@@ -138,7 +139,7 @@
 
     &::after {
       @apply absolute inset-0 bg-gradient-to-r from-transparent via-rose-100/10 to-transparent -translate-x-full animate-[shimmer_2s_infinite];
-      content: '';
+      content: "";
     }
   }
 
@@ -168,7 +169,8 @@
 
   .material-symbols-outlined {
     transition: font-variation-settings 0.2s;
-    font-variation-settings: 'FILL' var(--font-filled, 0), 'OPSZ' var(--font-opsz, 24);
+    font-variation-settings: "FILL" var(--font-filled, 0),
+      "OPSZ" var(--font-opsz, 24);
 
     &.size-20 {
       --font-opsz: 20;
@@ -212,8 +214,5 @@
     &::-webkit-scrollbar {
       display: none; /* Safari and Chrome */
     }
-  }
-  .mapboxgl-ctrl-logo {
-    @apply hidden;
   }
 }
