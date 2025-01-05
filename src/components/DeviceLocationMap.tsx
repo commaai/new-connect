@@ -47,17 +47,17 @@ type LocationBannerProps = {
 
 const LocationBanner = (props: LocationBannerProps) => {
   return (
-    <div class="absolute bottom-0 left-0 right-0 rounded-lg bg-surface-container-high px-8 py-4 m-2 shadow z-[5000]">
+    <div class="absolute inset-x-0 bottom-0 z-[5000] m-2 rounded-lg bg-surface-container-high px-8 py-4 shadow">
       <button
         onClick={() => props.onClose()}
-        class="absolute top-0 left-0 p-1 bg-surface-container-lowest border border-gray-400/30 rounded-full -translate-y-1/4 -translate-x-1/4"
+        class="absolute left-0 top-0 -translate-x-1/4 -translate-y-1/4 rounded-full border border-gray-400/30 bg-surface-container-lowest p-1"
       >
         <Icon size="20">close</Icon>
       </button>
-      <div class="flex justify-between items-center max-w-screen-xl mx-auto">
+      <div class="mx-auto flex max-w-screen-xl items-center justify-between">
         <div class="flex flex-col gap-1">
           <h2 class="text-lg font-medium">{props.locationName}</h2>
-          <p class="text-gray-400 text-sm">
+          <p class="text-sm text-gray-400">
             {formatDateFromNow(props.locationTimestamp)}
           </p>
         </div>
@@ -67,13 +67,13 @@ const LocationBanner = (props: LocationBannerProps) => {
               const address = encodeURIComponent(props.locationAddress)
               window.open(`https://maps.google.com?q=${address}`, '_blank')
             }}
-            class="bg-white text-black px-4 py-2 rounded-full hover:bg-gray-100"
+            class="rounded-full bg-white px-4 py-2 text-black hover:bg-gray-100"
           >
             open in maps
           </button>
         </div>
       </div>
-      <div class="flex mt-4 max-w-screen-xl mx-auto">
+      <div class="mx-auto mt-4 flex max-w-screen-xl">
         <p class="text-gray-300">{props.locationAddress}</p>
       </div>
     </div>
@@ -219,7 +219,7 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
     render(
       () => (
         <div
-          class="flex size-[40px] items-center justify-center rounded-full bg-primary-container cursor-pointer"
+          class="flex size-[40px] cursor-pointer items-center justify-center rounded-full bg-primary-container"
           onClick={() => {
             setSelectedLocation(loc)
             const mapEntity = map()
@@ -254,7 +254,7 @@ const DeviceLocationMap: VoidComponent<DeviceLocationProps> = (props) => {
             setSelectedLocation(undefined)
           }
         }}
-        class="h-[400px] w-full !bg-surface-container-low rounded-lg overflow-hidden"
+        class="h-[400px] w-full overflow-hidden rounded-lg !bg-surface-container-low"
       />
 
       <Show when={locationData.loading}>
