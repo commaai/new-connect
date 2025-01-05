@@ -213,4 +213,7 @@
       display: none; /* Safari and Chrome */
     }
   }
+  .mapboxgl-ctrl-logo {
+    @apply hidden;
+  }
 }
