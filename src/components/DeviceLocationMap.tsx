@@ -26,7 +26,7 @@ const CAR_ICON = 'directions_car'
 
 const VEHICLE_NAME_FALLBACK = 'Car'
 
-const SAN_DIEGO: [number, number] = [-117.130775, 32.834686]
+const SAN_DIEGO: [number, number] = [32.834686, -117.130775]
 const DEFAULT_ZOOM = 10
 
 type Location = {
