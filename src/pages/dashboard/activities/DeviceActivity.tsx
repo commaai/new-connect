@@ -1,4 +1,4 @@
-import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
+import { createResource, Suspense, useContext, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -12,6 +12,7 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
+import DeviceLocation from '~/components/DeviceLocation'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -111,11 +112,18 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <div class="m-4 flex">
-            <Suspense fallback={<div class="skeleton-loader size-full" />}>
-              <DeviceStatistics dongleId={props.dongleId} />
-            </Suspense>
-            <div class="flex items-center">
+          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
+            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+          </Show>
+          <div class="flex">
+            <div class="flex-auto">
+              <Suspense fallback={<div class="skeleton-loader size-full" />}>
+                <div class="p-4">
+                  <DeviceStatistics dongleId={props.dongleId} />
+                </div>
+              </Suspense>
+            </div>
+            <div class="flex p-4">
               <IconButton onClick={() => void takeSnapshot()}>camera</IconButton>
             </div>
           </div>

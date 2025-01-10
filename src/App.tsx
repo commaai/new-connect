@@ -1,5 +1,6 @@
 import { Suspense, lazy, type VoidComponent } from 'solid-js'
 import { Router, Route } from '@solidjs/router'
+import 'leaflet/dist/leaflet.css'
 
 const Login = lazy(() => import('./pages/auth/login'))
 const Logout = lazy(() => import('./pages/auth/logout'))
