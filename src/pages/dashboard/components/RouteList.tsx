@@ -5,19 +5,19 @@ import {
   createSignal,
   For,
   Suspense,
+  onCleanup,
+  onMount,
+  Index,
+  type VoidComponent,
 } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import clsx from 'clsx'
-
+import { clsx } from 'clsx'
 import type { RouteSegments } from '~/types'
-
 import RouteCard from '~/components/RouteCard'
 import { fetcher } from '~/api'
-import Button from '~/components/material/Button'
 
 const PAGE_SIZE = 3
 
-type RouteListProps = {
+interface RouteListProps {
   class?: string
   dongleId: string
 }
@@ -52,39 +52,66 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   })
 
   const [size, setSize] = createSignal(1)
-  const onLoadMore = () => setSize(size() + 1)
-  const pageNumbers = () => Array.from(Array(size()).keys())
+  const pageNumbers = () => Array.from({ length: size() })
+
+  const [sentinel, setSentinel] = createSignal<HTMLDivElement | undefined>()
+  let observer: IntersectionObserver | undefined
+
+  onMount(() => {
+    observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          setSize((prev) => prev + 1)
+        }
+      },
+      { threshold: 0.1 },
+    )
+
+    const sentinelEl = sentinel()
+    if (sentinelEl) {
+      observer.observe(sentinelEl)
+    }
+  })
+
+  onCleanup(() => observer?.disconnect())
+
+  const LoadingSkeleton = () => (
+    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+      <Index each={Array(PAGE_SIZE)}>
+        {() => (
+          <div
+            class="skeleton-loader elevation-1 flex h-[336px] flex-col rounded-lg bg-surface-container-low"
+          />
+        )}
+      </Index>
+    </div>
+  )
 
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
-    >
-      <For each={pageNumbers()}>
-        {(i) => {
-          const [routes] = createResource(() => i, getPage)
-          return (
-            <Suspense
-              fallback={
-                <>
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                </>
-              }
-            >
-              <For each={routes()}>
-                {(route) => <RouteCard route={route} />}
-              </For>
-            </Suspense>
-          )
-        }}
-      </For>
-      <div class="flex justify-center">
-        <Button onClick={onLoadMore}>Load more</Button>
+    <div class={clsx(
+      'w-full p-4 md:p-6',
+      'mx-auto max-w-7xl',
+      props.class,
+    )}>
+      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
+        <For each={pageNumbers()}>
+          {(_, i) => {
+            const [routes] = createResource(() => i(), getPage)
+            return (
+              <Suspense fallback={<LoadingSkeleton />}>
+                <For each={routes()}>
+                  {(route) => (
+                    <div class="w-full">
+                      <RouteCard route={route} />
+                    </div>
+                  )}
+                </For>
+              </Suspense>
+            )
+          }}
+        </For>
       </div>
+      <div ref={setSentinel} class="h-10 w-full" />
     </div>
   )
 }
