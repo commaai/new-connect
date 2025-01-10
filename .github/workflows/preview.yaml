@@ -12,12 +12,41 @@ permissions:
   checks: write
 
 jobs:
-  preview:
-    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request' }}
+  pr:
+    name: Find PR number
     runs-on: ubuntu-latest
+    outputs:
+      number: ${{ steps.pr.outputs.number }}
+    if: github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    steps:
+      # use `gr pr view` to get the PR number
+      # https://github.com/orgs/community/discussions/25220#discussioncomment-11285971
+      - name: Find PR number
+        id: pr
+        env:
+          GH_TOKEN: ${{ github.token }}
+          PR_TARGET_REPO: ${{ github.repository }}
+          PR_BRANCH: |-
+            ${{
+              (github.event.workflow_run.head_repository.owner.login != github.event.workflow_run.repository.owner.login)
+                && format('{0}:{1}', github.event.workflow_run.head_repository.owner.login, github.event.workflow_run.head_branch)
+                || github.event.workflow_run.head_branch
+            }}
+        run: |
+          gh pr view --repo "${PR_TARGET_REPO}" "${PR_BRANCH}" \
+            --json 'number' \
+            --jq '"number=\(.number)"' \
+            >> $GITHUB_OUTPUT
+
+      - run: |
+          echo "PR number: ${{ steps.pr.outputs.number }}"
+
+  preview:
+    if: github.repository == 'commaai/new-connect' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    runs-on: ubuntu-latest
+    needs: pr
     timeout-minutes: 2
     outputs:
-      pr: ${{ steps.pr.outputs.result }}
       check_id: ${{ steps.check.outputs.result }}
     steps:
       - name: Create PR check
@@ -49,30 +78,12 @@ jobs:
           run-id: ${{ github.event.workflow_run.id }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Find PR number
-        id: pr
-        uses: actions/github-script@v7
-        with:
-          retries: 3
-          script: |
-            const response = await github.rest.search.issuesAndPullRequests({
-              q: 'repo:${{ github.repository }} is:pr sha:${{ github.event.workflow_run.head_sha }}',
-            })
-            const items = response.data.items
-            if (items.length < 1) {
-              console.error('No PRs found')
-              return
-            }
-            const pullRequestNumber = items[0].number
-            console.info('Pull request number is', pullRequestNumber)
-            return pullRequestNumber
-
       - name: Deploy to Cloudflare Pages
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ steps.pr.outputs.result }} --commit-dirty=true
+          command: pages deploy dist --project-name=connect --branch=${{ needs.pr.outputs.number }} --commit-dirty=true
 
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
@@ -83,17 +94,17 @@ jobs:
           ref: master
 
       - name: take screenshots
-        run: node src/ci/screenshots.cjs https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
+        run: bun src/ci/screenshots.ts https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
 
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
-          git checkout -b new-connect/pr-${{ steps.pr.outputs.result }}
+          git checkout -b new-connect/pr-${{ needs.pr.outputs.number }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add .
-          git commit -m "screenshots for PR #${{ steps.pr.outputs.result }}"
-          git push origin new-connect/pr-${{ steps.pr.outputs.result }} --force
+          git commit -m "screenshots for PR #${{ needs.pr.outputs.number }}"
+          git push origin new-connect/pr-${{ needs.pr.outputs.number }} --force
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v3
@@ -101,7 +112,7 @@ jobs:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-            # deployed preview: https://${{ steps.pr.outputs.result }}.connect-d5y.pages.dev
+            # deployed preview: https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev
 
             Welcome to new-connect! Make sure to:
             * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
@@ -111,24 +122,24 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/Login-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteActivity-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/RouteList-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ steps.pr.outputs.result }}/SettingsActivity-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/Login-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteList-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-desktop.playwright.png"></td>
               </tr>
             </table>
           comment-tag: run_id
-          pr-number: ${{ steps.pr.outputs.result }}
+          pr-number: ${{ needs.pr.outputs.number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   update_pr_check:

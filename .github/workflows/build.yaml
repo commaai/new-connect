@@ -16,7 +16,8 @@ jobs:
       - uses: oven-sh/setup-bun@v1
 
       - run: bun install --frozen-lockfile
-      - run: timeout 12s bun pre-commit
+      - run: bun playwright install
+      - run: timeout 12s bun lefthook run pre-commit
       - run: bun run test
       - run: ./check-lines.sh
       - name: Bundle size breakdown
