@@ -17,7 +17,7 @@ const loadImage = (url: string | undefined): Promise<string | undefined> => {
     const image = new Image()
     image.src = url
     image.onload = () => resolve(url)
-    image.onerror = (error) => reject(error)
+    image.onerror = (error) => reject(new Error('Failed to load image', { cause: error }))
   })
 }
 
