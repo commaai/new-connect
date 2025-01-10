@@ -48,6 +48,7 @@
     "@solidjs/testing-library": "^0.8.8",
     "@stylistic/eslint-plugin": "^2.1.0",
     "@types/eslint__js": "^8.42.3",
+    "@types/leaflet": "^1.9.15",
     "@types/mapbox__polyline": "^1.0.5",
     "@typescript-eslint/eslint-plugin": "^7.13.0",
     "@typescript-eslint/parser": "^7.13.0",
@@ -79,11 +80,13 @@
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
+    "@solid-primitives/geolocation": "^1.4.14",
     "@solid-primitives/state-machine": "^0.0.3",
     "@solidjs/router": "^0.13.5",
     "clsx": "^1.2.1",
     "dayjs": "^1.11.11",
     "hls.js": "^1.5.13",
+    "leaflet": "^1.9.4",
     "qr-scanner": "^1.4.2",
     "solid-js": "^1.8.17"
   },

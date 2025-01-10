@@ -12,6 +12,7 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
+import DeviceLocationMap from '~/components/DeviceLocationMap'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -110,6 +111,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
+        <Suspense fallback={<div class="skeleton-loader size-full" />}>
+          <DeviceLocationMap dongleId={props.dongleId} deviceName={deviceName()} />
+        </Suspense>
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <div class="m-4 flex">
             <Suspense fallback={<div class="skeleton-loader size-full" />}>

@@ -13,7 +13,7 @@ if [ $BUNDLE_SIZE -lt 200 ]; then
   exit 1
 fi
 
-if [ $BUNDLE_SIZE -gt 325 ]; then
+if [ $BUNDLE_SIZE -gt 335 ]; then
   echo "Exceeded bundle size limit!"
   exit 1
 fi

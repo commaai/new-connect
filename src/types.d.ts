@@ -33,6 +33,16 @@ export interface Device extends ApiResponseBase {
   }
 }
 
+
+export interface DeviceLocation extends ApiResponseBase {
+  dongle_id: string
+  lat: number
+  lng: number
+  time: number
+  speed: number
+  bearing: number
+}
+
 export interface DrivingStatisticsAggregation {
   distance: number
   minutes: number

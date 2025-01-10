@@ -1,4 +1,4 @@
-import type { Device, DrivingStatistics } from '~/types'
+import type { Device, DeviceLocation, DrivingStatistics } from '~/types'
 
 import { fetcher } from '.'
 
@@ -19,6 +19,9 @@ export const getDevice = async (dongleId: string) =>
 
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
+
+export const getDeviceLocation = async (dongleId: string) =>
+  fetcher<DeviceLocation>(`/v1/devices/${dongleId}/location`)
 
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')

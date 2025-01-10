@@ -2,12 +2,14 @@ import dayjs, { type Dayjs } from 'dayjs'
 import advanced from 'dayjs/plugin/advancedFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration, { type Duration } from 'dayjs/plugin/duration'
+import relativeTime from 'dayjs/plugin/relativeTime'
 
 import type { Route } from '~/types'
 
 dayjs.extend(advanced)
 dayjs.extend(customParseFormat)
 dayjs.extend(duration)
+dayjs.extend(relativeTime)
 
 export { dayjs }
 
@@ -55,10 +57,22 @@ export const parseDateStr = (dateStr: string): Dayjs => {
   return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
 }
 
+const parseDateInput = (input: dayjs.ConfigType): Dayjs => {
+  // If input is a number, assume it's unix timestamp
+  return typeof input === 'number' 
+    ? input.toString().length > 10 
+      ? dayjs(input) // unix milliseconds
+      : dayjs.unix(input) // unix seconds
+    : dayjs(input)
+}
+
 export const formatDate = (input: dayjs.ConfigType) => {
-  // Assume number is unix timestamp
-  const date = typeof input === 'number' ? dayjs.unix(input) : dayjs(input)
+  const date = parseDateInput(input)
   // Hide current year
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
+}
+
+export const formatDateFromNow = (input: dayjs.ConfigType) => {
+  return parseDateInput(input).fromNow()
 }
