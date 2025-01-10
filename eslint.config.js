@@ -12,7 +12,7 @@ export default [
     languageOptions: { globals: globals.browser },
   },
   {
-    ignores: ['.github', '.vscode', 'node_modules', 'dist'],
+    ignores: ['.github', '.vscode', 'dist'],
   },
   js.configs.recommended,
   ...ts.configs.recommendedTypeChecked,
