@@ -35,12 +35,12 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       '1-line': 'h-14',
       '2-line': 'h-20',
       '3-line': 'h-28',
-      nav: 'h-14 before:rounded-full before:duration-0',
+      nav: 'h-14 gap-3 before:rounded-full before:duration-0',
     }[variant()])
   return (
     <ButtonBase
       class={clsx(
-        'elevation-0 state-layer flex items-center gap-3 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
+        'elevation-0 state-layer flex items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
         variantStyle(),
         props.selected && 'before:opacity-[.12]',
         props.class,
