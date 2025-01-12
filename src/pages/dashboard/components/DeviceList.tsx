@@ -24,14 +24,10 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           return (
             <ListItem
               variant="nav"
-              leading={<>
-                <span
-                  class={clsx(
-                    'mx-2 size-2 rounded-full',
-                    deviceIsOnline(device) ? 'bg-green-400' : 'bg-gray-400',
-                  )}
-                />
-              </>}
+              leading={<div class={clsx(
+                'm-2 size-2 rounded-full',
+                deviceIsOnline(device) ? 'bg-green-400' : 'bg-gray-400',
+              )} />}
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}
