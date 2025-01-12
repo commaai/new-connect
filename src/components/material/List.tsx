@@ -2,26 +2,6 @@ import type { JSXElement, ParentComponent, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
-import Icon from './Icon'
-
-type IconWithStatusIndicatorProps = {
-  isOnline: boolean
-  iconName: string
-}
-
-export const IconWithStatusIndicator: VoidComponent<IconWithStatusIndicatorProps> = (props) => {
-  return (
-    <div class="flex items-center">
-      <span
-        class={clsx(
-          'ml-2 mr-4 size-2 rounded-full',
-          props.isOnline ? 'bg-green-400' : 'bg-gray-400',
-        )}
-      />
-      <Icon>{props.iconName}</Icon>
-    </div>
-  )
-}
 
 type ListItemContentProps = {
   headline: JSXElement
@@ -55,7 +35,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       '1-line': 'h-14',
       '2-line': 'h-20',
       '3-line': 'h-28',
-      nav: 'h-14 before:rounded-full before:duration-0',
+      nav: 'h-14 gap-3 before:rounded-full before:duration-0',
     }[variant()])
   return (
     <ButtonBase
