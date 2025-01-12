@@ -2,11 +2,26 @@ import { For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
+import Icon from '~/components/material/Icon'
+import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/types'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
-
 import useDeviceList from '~/utils/useDeviceList'
+
+type StatusIndicatorProps = {
+  isOnline: boolean
+}
+
+const StatusIndicator: VoidComponent<StatusIndicatorProps> = (props) => {
+  return (
+    <span
+      class={clsx(
+        'ml-2 size-2 rounded-full',
+        props.isOnline ? 'bg-green-400' : 'bg-gray-400',
+      )}
+    />
+  )
+}
 
 type DeviceListProps = {
   class?: string
@@ -19,13 +34,13 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
     onClick,
   } = useDeviceList()
   return (
-    <List variant="nav" class={clsx(props.class)}>
+    <List variant="nav" class={props.class}>
       <For each={props.devices}>
         {(device) => {
           return (
             <ListItem
               variant="nav"
-              leading={<IconWithStatusIndicator isOnline={deviceIsOnline(device)} iconName="directions_car" />}
+              leading={<><StatusIndicator isOnline={deviceIsOnline(device)} /><Icon>directions_car</Icon></>}
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}
