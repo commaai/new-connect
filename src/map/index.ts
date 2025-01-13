@@ -13,7 +13,7 @@ export type Coords = [number, number][]
 const POLYLINE_SAMPLE_SIZE = 50
 const POLYLINE_PRECISION = 4
 
-export function getMapStyleId(themeId: string): string {
+function getMapStyleId(themeId: string): string {
   return themeId === 'light' ? MAPBOX_LIGHT_STYLE_ID : MAPBOX_DARK_STYLE_ID
 }
 
