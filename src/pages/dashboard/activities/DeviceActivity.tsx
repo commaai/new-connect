@@ -118,9 +118,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <div class="flex">
             <div class="flex-auto">
               <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                <div class="p-4">
-                  <DeviceStatistics dongleId={props.dongleId} />
-                </div>
+                <DeviceStatistics dongleId={props.dongleId} class="p-4" />
               </Suspense>
             </div>
             <div class="flex p-4">

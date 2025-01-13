@@ -1,9 +1,7 @@
 import { createSignal, onMount, onCleanup, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import L from 'leaflet'
-import { MAPBOX_USERNAME, MAPBOX_TOKEN } from '~/map/config'
-import { getThemeId } from '~/theme'
-import { getMapStyleId } from '~/map'
+import { getTileUrl, getPlaceName } from '~/map'
 import { render } from 'solid-js/web'
 import Icon from './material/Icon'
 import clsx from 'clsx'
@@ -45,9 +43,8 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       }
     }).catch(() => setUserPosition(null))
 
-    const tileLayer = L.tileLayer(
-      `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${getMapStyleId(getThemeId())}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`,
-    )
+    const tileUrl = getTileUrl()
+    const tileLayer = L.tileLayer(tileUrl)
 
     const m = L.map(
       mapRef,
@@ -209,16 +206,6 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       </div>
     </div>
   )
-}
-
-async function getPlaceName(lat: number, lng: number) {
-  try {
-    const r = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`)
-    const data = await r.json() as { features?: { place_name?: string }[] }
-    return data.features?.[0]?.place_name ?? null
-  } catch {
-    return null
-  }
 }
 
 export default DeviceLocation
