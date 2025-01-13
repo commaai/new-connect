@@ -7,12 +7,12 @@ import { getAccessToken } from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import { DashboardContext } from '../Dashboard'
-import DeviceLocation from '~/components/DeviceLocation'
 
 type DeviceActivityProps = {
   dongleId: string

@@ -1,13 +1,13 @@
-import { createSignal, onMount, onCleanup, Show } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import L from 'leaflet'
-import { getTileUrl, getPlaceName } from '~/map'
+import { createResource, createSignal, onMount, onCleanup, Show, type VoidComponent } from 'solid-js'
 import { render } from 'solid-js/web'
-import Icon from './material/Icon'
 import clsx from 'clsx'
+import L from 'leaflet'
+
+import Icon from './material/Icon'
 import Button from './material/Button'
-import { createResource } from 'solid-js'
+
 import { getDeviceLocation } from '~/api/devices'
+import { getTileUrl, getPlaceName } from '~/map'
 
 type Location = {
   lat: number
