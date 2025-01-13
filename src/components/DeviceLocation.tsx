@@ -16,7 +16,7 @@ type Location = {
   address: string | null
 }
 
-const THE_GUNDO: [number, number] = [33.9192, -118.4165]
+const SAN_DIEGO: [number, number] = [32.711483, -117.161052]
 
 type DeviceLocationProps = {
   dongleId: string
@@ -54,7 +54,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         layers: [tileLayer],
       },
     )
-    m.setView(THE_GUNDO, 10)
+    m.setView(SAN_DIEGO, 10)
     m.on('click', () => setSelectedLocation(null))
 
     setMap(m)
