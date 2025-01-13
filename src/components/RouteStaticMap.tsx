@@ -30,7 +30,7 @@ const getStaticMapUrl = (gpsPoints: GPSPathPoint[]): string | undefined => {
     path.push([lng, lat])
   })
   const themeId = getThemeId()
-  return getPathStaticMapUrl(themeId, path, 380, 192, true)
+  return getPathStaticMapUrl(themeId, path, 343, 256, true)
 }
 
 const State = (props: {
