@@ -78,6 +78,7 @@
     "clsx": "construct className strings conditionally",
     "dayjs": "work with dates (e.g., parse, validate, etc.)",
     "hls.js": "stream video data",
+    "leaflet": "interactive maps",
     "solid-js": "JS ui framework"
   },
   "dependencies": {
