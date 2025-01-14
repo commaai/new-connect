@@ -31,6 +31,17 @@ QCAM_DURATION = (59.9, 61.0)  # seconds
 MSG_FREQ_THRESHOLD = 0.95  # % of expected frequency
 
 
+def get_msgs_time_range(msgs: list) -> tuple[float, float]:
+  min_time, max_time = float("inf"), 0.0
+  for m in msgs:
+    msg_type = m.which()
+    if msg_type == "initData":
+      continue
+    log_time = m.logMonoTime / 1.0e9
+    min_time, max_time = min(min_time, log_time), max(max_time, log_time)
+  return min_time, max_time
+
+
 def get_expected_msg_freq(msg_type: str) -> float:
   service = SERVICE_LIST[msg_type]
   return service.frequency / (service.decimation if service.decimation else 1)
@@ -55,14 +66,10 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
   min_route_time, max_route_time = float("inf"), 0.0
 
   for i, qlog in tqdm(enumerate(qlog_paths), desc="Validating qlogs", total=len(qlog_paths)):
-    min_log_time, max_log_time = float("inf"), 0.0
+    msgs = list(LogReader(qlog))
 
-    for m in LogReader(qlog):
+    for m in msgs:
       msg_type = m.which()
-      if msg_type == "initData":
-        continue
-      log_time = m.logMonoTime / 1.0e9
-      min_log_time, max_log_time = min(min_log_time, log_time), max(max_log_time, log_time)
       if msg_type in ("gpsLocation", "thumbnail", "clocks"):
         msg_counts[msg_type] += 1
       if not clocks_valid and msg_type == "clocks" and m.valid is True:
@@ -70,6 +77,7 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
       if not location_has_fix and msg_type == "gpsLocation" and m.gpsLocation.hasFix is True:
         location_has_fix = True
 
+    min_log_time, max_log_time = get_msgs_time_range(msgs)
     min_route_time, max_route_time = min(min_route_time, min_log_time), max(max_route_time, max_log_time)
     log_duration = max_log_time - min_log_time
 
