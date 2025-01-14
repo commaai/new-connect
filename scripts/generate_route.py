@@ -10,6 +10,7 @@
 
 import argparse
 import random
+import subprocess
 import sys
 from functools import partial
 from pathlib import Path
@@ -103,6 +104,29 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
     panic("FAIL: Not all services have the expected frequency")
 
 
+def validate_qcams(qcamera_paths: list[str]) -> None:
+  # Simply check the duration of each qcamera.ts
+  # TODO: check for existence of video stream in correct format
+  for i, qcam in tqdm(enumerate(qcamera_paths), desc="Validating qcams", total=len(qcamera_paths)):
+    dat = URLFile(qcam, cache=True).read()
+    try:
+      result = subprocess.Popen(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", qcam], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+      output, error = result.communicate(dat)
+      if error:
+        panic(f"Error processing segment {i} qcamera: {error.decode()}")
+
+      duration = float(output.decode())
+
+      if i != len(qcamera_paths) - 1 and duration < QCAM_DURATION[0]:
+        panic(f"Segment {i} qcamera.ts is too short ({duration:.2f}s)")
+      if duration >= QCAM_DURATION[1]:
+        panic(f"Segment {i} qcamera.ts is too long ({duration:.2f}s)")
+    except ValueError as e:
+      panic(f"Could not parse duration for segment {i} qcamera.ts: {e}")
+    except subprocess.CalledProcessError as e:
+      panic(f"Failed to analyse segment {i} qcamera.ts: {e.output}")
+
+
 def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
   try:
     count = int(route_name.time_str.split("--")[0], 16)
@@ -128,8 +152,9 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
   assert all(qlog is not None for qlog in qlogs), "At least one qlog is missing"
   assert all(qcam is not None for qcam in qcams), "At least one qcam is missing"
 
-  # TODO: validate qcamera.ts files
   validate_qlogs(qlogs)
+  print()
+  validate_qcams(qcams)
 
   dongle_path = OUTPUT_PATH / route.name.dongle_id
   if not dongle_path.exists():
