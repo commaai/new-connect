@@ -128,7 +128,7 @@ def corrupt_qlog(omit_msg_types: list[str], qlog_path: str) -> list:
   return filter(lambda m: m.which() not in omit_msg_types, LogReader(qlog_path))
 
 
-def process(route: Route, omit_msg_types: list[str]) -> None:
+def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> None:
   # Get all file URLs from segment 0 to max
   qlogs, qcameras = route.qlog_paths(), route.qcamera_paths()
   assert all(qlog is not None for qlog in qlogs), "At least one qlog is missing"
@@ -145,6 +145,7 @@ def process(route: Route, omit_msg_types: list[str]) -> None:
   log_id = f"{count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
   print(f"Omitting messages: {omit_msg_types}")
+  print(f"Dropping qcamera.ts files: {drop_qcams}")
 
   segment_nums = range(len(qlogs))
   corrupt_qlogs = map(partial(corrupt_qlog, omit_msg_types), qlogs)
@@ -155,9 +156,10 @@ def process(route: Route, omit_msg_types: list[str]) -> None:
     qlog_path = segment_path / "qlog.gz"
     save_log(qlog_path.as_posix(), qlog)
 
-    qcam_path = segment_path / "qcamera.ts"
-    dat = URLFile(qcam).read()
-    qcam_path.write_bytes(dat)
+    if i not in drop_qcams:
+      qcam_path = segment_path / "qcamera.ts"
+      dat = URLFile(qcam).read()
+      qcam_path.write_bytes(dat)
 
 
 def main() -> None:
@@ -165,6 +167,8 @@ def main() -> None:
   parser.add_argument("--omit-clocks", action="store_true", help="Omit clocks messages")
   parser.add_argument("--omit-gps-location", action="store_true", help="Omit gpsLocation messages")
   parser.add_argument("--omit-thumbnail", action="store_true", help="Omit thumbnail messages")
+  parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a specific qcamera.ts file, can be specified more than once")
+  parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number, use 0 to drop all")
   parser.add_argument("route_name", nargs="?", default=f"{DEMO_DONGLE}|{DEMO_LOG_ID}")
   args = parser.parse_args()
 
@@ -181,6 +185,12 @@ def main() -> None:
   if not omit_msg_types:
     omit_msg_types = ["clocks", "gpsLocation", "thumbnail"]
 
+  drop_qcams = set()
+  if args.drop_qcam is not None:
+    drop_qcams.update(args.drop_qcam)
+  if args.drop_qcams is not None:
+    drop_qcams.update(range(args.drop_qcams, len(route.qcamera_paths())))
+
   use_demo_account = route.name.dongle_id == DEMO_DONGLE and not get_token()
   if use_demo_account:
     print("Using demo account")
@@ -190,7 +200,7 @@ def main() -> None:
     exit(1)
 
   try:
-    process(route, omit_msg_types)
+    process(route, omit_msg_types, drop_qcams)
   finally:
     if use_demo_account:
       clear_token()
