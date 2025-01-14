@@ -144,7 +144,7 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
   count = get_next_log_count(dongle_path, route.name)
   log_id = f"{count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
-  print(f"Omitting messages: {omit_msg_types}")
+  print(f"Omitting message types: {omit_msg_types}")
   print(f"Dropping qcamera.ts files: {drop_qcams}")
 
   segment_nums = range(len(qlogs))
@@ -164,10 +164,8 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
 
 def main() -> None:
   parser = argparse.ArgumentParser(description="Generate a corrupt route")
-  parser.add_argument("--omit-clocks", action="store_true", help="Omit clocks messages")
-  parser.add_argument("--omit-gps-location", action="store_true", help="Omit gpsLocation messages")
-  parser.add_argument("--omit-thumbnail", action="store_true", help="Omit thumbnail messages")
-  parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a specific qcamera.ts file, can be specified more than once")
+  parser.add_argument("-o", "--omit", action="append", choices=["clocks", "gpsLocation", "thumbnail"], help="Omit a message type")
+  parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a qcamera.ts file, can be specified more than once")
   parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number, use 0 to drop all")
   parser.add_argument("route_name", nargs="?", default=f"{DEMO_DONGLE}|{DEMO_LOG_ID}")
   args = parser.parse_args()
@@ -175,15 +173,9 @@ def main() -> None:
   route = Route(args.route_name)
   print(f"Route: {route.name}")
 
-  omit_msg_types = []
-  if args.omit_clocks:
-    omit_msg_types.append("clocks")
-  if args.omit_gps_location:
-    omit_msg_types.append("gpsLocation")
-  if args.omit_thumbnail:
-    omit_msg_types.append("thumbnail")
-  if not omit_msg_types:
-    omit_msg_types = ["clocks", "gpsLocation", "thumbnail"]
+  # Default to omitting clocks, gpsLocation and thumbnail if none specified
+  # Note: we should validate other message types before allowing them to be omitted
+  omit_msg_types = set(args.omit) if args.omit else {"clocks", "gpsLocation", "thumbnail"}
 
   drop_qcams = set()
   if args.drop_qcam is not None:
