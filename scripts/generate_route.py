@@ -163,9 +163,9 @@ def process(route: Route, omit_msg_types: list[str]) -> None:
 
 def main() -> None:
   parser = argparse.ArgumentParser(description="Generate a corrupt route")
-  parser.add_argument("--drop-clocks", action="store_true", help="Drop clocks messages")
-  parser.add_argument("--drop-gps-location", action="store_true", help="Drop gpsLocation messages")
-  parser.add_argument("--drop-thumbnail", action="store_true", help="Drop thumbnail messages")
+  parser.add_argument("--omit-clocks", action="store_true", help="Omit clocks messages")
+  parser.add_argument("--omit-gps-location", action="store_true", help="Omit gpsLocation messages")
+  parser.add_argument("--omit-thumbnail", action="store_true", help="Omit thumbnail messages")
   parser.add_argument("route_name", nargs="?", default=f"{DEMO_DONGLE}|{DEMO_LOG_ID}")
   args = parser.parse_args()
 
@@ -173,11 +173,11 @@ def main() -> None:
   print(f"Route: {route.name}")
 
   omit_msg_types = []
-  if args.drop_clocks:
+  if args.omit_clocks:
     omit_msg_types.append("clocks")
-  if args.drop_gps_location:
+  if args.omit_gps_location:
     omit_msg_types.append("gpsLocation")
-  if args.drop_thumbnail:
+  if args.omit_thumbnail:
     omit_msg_types.append("thumbnail")
   if not omit_msg_types:
     omit_msg_types = ["clocks", "gpsLocation", "thumbnail"]
