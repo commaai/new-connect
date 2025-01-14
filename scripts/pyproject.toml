@@ -1,0 +1,11 @@
+[project]
+name = "scripts"
+version = "0.1.0"
+requires-python = ">=3.12"
+dependencies = [
+  "openpilot",
+  "tqdm>=4.67.1",
+]
+
+[tool.uv.sources]
+openpilot = { path = "../../openpilot" }
