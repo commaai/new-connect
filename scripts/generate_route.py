@@ -16,15 +16,11 @@ from pathlib import Path
 from tqdm import tqdm
 
 from cereal.services import SERVICE_LIST
-from openpilot.tools.lib.auth_config import clear_token, get_token, set_token
 from openpilot.tools.lib.logreader import LogReader, save_log
 from openpilot.tools.lib.route import Route, RouteName
 from openpilot.tools.lib.url_file import URLFile
 
-
-DEMO_DONGLE = "1d3dc3e03047b0c7"
-DEMO_LOG_ID = "000000dd--455f14369d"
-DEMO_ACCOUNT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw"
+from auth import Auth, DEMO_ROUTE_ID
 
 OUTPUT_PATH = Path(__file__).parent.resolve() / "output"
 
@@ -166,7 +162,7 @@ def main() -> None:
   parser.add_argument("-o", "--omit", action="append", choices=["clocks", "gpsLocation", "thumbnail"], help="Omit a message type")
   parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a qcamera.ts file, can be specified more than once")
   parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number, use 0 to drop all")
-  parser.add_argument("route_name", nargs="?", default=f"{DEMO_DONGLE}|{DEMO_LOG_ID}")
+  parser.add_argument("route_name", nargs="?", default=DEMO_ROUTE_ID)
   args = parser.parse_args()
 
   route = Route(args.route_name)
@@ -182,19 +178,8 @@ def main() -> None:
   if args.drop_qcams is not None:
     drop_qcams.update(range(args.drop_qcams, len(route.qcamera_paths())))
 
-  use_demo_account = route.name.dongle_id == DEMO_DONGLE and not get_token()
-  if use_demo_account:
-    print("Using demo account")
-    set_token(DEMO_ACCOUNT)
-  elif not get_token():
-    print("Use the openpilot/tools/lib/auth.py script to set your JWT")
-    exit(1)
-
-  try:
+  with Auth(route):
     process(route, omit_msg_types, drop_qcams)
-  finally:
-    if use_demo_account:
-      clear_token()
 
 
 if __name__ == "__main__":
