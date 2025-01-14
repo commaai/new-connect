@@ -77,7 +77,6 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
 
   route_duration = max_route_time - min_route_time
   print(f"\nRoute duration: {route_duration:.2f}s")
-  print(f"  {len(qlog_paths)} qlogs")
   print(f"  logMonoTime min {min_route_time:.2f}, max: {max_route_time:.2f}")
 
   log_durations_valid = all(duration < MAX_LOG_DURATION for duration in log_durations)
@@ -147,10 +146,10 @@ def process(route: Route, omit_msg_types: list[str]) -> None:
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
   print(f"Omitting messages: {omit_msg_types}")
 
-  segment_names = [f"{log_id}--{i}" for i in range(len(qlogs))]
+  segment_nums = range(len(qlogs))
   corrupt_qlogs = map(partial(corrupt_qlog, omit_msg_types), qlogs)
-  for (segment_name, qlog, qcam) in tqdm(list(zip(segment_names, corrupt_qlogs, qcameras, strict=True)), desc="Generating corrupt logs"):
-    segment_path = dongle_path / segment_name
+  for (i, qlog, qcam) in tqdm(list(zip(segment_nums, corrupt_qlogs, qcameras, strict=True)), desc="Generating corrupt logs"):
+    segment_path = dongle_path / f"{log_id}--{i}"
     segment_path.mkdir(parents=True, exist_ok=True)
 
     qlog_path = segment_path / "qlog.gz"
