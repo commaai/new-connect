@@ -22,10 +22,12 @@ from openpilot.tools.lib.route import Route, RouteName
 from openpilot.tools.lib.url_file import URLFile
 
 from auth import Auth, DEMO_ROUTE_ID
+from utils import panic
 
 OUTPUT_PATH = Path(__file__).parent.resolve() / "output"
 
-MAX_LOG_DURATION = 62.0  # seconds
+QLOG_DURATION = (60.0, 62.0)  # seconds
+QCAM_DURATION = (59.9, 61.0)  # seconds
 MSG_FREQ_THRESHOLD = 0.95  # % of expected frequency
 
 
@@ -51,9 +53,8 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
   clocks_valid = False
   location_has_fix = False
   min_route_time, max_route_time = float("inf"), 0.0
-  log_durations: list[float] = []
 
-  for qlog in tqdm(qlog_paths, desc="Validating qlogs"):
+  for i, qlog in tqdm(enumerate(qlog_paths), desc="Validating qlogs", total=len(qlog_paths)):
     min_log_time, max_log_time = float("inf"), 0.0
 
     for m in LogReader(qlog):
@@ -70,18 +71,16 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
         location_has_fix = True
 
     min_route_time, max_route_time = min(min_route_time, min_log_time), max(max_route_time, max_log_time)
-    log_durations.append(max_log_time - min_log_time)
+    log_duration = max_log_time - min_log_time
+
+    if i != len(qlog_paths) - 1 and log_duration < QLOG_DURATION[0]:
+      panic(f"Segment {i} qlog is too short ({log_duration:.2f}s)")
+    if log_duration >= QLOG_DURATION[1]:
+      panic(f"Segment {i} qlog is too long ({log_duration:.2f}s)")
 
   route_duration = max_route_time - min_route_time
-  print(f"\nRoute duration: {route_duration:.2f}s")
+  print(f"Route duration: {route_duration:.2f}s")
   print(f"  logMonoTime min {min_route_time:.2f}, max: {max_route_time:.2f}")
-
-  log_durations_valid = all(duration < MAX_LOG_DURATION for duration in log_durations)
-  print(f"\nLog durations: {'PASS' if log_durations_valid else 'FAIL'}")
-  if not log_durations_valid:
-    for i, duration in enumerate(log_durations):
-      print(f"  qlog {i} duration: {duration:.2f}s")
-    exit(1)
 
   print("\nServices:")
   freq_valid = {}
@@ -97,14 +96,11 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
       print(f"    any(gpsLocation.hasFix): {'PASS' if location_has_fix else 'FAIL'}")
 
   if not clocks_valid:
-    print("FAIL: clocks.valid is False")
-    exit(1)
+    panic("FAIL: clocks.valid is False")
   elif not location_has_fix:
-    print("FAIL: gpsLocation.hasFix is False")
-    exit(1)
+    panic("FAIL: gpsLocation.hasFix is False")
   elif not all(freq_valid.values()):
-    print("FAIL: Not all services have the expected frequency")
-    exit(1)
+    panic("FAIL: Not all services have the expected frequency")
 
 
 def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
