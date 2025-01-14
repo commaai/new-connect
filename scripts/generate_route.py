@@ -10,6 +10,7 @@
 
 import argparse
 import random
+import sys
 from functools import partial
 from pathlib import Path
 
@@ -124,10 +125,12 @@ def corrupt_qlog(omit_msg_types: list[str], qlog_path: str) -> list:
 
 
 def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> None:
+  print(f"Route: {route.name}\n")
+
   # Get all file URLs from segment 0 to max
-  qlogs, qcameras = route.qlog_paths(), route.qcamera_paths()
+  qlogs, qcams = route.qlog_paths(), route.qcamera_paths()
   assert all(qlog is not None for qlog in qlogs), "At least one qlog is missing"
-  assert all(qcam is not None for qcam in qcameras), "At least one qcam is missing"
+  assert all(qcam is not None for qcam in qcams), "At least one qcam is missing"
 
   # TODO: validate qcamera.ts files
   validate_qlogs(qlogs)
@@ -140,11 +143,11 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
   log_id = f"{count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
   print(f"Omitting message types: {omit_msg_types}")
-  print(f"Dropping qcamera.ts files: {drop_qcams}")
+  print(f"Dropping qcamera.ts files: {drop_qcams}\n")
 
-  segment_nums = range(len(qlogs))
+  segment_count = len(qlogs)
   corrupt_qlogs = map(partial(corrupt_qlog, omit_msg_types), qlogs)
-  for (i, qlog, qcam) in tqdm(list(zip(segment_nums, corrupt_qlogs, qcameras, strict=True)), desc="Generating corrupt logs"):
+  for (i, qlog, qcam) in tqdm(zip(range(segment_count), corrupt_qlogs, qcams, strict=True), desc="Generating logs", total=segment_count):
     segment_path = dongle_path / f"{log_id}--{i}"
     segment_path.mkdir(parents=True, exist_ok=True)
 
@@ -153,24 +156,19 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
 
     if i not in drop_qcams:
       qcam_path = segment_path / "qcamera.ts"
-      dat = URLFile(qcam).read()
+      dat = URLFile(qcam, cache=True).read()
       qcam_path.write_bytes(dat)
 
 
 def main() -> None:
-  parser = argparse.ArgumentParser(description="Generate a corrupt route")
-  parser.add_argument("-o", "--omit", action="append", choices=["clocks", "gpsLocation", "thumbnail"], help="Omit a message type")
-  parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a qcamera.ts file, can be specified more than once")
-  parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number, use 0 to drop all")
+  parser = argparse.ArgumentParser(description="Generate a route with missing logs or messages")
+  parser.add_argument("--omit", action="append", choices=["clocks", "gpsLocation", "thumbnail"], help="Omit a message type. Can be specified more than once.")
+  parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a qcamera.ts file. Can be specified more than once.")
+  parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number. Use 0 to drop all.")
   parser.add_argument("route_name", nargs="?", default=DEMO_ROUTE_ID)
   args = parser.parse_args()
 
   route = Route(args.route_name)
-  print(f"Route: {route.name}")
-
-  # Default to omitting clocks, gpsLocation and thumbnail if none specified
-  # Note: we should validate other message types before allowing them to be omitted
-  omit_msg_types = set(args.omit) if args.omit else {"clocks", "gpsLocation", "thumbnail"}
 
   drop_qcams = set()
   if args.drop_qcam is not None:
@@ -178,8 +176,13 @@ def main() -> None:
   if args.drop_qcams is not None:
     drop_qcams.update(range(args.drop_qcams, len(route.qcamera_paths())))
 
+  if not args.omit and not drop_qcams:
+    parser.print_help(sys.stderr)
+    print("\nPass at least one flag to generate a corrupt route", file=sys.stderr)
+    sys.exit(1)
+
   with Auth(route):
-    process(route, omit_msg_types, drop_qcams)
+    process(route, args.omit, drop_qcams)
 
 
 if __name__ == "__main__":
