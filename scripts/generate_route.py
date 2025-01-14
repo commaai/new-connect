@@ -1,3 +1,13 @@
+# /// script
+# requires-python = ">=3.12"
+# dependencies = [
+#     "openpilot",
+# ]
+#
+# [tool.uv.sources]
+# openpilot = { path = "../../openpilot" }
+# ///
+
 import argparse
 import random
 from functools import partial
