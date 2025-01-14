@@ -111,11 +111,10 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
 
 
 def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
-  count = 0
   try:
     count = int(route_name.time_str.split("--")[0], 16)
   except ValueError:
-    pass
+    count = 0
   for dir in filter(lambda d: d.is_dir(), dongle_path.iterdir()):
     try:
       count = max(count, int(dir.name.split("--")[0], 16))
