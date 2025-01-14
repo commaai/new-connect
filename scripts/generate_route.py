@@ -11,7 +11,6 @@
 import argparse
 import random
 import subprocess
-import sys
 from functools import partial
 from pathlib import Path
 
