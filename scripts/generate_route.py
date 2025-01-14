@@ -108,23 +108,17 @@ def validate_qcams(qcamera_paths: list[str]) -> None:
   # Simply check the duration of each qcamera.ts
   # TODO: check for existence of video stream in correct format
   for i, qcam in tqdm(enumerate(qcamera_paths), desc="Validating qcams", total=len(qcamera_paths)):
-    dat = URLFile(qcam, cache=True).read()
+    result = subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", qcam],
+                            capture_output=True, text=True)
+    if result.stderr:
+      panic(f"Error processing segment {i} qcamera: {result.stderr}")
+
     try:
-      result = subprocess.Popen(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "default=noprint_wrappers=1:nokey=1", qcam], stdin=subprocess.PIPE, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-      output, error = result.communicate(dat)
-      if error:
-        panic(f"Error processing segment {i} qcamera: {error.decode()}")
-
-      duration = float(output.decode())
-
-      if i != len(qcamera_paths) - 1 and duration < QCAM_DURATION[0]:
-        panic(f"Segment {i} qcamera.ts is too short ({duration:.2f}s)")
-      if duration >= QCAM_DURATION[1]:
-        panic(f"Segment {i} qcamera.ts is too long ({duration:.2f}s)")
+      duration = float(result.stdout)
+      if i != len(qcamera_paths) - 1 and duration < QCAM_DURATION[0] or duration >= QCAM_DURATION[1]:
+        panic(f"Segment {i} qcamera.ts duration ({duration:.2f}s) is out of range")
     except ValueError as e:
-      panic(f"Could not parse duration for segment {i} qcamera.ts: {e}")
-    except subprocess.CalledProcessError as e:
-      panic(f"Failed to analyse segment {i} qcamera.ts: {e.output}")
+      panic(f"Error processing segment {i} qcamera: could not parse duration: {e}")
 
 
 def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
@@ -191,19 +185,15 @@ def main() -> None:
 
   route = Route(args.route_name)
 
-  drop_qcams = set()
-  if args.drop_qcam is not None:
-    drop_qcams.update(args.drop_qcam)
+  drop_qcams = set(args.drop_qcam or [])
   if args.drop_qcams is not None:
     drop_qcams.update(range(args.drop_qcams, len(route.qcamera_paths())))
 
   if not args.omit and not drop_qcams:
-    parser.print_help(sys.stderr)
-    print("\nPass at least one flag to generate a corrupt route", file=sys.stderr)
-    sys.exit(1)
+    parser.error("Pass at least one flag to generate a corrupt route")
 
   with Auth(route):
-    process(route, args.omit, drop_qcams)
+    process(route, args.omit or [], drop_qcams)
 
 
 if __name__ == "__main__":
