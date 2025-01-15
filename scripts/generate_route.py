@@ -59,14 +59,6 @@ def get_expected_msg_freq(msg_type: str) -> float:
 
 
 def validate_qlogs(qlog_paths: list[str]) -> None:
-  # 1. Get the duration of each log
-  #   i. Ensure that it is no longer than 60 seconds
-  #   ii. Use duration to calculate expected message counts
-  # 2. Check that the route contains messages at the correct frequency:
-  #   i. gpsLocation is present and that any(gpsLocation.hasFix is True)
-  #   ii. clocks is present and that any(msg.valid is True)
-  #   iii. thumbnail is present
-
   msg_counts: dict[str, int] = {
     "gpsLocation": 0,
     "clocks": 0,
