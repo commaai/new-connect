@@ -12,6 +12,7 @@ import argparse
 import random
 import subprocess
 from functools import partial
+import sys
 from pathlib import Path
 
 from tqdm import tqdm
@@ -31,13 +32,13 @@ QCAM_DURATION = (59.9, 61.0)  # seconds
 MSG_FREQ_THRESHOLD = 0.95  # % of expected frequency
 
 
-def get_msgs_time_range(msgs: list) -> tuple[float, float]:
-  min_time, max_time = float("inf"), 0.0
+def get_msgs_time_range(msgs: list) -> tuple[int, int]:
+  min_time, max_time = sys.maxsize, 0
   for m in msgs:
     msg_type = m.which()
     if msg_type == "initData":
       continue
-    log_time = m.logMonoTime / 1.0e9
+    log_time = m.logMonoTime
     min_time, max_time = min(min_time, log_time), max(max_time, log_time)
   return min_time, max_time
 
@@ -63,7 +64,7 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
   }
   clocks_valid = False
   location_has_fix = False
-  min_route_time, max_route_time = float("inf"), 0.0
+  min_route_time, max_route_time = sys.maxsize, 0.0
 
   for i, qlog in tqdm(enumerate(qlog_paths), desc="Validating qlogs", total=len(qlog_paths)):
     msgs = list(LogReader(qlog))
@@ -79,16 +80,16 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
 
     min_log_time, max_log_time = get_msgs_time_range(msgs)
     min_route_time, max_route_time = min(min_route_time, min_log_time), max(max_route_time, max_log_time)
-    log_duration = max_log_time - min_log_time
+    log_duration = (max_log_time - min_log_time) / 1.0e9
 
     if i != len(qlog_paths) - 1 and log_duration < QLOG_DURATION[0]:
       panic(f"Segment {i} qlog is too short ({log_duration:.2f}s)")
     if log_duration >= QLOG_DURATION[1]:
       panic(f"Segment {i} qlog is too long ({log_duration:.2f}s)")
 
-  route_duration = max_route_time - min_route_time
+  route_duration = (max_route_time - min_route_time) / 1.0e9
   print(f"Route duration: {route_duration:.2f}s")
-  print(f"  logMonoTime min {min_route_time:.2f}, max: {max_route_time:.2f}")
+  print(f"  logMonoTime min {min_route_time}, max: {max_route_time}")
 
   print("\nServices:")
   freq_valid = {}
