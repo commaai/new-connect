@@ -1,4 +1,4 @@
-import { Suspense, type VoidComponent } from 'solid-js'
+import { Suspense, type VoidComponent, createSignal } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
@@ -34,10 +34,13 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  return (
-    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}>
-      <RouteHeader route={props.route} />
+  const shouldRenderHeader = createSignal(false)[0]
 
+  return (
+
+    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}>
+      {/* <RouteHeader route={props.route} /> */}
+      {shouldRenderHeader() && <RouteHeader route={props.route} />}
       <div class="mx-2 h-48 overflow-hidden rounded-lg">
         <Suspense
           fallback={<div class="skeleton-loader size-full bg-surface" />}
