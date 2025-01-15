@@ -199,27 +199,18 @@ def create_corrupt_qlog(qlog_path: str, omit_msg_types: list[str], target_durati
     current_time += log_duration
 
 
-def truncate_qcam(input_path: str, output_path: str, target_duration: float):
-  result = subprocess.run(["ffmpeg", "-v", "error", "-i", input_path, "-t", f"{target_duration:.3f}",
-                           "-c", "copy", output_path], capture_output=True, text=True)
-  if result.stderr:
-    panic(f"Error truncating qcam {input_path}: {result.stderr}")
-
-
-def extend_qcam(input_path: str, output_path: str, duration: float, target_duration: float):
-  pass
-
-
-def create_corrupt_qcam(qcam_path: str, output_path: Path, target_duration: float | None):
+def create_corrupt_qcam(input_path: str, output_path: Path, target_duration: float | None):
   if not target_duration:
-    output_path.write_bytes(URLFile(qcam_path, cache=True).read())
+    output_path.write_bytes(URLFile(input_path, cache=True).read())
     return
 
-  duration = get_qcam_duration(qcam_path)
-  if target_duration <= duration:
-    truncate_qcam(qcam_path, output_path.as_posix(), target_duration)
-  elif target_duration > duration:
-    extend_qcam(qcam_path, output_path.as_posix(), duration, target_duration)
+  result = subprocess.run(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", input_path,
+                           "-t", f"{target_duration:.3f}", "-c:v", "copy", output_path.as_posix()],
+                           capture_output=True, text=True)
+  if result.stderr:
+    panic(f"Error creating corrupt qcam {input_path}:\n{result.stderr}")
+  elif result.stdout:
+    print(result.stdout)
 
 
 def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segment_durations: dict[int, float]) -> None:
