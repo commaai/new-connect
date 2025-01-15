@@ -49,14 +49,8 @@ def setup_auth(dongle_id: str):
 
 
 def get_msgs_time_range(msgs: list) -> tuple[int, int]:
-  min_time, max_time = sys.maxsize, 0
-  for m in msgs:
-    msg_type = m.which()
-    if msg_type == "initData":
-      continue
-    log_time = m.logMonoTime
-    min_time, max_time = min(min_time, log_time), max(max_time, log_time)
-  return min_time, max_time
+  log_times = [m.logMonoTime for m in msgs if m.logMonoTime]
+  return min(log_times), max(log_times)
 
 
 def get_expected_msg_freq(msg_type: str) -> float:
@@ -202,20 +196,16 @@ def create_corrupt_qcam(input_path: str, output_path: Path, target_duration: flo
   if not target_duration:
     output_path.write_bytes(URLFile(input_path, cache=True).read())
     return
-
   result = subprocess.run(["ffmpeg", "-v", "error", "-stream_loop", "-1", "-i", input_path,
                            "-t", f"{target_duration:.3f}", "-c:v", "copy", output_path.as_posix()],
                            capture_output=True, text=True)
   if result.stderr:
     panic(f"Error creating corrupt qcam {input_path}:\n{result.stderr}")
-  elif result.stdout:
-    print(result.stdout)
 
 
 def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segment_durations: dict[int, float]) -> None:
   print(f"Route: {route.name}\n")
 
-  # Get all file URLs from segment 0 to max
   qlogs, qcams = route.qlog_paths(), route.qcamera_paths()
   assert all(qlog is not None for qlog in qlogs), "At least one qlog is missing"
   assert all(qcam is not None for qcam in qcams), "At least one qcam is missing"
@@ -228,8 +218,8 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segme
   if not dongle_path.exists():
     dongle_path.mkdir(parents=True, exist_ok=True)
 
-  count = get_next_log_count(dongle_path, route.name)
-  log_id = f"{count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
+  log_count = get_next_log_count(dongle_path, route.name)
+  log_id = f"{log_count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
   print(f"Omitting message types: {omit_msg_types}")
   print(f"Dropping qcamera.ts files: {drop_qcams}")
