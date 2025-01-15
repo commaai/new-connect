@@ -38,7 +38,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
       pages[page] = new Promise(async (resolve) => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
+        resolve(key ? (await fetcher<RouteSegments[]>(key)).sort((a, b) => b.create_time - a.create_time) : []);
       })
     }
     return pages[page]

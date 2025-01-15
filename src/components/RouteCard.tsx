@@ -39,7 +39,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   return (
 
     <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}>
-      {/* <RouteHeader route={props.route} /> */}
       {shouldRenderHeader() && <RouteHeader route={props.route} />}
       <div class="mx-2 h-48 overflow-hidden rounded-lg">
         <Suspense
@@ -48,7 +47,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           <RouteStaticMap route={props.route} />
         </Suspense>
       </div>
-
       <CardContent>
         <RouteStatistics route={props.route} />
       </CardContent>
