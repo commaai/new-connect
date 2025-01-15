@@ -13,23 +13,39 @@ import random
 import subprocess
 import sys
 from pathlib import Path
-from typing import Iterator
+from typing import Iterator, NoReturn
 
 from tqdm import tqdm
 
 from cereal.services import SERVICE_LIST
+from openpilot.tools.lib.auth_config import clear_token, get_token, set_token
 from openpilot.tools.lib.logreader import LogReader, save_log
 from openpilot.tools.lib.route import Route, RouteName
 from openpilot.tools.lib.url_file import URLFile
 
-from auth import Auth, DEMO_ROUTE_ID
-from utils import panic
-
 OUTPUT_PATH = Path(__file__).parent.resolve() / "output"
+
+DEMO_DONGLE_ID = "1d3dc3e03047b0c7"
+DEMO_LOG_ID = "000000dd--455f14369d"
+DEMO_ROUTE_ID = f"{DEMO_DONGLE_ID}|{DEMO_LOG_ID}"
+DEMO_ACCOUNT = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw"
 
 QLOG_DURATION = (60.0, 62.0)  # seconds
 QCAM_DURATION = (59.9, 61.0)  # seconds
 MSG_FREQ_THRESHOLD = 0.95  # % of expected frequency
+
+
+def panic(*args, **kwargs) -> NoReturn:
+  print(*args, file=sys.stderr, **kwargs)
+  sys.exit(1)
+
+
+def setup_auth(dongle_id: str):
+  if not get_token():
+    if dongle_id != DEMO_DONGLE_ID:
+      panic("Use the openpilot/tools/lib/auth.py script to set your JWT")
+    print("Using demo account")
+    set_token(DEMO_ACCOUNT)
 
 
 def get_msgs_time_range(msgs: list) -> tuple[int, int]:
@@ -246,8 +262,17 @@ def main() -> None:
   if not args.omit and not drop_qcams and not segment_durations:
     parser.error("Pass at least one flag to generate a corrupt route")
 
-  with Auth(route):
+  if not get_token():
+    if route.name.dongle_id != DEMO_DONGLE_ID:
+      panic("Use the openpilot/tools/lib/auth.py script to set your JWT")
+    print("Using demo account")
+    set_token(DEMO_ACCOUNT)
+
+  try:
     process(route, args.omit or [], drop_qcams, segment_durations)
+  finally:
+    if get_token() == DEMO_ACCOUNT:
+      clear_token()
 
 
 if __name__ == "__main__":
