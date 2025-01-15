@@ -177,6 +177,8 @@ def create_corrupt_qlog(qlog_path: str, omit_msg_types: list[str], target_durati
   if target_duration is None:
     yield from msgs
     return
+  elif target_duration == 0:
+    return
 
   target_duration = int(target_duration * 1e9)
   min_log_time, max_log_time = get_msgs_time_range(msgs)
