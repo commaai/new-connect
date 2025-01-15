@@ -199,6 +199,29 @@ def create_corrupt_qlog(qlog_path: str, omit_msg_types: list[str], target_durati
     current_time += log_duration
 
 
+def truncate_qcam(input_path: str, output_path: str, target_duration: float):
+  result = subprocess.run(["ffmpeg", "-v", "error", "-i", input_path, "-t", f"{target_duration:.3f}",
+                           "-c", "copy", output_path], capture_output=True, text=True)
+  if result.stderr:
+    panic(f"Error truncating qcam {input_path}: {result.stderr}")
+
+
+def extend_qcam(input_path: str, output_path: str, duration: float, target_duration: float):
+  pass
+
+
+def create_corrupt_qcam(qcam_path: str, output_path: Path, target_duration: float | None):
+  if not target_duration:
+    output_path.write_bytes(URLFile(qcam_path, cache=True).read())
+    return
+
+  duration = get_qcam_duration(qcam_path)
+  if target_duration <= duration:
+    truncate_qcam(qcam_path, output_path.as_posix(), target_duration)
+  elif target_duration > duration:
+    extend_qcam(qcam_path, output_path.as_posix(), duration, target_duration)
+
+
 def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segment_durations: dict[int, float]) -> None:
   print(f"Route: {route.name}\n")
 
@@ -233,8 +256,7 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segme
 
     if i not in drop_qcams:
       qcam_path = segment_path / "qcamera.ts"
-      dat = URLFile(qcam, cache=True).read()
-      qcam_path.write_bytes(dat)
+      create_corrupt_qcam(qcam, qcam_path, segment_durations.get(i, None))
 
 
 def main() -> None:
