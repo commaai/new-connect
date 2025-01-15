@@ -82,12 +82,10 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
 
     min_log_time, max_log_time = get_msgs_time_range(msgs)
     min_route_time, max_route_time = min(min_route_time, min_log_time), max(max_route_time, max_log_time)
-    log_duration = (max_log_time - min_log_time) / 1.0e9
 
-    if i != len(qlog_paths) - 1 and log_duration < QLOG_DURATION[0]:
-      panic(f"Segment {i} qlog is too short ({log_duration:.2f}s)")
-    if log_duration >= QLOG_DURATION[1]:
-      panic(f"Segment {i} qlog is too long ({log_duration:.2f}s)")
+    log_duration = (max_log_time - min_log_time) / 1.0e9
+    if i != len(qlog_paths) - 1 and log_duration < QLOG_DURATION[0] or log_duration >= QLOG_DURATION[1]:
+      panic(f"Segment {i} qlog is out of range ({log_duration:.2f}s)")
 
   route_duration = (max_route_time - min_route_time) / 1.0e9
   print(f"Route duration: {route_duration:.2f}s")
