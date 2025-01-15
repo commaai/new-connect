@@ -11,9 +11,9 @@
 import argparse
 import random
 import subprocess
-from functools import partial
 import sys
 from pathlib import Path
+from typing import Iterator
 
 from tqdm import tqdm
 
@@ -89,7 +89,7 @@ def validate_qlogs(qlog_paths: list[str]) -> None:
 
   route_duration = (max_route_time - min_route_time) / 1.0e9
   print(f"Route duration: {route_duration:.2f}s")
-  print(f"  logMonoTime min {min_route_time}, max: {max_route_time}")
+  print(f"  logMonoTime min: {min_route_time}, max: {max_route_time}")
 
   print("\nServices:")
   freq_valid = {}
@@ -142,11 +142,43 @@ def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
   return count + 1
 
 
-def corrupt_qlog(omit_msg_types: list[str], qlog_path: str) -> list:
-  return filter(lambda m: m.which() not in omit_msg_types, LogReader(qlog_path))
+def filter_msgs_log_time(msgs: Iterator, max_log_time: int) -> Iterator:
+  return (m for m in msgs if m.logMonoTime < max_log_time)
 
 
-def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> None:
+def offset_msgs_log_time(msgs: Iterator, log_time_offset: int) -> Iterator:
+  for m in msgs:
+    builder = m.as_builder()
+    builder.logMonoTime += log_time_offset
+    yield builder.as_reader()
+
+
+def create_corrupt_qlog(qlog_path: str, omit_msg_types: list[str], target_duration: float | None) -> Iterator:
+  msgs = LogReader(qlog_path)
+  if omit_msg_types:
+    msgs = (m for m in msgs if m.which() not in omit_msg_types)
+
+  if target_duration is None:
+    yield from msgs
+    return
+
+  target_duration = int(target_duration * 1e9)
+  min_log_time, max_log_time = get_msgs_time_range(msgs)
+  log_duration = max_log_time - min_log_time
+  if target_duration <= log_duration:
+    yield from filter_msgs_log_time(msgs, min_log_time + target_duration)
+    return
+
+  current_time = 0
+  while current_time < target_duration:
+    remaining_log_time = target_duration - current_time
+    if remaining_log_time < log_duration:
+      msgs = filter_msgs_log_time(msgs, min_log_time + remaining_log_time)
+    yield from offset_msgs_log_time(msgs, current_time)
+    current_time += log_duration
+
+
+def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int], segment_durations: dict[int, float]) -> None:
   print(f"Route: {route.name}\n")
 
   # Get all file URLs from segment 0 to max
@@ -166,16 +198,17 @@ def process(route: Route, omit_msg_types: list[str], drop_qcams: set[int]) -> No
   log_id = f"{count:08x}--{''.join(random.choices("0123456789abcdef", k=10))}"
   print(f"\nNew route: {route.name.dongle_id}|{log_id}")
   print(f"Omitting message types: {omit_msg_types}")
-  print(f"Dropping qcamera.ts files: {drop_qcams}\n")
+  print(f"Dropping qcamera.ts files: {drop_qcams}")
+  print(f"Modifying segment durations: {segment_durations}\n")
 
   segment_count = len(qlogs)
-  corrupt_qlogs = map(partial(corrupt_qlog, omit_msg_types), qlogs)
-  for (i, qlog, qcam) in tqdm(zip(range(segment_count), corrupt_qlogs, qcams, strict=True), desc="Generating logs", total=segment_count):
+  for (i, qlog, qcam) in tqdm(zip(range(segment_count), qlogs, qcams, strict=True), desc="Generating logs", total=segment_count):
     segment_path = dongle_path / f"{log_id}--{i}"
     segment_path.mkdir(parents=True, exist_ok=True)
 
-    qlog_path = segment_path / "qlog.gz"
-    save_log(qlog_path.as_posix(), qlog)
+    qlog_path = segment_path / "qlog.zst"
+    corrupt_qlog = create_corrupt_qlog(qlog, omit_msg_types, segment_durations.get(i, None))
+    save_log(qlog_path.as_posix(), corrupt_qlog)
 
     if i not in drop_qcams:
       qcam_path = segment_path / "qcamera.ts"
@@ -188,6 +221,7 @@ def main() -> None:
   parser.add_argument("--omit", action="append", choices=["clocks", "gpsLocation", "thumbnail"], help="Omit a message type. Can be specified more than once.")
   parser.add_argument("--drop-qcam", action="append", type=int, help="Drop a qcamera.ts file. Can be specified more than once.")
   parser.add_argument("--drop-qcams", type=int, help="Drop all qcamera.ts files beginning with this segment number. Use 0 to drop all.")
+  parser.add_argument("--duration", action="append", type=str, help="Modify segment duration. Format: 'segment_index:duration_seconds' (e.g. 1:30.5)")
   parser.add_argument("route_name", nargs="?", default=DEMO_ROUTE_ID)
   args = parser.parse_args()
 
@@ -197,11 +231,23 @@ def main() -> None:
   if args.drop_qcams is not None:
     drop_qcams.update(range(args.drop_qcams, len(route.qcamera_paths())))
 
-  if not args.omit and not drop_qcams:
+  segment_durations: dict[int, float] = {}
+  if args.duration:
+    for segment_duration in args.duration:
+      try:
+        idx, duration = segment_duration.split(":")
+        idx = int(idx)
+        if idx in segment_durations:
+          parser.error("More than one duration provided for the same segment")
+        segment_durations[idx] = float(duration)
+      except ValueError:
+        parser.error("Invalid segment duration format. Use 'segment_index:duration_seconds'")
+
+  if not args.omit and not drop_qcams and not segment_durations:
     parser.error("Pass at least one flag to generate a corrupt route")
 
   with Auth(route):
-    process(route, args.omit or [], drop_qcams)
+    process(route, args.omit or [], drop_qcams, segment_durations)
 
 
 if __name__ == "__main__":
