@@ -128,20 +128,16 @@ def validate_qcams(qcamera_paths: list[str]) -> None:
   for i, qcam in tqdm(enumerate(qcamera_paths), desc="Validating qcams", total=len(qcamera_paths)):
     duration = get_qcam_duration(qcam)
     if i != len(qcamera_paths) - 1 and duration < QCAM_DURATION[0] or duration >= QCAM_DURATION[1]:
-      panic(f"Segment {i} qcamera.ts duration ({duration:.2f}s) is out of range")
+      panic(f"Segment {i} qcam duration ({duration:.2f}s) is out of range")
 
 
 def get_next_log_count(dongle_path: Path, route_name: RouteName) -> int:
   try:
-    count = int(route_name.time_str.split("--")[0], 16)
-  except ValueError:
-    count = 0
-  for dir in filter(lambda d: d.is_dir(), dongle_path.iterdir()):
-    try:
-      count = max(count, int(dir.name.split("--")[0], 16))
-    except ValueError:
-      pass
-  return count + 1
+    time_strs = [route_name.time_str.split("--")[0], *(d.name.split("--")[0] for d in dongle_path.iterdir())]
+    return max(int(t, 16) for t in time_strs) + 1
+  except ValueError as e:
+    print(f"Failed to determine next log count: {e}")
+    return 0
 
 
 def filter_msgs_log_time(msgs: Iterator, max_log_time: int) -> Iterator:
