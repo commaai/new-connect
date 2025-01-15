@@ -140,7 +140,6 @@ def get_qcam_duration(qcam_path: str) -> float:
 
 
 def validate_qcams(qcamera_paths: list[str]) -> None:
-  # Simply check the duration of each qcamera.ts
   # TODO: check for existence of video stream in correct format
   for i, qcam in tqdm(enumerate(qcamera_paths), desc="Validating qcams", total=len(qcamera_paths)):
     duration = get_qcam_duration(qcam)
