@@ -49,7 +49,7 @@ def setup_auth(dongle_id: str):
 
 
 def get_msgs_time_range(msgs: list) -> tuple[int, int]:
-  log_times = [m.logMonoTime for m in msgs if m.logMonoTime]
+  log_times = [m.logMonoTime for m in msgs if m.which() != "initData"]
   return min(log_times), max(log_times)
 
 
