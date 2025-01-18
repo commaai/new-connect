@@ -3,9 +3,11 @@ import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
 
+const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
+
 export default function Login() {
   const loginAsDemoUser = function () {
-    setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw')
+    setAccessToken(ACCESS_TOKEN)
     window.location.href = window.location.origin
   }
 
@@ -26,7 +28,7 @@ export default function Login() {
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
-            class="h-16 gap-4"
+            class="h-12 gap-4 md:h-16"
             href={getGoogleAuthUrl()}
             leading={
               <img
@@ -40,7 +42,7 @@ export default function Login() {
             Sign in with Google
           </Button>
           <Button
-            class="h-16 gap-4"
+            class="h-12 gap-4 md:h-16"
             href={getAppleAuthUrl()}
             leading={
               <img
@@ -54,7 +56,7 @@ export default function Login() {
             Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
-            class="h-16 gap-4"
+            class="h-12 gap-4 md:h-16"
             href={getGitHubAuthUrl()}
             leading={
               <img
@@ -70,7 +72,7 @@ export default function Login() {
         </div>
 
         <div class="flex justify-between gap-4">
-          <p class="text-body-lg">
+          <p class="text-body-md md:text-body-lg">
             Make sure to sign in with the same account if you have previously
             paired your comma three.
           </p>
