@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
   createResource,
@@ -33,13 +32,12 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
   const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (!pages[page]) {
-      // eslint-disable-next-line no-async-promise-executor
-      pages[page] = new Promise(async (resolve) => {
+    if (pages[page] === undefined) {
+      pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
-      })
+        return key ? fetcher<RouteSegments[]>(key) : []
+      })()
     }
     return pages[page]
   }
