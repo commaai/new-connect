@@ -21,7 +21,7 @@ export default function Login() {
           height={96}
         />
 
-        <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-2 text-center">
           <h1 class="text-display-sm font-extrabold md:mt-4">comma connect</h1>
           <p class="text-body-lg">Manage your openpilot experience.</p>
         </div>
