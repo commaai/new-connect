@@ -10,6 +10,15 @@ export interface Profile {
   user_id: string
 }
 
+export interface DeviceLocation extends ApiResponseBase {
+  lat: number
+  lng: number
+  time: number
+  accuracy: number
+  speed: number
+  bearing: number
+}
+
 export interface Device extends ApiResponseBase {
   dongle_id: string
   alias: string

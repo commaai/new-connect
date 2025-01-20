@@ -3,15 +3,16 @@ import globals from 'globals'
 import js from '@eslint/js'
 import ts from 'typescript-eslint'
 import tailwind from 'eslint-plugin-tailwindcss'
-import solid from 'eslint-plugin-solid/configs/typescript.js'
+import solid from 'eslint-plugin-solid/configs/typescript'
 import stylistic from '@stylistic/eslint-plugin'
+import vitest from '@vitest/eslint-plugin'
 
 export default [
   {
     languageOptions: { globals: globals.browser },
   },
   {
-    ignores: ['.github', '.husky', '.vscode', 'node_modules', 'dist'],
+    ignores: ['.github', '.vscode', 'dist'],
   },
   js.configs.recommended,
   ...ts.configs.recommendedTypeChecked,
@@ -63,6 +64,26 @@ export default [
           'ignoreRestSiblings': true,
         },
       ],
+    },
+  },
+  {
+    files: ['src/**/*.test.*'],
+    plugins: {
+      vitest,
+    },
+    languageOptions: {
+      globals: {
+        ...vitest.environments.env.globals,
+      },
+    },
+    rules: {
+      ...vitest.configs.recommended.rules,
+      '@typescript-eslint/unbound-method': 'off',
+    },
+    settings: {
+      vitest: {
+        typecheck: true,
+      },
     },
   },
 ]

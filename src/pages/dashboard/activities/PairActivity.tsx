@@ -62,11 +62,11 @@ const PairActivity: VoidComponent = () => {
         return (
           <div id="video-container" class="absolute size-full overflow-hidden bg-black text-white">
             <video class="left-1/2 top-1/2 h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover" ref={videoRef!} />
-            <div class="prose absolute inset-0 flex flex-col justify-between pb-4">
+            <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
               <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
                 Add new device
               </TopAppBar>
-              <h2 class="text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
+              <h2 class="px-8 text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
             </div>
           </div>
         )

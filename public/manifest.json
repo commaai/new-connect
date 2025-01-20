@@ -36,9 +36,9 @@
   ],
   "id": "/",
   "start_url": "/?pwa=1",
-  "background_color": "#1B1B1F",
+  "background_color": "#131318",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#1B1B1F",
+  "theme_color": "#535a92",
   "description": "manage your openpilot experience"
 }

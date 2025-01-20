@@ -3,9 +3,11 @@ import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
 
+const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
+
 export default function Login() {
   const loginAsDemoUser = function () {
-    setAccessToken('eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw')
+    setAccessToken(ACCESS_TOKEN)
     window.location.href = window.location.origin
   }
 
@@ -19,14 +21,14 @@ export default function Login() {
           height={96}
         />
 
-        <div class="flex flex-col items-center gap-2">
+        <div class="flex flex-col items-center gap-2 text-center">
           <h1 class="text-display-sm font-extrabold md:mt-4">comma connect</h1>
           <p class="text-body-lg">Manage your openpilot experience.</p>
         </div>
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
-            class="h-16 gap-4"
+            class="h-14 gap-4 xs:h-16"
             href={getGoogleAuthUrl()}
             leading={
               <img
@@ -40,7 +42,7 @@ export default function Login() {
             Sign in with Google
           </Button>
           <Button
-            class="h-16 gap-4"
+            class="h-14 gap-4 xs:h-16"
             href={getAppleAuthUrl()}
             leading={
               <img
@@ -54,7 +56,7 @@ export default function Login() {
             Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
-            class="h-16 gap-4"
+            class="h-14 gap-4 xs:h-16"
             href={getGitHubAuthUrl()}
             leading={
               <img
@@ -70,7 +72,7 @@ export default function Login() {
         </div>
 
         <div class="flex justify-between gap-4">
-          <p class="text-body-lg">
+          <p class="text-body-md xs:text-body-lg">
             Make sure to sign in with the same account if you have previously
             paired your comma three.
           </p>

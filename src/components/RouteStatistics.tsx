@@ -26,24 +26,24 @@ const RouteStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
 
   return (
     <div class={clsx('flex size-full items-stretch gap-8', props.class)}>
-      <div class="flex flex-col justify-between">
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Distance</span>
         <span class="font-mono text-label-lg uppercase">{formatRouteDistance(props.route)}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Duration</span>
         <span class="font-mono text-label-lg uppercase">{formatRouteDuration(props.route)}</span>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="hidden grow flex-col justify-between xs:flex">
         <span class="text-body-sm text-on-surface-variant">Engaged</span>
         <Suspense>
           <span class="font-mono text-label-lg uppercase">{formatEngagement(timeline())}</span>
         </Suspense>
       </div>
 
-      <div class="flex flex-col justify-between">
+      <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">User flags</span>
         <Suspense>
           <span class="font-mono text-label-lg uppercase">{formatUserFlags(timeline())}</span>

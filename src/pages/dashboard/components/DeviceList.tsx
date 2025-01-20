@@ -2,10 +2,9 @@ import { For } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import List, { IconWithStatusIndicator, ListItem, ListItemContent } from '~/components/material/List'
+import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/types'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
-
 import useDeviceList from '~/utils/useDeviceList'
 
 type DeviceListProps = {
@@ -19,13 +18,16 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
     onClick,
   } = useDeviceList()
   return (
-    <List variant="nav" class={clsx(props.class)}>
+    <List variant="nav" class={props.class}>
       <For each={props.devices}>
         {(device) => {
           return (
             <ListItem
               variant="nav"
-              leading={<IconWithStatusIndicator isOnline={deviceIsOnline(device)} iconName="directions_car" />}
+              leading={<div class={clsx(
+                'm-2 size-2 rounded-full',
+                deviceIsOnline(device) ? 'bg-green-400' : 'bg-gray-400',
+              )} />}
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}

@@ -17,7 +17,7 @@ const loadImage = (url: string | undefined): Promise<string | undefined> => {
     const image = new Image()
     image.src = url
     image.onload = () => resolve(url)
-    image.onerror = (error) => reject(error)
+    image.onerror = (error) => reject(new Error('Failed to load image', { cause: error }))
   })
 }
 
@@ -30,7 +30,7 @@ const getStaticMapUrl = (gpsPoints: GPSPathPoint[]): string | undefined => {
     path.push([lng, lat])
   })
   const themeId = getThemeId()
-  return getPathStaticMapUrl(themeId, path, 380, 192, true)
+  return getPathStaticMapUrl(themeId, path, 343, 256, true)
 }
 
 const State = (props: {

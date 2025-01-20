@@ -1,4 +1,4 @@
-import { createResource, Suspense, useContext, createSignal, For } from 'solid-js'
+import { createResource, Suspense, useContext, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -7,6 +7,7 @@ import { getAccessToken } from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
@@ -111,12 +112,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
+          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
+            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+          </Show>
           <div class="flex">
             <div class="flex-auto">
               <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                <div class="p-4">
-                  <DeviceStatistics dongleId={props.dongleId} />
-                </div>
+                <DeviceStatistics dongleId={props.dongleId} class="p-4" />
               </Suspense>
             </div>
             <div class="flex p-4">
