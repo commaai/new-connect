@@ -28,7 +28,7 @@ export default function Login() {
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
-            class="h-12 gap-4 xs:h-16"
+            class="h-14 gap-4 xs:h-16"
             href={getGoogleAuthUrl()}
             leading={
               <img
@@ -42,7 +42,7 @@ export default function Login() {
             Sign in with Google
           </Button>
           <Button
-            class="h-12 gap-4 xs:h-16"
+            class="h-14 gap-4 xs:h-16"
             href={getAppleAuthUrl()}
             leading={
               <img
@@ -56,7 +56,7 @@ export default function Login() {
             Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
-            class="h-12 gap-4 xs:h-16"
+            class="h-14 gap-4 xs:h-16"
             href={getGitHubAuthUrl()}
             leading={
               <img
