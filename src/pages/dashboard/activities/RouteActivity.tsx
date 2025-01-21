@@ -1,6 +1,5 @@
 import {
   createResource,
-  createSignal,
   lazy,
   Suspense,
   type VoidComponent,
@@ -12,8 +11,6 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
-import Timeline from '~/components/Timeline'
 import { parseDateStr } from '~/utils/date'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
@@ -24,8 +21,6 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(0)
-
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
@@ -42,16 +37,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
-          <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
+          <RouteVideoPlayer routeName={routeName()} route={route()} />
         </Suspense>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm">Timeline</h3>
-          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
-          <Suspense fallback={<div class="h-10" />}>
-            <RouteStatistics route={route()} />
-          </Suspense>
-        </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Route Map</h3>
