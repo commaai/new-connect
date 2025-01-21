@@ -83,8 +83,6 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
             >
               <For each={routes()}>
                 {(route) => {
-                  console.log(route.create_time)
-
                   return <RouteCard route={route} />
                 }}
               </For>
