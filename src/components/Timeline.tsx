@@ -1,5 +1,5 @@
-import { For, createResource, Show, Suspense } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
+import { For, createResource, createSignal, createEffect, createMemo, Show, Suspense } from 'solid-js'
+import type { VoidComponent, Accessor } from 'solid-js'
 import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
@@ -92,43 +92,87 @@ function renderTimelineEvents(
   )
 }
 
-// TODO: align to first camera frame event
-function renderMarker(route: Route | undefined, seekTime: number | undefined) {
-  if (!route) return null
-  if (seekTime === undefined) return null
-
-  const duration = getRouteDuration(route)?.asSeconds() ?? 0
-  const offsetPct = (seekTime / duration) * 100
-  return (
-    <div
-      class="absolute top-0 z-10 h-full"
-      style={{
-        'background-color': 'rgba(255,255,255,0.7)',
-        width: '3px',
-        left: `${offsetPct}%`,
-      }}
-    />
-  )
-}
-
 interface TimelineProps {
   class?: string
   routeName: string
-  seekTime?: number
+  seekTime: Accessor<number>
+  updateTime: (newTime: number) => void
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   const [route] = createResource(() => props.routeName, getRoute)
   const [events] = createResource(route, getTimelineEvents)
+  // TODO: align to first camera frame event
+  const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
+  const duration = createMemo(() => 
+    route()
+      ? getRouteDuration(route()!)?.asSeconds() ?? 0
+      : 0,
+  )
+
+  let ref: HTMLDivElement
+  let handledTouchStart = false
+
+  function updateMarker(clientX: number, rect: DOMRect) {
+    const x = clientX - rect.left
+    const fraction = x / rect.width
+    // Update marker immediately without waiting for video
+    setMarkerOffsetPct(fraction * 100)
+    const newTime = duration() * fraction
+    props.updateTime(newTime)
+  }
+
+  function onMouseDownOrTouchStart(ev: MouseEvent | TouchEvent) {
+    if (handledTouchStart || !route()) return
+
+    const rect = ref.getBoundingClientRect()
+
+    if (ev.type === 'mousedown') {
+      ev = ev as MouseEvent
+      updateMarker(ev.clientX, rect)
+      const onMove = (moveEv: MouseEvent) => {
+        updateMarker(moveEv.clientX, rect)
+      }
+      const onUpOrLeave = () => {
+        ref.removeEventListener('mousemove', onMove)
+        ref.removeEventListener('mouseup', onUpOrLeave)
+        ref.removeEventListener('mouseleave', onUpOrLeave)
+      }
+      ref.addEventListener('mousemove', onMove)
+      ref.addEventListener('mouseup', onUpOrLeave)
+      ref.addEventListener('mouseleave', onUpOrLeave)
+    } else {
+      ev = ev as TouchEvent
+      if (ev.touches.length === 1) {
+        updateMarker(ev.touches[0].clientX, rect)
+      }
+    }
+  }
+
+  createEffect(() => {
+    setMarkerOffsetPct((props.seekTime() / duration()) * 100)
+  })
 
   return (
     <div
+      ref={ref!}
       class={clsx(
-        'relative isolate flex h-6 self-stretch overflow-hidden rounded-sm bg-blue-900',
+        'relative isolate flex h-6 cursor-pointer self-stretch overflow-hidden rounded-sm bg-blue-900',
         'after:absolute after:inset-0 after:bg-gradient-to-b after:from-[rgba(0,0,0,0)] after:via-[rgba(0,0,0,0.1)] after:to-[rgba(0,0,0,0.2)]',
         props.class,
       )}
       title="Disengaged"
+      onMouseDown={onMouseDownOrTouchStart}
+      onTouchStart={(ev) => {
+        handledTouchStart = false
+        onMouseDownOrTouchStart(ev)
+        handledTouchStart = true
+      }}
+      onTouchMove={(ev) => {
+        if (ev.touches.length !== 1 || !route()) return
+        const rect = ref.getBoundingClientRect()
+        updateMarker(ev.touches[0].clientX, rect)
+      }}
     >
       <Suspense fallback={<div class="skeleton-loader size-full" />}>
         <Show when={route()} keyed>
@@ -137,7 +181,14 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
               <Show when={events()} keyed>
                 {(events) => renderTimelineEvents(route, events)}
               </Show>
-              {renderMarker(route, props.seekTime)}
+              <div
+                class="absolute top-0 z-10 h-full"
+                style={{
+                  'background-color': 'rgba(255,255,255,0.7)',
+                  width: '3px',
+                  left: `${markerOffsetPct()}%`,
+                }}
+              />
             </>
           )}
         </Show>

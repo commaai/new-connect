@@ -30,6 +30,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
 
+  let videoRef: HTMLVideoElement
+
+  function onTimelineChange(newTime: number) {
+    videoRef.currentTime = newTime
+  }
+
   return (
     <>
       <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>}>
@@ -42,12 +48,17 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
-          <RouteVideoPlayer routeName={routeName()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={ref => videoRef = ref} routeName={routeName()} onProgress={setSeekTime} />
         </Suspense>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Timeline</h3>
-          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime()} />
+          <Timeline
+            class="mb-1"
+            routeName={routeName()}
+            seekTime={seekTime}
+            updateTime={onTimelineChange}
+          />
           <Suspense fallback={<div class="h-10" />}>
             <RouteStatistics route={route()} />
           </Suspense>
