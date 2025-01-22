@@ -164,9 +164,17 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       title="Disengaged"
       onMouseDown={onMouseDownOrTouchStart}
       onTouchStart={(ev) => {
-        handledTouchStart = false
-        onMouseDownOrTouchStart(ev)
+        if (ev.touches.length === 1) {
+          handledTouchStart = false
+          document.querySelector('main')!.style.overflowY = 'hidden'
+          onMouseDownOrTouchStart(ev)
+        }
         handledTouchStart = true
+      }}
+      onTouchEnd={(ev) => {
+        if (ev.touches.length === 0) {
+          document.querySelector('main')!.style.overflowY = ''
+        }
       }}
       onTouchMove={(ev) => {
         if (ev.touches.length !== 1 || !route()) return
