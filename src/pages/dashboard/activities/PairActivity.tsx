@@ -16,57 +16,92 @@ const PairActivity: VoidComponent = () => {
 
   const state = createMachine<{
     scanning: {
-      value: JSX.Element,
-      to: 'pairing' | 'error'
-    },
+      value: JSX.Element;
+      to: 'pairing' | 'error';
+    };
     pairing: {
-      input: { pairToken: string },
-      value: JSX.Element,
-      to: 'error'
-    },
+      input: { pairToken: string };
+      value: JSX.Element;
+      to: 'error';
+    };
     error: {
-      input: { error: Error }
-      value: JSX.Element,
-      to: 'scanning'
-    }
+      input: { error: Error };
+      value: JSX.Element;
+      to: 'scanning';
+    };
   }>({
-    initial: pairToken ? {
-      type: 'pairing',
-      input: { pairToken },
-    } : 'scanning',
+    initial: pairToken
+      ? {
+        type: 'pairing',
+        input: { pairToken },
+      }
+      : 'scanning',
     states: {
       scanning(_input, to) {
         let videoRef: HTMLVideoElement
         let qrScanner: QrScanner
+        let stream: MediaStream | null = null
 
-        onMount(() => {
-          qrScanner = new QrScanner(
-            videoRef,
-            (result) => {
-              qrScanner.destroy()
-              to.pairing({ pairToken: result.data })
-            },
-            {
-              highlightScanRegion: true,
-            },
-          )
-          void qrScanner.start()
+        const requestCameraPermission = async () => {
+          try {
+            stream = await navigator.mediaDevices.getUserMedia({
+              video: true,
+            })
+            return stream
+          } catch (error) {
+            console.error('Camera permission error:', error)
+            to.error({ error: new Error('Camera permission denied') })
+            return null
+          }
+        }
+
+        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+        onMount(async () => {
+          const cameraStream = await requestCameraPermission()
+          if (cameraStream) {
+            qrScanner = new QrScanner(
+              videoRef,
+              (result) => {
+                qrScanner.destroy()
+                to.pairing({ pairToken: result.data })
+              },
+              {
+                highlightScanRegion: true,
+              },
+            )
+            videoRef.srcObject = cameraStream
+            await qrScanner.start()
+          }
         })
 
         onCleanup(() => {
           try {
+            if (stream) {
+              const tracks = stream.getTracks()
+              tracks.forEach(track => track.stop())
+            }
             qrScanner?.destroy()
-          } catch (_) { /* empty */ }
+          } catch (_) {
+            /* empty */
+          }
         })
 
         return (
-          <div id="video-container" class="absolute size-full overflow-hidden bg-black text-white">
-            <video class="left-1/2 top-1/2 h-full min-w-full -translate-x-1/2 -translate-y-1/2 object-cover" ref={videoRef!} />
+          <div
+            id="video-container"
+            class="absolute inset-0 bg-black text-white"
+          >
+            <video
+              class="absolute inset-0 size-full object-cover"
+              ref={(ref) => (videoRef = ref)}
+            />
             <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
               <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
                 Add new device
               </TopAppBar>
-              <h2 class="px-8 text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
+              <h2 class="px-8 text-center text-title-md">
+                Use the viewfinder to scan the QR code on your device
+              </h2>
             </div>
           </div>
         )
@@ -93,7 +128,6 @@ const PairActivity: VoidComponent = () => {
 
             <div class="flex flex-col items-center gap-4">
               <CircularProgress class="m-4" color="primary" size={64} />
-
               Pairing your device...
             </div>
           </>
@@ -108,7 +142,6 @@ const PairActivity: VoidComponent = () => {
 
             <div class="flex flex-col items-center gap-4">
               An error occurred: {input.error.message}
-
               <Button color="primary" onClick={() => to.scanning()}>
                 Retry
               </Button>
