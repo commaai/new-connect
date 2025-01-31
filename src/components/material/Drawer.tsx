@@ -35,7 +35,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       </nav>
 
       <main
-        class="absolute inset-y-0 w-screen overflow-y-auto bg-background transition-drawer duration-500"
+        class="absolute inset-y-0 w-full overflow-y-auto bg-background transition-drawer duration-500"
         style={{ left: props.open ? `${drawerWidth}px` : 0 }}
       >
         {props.children}
