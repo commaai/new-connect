@@ -105,7 +105,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
         onClose={() => setIsDrawerOpen(false)}
         drawer={<DashboardDrawer onClose={() => setIsDrawerOpen(false)} devices={devices()} />}
       >
-        <div class="max-w-3xl">
+        <div class="max-w-5xl">
           <Switch
             fallback={
               <TopAppBar
