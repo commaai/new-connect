@@ -12,7 +12,8 @@ import TopAppBar from '~/components/material/TopAppBar'
 import './PairActivity.css'
 
 const PairActivity: VoidComponent = () => {
-  const { pair: pairToken } = useLocation().query
+  const { pair } = useLocation().query
+  const pairToken: string | undefined = pair instanceof Array ? pair[0] : pair
 
   const state = createMachine<{
     scanning: {
@@ -36,7 +37,7 @@ const PairActivity: VoidComponent = () => {
     } : 'scanning',
     states: {
       scanning(_input, to) {
-        let videoRef: HTMLVideoElement
+        let videoRef!: HTMLVideoElement
         let qrScanner: QrScanner
 
         onMount(() => {
@@ -61,7 +62,7 @@ const PairActivity: VoidComponent = () => {
 
         return (
           <div id="video-container" class="fixed inset-0 bg-black text-white">
-            <video class="absolute inset-0 size-full object-cover" ref={videoRef!} />
+            <video class="absolute inset-0 size-full object-cover" ref={videoRef} />
             <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
               <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
                 Add new device
