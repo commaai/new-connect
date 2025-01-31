@@ -41,16 +41,6 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         }}
       >
         {props.children}
-        {!isDesktop() && (
-          <div
-            class="absolute inset-0 bg-background transition-drawer duration-500"
-            style={{
-              'pointer-events': props.open ? undefined : 'none',
-              opacity: props.open ? 0.5 : 0,
-            }}
-            onClick={props.onClose}
-          />
-        )}
       </main>
     </>
   )
