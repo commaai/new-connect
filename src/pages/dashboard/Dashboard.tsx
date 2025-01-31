@@ -1,11 +1,9 @@
 import {
-  Accessor,
   createContext,
   createResource,
   createSignal,
   lazy,
   Match,
-  Setter,
   Show,
   Switch,
 } from 'solid-js'
@@ -19,7 +17,6 @@ import type { Device } from '~/types'
 import Button from '~/components/material/Button'
 import Drawer from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
@@ -27,13 +24,18 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import storage from '~/utils/storage'
+import TopHeader from '~/components/TopHeader'
+import { useDimensions } from '~/utils/window'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
+const DESKTOP_THRESHOLD = 768
+
 type DashboardState = {
-  drawer: Accessor<boolean>
-  setDrawer: Setter<boolean>
+  isDrawerOpen: () => boolean
   toggleDrawer: () => void
+  isDesktop: () => boolean
+  showHeader: () => boolean
 }
 
 export const DashboardContext = createContext<DashboardState>()
@@ -44,13 +46,7 @@ const DashboardDrawer = (props: {
 }) => {
   return (
     <>
-      <TopAppBar
-        component="h1"
-        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
-      >
-        comma connect
-      </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
+      <h2 class="mx-4 mb-2 mt-4 text-label-sm">
         Devices
       </h2>
       <Show when={props.devices} keyed>
@@ -68,6 +64,7 @@ const DashboardDrawer = (props: {
 
 const DashboardLayout: Component<RouteSectionProps> = () => {
   const location = useLocation()
+  const dimensions = useDimensions()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
@@ -75,10 +72,16 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query['pair']
 
-  const [drawer, setDrawer] = createSignal(false)
-  const onOpen = () => setDrawer(true)
-  const onClose = () => setDrawer(false)
-  const toggleDrawer = () => setDrawer((prev) => !prev)
+  const isDesktop = () => dimensions().width >= DESKTOP_THRESHOLD
+  const [isDrawerOpen, setIsDrawerOpen] = createSignal(false)
+
+  const toggleDrawer = () => {
+    if (!isDesktop()) {
+      setIsDrawerOpen(prev => !prev)
+    }
+  }
+
+  const showHeader = () => isDesktop() || (!dateStr() && dongleId() !== 'pair')
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
@@ -93,18 +96,20 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
+    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop, showHeader }}>
+      <Show when={showHeader()}>
+        <TopHeader />
+      </Show>
       <Drawer
-        open={drawer()}
-        onOpen={onOpen}
-        onClose={onClose}
-        drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
+        open={isDrawerOpen() || isDesktop()}
+        onClose={() => setIsDrawerOpen(false)}
+        drawer={<DashboardDrawer onClose={() => setIsDrawerOpen(false)} devices={devices()} />}
       >
         <div class="max-w-3xl">
           <Switch
             fallback={
               <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+                leading={<Icon class="text-yellow-400">warning</Icon>}
               >
                 No device
               </TopAppBar>

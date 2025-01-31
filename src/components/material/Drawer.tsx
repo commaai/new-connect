@@ -1,52 +1,56 @@
 import type { JSXElement, ParentComponent } from 'solid-js'
-
+import { useContext } from 'solid-js'
+import { DashboardContext } from '~/pages/dashboard/Dashboard'
 import { useDimensions } from '~/utils/window'
 
 type DrawerProps = {
   drawer: JSXElement
   open: boolean
-  onOpen?: () => void
-  onClose?: () => void
+  onClose: () => void
 }
 
-const PEEK = 56
-
 const Drawer: ParentComponent<DrawerProps> = (props) => {
+  const { isDesktop, showHeader } = useContext(DashboardContext)!
   const dimensions = useDimensions()
 
-  const isMobile = dimensions().width < 500
-  const drawerWidth = isMobile ? dimensions().width - PEEK : 350
-
-  const onClose = () => props.onClose?.()
+  const drawerWidth = () => isDesktop() ? 300 : dimensions().width
 
   return (
     <>
       <nav
-        class="hide-scrollbar fixed inset-y-0 left-0 h-full w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
+        class="hide-scrollbar fixed left-0 w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
-          left: props.open ? 0 : `${-PEEK}px`,
+          left: props.open ? 0 : `${-drawerWidth()}px`,
           opacity: props.open ? 1 : 0.5,
-          width: `${drawerWidth}px`,
+          width: `${drawerWidth()}px`,
+          top: 'var(--top-header-height)',
+          bottom: 0,
         }}
       >
-        <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
+        <div class="flex h-full flex-col bg-surface-container-low text-on-surface-variant">
           {props.drawer}
         </div>
       </nav>
-
       <main
-        class="absolute inset-y-0 w-full overflow-y-auto bg-background transition-drawer duration-500"
-        style={{ left: props.open ? `${drawerWidth}px` : 0 }}
+        class="absolute overflow-y-auto bg-background transition-drawer duration-500"
+        style={{
+          left: props.open ? `${drawerWidth()}px` : 0,
+          right: 0,
+          top: showHeader() ? 'var(--top-header-height)' : 0,
+          bottom: 0,
+        }}
       >
         {props.children}
-        <div
-          class="absolute inset-0 bg-background transition-drawer duration-500"
-          style={{
-            'pointer-events': props.open ? undefined : 'none',
-            opacity: props.open ? 0.5 : 0,
-          }}
-          onClick={onClose}
-        />
+        {!isDesktop() && (
+          <div
+            class="absolute inset-0 bg-background transition-drawer duration-500"
+            style={{
+              'pointer-events': props.open ? undefined : 'none',
+              opacity: props.open ? 0.5 : 0,
+            }}
+            onClick={props.onClose}
+          />
+        )}
       </main>
     </>
   )

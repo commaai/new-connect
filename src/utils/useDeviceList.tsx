@@ -5,7 +5,7 @@ import storage from './storage'
 import { DashboardContext } from '~/pages/dashboard/Dashboard'
 
 export default function useDeviceList() {
-  const { setDrawer } = useContext(DashboardContext)!
+  const { toggleDrawer, isDesktop } = useContext(DashboardContext)!
   const location = useLocation()
 
   const isSelected = (device: Device) => {
@@ -14,7 +14,9 @@ export default function useDeviceList() {
 
   const onClick = (device: Device) => {
     return () => {
-      setDrawer(false)
+      if (!isDesktop()) {
+        toggleDrawer()
+      }
       storage.setItem('lastSelectedDongleId', device.dongle_id)
     }
   }

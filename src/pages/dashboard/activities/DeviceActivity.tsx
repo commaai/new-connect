@@ -1,4 +1,4 @@
-import { createResource, Suspense, useContext, createSignal, For, Show } from 'solid-js'
+import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -6,13 +6,11 @@ import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
 import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
-import { DashboardContext } from '../Dashboard'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -26,7 +24,6 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const { toggleDrawer } = useContext(DashboardContext)!
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
@@ -104,13 +101,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar
-        leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-        trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
-      >
-        {deviceName()}
-      </TopAppBar>
-      <div class="flex flex-col gap-4 px-4 pb-4">
+      <div class="mt-5 flex flex-col gap-4 px-6 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
