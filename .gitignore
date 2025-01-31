@@ -45,3 +45,6 @@ Thumbs.db
 .classpath
 *.launch
 .settings/
+
+# Sentry Config File
+.env.sentry-build-plugin

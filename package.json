@@ -74,6 +74,7 @@
   },
   "//dependencies": {
     "@mapbox/polyline": "display series of map coordinates as a line",
+    "@sentry/solid": "error monitoring",
     "@solidjs/router": "changes view based on browser url",
     "clsx": "construct className strings conditionally",
     "dayjs": "work with dates (e.g., parse, validate, etc.)",
@@ -83,6 +84,8 @@
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
+    "@sentry/solid": "^8.53.0",
+    "@sentry/vite-plugin": "^3.1.1",
     "@solid-primitives/state-machine": "^0.0.3",
     "@solidjs/router": "^0.15.2",
     "clsx": "^2.1.1",
