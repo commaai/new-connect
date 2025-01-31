@@ -1,4 +1,3 @@
-
 import { defineConfig } from 'vite'
 import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
@@ -14,6 +13,7 @@ export default defineConfig({
       org: 'commaai',
       project: 'new-connect',
       telemetry: false,
+      disable: !process.env.CI,
     }),
   ],
   server: {
