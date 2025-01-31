@@ -60,14 +60,8 @@ const PairActivity: VoidComponent = () => {
         })
 
         return (
-          <div
-            id="video-container"
-            class="fixed inset-0 bg-black text-white"
-          >
-            <video
-              class="absolute inset-0 size-full object-cover"
-              ref={(ref) => (videoRef = ref)}
-            />
+          <div id="video-container" class="fixed inset-0 bg-black text-white">
+            <video class="absolute inset-0 size-full object-cover" ref={videoRef!} />
             <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
               <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
                 Add new device
