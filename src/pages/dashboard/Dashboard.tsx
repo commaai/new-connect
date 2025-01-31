@@ -81,7 +81,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
     }
   }
 
-  const showHeader = () => isDesktop() || (!dateStr() && dongleId() !== 'pair')
+  const showHeader = () => true
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
