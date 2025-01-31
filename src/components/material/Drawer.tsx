@@ -10,7 +10,7 @@ type DrawerProps = {
 }
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
-  const { isDesktop, showHeader } = useContext(DashboardContext)!
+  const { isDesktop } = useContext(DashboardContext)!
   const dimensions = useDimensions()
 
   const drawerWidth = () => isDesktop() ? 300 : dimensions().width
@@ -35,7 +35,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         style={{
           left: props.open ? `${drawerWidth()}px` : 0,
           right: 0,
-          top: showHeader() ? 'var(--top-header-height)' : 0,
+          top: 'var(--top-header-height)',
           bottom: 0,
         }}
       >
