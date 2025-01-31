@@ -1,6 +1,8 @@
+
 import { defineConfig } from 'vite'
 import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
+import { sentryVitePlugin } from '@sentry/vite-plugin'
 
 export default defineConfig({
   plugins: [
@@ -8,12 +10,17 @@ export default defineConfig({
     solid({
       ssr: false,
     }),
+    sentryVitePlugin({
+      org: 'commaai',
+      project: 'new-connect',
+    }),
   ],
   server: {
     port: 3000,
   },
   build: {
     target: 'esnext',
+    sourcemap: true,
   },
   resolve: {
     alias: {
