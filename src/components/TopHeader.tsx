@@ -4,7 +4,7 @@ import IconButton from '~/components/material/IconButton'
 import { DashboardContext } from '~/pages/dashboard/Dashboard'
 
 const TopHeader: Component = () => {
-  const { toggleDrawer, isDesktop } = useContext(DashboardContext)!
+  const { toggleDrawer, isDesktop, isDrawerOpen } = useContext(DashboardContext)!
   const params = useParams()
 
   return (
@@ -17,7 +17,11 @@ const TopHeader: Component = () => {
         )}
         <h1 class="ml-2 text-3xl font-bold">connect</h1>
       </div>
-      <IconButton href={`/${params.dongleId}/settings`} class="text-white">
+      <IconButton
+        href={`/${params.dongleId}/settings`}
+        class="text-white"
+        onClick={() => isDrawerOpen() && toggleDrawer()}
+      >
         settings
       </IconButton>
     </header>
