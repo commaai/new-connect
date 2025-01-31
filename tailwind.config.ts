@@ -208,7 +208,7 @@ export default {
       },
       transitionProperty: {
         indeterminate: 'transform, background-color',
-        drawer: 'left, opacity, width',
+        drawer: 'left, width',
       },
     },
   },

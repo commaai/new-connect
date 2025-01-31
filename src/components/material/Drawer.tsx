@@ -21,7 +21,6 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         class="hide-scrollbar fixed left-0 w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
           left: props.open ? 0 : `${-drawerWidth()}px`,
-          opacity: props.open ? 1 : 0.5,
           width: `${drawerWidth()}px`,
           top: 'var(--top-header-height)',
           bottom: 0,
