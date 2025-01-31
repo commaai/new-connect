@@ -100,7 +100,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
         onClose={onClose}
         drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
       >
-        <div class="mx-auto max-w-3xl">
+        <div class="max-w-3xl">
           <Switch
             fallback={
               <TopAppBar
