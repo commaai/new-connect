@@ -1,15 +1,20 @@
 /* @refresh reload */
 import './index.css'
 
+import * as Sentry from '@sentry/solid'
+import { DEV } from 'solid-js'
 import { render } from 'solid-js/web'
 import App from './App'
 
-const root = document.getElementById('root')
-
-if (import.meta.env.DEV && !(root instanceof HTMLElement)) {
-  throw new Error(
-    'Root element not found. Did you forget to add it to your index.html? Or maybe the id attribute got misspelled?',
-  )
+if (!DEV) {
+  Sentry.init({
+    dsn: 'https://c3402db23a1a02fe83b7a43b7dbbbac0@o33823.ingest.us.sentry.io/4508738328854529',
+    integrations: [],
+  })
 }
 
-render(() => <App />, root!)
+const root = document.getElementById('root')
+
+if (!root) throw new Error('No #root element found in the DOM.')
+
+render(() => <App />, root)
