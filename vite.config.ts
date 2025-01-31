@@ -13,6 +13,7 @@ export default defineConfig({
     sentryVitePlugin({
       org: 'commaai',
       project: 'new-connect',
+      telemetry: false,
     }),
   ],
   server: {
