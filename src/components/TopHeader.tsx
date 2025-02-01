@@ -1,11 +1,10 @@
-import { useParams } from '@solidjs/router'
 import { Component, useContext } from 'solid-js'
 import IconButton from '~/components/material/IconButton'
 import { DashboardContext } from '~/pages/dashboard/Dashboard'
 
 const TopHeader: Component = () => {
-  const { toggleDrawer, isDesktop, isDrawerOpen } = useContext(DashboardContext)!
-  const params = useParams()
+  const { toggleDrawer, isDesktop, isDrawerOpen, dongleId } = useContext(DashboardContext)!
+  const settingsUrl = () => `/${dongleId()}/settings`
 
   return (
     <header class="fixed inset-x-0 top-0 z-10 flex h-[var(--top-header-height)] items-center justify-between border-b-8 border-black bg-[#09090C] p-4 text-white">
@@ -26,7 +25,7 @@ const TopHeader: Component = () => {
         </h1>
       </div>
       <IconButton
-        href={`/${params.dongleId}/settings`}
+        href={settingsUrl()}
         class="text-white"
         onClick={() => isDrawerOpen() && toggleDrawer()}
       >

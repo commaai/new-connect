@@ -35,6 +35,7 @@ type DashboardState = {
   isDrawerOpen: () => boolean
   toggleDrawer: () => void
   isDesktop: () => boolean
+  dongleId: () => string | undefined
 }
 
 export const DashboardContext = createContext<DashboardState>()
@@ -93,7 +94,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop }}>
+    <DashboardContext.Provider value={{ isDrawerOpen, toggleDrawer, isDesktop, dongleId }}>
       <TopHeader />
       <Drawer
         open={isDrawerOpen() || isDesktop()}
