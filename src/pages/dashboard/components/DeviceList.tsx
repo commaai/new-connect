@@ -1,11 +1,12 @@
-import { For } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
+import { For, type VoidComponent } from 'solid-js'
+import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
+import { useDrawerContext } from '~/components/material/Drawer'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/types'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
-import useDeviceList from '~/utils/useDeviceList'
+import storage from '~/utils/storage'
 
 type DeviceListProps = {
   class?: string
@@ -13,10 +14,15 @@ type DeviceListProps = {
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
-  const {
-    isSelected,
-    onClick,
-  } = useDeviceList()
+  const location = useLocation()
+  const { setOpen } = useDrawerContext()
+
+  const isSelected = (device: Device) => location.pathname.includes(device.dongle_id)
+  const onClick = (device: Device) => () => {
+    setOpen(false)
+    storage.setItem('lastSelectedDongleId', device.dongle_id)
+  }
+
   return (
     <List variant="nav" class={props.class}>
       <For each={props.devices}>
