@@ -2,7 +2,7 @@ import { Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
-import Card, { CardContent, CardHeader } from '~/components/material/Card'
+import Card, { CardContent, CardHeader, ThreeDotMenu } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
@@ -24,6 +24,36 @@ const RouteHeader = (props: { route: RouteSegments }) => {
         <Avatar>
           <Icon>directions_car</Icon>
         </Avatar>
+      }
+      trailing={
+        <ThreeDotMenu
+          items={[
+            {
+              label: 'Road Camera',
+              onClick: () => { /* handle edit */ },
+            },
+            {
+              label: 'Wide Angle Camera',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'Driver Camera',
+              onClick: () => { /* handle edit */ },
+            },
+            {
+              label: 'Log Data',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'All Logs',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'All files',
+              onClick: () => { /* handle delete */ },
+            },
+          ]}
+        />
       }
     />
   )

@@ -1,4 +1,5 @@
 import type { ParentComponent, JSXElement, VoidComponent } from 'solid-js'
+import { createSignal, For } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
@@ -69,6 +70,64 @@ type CardActionsProps = {
 
 export const CardActions: ParentComponent<CardActionsProps> = (props) => {
   return <div class={clsx('flex justify-end gap-4', props.class)}>{props.children}</div>
+}
+
+type ThreeDotMenuProps = {
+  class?: string
+  items: Array<{
+    label: string
+    onClick: () => void
+  }>
+}
+
+export const ThreeDotMenu: VoidComponent<ThreeDotMenuProps> = (props) => {
+  const [menuOpen, setMenuOpen] = createSignal(false)
+
+  return (
+    <div class={clsx('relative', props.class)}>
+      <button
+        onClick={(e) => {
+          e.stopPropagation()
+          e.preventDefault()
+          setMenuOpen(!menuOpen())
+        }}
+        class="rounded-full p-2 hover:bg-surface-container-highest"
+        aria-label="Menu"
+      >
+        <svg
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="currentColor"
+        >
+          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+        </svg>
+      </button>
+      
+      {menuOpen() && (
+        <div 
+          class="absolute right-0 top-full z-10 mt-1 w-48 rounded-lg bg-surface-container-highest shadow-lg"
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div class="py-1">
+            <For each={props.items}>{(item) => (
+              <button
+                class="w-full px-4 py-2 text-left hover:bg-surface-container-low"
+                onClick={(e) => {
+                  item.onClick()
+                  e.stopPropagation()
+                  e.preventDefault()
+                  setMenuOpen(false)
+                }}
+              >
+                {item.label}
+              </button>
+            )}</For>
+          </div>
+        </div>
+      )}
+    </div>
+  )
 }
 
 type CardProps = {

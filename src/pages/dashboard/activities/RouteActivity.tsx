@@ -7,6 +7,7 @@ import {
 } from 'solid-js'
 
 import { getRoute } from '~/api/route'
+import { ThreeDotMenu } from '~/components/material/Card'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -38,7 +39,36 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>}>
+      <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>} trailing={
+        <ThreeDotMenu
+          items={[
+            {
+              label: 'Road Camera',
+              onClick: () => { /* handle edit */ },
+            },
+            {
+              label: 'Wide Angle Camera',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'Driver Camera',
+              onClick: () => { /* handle edit */ },
+            },
+            {
+              label: 'Log Data',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'All Logs',
+              onClick: () => { /* handle delete */ },
+            },
+            {
+              label: 'All files',
+              onClick: () => { /* handle delete */ },
+            },
+          ]}
+        />
+      }>
         {startTime()}
       </TopAppBar>
 
