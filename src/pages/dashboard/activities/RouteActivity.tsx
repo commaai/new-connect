@@ -40,34 +40,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>} trailing={
-        <MediaMenu
-          items={[
-            {
-              label: 'Road Camera',
-              onClick: () => { /* handle edit */ },
-            },
-            {
-              label: 'Wide Angle Camera',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'Driver Camera',
-              onClick: () => { /* handle edit */ },
-            },
-            {
-              label: 'Log Data',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'All Logs',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'All files',
-              onClick: () => { /* handle delete */ },
-            },
-          ]}
-        />
+        <MediaMenu />
       }>
         {startTime()}
       </TopAppBar>

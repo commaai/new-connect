@@ -27,34 +27,7 @@ const RouteHeader = (props: { route: RouteSegments }) => {
         </Avatar>
       }
       trailing={
-        <MediaMenu
-          items={[
-            {
-              label: 'Road Camera',
-              onClick: () => { /* handle edit */ },
-            },
-            {
-              label: 'Wide Angle Camera',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'Driver Camera',
-              onClick: () => { /* handle edit */ },
-            },
-            {
-              label: 'Log Data',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'All Logs',
-              onClick: () => { /* handle delete */ },
-            },
-            {
-              label: 'All files',
-              onClick: () => { /* handle delete */ },
-            },
-          ]}
-        />
+        <MediaMenu />
       }
     />
   )
