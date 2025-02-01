@@ -2,12 +2,13 @@ import { Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import Avatar from '~/components/material/Avatar'
-import Card, { CardContent, CardHeader, ThreeDotMenu } from '~/components/material/Card'
+import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 
 import type { RouteSegments } from '~/types'
+import MediaMenu from './material/MediaMenu'
 
 const RouteHeader = (props: { route: RouteSegments }) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
@@ -26,7 +27,7 @@ const RouteHeader = (props: { route: RouteSegments }) => {
         </Avatar>
       }
       trailing={
-        <ThreeDotMenu
+        <MediaMenu
           items={[
             {
               label: 'Road Camera',

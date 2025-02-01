@@ -7,9 +7,9 @@ import {
 } from 'solid-js'
 
 import { getRoute } from '~/api/route'
-import { ThreeDotMenu } from '~/components/material/Card'
 
 import IconButton from '~/components/material/IconButton'
+import MediaMenu from '~/components/material/MediaMenu'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import RouteStaticMap from '~/components/RouteStaticMap'
@@ -40,7 +40,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<IconButton href={`/${props.dongleId}`}>arrow_back</IconButton>} trailing={
-        <ThreeDotMenu
+        <MediaMenu
           items={[
             {
               label: 'Road Camera',
