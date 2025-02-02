@@ -18,7 +18,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <>
       <nav
-        class="hide-scrollbar fixed left-0 w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
+        class="hide-scrollbar fixed left-0 w-screen touch-pan-y overflow-y-auto overscroll-y-contain transition-all duration-300"
         style={{
           left: props.open ? 0 : `${-drawerWidth()}px`,
           width: `${drawerWidth()}px`,
@@ -31,10 +31,11 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         </div>
       </nav>
       <main
-        class="absolute overflow-y-auto bg-background transition-drawer duration-500"
+        class="absolute overflow-y-auto bg-background transition-all duration-300"
         style={{
           left: props.open ? `${drawerWidth()}px` : 0,
-          right: 0,
+          width: isDesktop() ? `calc(100% - ${props.open ? drawerWidth() : 0}px)` : '100%',
+          transform: isDesktop() ? 'none' : props.open ? `translateX(${drawerWidth()}px)` : 'translateX(0)',
           top: 'var(--top-header-height)',
           bottom: 0,
         }}
