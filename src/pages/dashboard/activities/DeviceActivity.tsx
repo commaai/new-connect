@@ -1,10 +1,11 @@
-import { createResource, Suspense, useContext, createSignal, For, Show } from 'solid-js'
+import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
+import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
@@ -12,7 +13,6 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
-import { DashboardContext } from '../Dashboard'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -26,7 +26,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const { toggleDrawer } = useContext(DashboardContext)!
+  const { toggleOpen: toggleDrawer } = useDrawerContext()
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
@@ -105,7 +105,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar
-        leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
+        leading={<DrawerToggleButton />}
         trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
       >
         {deviceName()}
