@@ -7,7 +7,6 @@ import { useDimensions } from '~/utils/window'
 interface DrawerContext {
   open: Accessor<boolean>
   setOpen: Setter<boolean>
-  toggleOpen: () => void
 }
 
 const DrawerContext = createContext<DrawerContext>()
@@ -19,8 +18,8 @@ export function useDrawerContext() {
 }
 
 export const DrawerToggleButton: VoidComponent = () => {
-  const { toggleOpen } = useDrawerContext()
-  return <IconButton onClick={toggleOpen}>menu</IconButton>
+  const { setOpen } = useDrawerContext()
+  return <IconButton onClick={() => setOpen((prev) => !prev)}>menu</IconButton>
 }
 
 const PEEK = 56
@@ -34,10 +33,9 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const drawerWidth = () => Math.min(dimensions().width - PEEK, 360)
 
   const [open, setOpen] = createSignal(false)
-  const toggleOpen = () => setOpen((prev) => !prev)
 
   return (
-    <DrawerContext.Provider value={{ open, setOpen, toggleOpen }}>
+    <DrawerContext.Provider value={{ open, setOpen }}>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
