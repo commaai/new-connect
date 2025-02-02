@@ -13,7 +13,6 @@ import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
-import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import type { RouteSegments } from '~/types'
 import { useDimensions } from '~/utils/window'
@@ -28,17 +27,14 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endTime = () => dayjs(props.route.end_time_utc_millis)
 
   return (
-    <Card href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}>
+    <Card
+      class="max-w-none"
+      href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
+    >
       <CardHeader
         headline={startTime().format('ddd, MMM D, YYYY')}
         subhead={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
       />
-
-      <div class="mx-2 h-48 overflow-hidden rounded-lg">
-        <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-          <RouteStaticMap route={props.route} />
-        </Suspense>
-      </div>
 
       <CardContent>
         <RouteStatistics route={props.route} />
@@ -54,7 +50,7 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 348), 1)
+  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 140), 1)
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -105,7 +101,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           return (
             <Suspense
               fallback={<Index each={new Array(pageSize())}>{() => (
-                <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+                <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />
               )}</Index>}
             >
               <For each={routes()}>

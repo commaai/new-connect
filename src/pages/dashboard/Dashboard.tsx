@@ -36,7 +36,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
       >
         comma connect
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
+      <h2 class="mx-4 mb-2 text-label-sm uppercase">
         Devices
       </h2>
       <Show when={props.devices} keyed>
