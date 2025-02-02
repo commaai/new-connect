@@ -1,28 +1,26 @@
-/* eslint-disable @typescript-eslint/no-misused-promises */
 import {
   createEffect,
   createResource,
   createSignal,
   For,
+  Index,
+  onCleanup,
+  onMount,
   Suspense,
+  type VoidComponent,
 } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
+import { fetcher } from '~/api'
 import type { RouteSegments } from '~/types'
 
 import RouteCard from '~/components/RouteCard'
-import { fetcher } from '~/api'
-import Button from '~/components/material/Button'
+
 
 const PAGE_SIZE = 3
 
 type RouteListProps = {
-  class?: string
   dongleId: string
 }
-
-const pages: Promise<RouteSegments[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
@@ -33,16 +31,19 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return `${endpoint()}&end=${lastSegmentEndTime - 1}`
   }
   const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (!pages[page]) {
-      // eslint-disable-next-line no-async-promise-executor
-      pages[page] = new Promise(async (resolve) => {
+    if (pages[page] === undefined) {
+      pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        resolve(key ? fetcher<RouteSegments[]>(key) : [])
-      })
+        return key ? fetcher<RouteSegments[]>(key) : []
+      })()
     }
     return pages[page]
   }
+
+  const pages: Promise<RouteSegments[]>[] = []
+  const [size, setSize] = createSignal(1)
+  const pageNumbers = () => Array.from({ length: size() })
 
   createEffect(() => {
     if (props.dongleId) {
@@ -51,29 +52,30 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   })
 
-  const [size, setSize] = createSignal(1)
-  const onLoadMore = () => setSize(size() + 1)
-  const pageNumbers = () => Array.from(Array(size()).keys())
+  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      setSize((prev) => prev + 1)
+    }
+  }, { threshold: 0.1 })
+  onMount(() => {
+    const sentinelEl = sentinel()
+    if (sentinelEl) {
+      observer.observe(sentinelEl)
+    }
+  })
+  onCleanup(() => observer.disconnect())
 
   return (
-    <div
-      class={clsx(
-        'flex w-full flex-col justify-items-stretch gap-4',
-        props.class,
-      )}
-    >
+    <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
-        {(i) => {
-          const [routes] = createResource(() => i, getPage)
+        {(_, i) => {
+          const [routes] = createResource(() => i(), getPage)
           return (
             <Suspense
-              fallback={
-                <>
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                  <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
-                </>
-              }
+              fallback={<Index each={new Array(PAGE_SIZE)}>{() => (
+                <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+              )}</Index>}
             >
               <For each={routes()}>
                 {(route) => <RouteCard route={route} />}
@@ -82,9 +84,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           )
         }}
       </For>
-      <div class="flex justify-center">
-        <Button onClick={onLoadMore}>Load more</Button>
-      </div>
+      <div ref={setSentinel} class="h-10 w-full" />
     </div>
   )
 }
