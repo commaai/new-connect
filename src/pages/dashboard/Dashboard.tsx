@@ -1,23 +1,14 @@
-import {
-  Accessor,
-  createContext,
-  createResource,
-  createSignal,
-  lazy,
-  Match,
-  Setter,
-  Show,
-  Switch,
-} from 'solid-js'
-import type { Component } from 'solid-js'
+import { createResource, lazy, Match, Show, Switch } from 'solid-js'
+import type { Component, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import type { Device } from '~/types'
+import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
-import Drawer from '~/components/material/Drawer'
+import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -26,27 +17,21 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
-import storage from '~/utils/storage'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-type DashboardState = {
-  drawer: Accessor<boolean>
-  setDrawer: Setter<boolean>
-  toggleDrawer: () => void
+interface DashboardDrawerProps {
+  devices?: Device[]
 }
 
-export const DashboardContext = createContext<DashboardState>()
-
-const DashboardDrawer = (props: {
-  onClose: () => void
-  devices: Device[] | undefined
-}) => {
+const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
+  const { setOpen } = useDrawerContext()
+  const onClose = () => setOpen(false)
   return (
     <>
       <TopAppBar
         component="h1"
-        leading={<IconButton onClick={props.onClose}>arrow_back</IconButton>}
+        leading={<IconButton onClick={onClose}>arrow_back</IconButton>}
       >
         comma connect
       </TopAppBar>
@@ -57,7 +42,7 @@ const DashboardDrawer = (props: {
         {devices => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
       </Show>
       <div class="grow" />
-      <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={props.onClose}>
+      <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={onClose}>
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
@@ -75,11 +60,6 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query['pair']
 
-  const [drawer, setDrawer] = createSignal(false)
-  const onOpen = () => setDrawer(true)
-  const onClose = () => setDrawer(false)
-  const toggleDrawer = () => setDrawer((prev) => !prev)
-
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
 
@@ -93,45 +73,28 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <DashboardContext.Provider value={{ drawer, setDrawer, toggleDrawer }}>
-      <Drawer
-        open={drawer()}
-        onOpen={onOpen}
-        onClose={onClose}
-        drawer={<DashboardDrawer onClose={onClose} devices={devices()} />}
-      >
-        <div class="mx-auto max-w-3xl">
-          <Switch
-            fallback={
-              <TopAppBar
-                leading={<IconButton onClick={toggleDrawer}>menu</IconButton>}
-              >
-                No device
-              </TopAppBar>
-            }
-          >
-            <Match when={!!profile.error}>
-              <Navigate href="/login" />
-            </Match>
-            <Match when={dongleId() === 'pair' || pairToken()}>
-              <PairActivity />
-            </Match>
-            <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-              <SettingsActivity dongleId={dongleId()} />
-            </Match>
-            <Match when={dateStr()} keyed>
-              <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
-            </Match>
-            <Match when={dongleId()} keyed>
-              <DeviceActivity dongleId={dongleId()} />
-            </Match>
-            <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
-              <Navigate href={`/${defaultDongleId}`} />
-            )}</Match>
-          </Switch>
-        </div>
-      </Drawer>
-    </DashboardContext.Provider>
+    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+        <Match when={!!profile.error}>
+          <Navigate href="/login" />
+        </Match>
+        <Match when={dongleId() === 'pair' || pairToken()}>
+          <PairActivity />
+        </Match>
+        <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+          <SettingsActivity dongleId={dongleId()} />
+        </Match>
+        <Match when={dateStr()} keyed>
+          <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
+        </Match>
+        <Match when={dongleId()} keyed>
+          <DeviceActivity dongleId={dongleId()} />
+        </Match>
+        <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
+          <Navigate href={`/${defaultDongleId}`} />
+        )}</Match>
+      </Switch>
+    </Drawer>
   )
 }
 
