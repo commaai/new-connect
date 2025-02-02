@@ -1,6 +1,14 @@
-import { createResource, lazy, Match, Show, Switch } from 'solid-js'
-import type { Component, VoidComponent } from 'solid-js'
+import {
+  createResource,
+  lazy,
+  Match,
+  Show,
+  SuspenseList,
+  Switch,
+} from 'solid-js'
+import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
+import clsx from 'clsx'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -10,7 +18,6 @@ import storage from '~/utils/storage'
 import Button from '~/components/material/Button'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
@@ -25,14 +32,11 @@ interface DashboardDrawerProps {
 }
 
 const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
-  const { modal, setOpen } = useDrawerContext()
+  const { setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
   return (
     <>
-      <TopAppBar
-        component="h1"
-        leading={<Show when={modal()}><IconButton onClick={onClose}>arrow_back</IconButton></Show>}
-      >
+      <TopAppBar component="h1">
         comma connect
       </TopAppBar>
       <h2 class="mx-4 mb-2 text-label-sm">
@@ -48,6 +52,30 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
       <hr class="mx-4 opacity-20" />
       <Button class="m-4" color="error" href="/logout">Sign out</Button>
     </>
+  )
+}
+
+const TwoPaneLayout: Component<{
+  paneOne: JSXElement
+  paneTwo: JSXElement
+  paneTwoContent: boolean
+}> = (props) => {
+  return (
+    <div class="relative size-full overflow-hidden">
+      <div
+        class={clsx(
+          'mx-auto size-full max-w-7xl md:grid md:grid-cols-2 lg:gap-2',
+          // Flex layout for mobile with horizontal transition
+          'flex transition-transform duration-300 ease-in-out',
+          props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
+        )}
+      >
+        <SuspenseList revealOrder="forwards">
+          <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
+          <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
+        </SuspenseList>
+      </div>
+    </div>
   )
 }
 
@@ -82,18 +110,28 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <Match when={dongleId() === 'pair' || pairToken()}>
             <PairActivity />
           </Match>
-          <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-            <SettingsActivity dongleId={dongleId()} />
-          </Match>
-          <Match when={dateStr()} keyed>
-            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
-          </Match>
-          <Match when={dongleId()} keyed>
-            <DeviceActivity dongleId={dongleId()} />
-          </Match>
-          <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
-            <Navigate href={`/${defaultDongleId}`} />
+          <Match when={dongleId()} keyed>{(id) => (
+            <TwoPaneLayout
+              paneOne={<DeviceActivity dongleId={id} />}
+              paneTwo={<Switch
+                fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                  <Icon size="48">search</Icon>
+                  <span class="text-title-md">Select a route to view</span>
+                </div>}
+              >
+                <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                  <SettingsActivity dongleId={id} />
+                </Match>
+                <Match when={dateStr()} keyed>
+                  {(date) => <RouteActivity dongleId={id} dateStr={date} />}
+                </Match>
+              </Switch>}
+              paneTwoContent={!!dateStr()}
+            />
           )}</Match>
+          <Match when={getDefaultDongleId()} keyed>
+            {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+          </Match>
         </Switch>
       </div>
     </Drawer>
