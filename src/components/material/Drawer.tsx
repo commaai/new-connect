@@ -23,7 +23,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <>
       <nav
-        class="hide-scrollbar fixed bottom-0 left-0 top-[var(--top-header-height)] touch-pan-y overflow-y-auto overscroll-y-contain transition-all duration-300"
+        class="hide-scrollbar fixed bottom-0 left-0 top-[var(--top-header-height)] touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-300"
         style={{
           left: props.open ? 0 : `${-drawerWidth()}px`,
           width: `${drawerWidth()}px`,
@@ -34,7 +34,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         </div>
       </nav>
       <main
-        class="absolute bottom-0 top-[var(--top-header-height)] overflow-y-auto bg-background transition-all duration-300"
+        class="absolute bottom-0 top-[var(--top-header-height)] overflow-y-auto bg-background transition-drawer duration-300"
         style={{
           left: props.open ? `${drawerWidth()}px` : 0,
           width: getResponsiveWidth(),
