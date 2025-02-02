@@ -3,25 +3,24 @@ import {
   createResource,
   createSignal,
   For,
-  Suspense,
+  Index,
   onCleanup,
   onMount,
-  Index,
+  Suspense,
   type VoidComponent,
 } from 'solid-js'
-import { clsx } from 'clsx'
-import type { RouteSegments } from '~/types'
-import RouteCard from '~/components/RouteCard'
+
 import { fetcher } from '~/api'
+import type { RouteSegments } from '~/types'
+
+import RouteCard from '~/components/RouteCard'
+
 
 const PAGE_SIZE = 3
 
-interface RouteListProps {
-  class?: string
+type RouteListProps = {
   dongleId: string
 }
-
-const pages: Promise<RouteSegments[]>[] = []
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
@@ -42,6 +41,10 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     return pages[page]
   }
 
+  const pages: Promise<RouteSegments[]>[] = []
+  const [size, setSize] = createSignal(1)
+  const pageNumbers = () => Array.from({ length: size() })
+
   createEffect(() => {
     if (props.dongleId) {
       pages.length = 0
@@ -49,66 +52,38 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
     }
   })
 
-  const [size, setSize] = createSignal(1)
-  const pageNumbers = () => Array.from({ length: size() })
-
-  const [sentinel, setSentinel] = createSignal<HTMLDivElement | undefined>()
-  let observer: IntersectionObserver | undefined
-
+  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
+  const observer = new IntersectionObserver((entries) => {
+    if (entries[0].isIntersecting) {
+      setSize((prev) => prev + 1)
+    }
+  }, { threshold: 0.1 })
   onMount(() => {
-    observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting) {
-          setSize((prev) => prev + 1)
-        }
-      },
-      { threshold: 0.1 },
-    )
-
     const sentinelEl = sentinel()
     if (sentinelEl) {
       observer.observe(sentinelEl)
     }
   })
-
-  onCleanup(() => observer?.disconnect())
-
-  const LoadingSkeleton = () => (
-    <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-      <Index each={Array(PAGE_SIZE)}>
-        {() => (
-          <div
-            class="skeleton-loader elevation-1 flex h-[336px] flex-col rounded-lg bg-surface-container-low"
-          />
-        )}
-      </Index>
-    </div>
-  )
+  onCleanup(() => observer.disconnect())
 
   return (
-    <div class={clsx(
-      'w-full p-4 md:p-6',
-      'mx-auto max-w-7xl',
-      props.class,
-    )}>
-      <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 md:gap-6 lg:grid-cols-3 xl:grid-cols-4">
-        <For each={pageNumbers()}>
-          {(_, i) => {
-            const [routes] = createResource(() => i(), getPage)
-            return (
-              <Suspense fallback={<LoadingSkeleton />}>
-                <For each={routes()}>
-                  {(route) => (
-                    <div class="w-full">
-                      <RouteCard route={route} />
-                    </div>
-                  )}
-                </For>
-              </Suspense>
-            )
-          }}
-        </For>
-      </div>
+    <div class="flex w-full flex-col justify-items-stretch gap-4">
+      <For each={pageNumbers()}>
+        {(_, i) => {
+          const [routes] = createResource(() => i(), getPage)
+          return (
+            <Suspense
+              fallback={<Index each={new Array(PAGE_SIZE)}>{() => (
+                <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
+              )}</Index>}
+            >
+              <For each={routes()}>
+                {(route) => <RouteCard route={route} />}
+              </For>
+            </Suspense>
+          )
+        }}
+      </For>
       <div ref={setSentinel} class="h-10 w-full" />
     </div>
   )
