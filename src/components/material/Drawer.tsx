@@ -31,9 +31,7 @@ interface DrawerProps {
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
   const dimensions = useDimensions()
-
-  const isMobile = () => dimensions().width < 500
-  const drawerWidth = () => isMobile() ? dimensions().width - PEEK : 350
+  const drawerWidth = () => Math.min(dimensions().width - PEEK, 360)
 
   const [open, setOpen] = createSignal(false)
   const toggleOpen = () => setOpen((prev) => !prev)
