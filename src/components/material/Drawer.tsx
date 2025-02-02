@@ -15,6 +15,11 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   const drawerWidth = () => isDesktop() ? 300 : dimensions().width
 
+  const getResponsiveWidth = () => {
+    if (!isDesktop()) return '100%'
+    return `calc(100% - ${props.open ? drawerWidth() : 0}px)`
+  }
+
   return (
     <>
       <nav
@@ -34,7 +39,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         class="absolute overflow-y-auto bg-background transition-all duration-300"
         style={{
           left: props.open ? `${drawerWidth()}px` : 0,
-          width: isDesktop() ? `calc(100% - ${props.open ? drawerWidth() : 0}px)` : '100%',
+          width: getResponsiveWidth(),
           transform: isDesktop() ? 'none' : props.open ? `translateX(${drawerWidth()}px)` : 'translateX(0)',
           top: 'var(--top-header-height)',
           bottom: 0,
