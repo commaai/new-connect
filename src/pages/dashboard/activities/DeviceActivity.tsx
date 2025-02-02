@@ -5,7 +5,7 @@ import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
-import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
+import { DrawerToggleButton } from '~/components/material/Drawer'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
@@ -26,8 +26,6 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const { toggleOpen: toggleDrawer } = useDrawerContext()
-
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
   const [snapshot, setSnapshot] = createSignal<{
