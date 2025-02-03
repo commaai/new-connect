@@ -95,38 +95,36 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <div class="mx-auto max-w-3xl">
-        <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-          <Match when={!!profile.error}>
-            <Navigate href="/login" />
-          </Match>
-          <Match when={dongleId() === 'pair' || pairToken()}>
-            <PairActivity />
-          </Match>
-          <Match when={dongleId()} keyed>{(id) => (
-            <TwoPaneLayout
-              paneOne={<DeviceActivity dongleId={id} />}
-              paneTwo={<Switch
-                fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                  <Icon size="48">search</Icon>
-                  <span class="text-title-md">Select a route to view</span>
-                </div>}
-              >
-                <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                  <SettingsActivity dongleId={id} />
-                </Match>
-                <Match when={dateStr()} keyed>
-                  {(date) => <RouteActivity dongleId={id} dateStr={date} />}
-                </Match>
-              </Switch>}
-              paneTwoContent={!!dateStr()}
-            />
-          )}</Match>
-          <Match when={getDefaultDongleId()} keyed>
-            {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
-          </Match>
-        </Switch>
-      </div>
+      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+        <Match when={!!profile.error}>
+          <Navigate href="/login" />
+        </Match>
+        <Match when={dongleId() === 'pair' || pairToken()}>
+          <PairActivity />
+        </Match>
+        <Match when={dongleId()} keyed>{(id) => (
+          <TwoPaneLayout
+            paneOne={<DeviceActivity dongleId={id} />}
+            paneTwo={<Switch
+              fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                <Icon size="48">search</Icon>
+                <span class="text-title-md">Select a route to view</span>
+              </div>}
+            >
+              <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                <SettingsActivity dongleId={id} />
+              </Match>
+              <Match when={dateStr()} keyed>
+                {(date) => <RouteActivity dongleId={id} dateStr={date} />}
+              </Match>
+            </Switch>}
+            paneTwoContent={!!dateStr()}
+          />
+        )}</Match>
+        <Match when={getDefaultDongleId()} keyed>
+          {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+        </Match>
+      </Switch>
     </Drawer>
   )
 }
