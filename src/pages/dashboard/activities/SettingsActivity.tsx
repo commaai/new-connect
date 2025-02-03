@@ -354,7 +354,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   return (
     <>
       <ActivityBar backHref={`/${props.dongleId}`}>
-        <Show when={device()} keyed>{device => getDeviceName(device)}</Show>
+        Device Settings
       </ActivityBar>
       <div class="max-w-lg px-4">
         <h2 class="mb-4 text-headline-sm">comma prime</h2>
