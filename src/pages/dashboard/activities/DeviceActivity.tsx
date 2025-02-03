@@ -103,7 +103,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar
-        class="bg-surface-container-low m-4 rounded-lg"
         leading={<DrawerToggleButton />}
         trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
       >
