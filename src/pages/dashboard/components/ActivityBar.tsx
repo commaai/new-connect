@@ -8,14 +8,12 @@ interface ActivityBarProps {
 }
 
 const ActivityBar: ParentComponent<ActivityBarProps> = (props) => {
-  return (
-    <TopAppBar
-      leading={<IconButton class="md:hidden" href={props.backHref}>arrow_back</IconButton>}
-      trailing={<IconButton class="hidden md:inline-flex" href={props.backHref}>close</IconButton>}
-    >
-      {props.children}
-    </TopAppBar>
-  )
+  return <TopAppBar
+    leading={<IconButton class="md:hidden" href={props.backHref}>arrow_back</IconButton>}
+    trailing={<IconButton class="hidden md:inline-flex" href={props.backHref}>close</IconButton>}
+  >
+    {props.children}
+  </TopAppBar>
 }
 
 export default ActivityBar
