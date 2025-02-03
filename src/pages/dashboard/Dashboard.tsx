@@ -57,7 +57,7 @@ const TwoPaneLayout: Component<{
     <div class="relative size-full overflow-hidden">
       <div
         class={clsx(
-          'mx-auto size-full max-w-screen-2xl md:grid md:grid-cols-2 lg:gap-2',
+          'mx-auto size-full max-w-[1560px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
