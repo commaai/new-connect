@@ -32,7 +32,7 @@ interface DrawerProps {
 const Drawer: ParentComponent<DrawerProps> = (props) => {
   const dimensions = useDimensions()
   const drawerWidth = () => Math.min(dimensions().width - PEEK, 360)
-  const modal = () => dimensions().width < 1280
+  const modal = () => dimensions().width < 840
   const contentWidth = () => dimensions().width - (modal() ? 0 : drawerWidth())
 
   const [open, setOpen] = createSignal(false)
