@@ -74,26 +74,28 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={!!profile.error}>
-          <Navigate href="/login" />
-        </Match>
-        <Match when={dongleId() === 'pair' || pairToken()}>
-          <PairActivity />
-        </Match>
-        <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-          <SettingsActivity dongleId={dongleId()} />
-        </Match>
-        <Match when={dateStr()} keyed>
-          <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
-        </Match>
-        <Match when={dongleId()} keyed>
-          <DeviceActivity dongleId={dongleId()} />
-        </Match>
-        <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
-          <Navigate href={`/${defaultDongleId}`} />
-        )}</Match>
-      </Switch>
+      <div class="mx-auto max-w-3xl">
+        <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+          <Match when={!!profile.error}>
+            <Navigate href="/login" />
+          </Match>
+          <Match when={dongleId() === 'pair' || pairToken()}>
+            <PairActivity />
+          </Match>
+          <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+            <SettingsActivity dongleId={dongleId()} />
+          </Match>
+          <Match when={dateStr()} keyed>
+            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} />
+          </Match>
+          <Match when={dongleId()} keyed>
+            <DeviceActivity dongleId={dongleId()} />
+          </Match>
+          <Match when={getDefaultDongleId()} keyed>{(defaultDongleId) => (
+            <Navigate href={`/${defaultDongleId}`} />
+          )}</Match>
+        </Switch>
+      </div>
     </Drawer>
   )
 }
