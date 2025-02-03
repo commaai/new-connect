@@ -16,6 +16,7 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import type { RouteSegments } from '~/types'
+import { useDimensions } from '~/utils/window'
 
 
 interface RouteCardProps {
@@ -47,14 +48,14 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 }
 
 
-const PAGE_SIZE = 3
-
 type RouteListProps = {
   dongleId: string
 }
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
+  const dimensions = useDimensions()
+  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 348), 1)
+  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
@@ -103,7 +104,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           const [routes] = createResource(() => i(), getPage)
           return (
             <Suspense
-              fallback={<Index each={new Array(PAGE_SIZE)}>{() => (
+              fallback={<Index each={new Array(pageSize())}>{() => (
                 <div class="skeleton-loader elevation-1 flex h-[336px] max-w-md flex-col rounded-lg bg-surface-container-low" />
               )}</Index>}
             >
