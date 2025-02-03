@@ -5,15 +5,14 @@ import clsx from 'clsx'
 import { getDevice } from '~/api/devices'
 import { cancelSubscription, getStripeCheckout, getStripePortal, getStripeSession, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
 import { formatDate } from '~/utils/date'
-import { getDeviceName } from '~/utils/device'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
+
+import ActivityBar from '../components/ActivityBar'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -350,13 +349,12 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const dongleId = () => props.dongleId
-  const [device] = createResource(dongleId, getDevice)
+  const [device] = createResource(() => props.dongleId, getDevice)
   return (
     <>
-      <TopAppBar leading={<IconButton href={`/${dongleId()}`}>arrow_back</IconButton>}>
-        <Show when={device()} keyed>{device => getDeviceName(device)}</Show>
-      </TopAppBar>
+      <ActivityBar backHref={`/${props.dongleId}`}>
+        Device Settings
+      </ActivityBar>
       <div class="max-w-lg px-4">
         <h2 class="mb-4 text-headline-sm">comma prime</h2>
         <Suspense>
