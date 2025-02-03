@@ -48,7 +48,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
   )
 }
 
-const TwoPaneLayout: Component<{
+const DashboardLayout: Component<{
   paneOne: JSXElement
   paneTwo: JSXElement
   paneTwoContent: boolean
@@ -72,7 +72,7 @@ const TwoPaneLayout: Component<{
   )
 }
 
-const DashboardLayout: Component<RouteSectionProps> = () => {
+const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
@@ -103,7 +103,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <PairActivity />
         </Match>
         <Match when={dongleId()} keyed>{(id) => (
-          <TwoPaneLayout
+          <DashboardLayout
             paneOne={<DeviceActivity dongleId={id} />}
             paneTwo={<Switch
               fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
@@ -129,4 +129,4 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   )
 }
 
-export default DashboardLayout
+export default Dashboard
