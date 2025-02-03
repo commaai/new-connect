@@ -12,11 +12,10 @@ import {
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import type { RouteSegments } from '~/types'
-
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
+import type { RouteSegments } from '~/types'
 
 
 interface RouteCardProps {
