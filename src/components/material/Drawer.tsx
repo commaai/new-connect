@@ -1,10 +1,11 @@
-import { createContext, createSignal, useContext } from 'solid-js'
+import { createContext, createSignal, Show, useContext } from 'solid-js'
 import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
 import { useDimensions } from '~/utils/window'
 
 interface DrawerContext {
+  modal: Accessor<boolean>
   open: Accessor<boolean>
   setOpen: Setter<boolean>
 }
@@ -18,8 +19,8 @@ export function useDrawerContext() {
 }
 
 export const DrawerToggleButton: VoidComponent = () => {
-  const { setOpen } = useDrawerContext()
-  return <IconButton onClick={() => setOpen((prev) => !prev)}>menu</IconButton>
+  const { modal, setOpen } = useDrawerContext()
+  return <Show when={modal()}><IconButton onClick={() => setOpen((prev) => !prev)}>menu</IconButton></Show>
 }
 
 const PEEK = 56
@@ -31,16 +32,19 @@ interface DrawerProps {
 const Drawer: ParentComponent<DrawerProps> = (props) => {
   const dimensions = useDimensions()
   const drawerWidth = () => Math.min(dimensions().width - PEEK, 360)
+  const modal = () => dimensions().width < 840
+  const contentWidth = () => dimensions().width - (modal() ? 0 : drawerWidth())
 
   const [open, setOpen] = createSignal(false)
+  const drawerVisible = () => !modal() || open()
 
   return (
-    <DrawerContext.Provider value={{ open, setOpen }}>
+    <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
-          left: open() ? 0 : `${-PEEK}px`,
-          opacity: open() ? 1 : 0.5,
+          left: drawerVisible() ? 0 : `${-PEEK}px`,
+          opacity: drawerVisible() ? 1 : 0.5,
           width: `${drawerWidth()}px`,
         }}
       >
@@ -50,17 +54,18 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       </nav>
 
       <main
-        class="absolute inset-y-0 w-screen overflow-y-auto bg-background transition-drawer duration-500"
+        class="absolute inset-y-0 overflow-y-auto bg-background transition-drawer duration-500"
         style={{
-          left: open() ? `${drawerWidth()}px` : 0,
+          left: drawerVisible() ? `${drawerWidth()}px` : 0,
+          width: `${contentWidth()}px`,
         }}
       >
         {props.children}
         <div
-          class="absolute inset-0 bg-background transition-drawer duration-500"
+          class="absolute inset-0 z-[9999] bg-background transition-drawer duration-500"
           style={{
-            'pointer-events': open() ? undefined : 'none',
-            opacity: open() ? 0.5 : 0,
+            'pointer-events': modal() && open() ? 'auto' : 'none',
+            opacity: modal() && open() ? 0.5 : 0,
           }}
           onClick={() => setOpen(false)}
         />
