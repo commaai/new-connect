@@ -19,3 +19,17 @@ export const getQCameraStreamUrl = (routeName: Route['fullname']): Promise<strin
   getRouteShareSignature(routeName).then((signature) =>
     createQCameraStreamUrl(routeName, signature),
   )
+
+export const setRoutePublic = (routeName: string, isPublic: boolean): Promise<Route> =>
+  fetcher<Route>(`/v1/route/${routeName}/`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ is_public: isPublic }),
+  })
+
+export const setRoutePreserved = (routeName: string, preserved: boolean): Promise<Route> =>
+  fetcher<Route>(`/v1/route/${routeName}/preserve`, {
+    method: preserved ? 'POST' : 'DELETE',
+  })
