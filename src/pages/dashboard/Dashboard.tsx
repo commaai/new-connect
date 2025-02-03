@@ -11,6 +11,7 @@ import storage from '~/utils/storage'
 import Button from '~/components/material/Button'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
+import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
@@ -29,7 +30,10 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
   const onClose = () => setOpen(false)
   return (
     <>
-      <TopAppBar component="h1">
+      <TopAppBar
+        component="h1"
+        leading={<IconButton onClick={onClose}>arrow_back</IconButton>}
+      >
         comma connect
       </TopAppBar>
       <h2 class="mx-4 mb-2 text-label-sm">
