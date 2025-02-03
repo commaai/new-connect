@@ -26,13 +26,13 @@ interface DashboardDrawerProps {
 }
 
 const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
-  const { setOpen } = useDrawerContext()
+  const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
   return (
     <>
       <TopAppBar
         component="h1"
-        leading={<IconButton onClick={onClose}>arrow_back</IconButton>}
+        leading={<Show when={modal()}><IconButton onClick={onClose}>arrow_back</IconButton></Show>}
       >
         comma connect
       </TopAppBar>
