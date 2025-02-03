@@ -71,9 +71,9 @@ export const CardActions: ParentComponent<CardActionsProps> = (props) => {
 
 type CardProps = {
   class?: string
-  activeClass?: string
   onClick?: () => void
   href?: string
+  activeClass?: string
 }
 
 const Card: ParentComponent<CardProps> = (props) => {
@@ -83,12 +83,9 @@ const Card: ParentComponent<CardProps> = (props) => {
         'state-layer flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface',
         props.class,
       )}
-      activeClass={clsx(
-        'before:opacity-[.12]',
-        props.activeClass,
-      )}
       onClick={props.onClick}
       href={props.href}
+      activeClass={clsx('before:opacity-[.12]', props.activeClass)}
     >
       {props.children}
     </ButtonBase>

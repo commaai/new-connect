@@ -29,8 +29,8 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   return (
     <Card
       class="max-w-none"
-      activeClass="before:bg-primary"
       href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
+      activeClass="before:bg-primary"
     >
       <CardHeader
         headline={startTime().format('ddd, MMM D, YYYY')}
