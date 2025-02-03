@@ -1,11 +1,4 @@
-import {
-  createResource,
-  lazy,
-  Match,
-  Show,
-  SuspenseList,
-  Switch,
-} from 'solid-js'
+import { createResource, lazy, Match, Show, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
