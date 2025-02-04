@@ -14,6 +14,7 @@ import Timeline from '~/components/Timeline'
 import { parseDateStr } from '~/utils/date'
 
 import ActivityBar from '../components/ActivityBar'
+import RouteCardExpanded from '~/components/RouteCardExpanded'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -62,6 +63,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <RouteStatistics route={route()} />
           </Suspense>
         </div>
+
+        <Suspense fallback={<div class="skeleton-loader rounded-lg bg-surface-container-low min-h-80" />}>
+          <RouteCardExpanded
+            routeName={routeName()}
+            initialPublic={route()?.is_public ?? false}
+            initialPreserved={route()?.is_preserved ?? false}
+          />
+        </Suspense>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Route Map</h3>
