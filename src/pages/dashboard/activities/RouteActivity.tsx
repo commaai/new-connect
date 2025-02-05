@@ -64,7 +64,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           </Suspense>
         </div>
 
-        <Suspense fallback={<div class="skeleton-loader rounded-lg bg-surface-container-low min-h-80" />}>
+        <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
           <RouteCardExpanded
             routeName={routeName()}
             initialPublic={route()?.is_public ?? false}
