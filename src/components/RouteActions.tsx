@@ -4,7 +4,7 @@ import Icon from '~/components/material/Icon'
 import { setRoutePublic, setRoutePreserved } from '~/api/route'
 import { USERADMIN_URL } from '~/api/config'
 
-interface RouteCardExpandedProps {
+interface RouteActionsProps {
   routeName: string
   initialPublic: boolean
   initialPreserved: boolean
@@ -52,7 +52,7 @@ const ActionButton: VoidComponent<{
   </Button>
 )
 
-const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
+const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [preserveRoute, setPreserveRoute] = createSignal(props.initialPreserved)
   const [makePublic, setMakePublic] = createSignal(props.initialPublic)
   const [error, setError] = createSignal<string | null>(null)
@@ -140,4 +140,4 @@ const RouteCardExpanded: VoidComponent<RouteCardExpandedProps> = (props) => {
   )
 }
 
-export default RouteCardExpanded
+export default RouteActions
