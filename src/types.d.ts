@@ -104,7 +104,6 @@ export interface RouteShareSignature extends Record<string, string> {
 export interface RouteSegments extends Route {
   end_time_utc_millis: number
   is_preserved: boolean
-  is_public: boolean
   share_exp: RouteShareSignature['exp']
   share_sig: RouteShareSignature['sig']
   start_time_utc_millis: number
