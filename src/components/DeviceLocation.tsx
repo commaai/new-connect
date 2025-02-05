@@ -153,7 +153,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   return (
     <div class="relative">
-      <div ref={mapRef} class="h-[200px] w-full !bg-surface-container-low" />
+      <div ref={mapRef} class="h-[240px] w-full !bg-surface-container-low" />
 
       <Show when={!userPosition()}>
         <div class="absolute bottom-2 right-2 z-[9999]">

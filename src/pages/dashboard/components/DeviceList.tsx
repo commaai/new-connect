@@ -37,6 +37,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}
+              activeClass="before:bg-primary"
             >
               <ListItemContent
                 headline={getDeviceName(device)}

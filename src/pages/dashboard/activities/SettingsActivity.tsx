@@ -10,9 +10,10 @@ import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
+import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 
-import ActivityBar from '../components/ActivityBar'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -352,9 +353,9 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   return (
     <>
-      <ActivityBar backHref={`/${props.dongleId}`}>
+      <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
         Device Settings
-      </ActivityBar>
+      </TopAppBar>
       <div class="max-w-lg px-4">
         <h2 class="mb-4 text-headline-sm">comma prime</h2>
         <Suspense>

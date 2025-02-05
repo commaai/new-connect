@@ -25,6 +25,7 @@ type ListItemProps = {
   trailing?: JSXElement
   onClick?: () => void
   href?: string
+  activeClass?: string
 }
 
 // TODO: guess variant from content
@@ -47,6 +48,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       )}
       onClick={props.onClick}
       href={props.href}
+      activeClass={clsx('before:opacity-[.12]', props.activeClass)}
     >
       {props.leading}
       {props.children}
