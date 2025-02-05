@@ -7,6 +7,7 @@ export type ButtonBaseProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
   class?: string
   onClick?: (e: MouseEvent) => void
   href?: string
+  activeClass?: string
 }
 
 const ButtonBase: Component<ButtonBaseProps> = (props) => {
@@ -32,8 +33,9 @@ const ButtonBase: Component<ButtonBaseProps> = (props) => {
       {(href) => (
         <A
           class={clsx('relative isolate overflow-hidden', props.class)}
-          href={href}
           onClick={onClick}
+          href={href}
+          activeClass={props.activeClass}
         >
           {props.children}
         </A>

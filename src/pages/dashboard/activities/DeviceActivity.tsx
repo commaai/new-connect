@@ -155,7 +155,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           )}
         </div>
         <div class="flex flex-col gap-2">
-          <span class="text-label-sm">Routes</span>
+          <span class="text-label-sm uppercase">Routes</span>
           <RouteList dongleId={props.dongleId} />
         </div>
       </div>

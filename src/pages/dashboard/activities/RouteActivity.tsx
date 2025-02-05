@@ -8,12 +8,12 @@ import {
 
 import { getRoute } from '~/api/route'
 
+import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from '~/components/Timeline'
 import { parseDateStr } from '~/utils/date'
-
-import ActivityBar from '../components/ActivityBar'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -37,9 +37,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   return (
     <>
-      <ActivityBar backHref={`/${props.dongleId}`}>
+      <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
         {startTime()}
-      </ActivityBar>
+      </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <Suspense
@@ -64,8 +64,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm">Route Map</h3>
-          <div class="h-64 overflow-hidden rounded-lg">
+          <h3 class="text-label-sm uppercase">Route Map</h3>
+          <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
               <RouteStaticMap route={route()} />
             </Suspense>

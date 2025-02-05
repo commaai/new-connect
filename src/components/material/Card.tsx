@@ -13,9 +13,7 @@ type CardHeaderProps = {
 
 export const CardHeader: VoidComponent<CardHeaderProps> = (props) => {
   return (
-    <div
-      class={clsx('flex h-[72px] items-center gap-4 px-4 py-3', props.class)}
-    >
+    <div class={clsx('flex h-[72px] items-center gap-4 px-4 py-3', props.class)}>
       {props.leading}
       <div class="flex h-12 grow flex-col justify-between">
         {props.headline && <span class="text-title-md">{props.headline}</span>}
@@ -75,17 +73,19 @@ type CardProps = {
   class?: string
   onClick?: () => void
   href?: string
+  activeClass?: string
 }
 
 const Card: ParentComponent<CardProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer elevation-1 flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface',
+        'state-layer flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface',
         props.class,
       )}
       onClick={props.onClick}
       href={props.href}
+      activeClass={clsx('before:opacity-[.12]', props.activeClass)}
     >
       {props.children}
     </ButtonBase>

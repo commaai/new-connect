@@ -36,7 +36,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
       >
         comma connect
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm">
+      <h2 class="mx-4 mb-2 text-label-sm uppercase">
         Devices
       </h2>
       <Show when={props.devices} keyed>
@@ -52,7 +52,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
   )
 }
 
-const TwoPaneLayout: Component<{
+const DashboardLayout: Component<{
   paneOne: JSXElement
   paneTwo: JSXElement
   paneTwoContent: boolean
@@ -61,7 +61,7 @@ const TwoPaneLayout: Component<{
     <div class="relative size-full overflow-hidden">
       <div
         class={clsx(
-          'mx-auto size-full max-w-screen-2xl md:grid md:grid-cols-2 lg:gap-2',
+          'mx-auto size-full max-w-[1560px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
@@ -76,7 +76,7 @@ const TwoPaneLayout: Component<{
   )
 }
 
-const DashboardLayout: Component<RouteSectionProps> = () => {
+const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
@@ -107,7 +107,7 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
           <PairActivity />
         </Match>
         <Match when={dongleId()} keyed>{(id) => (
-          <TwoPaneLayout
+          <DashboardLayout
             paneOne={<DeviceActivity dongleId={id} />}
             paneTwo={<Switch
               fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
@@ -133,4 +133,4 @@ const DashboardLayout: Component<RouteSectionProps> = () => {
   )
 }
 
-export default DashboardLayout
+export default Dashboard
