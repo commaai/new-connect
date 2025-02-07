@@ -63,7 +63,7 @@ const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
   return dayjs(input)
 }
 
-export const formatDate = (input: dayjs.ConfigType) => {
+export const formatDate = (input: dayjs.ConfigType): string => {
   const date = parseTimestamp(input)
   // Hide current year
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
