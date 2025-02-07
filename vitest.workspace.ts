@@ -1,3 +1,4 @@
+import { loadEnv } from 'vite'
 import { configDefaults, defineWorkspace } from 'vitest/config'
 
 export default defineWorkspace([
@@ -14,6 +15,7 @@ export default defineWorkspace([
       ],
       name: 'unit',
       environment: 'node',
+      env: loadEnv('development', '.'),
     },
   },
   {
