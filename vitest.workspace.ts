@@ -1,3 +1,5 @@
+/// <reference types="@vitest/browser/providers/playwright" />
+import { loadEnv } from 'vite'
 import { configDefaults, defineWorkspace } from 'vitest/config'
 
 export default defineWorkspace([
@@ -15,6 +17,7 @@ export default defineWorkspace([
       name: 'unit',
       environment: 'node',
       setupFiles: './src/test/setup.ts',
+      env: loadEnv('development', '.'),
     },
   },
   {
@@ -24,10 +27,11 @@ export default defineWorkspace([
         '**/*.browser.{test,spec}.{ts,tsx}',
       ],
       browser: {
-        provider: 'playwright',
-        enabled: true,
-        headless: true,
-        name: 'chromium',
+        instances: [
+          {
+            browser: 'chrome',
+          },
+        ],
       },
     },
   },
