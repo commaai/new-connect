@@ -9,13 +9,26 @@ import {
   Suspense,
   type VoidComponent,
 } from 'solid-js'
-import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
+import { getTimelineStatistics, TimelineStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
-import RouteStatistics from '~/components/RouteStatistics'
+import Icon from '~/components/material/Icon'
 import type { RouteSegments } from '~/types'
+import { formatRouteDistance, formatRouteDuration } from '~/utils/date'
 import { useDimensions } from '~/utils/window'
+
+
+const formatEngagement = (timeline?: TimelineStatistics): string => {
+  if (!timeline) return ''
+  const { engagedDuration, duration } = timeline
+  return `Engaged Time: ${(100 * (engagedDuration / duration)).toFixed(0)}%`
+}
+
+
+const formatUserFlags = (timeline?: TimelineStatistics): string => {
+  return timeline?.userFlags !== undefined ? `${timeline.userFlags} user flags` : ''
+}
 
 
 interface RouteCardProps {
@@ -23,8 +36,18 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  const startTime = () => dayjs(props.route.start_time_utc_millis)
-  const endTime = () => dayjs(props.route.end_time_utc_millis)
+  // TODO: move to date utils
+  const dateRange = () => new Intl.DateTimeFormat('en', {
+    weekday: 'long',
+    day: 'numeric',
+    month: 'long',
+    year: 'numeric',
+  }).formatRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const timeRange = () => new Intl.DateTimeFormat('en', {
+    hour: 'numeric',
+    minute: 'numeric',
+  }).formatRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const [timeline] = createResource(() => props.route, getTimelineStatistics)
 
   return (
     <Card
@@ -32,13 +55,31 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
       activeClass="md:before:bg-primary"
     >
-      <CardHeader
-        headline={startTime().format('ddd, MMM D, YYYY')}
-        subhead={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
-      />
+      <CardHeader headline={dateRange()} subhead={timeRange()} />
 
       <CardContent>
-        <RouteStatistics route={props.route} />
+        <div class="grid size-full grid-cols-2 gap-4">
+          <div class="flex items-center gap-2">
+            <Icon size="20">schedule</Icon>
+            {formatRouteDuration(props.route)}
+          </div>
+          <div class="flex items-center gap-2">
+            <Icon size="20">route</Icon>
+            {formatRouteDistance(props.route)}
+          </div>
+          <Suspense fallback={<div class="skeleton-loader h-6" />}>
+            <div class="hidden items-center gap-2 xs:flex">
+              <Icon size="20">speed</Icon>
+              {formatEngagement(timeline())}
+            </div>
+          </Suspense>
+          <Suspense fallback={<div class="skeleton-loader h-6" />}>
+            <div class="flex items-center gap-2">
+              <Icon size="20">flag</Icon>
+              {formatUserFlags(timeline())}
+            </div>
+          </Suspense>
+        </div>
       </CardContent>
     </Card>
   )
