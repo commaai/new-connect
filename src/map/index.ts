@@ -58,18 +58,3 @@ export function getTileUrl(): string {
 
   return `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${styleId}/tiles/256/{z}/{x}/{y}@2x?access_token=${MAPBOX_TOKEN}`
 }
-
-export async function getPlaceName(lat: number, lng: number): Promise<string | null> {
-  type PlaceNameResponse = {
-    features?: Array<{ place_name?: string }>
-  }
-
-  const rsp = await fetch(`https://api.mapbox.com/geocoding/v5/mapbox.places/${lng},${lat}.json?access_token=${MAPBOX_TOKEN}`)
-
-  if (!rsp.ok) {
-    return null
-  }
-
-  const data = await rsp.json() as PlaceNameResponse
-  return data.features?.[0]?.place_name ?? null
-}
