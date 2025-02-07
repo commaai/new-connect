@@ -69,3 +69,23 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
 }
+
+const LONG_DATE_FORMAT = new Intl.DateTimeFormat('en', {
+  weekday: 'long',
+  day: 'numeric',
+  month: 'long',
+  year: 'numeric',
+})
+
+const TIME_FORMAT = new Intl.DateTimeFormat('en', {
+  hour: 'numeric',
+  minute: 'numeric',
+})
+
+export const formatDateRange = (start: number, end: number): string => {
+  return LONG_DATE_FORMAT.formatRange(start, end)
+}
+
+export const formatTimeRange = (start: number, end: number): string => {
+  return TIME_FORMAT.formatRange(start, end)
+}

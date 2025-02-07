@@ -6,6 +6,7 @@ import {
   Index,
   onCleanup,
   onMount,
+  Show,
   Suspense,
   type VoidComponent,
 } from 'solid-js'
@@ -15,19 +16,15 @@ import { getTimelineStatistics, TimelineStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import type { RouteSegments } from '~/types'
-import { formatRouteDistance, formatRouteDuration } from '~/utils/date'
+import { formatDateRange, formatRouteDistance, formatRouteDuration, formatTimeRange } from '~/utils/date'
 import { useDimensions } from '~/utils/window'
 
 
-const formatEngagement = (timeline?: TimelineStatistics): string => {
-  if (!timeline) return ''
+const getEngagement = (timeline?: TimelineStatistics): string | null => {
+  if (!timeline) return null
   const { engagedDuration, duration } = timeline
-  return `Engaged Time: ${(100 * (engagedDuration / duration)).toFixed(0)}%`
-}
-
-
-const formatUserFlags = (timeline?: TimelineStatistics): string => {
-  return timeline?.userFlags !== undefined ? `${timeline.userFlags} user flags` : ''
+  if (!duration) return null
+  return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
 }
 
 
@@ -36,17 +33,8 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  // TODO: move to date utils
-  const dateRange = () => new Intl.DateTimeFormat('en', {
-    weekday: 'long',
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  }).formatRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
-  const timeRange = () => new Intl.DateTimeFormat('en', {
-    hour: 'numeric',
-    minute: 'numeric',
-  }).formatRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const dateRange = () => formatDateRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const timeRange = () => formatTimeRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
 
   return (
@@ -55,29 +43,36 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
       activeClass="md:before:bg-primary"
     >
-      <CardHeader headline={dateRange()} subhead={timeRange()} />
+      <CardHeader
+        headline={dateRange()}
+        subhead={timeRange()}
+        trailing={<div class="flex flex-row gap-2">
+          <Icon size="24">route</Icon>
+          {formatRouteDistance(props.route)}
+        </div>}
+      />
 
       <CardContent>
-        <div class="grid size-full grid-cols-2 gap-4">
+        <div class="grid gap-2 grid-cols-3 whitespace-nowrap">
           <div class="flex items-center gap-2">
             <Icon size="20">schedule</Icon>
             {formatRouteDuration(props.route)}
           </div>
-          <div class="flex items-center gap-2">
-            <Icon size="20">route</Icon>
-            {formatRouteDistance(props.route)}
-          </div>
-          <Suspense fallback={<div class="skeleton-loader h-6" />}>
-            <div class="hidden items-center gap-2 xs:flex">
-              <Icon size="20">speed</Icon>
-              {formatEngagement(timeline())}
-            </div>
+          <Suspense fallback={<div class="flex h-6"><div class="skeleton-loader size-full" /></div>}>
+            <Show when={getEngagement(timeline())}>{(engagement) => (
+              <div class="hidden items-center gap-2 xs:flex">
+                <Icon size="20">speed</Icon>
+                <span>Engaged: {engagement()}</span>
+              </div>
+            )}</Show>
           </Suspense>
-          <Suspense fallback={<div class="skeleton-loader h-6" />}>
-            <div class="flex items-center gap-2">
-              <Icon size="20">flag</Icon>
-              {formatUserFlags(timeline())}
-            </div>
+          <Suspense fallback={<div class="flex h-6"><div class="skeleton-loader size-full" /></div>}>
+            <Show when={timeline()}>{(timeline) => (
+              <div class="flex items-center gap-2 justify-self-end ps-2">
+                <Icon size="20">flag</Icon>
+                <span>{timeline()?.userFlags} <span class="hidden xs:inline">user</span> flags</span>
+              </div>
+            )}</Show>
           </Suspense>
         </div>
       </CardContent>
