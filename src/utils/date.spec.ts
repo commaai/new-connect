@@ -22,4 +22,11 @@ describe('formatDate', () => {
     expect(formatDate('2025/01/01')).toBe('January 1st')
     expect(formatDate('2025/01/02')).toBe('January 2nd')
   })
+
+  it('should parse unix timestamps', () => {
+    expect(formatDate(0)).toBe('January 1st, 1970')
+    expect(formatDate(1482652800)).toBe('December 25th, 2016')
+    expect(formatDate(1738943059)).toBe('February 7th')
+    expect(formatDate(1738943059000)).toBe('February 7th')
+  })
 })
