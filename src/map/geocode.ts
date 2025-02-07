@@ -1,4 +1,4 @@
-import { Position } from 'geojson'
+import type { Position } from 'geojson'
 
 import type { ReverseGeocodingResponse, ReverseGeocodingFeature } from '~/map/api-types'
 import { MAPBOX_TOKEN } from '~/map/config'
