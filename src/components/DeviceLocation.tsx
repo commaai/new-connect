@@ -7,7 +7,8 @@ import Icon from './material/Icon'
 import Button from './material/Button'
 
 import { getDeviceLocation } from '~/api/devices'
-import { getTileUrl, getPlaceName } from '~/map'
+import { getTileUrl } from '~/map'
+import { getFullAddress } from '~/map/geocode'
 
 type Location = {
   lat: number
@@ -84,7 +85,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     const location = deviceLocation()
     if (location) {
-      const address = await getPlaceName(location.lat, location.lng)
+      const address = await getFullAddress([location.lng, location.lat])
       const deviceLoc: Location = {
         lat: location.lat,
         lng: location.lng,
@@ -97,10 +98,11 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     }
 
     if (args.userPosition) {
-      const addr = await getPlaceName(args.userPosition.coords.latitude, args.userPosition.coords.longitude)
+      const { longitude, latitude } = args.userPosition.coords
+      const addr = await getFullAddress([longitude, latitude])
       const userLoc: Location = {
-        lat: args.userPosition.coords.latitude,
-        lng: args.userPosition.coords.longitude,
+        lat: latitude,
+        lng: longitude,
         label: 'You',
         address: addr,
       }
