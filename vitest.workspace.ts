@@ -14,7 +14,6 @@ export default defineWorkspace([
       ],
       name: 'unit',
       environment: 'node',
-      setupFiles: './src/test/setup.ts',
     },
   },
   {
