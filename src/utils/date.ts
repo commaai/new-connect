@@ -55,9 +55,16 @@ export const parseDateStr = (dateStr: string): Dayjs => {
   return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
 }
 
+const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
+  if (typeof input === 'number') {
+    // Assume number is unix timestamp, convert to seconds
+    return dayjs.unix(input >= 1E11 ? input / 1000 : input)
+  }
+  return dayjs(input)
+}
+
 export const formatDate = (input: dayjs.ConfigType) => {
-  // Assume number is unix timestamp
-  const date = typeof input === 'number' ? dayjs.unix(input) : dayjs(input)
+  const date = parseTimestamp(input)
   // Hide current year
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
