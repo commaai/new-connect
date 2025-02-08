@@ -7,6 +7,8 @@ import Icon from './material/Icon'
 import Button from './material/Button'
 
 import { getDeviceLocation } from '~/api/devices'
+import Card from '~/components/material/Card'
+import IconButton from '~/components/material/IconButton'
 import { getTileUrl } from '~/map'
 import { getFullAddress } from '~/map/geocode'
 
@@ -189,27 +191,25 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         </div>
       </Show>
 
-      <div class={clsx(
-        'absolute bottom-0 left-0 z-[9999] w-full p-2 transition-opacity duration-150',
+      <Card class={clsx(
+        'absolute inset-2 top-auto z-[9999] flex !bg-surface-container-high p-4 pt-3 transition-opacity duration-150',
         showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}>
-        <div class="flex w-full gap-4 rounded-lg bg-surface-container-high p-4 shadow-lg">
-          <div class="flex-auto">
-            <h3 class="mb-2 font-bold">{selectedLocation()?.label}</h3>
-            <p class="mb-2 text-sm text-on-surface-variant">{selectedLocation()?.address}</p>
-          </div>
-          <div class="shrink-0 self-end">
-            <Button
-              color="secondary"
-              onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
-              trailing={<Icon size="20">open_in_new</Icon>}
-              class="rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-black"
-            >
-              Open in Maps
-            </Button>
-          </div>
+        <div class="mb-2 flex flex-row items-center justify-between gap-4">
+          <span class="truncate text-title-md">{selectedLocation()?.label}</span>
+          <IconButton onClick={() => setShowSelectedLocation(false)}>close</IconButton>
         </div>
-      </div>
+        <div class="flex flex-col items-end gap-3 xs:flex-row">
+          <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
+          <Button
+            color="secondary"
+            onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
+            trailing={<Icon size="20">open_in_new</Icon>}
+          >
+            Open in Maps
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }

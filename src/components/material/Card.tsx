@@ -1,4 +1,4 @@
-import type { ParentComponent, JSXElement, VoidComponent } from 'solid-js'
+import { type JSXElement, type ParentComponent, Show, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
@@ -77,18 +77,25 @@ type CardProps = {
 }
 
 const Card: ParentComponent<CardProps> = (props) => {
+  const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface'
   return (
-    <ButtonBase
-      class={clsx(
-        'state-layer flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface',
-        props.class,
-      )}
-      onClick={props.onClick}
-      href={props.href}
-      activeClass={clsx('before:opacity-[.12]', props.activeClass)}
+    <Show
+      when={props.onClick || props.href}
+      fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}
     >
-      {props.children}
-    </ButtonBase>
+      <ButtonBase
+        class={clsx(
+          cardStyle,
+          props.href || props.onClick && 'state-layer',
+          props.class,
+        )}
+        onClick={props.onClick}
+        href={props.href}
+        activeClass={clsx('before:opacity-[.12]', props.activeClass)}
+      >
+        {props.children}
+      </ButtonBase>
+    </Show>
   )
 }
 
