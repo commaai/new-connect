@@ -24,21 +24,6 @@ export const CardHeader: VoidComponent<CardHeaderProps> = (props) => {
   )
 }
 
-type CardHeadlineProps = {
-  class?: string
-  title?: string
-  subhead?: string
-}
-
-export const CardHeadline: VoidComponent<CardHeadlineProps> = (props) => {
-  return (
-    <div class={clsx('flex h-12 grow flex-col justify-between', props.class)}>
-      {props.title && <span class="text-body-lg">{props.title}</span>}
-      {props.subhead && <span class="text-body-md text-on-surface-variant">{props.subhead}</span>}
-    </div>
-  )
-}
-
 type CardContentProps = {
   class?: string
 }
