@@ -6,16 +6,26 @@ import {
   Index,
   onCleanup,
   onMount,
+  Show,
   Suspense,
   type VoidComponent,
 } from 'solid-js'
-import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
+import { getTimelineStatistics, TimelineStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
-import RouteStatistics from '~/components/RouteStatistics'
+import Icon from '~/components/material/Icon'
 import type { RouteSegments } from '~/types'
+import { formatDateRange, formatRouteDistance, formatRouteDuration, formatTimeRange } from '~/utils/date'
 import { useDimensions } from '~/utils/window'
+
+
+const getEngagement = (timeline?: TimelineStatistics): string | null => {
+  if (!timeline) return null
+  const { engagedDuration, duration } = timeline
+  if (!duration) return null
+  return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
+}
 
 
 interface RouteCardProps {
@@ -23,8 +33,9 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  const startTime = () => dayjs(props.route.start_time_utc_millis)
-  const endTime = () => dayjs(props.route.end_time_utc_millis)
+  const dateRange = () => formatDateRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const timeRange = () => formatTimeRange(props.route.start_time_utc_millis, props.route.end_time_utc_millis)
+  const [timeline] = createResource(() => props.route, getTimelineStatistics)
 
   return (
     <Card
@@ -33,12 +44,37 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       activeClass="md:before:bg-primary"
     >
       <CardHeader
-        headline={startTime().format('ddd, MMM D, YYYY')}
-        subhead={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
+        headline={dateRange()}
+        subhead={timeRange()}
+        trailing={<div class="flex flex-row gap-2">
+          <Icon size="24">route</Icon>
+          {formatRouteDistance(props.route)}
+        </div>}
       />
 
       <CardContent>
-        <RouteStatistics route={props.route} />
+        <div class="grid gap-2 grid-cols-3 whitespace-nowrap">
+          <div class="flex items-center gap-2">
+            <Icon size="20">schedule</Icon>
+            {formatRouteDuration(props.route)}
+          </div>
+          <Suspense fallback={<div class="flex h-6"><div class="skeleton-loader size-full" /></div>}>
+            <Show when={getEngagement(timeline())}>{(engagement) => (
+              <div class="hidden items-center gap-2 xs:flex">
+                <Icon size="20">speed</Icon>
+                <span>Engaged: {engagement()}</span>
+              </div>
+            )}</Show>
+          </Suspense>
+          <Suspense fallback={<div class="flex h-6"><div class="skeleton-loader size-full" /></div>}>
+            <Show when={timeline()}>{(timeline) => (
+              <div class="flex items-center gap-2 justify-self-end ps-2">
+                <Icon size="20">flag</Icon>
+                <span>{timeline()?.userFlags} <span class="hidden xs:inline">user</span> flags</span>
+              </div>
+            )}</Show>
+          </Suspense>
+        </div>
       </CardContent>
     </Card>
   )
