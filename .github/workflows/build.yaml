@@ -34,8 +34,8 @@ jobs:
           VITE_SENTRY_ENVIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
       - name: Bundle size breakdown
-        run: bun src/ci/dependency_report.ts dist/ | column -t -s ":"
-      - run: bun src/ci/check-bundle-size.sh dist/
+        run: bun dependency-report | column -t -s ":"
+      - run: bun bundle-size
 
       - name: Upload built project
         uses: actions/upload-artifact@v4

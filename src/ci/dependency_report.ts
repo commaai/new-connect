@@ -1,6 +1,7 @@
+import { argv } from 'bun'
 import fs from 'node:fs'
 
-const bundle = process.argv[2]
+const bundle = argv[2] || 'dist'
 const dir = bundle + '/assets/'
 const extension = '.map'
 const mapFiles = fs.readdirSync(dir).filter(fn => fn.endsWith(extension))
