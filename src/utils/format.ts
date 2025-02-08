@@ -16,11 +16,6 @@ export const formatDistance = (miles: number | undefined): string => {
   return `${miles.toFixed(1)} mi`
 }
 
-export const formatRouteDistance = (route: Route | undefined): string => {
-  if (route?.length === undefined) return ''
-  return formatDistance(route.length)
-}
-
 const _formatDuration = (duration: Duration): string => {
   if (duration.asHours() > 0) {
     return duration.format('H[h] m[m]')
