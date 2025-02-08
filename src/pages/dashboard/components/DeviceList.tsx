@@ -31,7 +31,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
             <ListItem
               variant="nav"
               leading={<div class={clsx(
-                'm-2 size-2 rounded-full',
+                'm-2 size-2 shrink-0 rounded-full',
                 deviceIsOnline(device) ? 'bg-green-400' : 'bg-gray-400',
               )} />}
               selected={isSelected(device)}

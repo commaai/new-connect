@@ -7,6 +7,8 @@ import Icon from './material/Icon'
 import Button from './material/Button'
 
 import { getDeviceLocation } from '~/api/devices'
+import Card from '~/components/material/Card'
+import IconButton from '~/components/material/IconButton'
 import { getTileUrl } from '~/map'
 import { getFullAddress } from '~/map/geocode'
 
@@ -29,6 +31,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
+  const [showSelectedLocation, setShowSelectedLocation] = createSignal(false)
   const [userPosition, setUserPosition] = createSignal<GeolocationPosition | null>(null)
   const [deviceLocation] = createResource(
     () => props.dongleId,
@@ -56,7 +59,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       },
     )
     m.setView(SAN_DIEGO, 10)
-    m.on('click', () => setSelectedLocation(null))
+    m.on('click', () => setShowSelectedLocation(false))
 
     setMap(m)
 
@@ -99,12 +102,12 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     if (args.userPosition) {
       const { longitude, latitude } = args.userPosition.coords
-      const addr = await getFullAddress([longitude, latitude])
+      const address = await getFullAddress([longitude, latitude])
       const userLoc: Location = {
         lat: latitude,
         lng: longitude,
         label: 'You',
-        address: addr,
+        address,
       }
 
       addMarker(args.map, userLoc, 'person', 'bg-primary')
@@ -140,7 +143,10 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     L.marker([loc.lat, loc.lng], { icon })
       .addTo(instance)
-      .on('click', () => setSelectedLocation(loc))
+      .on('click', () => {
+        setSelectedLocation(loc)
+        setShowSelectedLocation(true)
+      })
   }
 
   const requestUserLocation = () => {
@@ -157,7 +163,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     <div class="relative">
       <div ref={mapRef} class="h-[240px] w-full !bg-surface-container-low" />
 
-      <Show when={!userPosition()}>
+      <Show when={!userPosition() && !showSelectedLocation()}>
         <div class="absolute bottom-2 right-2 z-[9999]">
           <Button
             title="Show your current location"
@@ -185,27 +191,25 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         </div>
       </Show>
 
-      <div class={clsx(
-        'absolute bottom-0 left-0 z-[9999] w-full p-2 transition-opacity duration-150',
-        selectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
+      <Card class={clsx(
+        'absolute inset-2 top-auto z-[9999] flex !bg-surface-container-high p-4 pt-3 transition-opacity duration-150',
+        showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}>
-        <div class="flex w-full gap-4 rounded-lg bg-surface-container-high p-4 shadow-lg">
-          <div class="flex-auto">
-            <h3 class="mb-2 font-bold">{selectedLocation()?.label}</h3>
-            <p class="mb-2 text-sm text-on-surface-variant">{selectedLocation()?.address}</p>
-          </div>
-          <div class="shrink-0 self-end">
-            <Button
-              color="secondary"
-              onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
-              trailing={<Icon size="20">open_in_new</Icon>}
-              class="rounded-lg bg-gray-50 px-3 py-2 text-sm font-medium text-black"
-            >
-              Open in Maps
-            </Button>
-          </div>
+        <div class="mb-2 flex flex-row items-center justify-between gap-4">
+          <span class="truncate text-title-md">{selectedLocation()?.label}</span>
+          <IconButton onClick={() => setShowSelectedLocation(false)}>close</IconButton>
         </div>
-      </div>
+        <div class="flex flex-col items-end gap-3 xs:flex-row">
+          <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
+          <Button
+            color="secondary"
+            onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
+            trailing={<Icon size="20">open_in_new</Icon>}
+          >
+            Open in Maps
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }

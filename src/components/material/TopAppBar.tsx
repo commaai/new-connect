@@ -18,7 +18,7 @@ const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
       )}
     >
       {props.leading}
-      <Dynamic class="grow text-title-lg" component={props.component || 'h2'}>
+      <Dynamic class="grow truncate text-title-lg" component={props.component || 'h2'}>
         {props.children}
       </Dynamic>
       {props.trailing}

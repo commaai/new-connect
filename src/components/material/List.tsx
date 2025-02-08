@@ -10,8 +10,8 @@ type ListItemContentProps = {
 
 export const ListItemContent: VoidComponent<ListItemContentProps> = (props) => {
   return (
-    <div>
-      <div class="text-body-lg text-on-surface">{props.headline}</div>
+    <div class="min-w-0">
+      <div class="truncate text-body-lg text-on-surface">{props.headline}</div>
       {props.subhead && <div class="text-body-md text-on-surface-variant">{props.subhead}</div>}
     </div>
   )
