@@ -1,12 +1,12 @@
 {
-  "name": "connect-beta",
+  "name": "new-connect",
   "version": "1.0.0",
-  "homepage": "https://connect-beta.comma.ai",
+  "homepage": "https://new-connect.connect-d5y.pages.dev",
   "license": "MIT",
   "author": "comma.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commaai/connect-beta.git"
+    "url": "https://github.com/commaai/new-connect.git"
   },
   "scripts": {
     "build": "vite build",
