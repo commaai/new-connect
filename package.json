@@ -47,6 +47,7 @@
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.10",
     "@stylistic/eslint-plugin": "^3.0.1",
+    "@types/bun": "^1.2.2",
     "@types/eslint__js": "^8.42.3",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.16",
