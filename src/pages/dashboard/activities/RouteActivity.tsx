@@ -13,7 +13,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from '~/components/Timeline'
-import { parseDateStr } from '~/utils/date'
+import { parseDateStr } from '~/utils/format'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 

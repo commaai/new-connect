@@ -3,7 +3,7 @@ import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getDeviceStats } from '~/api/devices'
-import { formatDistance, formatDuration } from '~/utils/date'
+import { formatDistance, formatDuration } from '~/utils/format'
 
 type DeviceStatisticsProps = {
   class?: string
