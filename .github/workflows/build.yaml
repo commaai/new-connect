@@ -19,7 +19,7 @@ jobs:
       - run: bun playwright install
       - run: timeout 12s bun lefthook run pre-commit
       - run: bun run test
-      - run: ./check-lines.sh
+      - run: bun lines
 
   build:
     runs-on: ubuntu-latest
