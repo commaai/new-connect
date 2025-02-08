@@ -122,17 +122,14 @@
     @apply h-full overflow-hidden;
   }
 
-  *::-webkit-scrollbar {
+  ::-webkit-scrollbar {
     width: 6px;
   }
-  *::-webkit-scrollbar-track {
-    background-color: var(--color-background);
-  }
-  *::-webkit-scrollbar-thumb {
+  ::-webkit-scrollbar-thumb {
     background-color: color-mix(in oklab, var(--color-surface), var(--color-surface-tint) 40%);
     border-radius: 999px;
   }
-  *::-webkit-scrollbar-thumb:hover {
+  ::-webkit-scrollbar-thumb:hover {
     background-color: color-mix(in oklab, var(--color-surface), var(--color-surface-tint) 60%);
   }
 
