@@ -29,6 +29,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
+  const [showSelectedLocation, setShowSelectedLocation] = createSignal(false)
   const [userPosition, setUserPosition] = createSignal<GeolocationPosition | null>(null)
   const [deviceLocation] = createResource(
     () => props.dongleId,
@@ -56,7 +57,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       },
     )
     m.setView(SAN_DIEGO, 10)
-    m.on('click', () => setSelectedLocation(null))
+    m.on('click', () => setShowSelectedLocation(false))
 
     setMap(m)
 
@@ -99,12 +100,12 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     if (args.userPosition) {
       const { longitude, latitude } = args.userPosition.coords
-      const addr = await getFullAddress([longitude, latitude])
+      const address = await getFullAddress([longitude, latitude])
       const userLoc: Location = {
         lat: latitude,
         lng: longitude,
         label: 'You',
-        address: addr,
+        address,
       }
 
       addMarker(args.map, userLoc, 'person', 'bg-primary')
@@ -140,7 +141,10 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     L.marker([loc.lat, loc.lng], { icon })
       .addTo(instance)
-      .on('click', () => setSelectedLocation(loc))
+      .on('click', () => {
+        setSelectedLocation(loc)
+        setShowSelectedLocation(true)
+      })
   }
 
   const requestUserLocation = () => {
@@ -157,7 +161,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     <div class="relative">
       <div ref={mapRef} class="h-[240px] w-full !bg-surface-container-low" />
 
-      <Show when={!userPosition()}>
+      <Show when={!userPosition() && !showSelectedLocation()}>
         <div class="absolute bottom-2 right-2 z-[9999]">
           <Button
             title="Show your current location"
@@ -187,7 +191,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
       <div class={clsx(
         'absolute bottom-0 left-0 z-[9999] w-full p-2 transition-opacity duration-150',
-        selectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
+        showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
       )}>
         <div class="flex w-full gap-4 rounded-lg bg-surface-container-high p-4 shadow-lg">
           <div class="flex-auto">
