@@ -15,6 +15,7 @@ for await (const path of $`find ${OUT_DIR} -type f ! -name '*.map'`.lines()) {
     compressedSizeKB: (compressedSize / 1024).toFixed(2),
   })
 }
+files.sort((a, b) => b.compressedSize - a.compressedSize)
 
 const totalSizeKB = (files.reduce((acc, file) => acc + file.size, 0) / 1024).toFixed(2)
 const totalCompressedSize = files.reduce((acc, file) => acc + file.compressedSize, 0)
