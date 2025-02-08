@@ -13,7 +13,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from '~/components/Timeline'
-import { parseDateStr } from '~/utils/format'
+import { dayjs } from '~/utils/format'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -27,7 +27,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
   let videoRef: HTMLVideoElement
 

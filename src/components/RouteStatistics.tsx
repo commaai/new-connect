@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
 import type { Route } from '~/types'
-import { formatRouteDistance, formatRouteDuration } from '~/utils/format'
+import { formatDistance, formatRouteDuration } from '~/utils/format'
 
 const formatEngagement = (timeline?: TimelineStatistics): string => {
   if (!timeline) return ''
@@ -28,7 +28,7 @@ const RouteStatistics: VoidComponent<RouteStatisticsProps> = (props) => {
     <div class={clsx('flex size-full items-stretch gap-8', props.class)}>
       <div class="flex grow flex-col justify-between">
         <span class="text-body-sm text-on-surface-variant">Distance</span>
-        <span class="font-mono text-label-lg uppercase">{formatRouteDistance(props.route)}</span>
+        <span class="font-mono text-label-lg uppercase">{formatDistance(props.route?.length)}</span>
       </div>
 
       <div class="flex grow flex-col justify-between">

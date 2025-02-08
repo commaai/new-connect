@@ -13,16 +13,11 @@ export { dayjs }
 
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
-  return `${miles.toFixed(1) ?? 0} mi`
-}
-
-export const formatRouteDistance = (route: Route | undefined): string => {
-  if (route?.length === undefined) return ''
-  return formatDistance(route.length)
+  return `${miles.toFixed(1)} mi`
 }
 
 const _formatDuration = (duration: Duration): string => {
-  if (duration.asHours() > 0) {
+  if (duration.hours() > 0) {
     return duration.format('H[h] m[m]')
   } else {
     return duration.format('m[m]')
@@ -33,7 +28,7 @@ export const formatDuration = (minutes: number | undefined): string => {
   if (minutes === undefined) return ''
   const duration = dayjs.duration({
     hours: Math.floor(minutes / 60),
-    minutes: minutes % 60,
+    minutes: Math.round(minutes % 60),
   })
   return _formatDuration(duration)
 }
@@ -49,10 +44,6 @@ export const formatRouteDuration = (route: Route | undefined): string => {
   if (!route) return ''
   const duration = getRouteDuration(route)
   return duration ? _formatDuration(duration) : ''
-}
-
-export const parseDateStr = (dateStr: string): Dayjs => {
-  return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
 }
 
 const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
