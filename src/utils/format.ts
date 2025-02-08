@@ -17,7 +17,7 @@ export const formatDistance = (miles: number | undefined): string => {
 }
 
 const _formatDuration = (duration: Duration): string => {
-  if (duration.asHours() > 0) {
+  if (duration.hours() > 0) {
     return duration.format('H[h] m[m]')
   } else {
     return duration.format('m[m]')
@@ -28,7 +28,7 @@ export const formatDuration = (minutes: number | undefined): string => {
   if (minutes === undefined) return ''
   const duration = dayjs.duration({
     hours: Math.floor(minutes / 60),
-    minutes: minutes % 60,
+    minutes: Math.round(minutes % 60),
   })
   return _formatDuration(duration)
 }
