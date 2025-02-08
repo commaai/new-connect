@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
 import { cancelSubscription, getStripeCheckout, getStripePortal, getStripeSession, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
-import { formatDate } from '~/utils/date'
+import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'

@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
 import type { Route } from '~/types'
-import { formatRouteDistance, formatRouteDuration } from '~/utils/date'
+import { formatRouteDistance, formatRouteDuration } from '~/utils/format'
 
 const formatEngagement = (timeline?: TimelineStatistics): string => {
   if (!timeline) return ''
