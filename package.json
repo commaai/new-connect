@@ -10,12 +10,14 @@
   },
   "scripts": {
     "build": "vite build",
+    "bundle-size": "bun src/ci/check_bundle_size.ts",
+    "dependency-report": "bun src/ci/dependency_report.ts",
     "dev": "vite",
     "serve": "vite prefix",
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "test": "vitest run"
   },
-  "packageManager": "bun@1.1.43",
+  "packageManager": "bun@1.2.2",
   "type": "module",
   "//devDependencies": {
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
@@ -47,6 +49,7 @@
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.10",
     "@stylistic/eslint-plugin": "^3.0.1",
+    "@types/bun": "^1.2.2",
     "@types/eslint__js": "^8.42.3",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.16",
