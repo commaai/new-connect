@@ -122,6 +122,20 @@
     @apply h-full overflow-hidden;
   }
 
+  *::-webkit-scrollbar {
+    width: 6px;
+  }
+  *::-webkit-scrollbar-track {
+    background-color: var(--color-background);
+  }
+  *::-webkit-scrollbar-thumb {
+    background-color: color-mix(in oklab, var(--color-surface), var(--color-surface-tint) 40%);
+    border-radius: 999px;
+  }
+  *::-webkit-scrollbar-thumb:hover {
+    background-color: color-mix(in oklab, var(--color-surface), var(--color-surface-tint) 60%);
+  }
+
   button {
     /* revert user-agent style */
     text-align: unset;
