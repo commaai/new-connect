@@ -17,7 +17,7 @@
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "test": "vitest run"
   },
-  "packageManager": "bun@1.1.43",
+  "packageManager": "bun@1.2.2",
   "type": "module",
   "//devDependencies": {
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
