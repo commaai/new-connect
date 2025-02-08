@@ -1,6 +1,17 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { formatDate } from './format'
+import { formatDate, formatDistance } from './format'
+
+
+describe('formatDistance', () => {
+  it('should format distance', () => {
+    expect(formatDistance(0)).toBe('0.0 mi')
+    expect(formatDistance(1.234)).toBe('1.2 mi')
+  })
+  it('should be blank for undefined distance', () => {
+    expect(formatDistance(undefined)).toBe('')
+  })
+})
 
 
 describe('formatDate', () => {

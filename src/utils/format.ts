@@ -13,7 +13,7 @@ export { dayjs }
 
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
-  return `${miles.toFixed(1) ?? 0} mi`
+  return `${miles.toFixed(1)} mi`
 }
 
 export const formatRouteDistance = (route: Route | undefined): string => {
