@@ -11,6 +11,10 @@ permissions:
   pull-requests: write
   checks: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr:
     name: Find PR number
