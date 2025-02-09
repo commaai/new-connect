@@ -1,4 +1,4 @@
-import { createSignal, Show, type VoidComponent } from 'solid-js'
+import { createSignal, Show, type VoidComponent, createEffect } from 'solid-js'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import { setRoutePublic, setRoutePreserved } from '~/api/route'
@@ -6,13 +6,15 @@ import { USERADMIN_URL } from '~/api/config'
 
 interface RouteActionsProps {
   routeName: string
-  initialPublic: boolean
-  initialPreserved: boolean
+  initialPublic: boolean | undefined
+  initialPreserved: boolean | undefined
+  isPublic: () => boolean | undefined
+  isPreserved: () => boolean | undefined
 }
 
 const ToggleButton: VoidComponent<{
   label: string
-  active: () => boolean
+  active: () => boolean | undefined
   onToggle: () => void
 }> = (props) => (
   <button
@@ -58,9 +60,25 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [error, setError] = createSignal<string | null>(null)
   const [copied, setCopied] = createSignal(false)
 
+  // Keep makePublic in sync with isPublic
+  createEffect(() => {
+    const publicStatus = props.isPublic()
+    if (publicStatus !== undefined) {
+      setMakePublic(publicStatus)
+    }
+  })
+
+  // Keep preserveRoute in sync with isPreserved
+  createEffect(() => {
+    const preserveStatus = props.isPreserved()
+    if (preserveStatus !== undefined) {
+      setPreserveRoute(preserveStatus)
+    }
+  })
+
   const handleToggle = async (
     apiCall: (routeName: string, value: boolean) => Promise<unknown>,
-    getter: () => boolean,
+    getter: () => boolean | undefined,
     setter: (value: boolean) => void,
   ) => {
     setError(null)

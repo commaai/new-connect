@@ -13,16 +13,11 @@ export { dayjs }
 
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
-  return `${miles.toFixed(1) ?? 0} mi`
-}
-
-export const formatRouteDistance = (route: Route | undefined): string => {
-  if (route?.length === undefined) return ''
-  return formatDistance(route.length)
+  return `${miles.toFixed(1)} mi`
 }
 
 const _formatDuration = (duration: Duration): string => {
-  if (duration.asHours() > 0) {
+  if (duration.hours() > 0) {
     return duration.format('H[h] m[m]')
   } else {
     return duration.format('m[m]')
@@ -33,7 +28,7 @@ export const formatDuration = (minutes: number | undefined): string => {
   if (minutes === undefined) return ''
   const duration = dayjs.duration({
     hours: Math.floor(minutes / 60),
-    minutes: minutes % 60,
+    minutes: Math.round(minutes % 60),
   })
   return _formatDuration(duration)
 }
@@ -51,13 +46,16 @@ export const formatRouteDuration = (route: Route | undefined): string => {
   return duration ? _formatDuration(duration) : ''
 }
 
-export const parseDateStr = (dateStr: string): Dayjs => {
-  return dayjs(dateStr, 'YYYY-MM-DD--HH-mm-ss')
+const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
+  if (typeof input === 'number') {
+    // Assume number is unix timestamp, convert to seconds
+    return dayjs.unix(input >= 1E11 ? input / 1000 : input)
+  }
+  return dayjs(input)
 }
 
-export const formatDate = (input: dayjs.ConfigType) => {
-  // Assume number is unix timestamp
-  const date = typeof input === 'number' ? dayjs.unix(input) : dayjs(input)
+export const formatDate = (input: dayjs.ConfigType): string => {
+  const date = parseTimestamp(input)
   // Hide current year
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)

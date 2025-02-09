@@ -1,21 +1,24 @@
 {
-  "name": "connect-beta",
+  "name": "new-connect",
   "version": "1.0.0",
-  "homepage": "https://connect-beta.comma.ai",
+  "homepage": "https://new-connect.connect-d5y.pages.dev",
   "license": "MIT",
   "author": "comma.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commaai/connect-beta.git"
+    "url": "https://github.com/commaai/new-connect.git"
   },
   "scripts": {
     "build": "vite build",
+    "bundle-size": "bun src/ci/check_bundle_size.ts",
+    "dependency-report": "bun src/ci/dependency_report.ts",
     "dev": "vite",
     "serve": "vite prefix",
+    "lines": "bun src/ci/check_lines.ts",
     "lint": "eslint --cache --cache-location node_modules/.eslintcache",
     "test": "vitest run"
   },
-  "packageManager": "bun@1.1.43",
+  "packageManager": "bun@1.2.2",
   "type": "module",
   "//devDependencies": {
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
@@ -47,12 +50,14 @@
   "devDependencies": {
     "@solidjs/testing-library": "^0.8.10",
     "@stylistic/eslint-plugin": "^3.0.1",
+    "@types/bun": "^1.2.2",
     "@types/eslint__js": "^8.42.3",
-    "@types/mapbox__polyline": "^1.0.5",
+    "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.16",
-    "@typescript-eslint/eslint-plugin": "^8.22.0",
-    "@typescript-eslint/parser": "^8.22.0",
-    "@vitest/browser": "^3.0.4",
+    "@types/mapbox__polyline": "^1.0.5",
+    "@typescript-eslint/eslint-plugin": "^8.23.0",
+    "@typescript-eslint/parser": "^8.23.0",
+    "@vitest/browser": "^3.0.5",
     "@vitest/eslint-plugin": "^1.1.25",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.19.0",
@@ -66,11 +71,11 @@
     "solid-devtools": "^0.33.0",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.7.3",
-    "typescript-eslint": "^8.22.0",
-    "vite": "^6.0.11",
-    "vite-plugin-solid": "^2.11.0",
-    "vitest": "^3.0.4",
-    "wrangler": "^3.107.2"
+    "typescript-eslint": "^8.23.0",
+    "vite": "^6.1.0",
+    "vite-plugin-solid": "^2.11.1",
+    "vitest": "^3.0.5",
+    "wrangler": "^3.107.3"
   },
   "//dependencies": {
     "@mapbox/polyline": "display series of map coordinates as a line",
@@ -84,8 +89,8 @@
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
-    "@sentry/solid": "^8.53.0",
-    "@sentry/vite-plugin": "^3.1.1",
+    "@sentry/solid": "^8.54.0",
+    "@sentry/vite-plugin": "^3.1.2",
     "@solid-primitives/state-machine": "^0.1.0",
     "@solidjs/router": "^0.15.3",
     "clsx": "^2.1.1",

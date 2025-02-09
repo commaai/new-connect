@@ -1,5 +1,5 @@
 import type { Route } from '~/types'
-import { getRouteDuration } from '~/utils/date'
+import { getRouteDuration } from '~/utils/format'
 
 export interface GPSPathPoint {
   t: number

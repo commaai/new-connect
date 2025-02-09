@@ -19,7 +19,7 @@ jobs:
       - run: bun playwright install
       - run: timeout 12s bun lefthook run pre-commit
       - run: bun run test
-      - run: ./check-lines.sh
+      - run: bun lines
 
   build:
     runs-on: ubuntu-latest
@@ -34,8 +34,8 @@ jobs:
           VITE_SENTRY_ENVIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
 
       - name: Bundle size breakdown
-        run: bun src/ci/dependency_report.ts dist/ | column -t -s ":"
-      - run: ./check-bundle-size.sh
+        run: bun dependency-report | column -t -s ":"
+      - run: bun bundle-size
 
       - name: Upload built project
         uses: actions/upload-artifact@v4

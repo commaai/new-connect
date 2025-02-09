@@ -4,16 +4,20 @@ import {
   lazy,
   Suspense,
   type VoidComponent,
+  createEffect,
+  Switch,
+  Match,
+  createMemo,
 } from 'solid-js'
 
-import { getRoute } from '~/api/route'
+import { getRoute, getPreservedRoutes } from '~/api/route'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from '~/components/Timeline'
-import { parseDateStr } from '~/utils/date'
+import { dayjs } from '~/utils/format'
 
 import RouteActions from '~/components/RouteActions'
 
@@ -29,7 +33,36 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => parseDateStr(route.start_time)?.format('ddd, MMM D, YYYY'))
+
+  // Add debug logging to see route contents
+  createEffect(() => {
+    console.log('Route data:', route())
+  })
+
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+  const [isPublic] = createResource(route, (route) => route.is_public)
+
+  // Get all preserved routes for this device
+  const [preservedRoutes] = createResource(
+    () => props.dongleId,
+    getPreservedRoutes,
+  )
+
+  const isPreserved = createMemo(() => {
+    try {
+      const currentRoute = route()
+      const preserved = preservedRoutes()
+
+      if (!currentRoute) return undefined
+      if (currentRoute.is_preserved) return true
+      if (!preserved) return undefined
+
+      return preserved.some(r => r.fullname === currentRoute.fullname)
+    } catch (err) {
+      console.error('Error checking preserved status:', err)
+      return undefined
+    }
+  })
 
   let videoRef: HTMLVideoElement
 
@@ -40,7 +73,20 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
-        {startTime()}
+        <div class="flex items-center gap-2">
+          {startTime()}
+          <Switch>
+            <Match when={isPublic() === undefined}>
+              <span class="text-sm text-error" title="Loading status...">DANGGG</span>
+            </Match>
+            <Match when={isPublic()}>
+              <span class="text-sm" title="Public route">public</span>
+            </Match>
+            <Match when={isPublic() === false}>
+              <span class="text-sm text-error" title="Not public">public_off</span>
+            </Match>
+          </Switch>
+        </div>
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
@@ -68,8 +114,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
           <RouteActions
             routeName={routeName()}
-            initialPublic={route()?.is_public ?? false}
-            initialPreserved={route()?.is_preserved ?? false}
+            initialPublic={isPublic()}
+            initialPreserved={isPreserved()}
+            isPublic={isPublic}
+            isPreserved={isPreserved}
           />
         </Suspense>
 
