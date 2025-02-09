@@ -24,15 +24,15 @@ type RouteActivityProps = {
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(0)
-  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
+  let videoRef: HTMLVideoElement
+
   function onTimelineChange(newTime: number) {
-    const video = videoRef()
-    if (video) video.currentTime = newTime
+    videoRef.currentTime = newTime
   }
 
   return (
@@ -47,7 +47,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={ref => videoRef = ref} routeName={routeName()} onProgress={setSeekTime} />
         </Suspense>
 
         <div class="flex flex-col gap-2">

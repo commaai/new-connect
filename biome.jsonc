@@ -21,21 +21,6 @@
     "enabled": true,
     "rules": {
       "recommended": true,
-      "a11y": {
-        "all": false
-      },
-      "complexity": {
-        "noForEach": "off"
-      },
-      "correctness": {
-        "noUnusedImports": "error",
-        "noUnusedVariables": "error",
-        // SolidJS does not require JSX key in iterables
-        "useJsxKeyInIterable": "off"
-      },
-      "performance": {
-        "noBarrelFile": "error"
-      },
       "style": {
         "all": false
       },

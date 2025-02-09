@@ -83,7 +83,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
 
-  const pairToken = () => !!location.query.pair
+  const pairToken = () => !!location.query['pair']
 
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
