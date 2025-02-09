@@ -17,7 +17,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun playwright install
-      - run: bun biome ci --reporter=github
+      - run: bun run lint --reporter=github
       - run: bun run test
       - run: bun lines
 
