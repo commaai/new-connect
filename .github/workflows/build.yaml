@@ -17,7 +17,7 @@ jobs:
 
       - run: bun install --frozen-lockfile
       - run: bun playwright install
-      - run: timeout 5s bun lefthook run pre-commit --all-files
+      - run: bun biome ci --reporter=github
       - run: bun run test
       - run: bun lines
 
