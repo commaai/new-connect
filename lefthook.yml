@@ -4,6 +4,3 @@ pre-commit:
     lint:
       glob: "*.{js,mjs,cjs,ts,jsx,tsx,cts,json,jsonc,css}"
       run: bun lint {staged_files}
-
-skip_output:
- - execution_out
