@@ -1,4 +1,4 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, JSX, For, createSignal, type Resource, createEffect } from 'solid-js'
+import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, For, createSignal, type Resource, createEffect, type JSXElement } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
@@ -22,7 +22,7 @@ const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   return [trigger, data]
 }
 
-const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 == 0 ? 0 : 2)}`
+const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 === 0 ? 0 : 2)}`
 
 type PrimeActivityProps = {
   dongleId: string
@@ -43,7 +43,7 @@ const PrimePlanName: Record<PrimePlan, string> = {
 }
 
 const Plan = (props: PlanProps) => {
-  return props as unknown as JSX.Element
+  return props as unknown as JSXElement
 }
 
 const PlanSelector: ParentComponent<{
@@ -102,7 +102,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
     (source) => {
       if (!source.device || !source.subscribeInfo) return null
 
-      let trialEndDate, trialClaimable
+      let trialEndDate: number | null, trialClaimable: boolean
       if (source.selectedPlan === 'data') {
         trialEndDate = source.subscribeInfo.trial_end_data
         trialClaimable = !!trialEndDate
@@ -114,7 +114,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
         trialClaimable = Boolean(source.subscribeInfo.trial_end_data && source.subscribeInfo.trial_end_nodata)
       }
 
-      let checkoutText
+      let checkoutText: string
       if (source.selectedPlan) {
         checkoutText = trialClaimable ? 'Claim trial' : 'Go to checkout'
       } else {
@@ -122,12 +122,12 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
         if (trialClaimable) checkoutText += ' to claim trial'
       }
 
-      let chargeText
+      let chargeText: string
       if (source.selectedPlan && trialClaimable) {
         chargeText = `Your first charge will be on ${formatDate(trialEndDate)}, then monthly thereafter.`
       }
 
-      let disabledDataPlanText
+      let disabledDataPlanText: JSXElement
       if (!source.device.eligible_features?.prime_data) {
         disabledDataPlanText = 'Standard plan is not available for your device.'
       } else if (!source.subscribeInfo.sim_id && source.subscribeInfo.device_online) {
