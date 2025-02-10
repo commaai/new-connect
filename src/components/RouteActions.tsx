@@ -55,35 +55,39 @@ const ActionButton: VoidComponent<{
 )
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [preserveRoute, setPreserveRoute] = createSignal(props.initialPreserved)
-  const [makePublic, setMakePublic] = createSignal(props.initialPublic)
+  const [isPreservedLocal, setIsPreservedLocal] = createSignal(props.initialPreserved)
+  const [isPublicLocal, setIsPublicLocal] = createSignal(props.initialPublic)
   const [error, setError] = createSignal<string | null>(null)
   const [copied, setCopied] = createSignal(false)
 
-  // Keep makePublic in sync with isPublic
   createEffect(() => {
-    const publicStatus = props.isPublic()
-    if (publicStatus !== undefined) {
-      setMakePublic(publicStatus)
-    }
+    const publicVal = props.isPublic()
+    const preservedVal = props.isPreserved()
+
+    if (publicVal !== undefined) setIsPublicLocal(publicVal)
+    if (preservedVal !== undefined) setIsPreservedLocal(preservedVal)
   })
 
-  // Keep preserveRoute in sync with isPreserved
-  createEffect(() => {
-    const preserveStatus = props.isPreserved()
-    if (preserveStatus !== undefined) {
-      setPreserveRoute(preserveStatus)
-    }
-  })
-
-  const handleToggle = async (
-    apiCall: (routeName: string, value: boolean) => Promise<unknown>,
-    getter: () => boolean | undefined,
-    setter: (value: boolean) => void,
-  ) => {
+  const toggleRoute = async (type: 'public' | 'preserved') => {
     setError(null)
+    let currentValue: boolean | undefined
+    let setter: (next: boolean) => void
+    let apiCall: (routeName: string, newVal: boolean) => Promise<unknown>
+
+    if (type === 'public') {
+      currentValue = isPublicLocal()
+      setter = setIsPublicLocal
+      apiCall = setRoutePublic
+    } else {
+      currentValue = isPreservedLocal()
+      setter = setIsPreservedLocal
+      apiCall = setRoutePreserved
+    }
+
+    if (currentValue === undefined) return
+
     try {
-      const newValue = !getter()
+      const newValue = !currentValue
       await apiCall(props.routeName, newValue)
       setter(newValue)
     } catch (err) {
@@ -131,13 +135,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       <div class="divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
-          active={() => preserveRoute()}
-          onToggle={() => void handleToggle(setRoutePreserved, preserveRoute, setPreserveRoute)}
+          active={() => isPreservedLocal()}
+          onToggle={() => void toggleRoute('preserved')}
         />
         <ToggleButton
           label="Public Access"
-          active={() => makePublic()}
-          onToggle={() => void handleToggle(setRoutePublic, makePublic, setMakePublic)}
+          active={() => isPublicLocal()}
+          onToggle={() => void toggleRoute('public')}
         />
       </div>
 
