@@ -4,8 +4,6 @@ import {
   lazy,
   Suspense,
   type VoidComponent,
-  Switch,
-  Match,
   createMemo,
 } from 'solid-js'
 
@@ -66,20 +64,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
-        <div class="flex items-center gap-2">
-          {startTime()}
-          <Switch>
-            <Match when={isPublic() === undefined}>
-              <span class="text-sm text-error" title="Loading status...">DANGGG</span>
-            </Match>
-            <Match when={isPublic()}>
-              <span class="text-sm" title="Public route">public</span>
-            </Match>
-            <Match when={isPublic() === false}>
-              <span class="text-sm text-error" title="Not public">public_off</span>
-            </Match>
-          </Switch>
-        </div>
+        {startTime()}
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
