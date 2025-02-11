@@ -61,11 +61,9 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [copied, setCopied] = createSignal(false)
 
   createEffect(() => {
-    const publicVal = props.isPublic()
-    const preservedVal = props.isPreserved()
-
-    if (publicVal !== undefined) setIsPublicLocal(publicVal)
-    if (preservedVal !== undefined) setIsPreservedLocal(preservedVal)
+    const [publicValue, preservedValue] = [props.isPublic(), props.isPreserved()]
+    if (publicValue !== undefined) setIsPublicLocal(publicValue)
+    if (preservedValue !== undefined) setIsPreservedLocal(preservedValue)
   })
 
   const toggleRoute = async (type: 'public' | 'preserved') => {
