@@ -68,19 +68,9 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   const toggleRoute = async (type: 'public' | 'preserved') => {
     setError(null)
-    let currentValue: boolean | undefined
-    let setter: (next: boolean) => void
-    let apiCall: (routeName: string, newVal: boolean) => Promise<unknown>
-
-    if (type === 'public') {
-      currentValue = isPublicLocal()
-      setter = setIsPublicLocal
-      apiCall = setRoutePublic
-    } else {
-      currentValue = isPreservedLocal()
-      setter = setIsPreservedLocal
-      apiCall = setRoutePreserved
-    }
+    const [currentValue, setter, apiCall] = type === 'public'
+      ? [isPublicLocal(), setIsPublicLocal, setRoutePublic]
+      : [isPreservedLocal(), setIsPreservedLocal, setRoutePreserved]
 
     if (currentValue === undefined) return
 
