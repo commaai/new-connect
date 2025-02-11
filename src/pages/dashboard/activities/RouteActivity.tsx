@@ -4,7 +4,6 @@ import {
   lazy,
   Suspense,
   type VoidComponent,
-  createEffect,
   Switch,
   Match,
   createMemo,
@@ -34,15 +33,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
 
-  // Add debug logging to see route contents
-  createEffect(() => {
-    console.log('Route data:', route())
-  })
-
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
   const [isPublic] = createResource(route, (route) => route.is_public)
 
-  // Get all preserved routes for this device
   const [preservedRoutes] = createResource(
     () => props.dongleId,
     getPreservedRoutes,
