@@ -12,11 +12,10 @@ import { getRoute, getPreservedRoutes } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
 import Timeline from '~/components/Timeline'
-import { dayjs } from '~/utils/format'
-
+import RouteInfo from '~/components/RouteInfo'
 import RouteActions from '~/components/RouteActions'
+import { dayjs } from '~/utils/format'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -83,7 +82,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <Suspense fallback={<div class="h-10" />}>
-          <RouteStatistics route={route()} />
+          <RouteInfo route={route()} />
         </Suspense>
 
         <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
