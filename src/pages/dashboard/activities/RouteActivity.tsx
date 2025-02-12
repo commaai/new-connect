@@ -67,26 +67,24 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <Suspense
-          fallback={
-            <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
-          }
-        >
-          <RouteVideoPlayer ref={ref => videoRef = ref} routeName={routeName()} onProgress={setSeekTime} />
-        </Suspense>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm">Timeline</h3>
+        <div class="flex flex-col">
+          <Suspense
+            fallback={
+              <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
+            }
+          >
+            <RouteVideoPlayer ref={ref => videoRef = ref} routeName={routeName()} onProgress={setSeekTime} />
+          </Suspense>
           <Timeline
-            class="mb-1"
             routeName={routeName()}
             seekTime={seekTime}
             updateTime={onTimelineChange}
           />
-          <Suspense fallback={<div class="h-10" />}>
-            <RouteStatistics route={route()} />
-          </Suspense>
         </div>
+
+        <Suspense fallback={<div class="h-10" />}>
+          <RouteStatistics route={route()} />
+        </Suspense>
 
         <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
           <RouteActions
