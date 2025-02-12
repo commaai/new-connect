@@ -104,14 +104,14 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col rounded-md border-2 border-surface-container-high bg-surface-container-lowest p-4">
-      {/* <div
+    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-4">
+      <div
         class="mb-4 ml-2 text-body-sm text-zinc-500"
         style={{'font-family':"'JetBrains Mono', monospace"}}
       >
         <div>Route ID:</div>
         <div class="mt-1 break-all md:text-body-md">{currentRouteId()}</div>
-      </div> */}
+      </div>
 
       <Show when={error()}>
         <div class="mb-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
