@@ -1,4 +1,4 @@
-import dayjs, { type Dayjs } from 'dayjs'
+import dayjs from 'dayjs'
 import advanced from 'dayjs/plugin/advancedFormat'
 import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration, { type Duration } from 'dayjs/plugin/duration'
@@ -24,13 +24,10 @@ const _formatDuration = (duration: Duration): string => {
   }
 }
 
-export const formatDuration = (minutes: number | undefined): string => {
-  if (minutes === undefined) return ''
-  const duration = dayjs.duration({
-    hours: Math.floor(minutes / 60),
-    minutes: Math.round(minutes % 60),
-  })
-  return _formatDuration(duration)
+export const formatDuration = (seconds: number): string => {
+  const minutes = Math.floor(seconds / 60)
+  const remainingSeconds = Math.floor(seconds % 60)
+  return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
 export const getRouteDuration = (route: Route): Duration | undefined => {
