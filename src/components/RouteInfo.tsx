@@ -3,7 +3,6 @@ import clsx from 'clsx'
 import type { Route } from '~/types'
 import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
 import { formatDistance, formatRouteDuration } from '~/utils/format'
-import Icon from '~/components/material/Icon'
 
 const formatEngagement = (timeline?: TimelineStatistics): string => {
   if (!timeline) return ''
@@ -25,38 +24,34 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
 
   return (
     <div class={clsx('flex flex-col rounded-t-md bg-surface-container-low p-5', props.class)}>
-      <div class="flex size-full items-center gap-8">
-        <div class="flex grow flex-col items-start">
+      <div class="flex size-full items-stretch gap-8">
+        <div class="flex grow flex-col justify-between">
           <span class="text-body-sm text-on-surface-variant">Distance</span>
-          <span class="flex w-full items-center justify-center gap-2 font-mono text-[20px] uppercase">
-            <Icon>route</Icon>
+          <span class="font-mono text-label-lg uppercase">
             {formatDistance(props.route?.length)}
           </span>
         </div>
 
-        <div class="flex grow flex-col items-start">
+        <div class="flex grow flex-col justify-between">
           <span class="text-body-sm text-on-surface-variant">Duration</span>
-          <span class="flex w-full items-center justify-center gap-2 font-mono text-[20px] uppercase">
-            <Icon>schedule</Icon>
+          <span class="font-mono text-label-lg uppercase">
             {formatRouteDuration(props.route)}
           </span>
         </div>
 
-        <div class="hidden grow flex-col items-start xs:flex">
+        <div class="hidden grow flex-col justify-between xs:flex">
           <span class="text-body-sm text-on-surface-variant">Engaged</span>
           <Suspense>
-            <span class="flex w-full items-center justify-center gap-2 font-mono text-[20px] uppercase">
-              <Icon>speed</Icon>
+            <span class="font-mono text-label-lg uppercase">
               {formatEngagement(timeline())}
             </span>
           </Suspense>
         </div>
 
-        <div class="flex grow flex-col items-start">
+        <div class="flex grow flex-col justify-between">
           <span class="text-body-sm text-on-surface-variant">User flags</span>
           <Suspense>
-            <span class="flex w-full items-center justify-center gap-2 font-mono text-[20px] uppercase">
-              <Icon>flag</Icon>
+            <span class="font-mono text-label-lg uppercase">
               {formatUserFlags(timeline())}
             </span>
           </Suspense>
