@@ -13,7 +13,7 @@ import './PairActivity.css'
 
 const PairActivity: VoidComponent = () => {
   const { pair } = useLocation().query
-  const pairToken: string | undefined = pair instanceof Array ? pair[0] : pair
+  const pairToken: string | undefined = Array.isArray(pair) ? pair[0] : pair
 
   const state = createMachine<{
     scanning: {
@@ -78,7 +78,7 @@ const PairActivity: VoidComponent = () => {
         pairDevice(input.pairToken)
           .then((dongleId) => navigate(`/${dongleId}`))
           .catch((reason) => {
-            let error
+            let error: Error
             if (reason instanceof Error) {
               error = reason
             } else {

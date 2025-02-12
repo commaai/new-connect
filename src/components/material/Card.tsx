@@ -71,7 +71,7 @@ const Card: ParentComponent<CardProps> = (props) => {
       <ButtonBase
         class={clsx(
           cardStyle,
-          props.href || props.onClick && 'state-layer',
+          (props.href || props.onClick) && 'state-layer',
           props.class,
         )}
         onClick={props.onClick}

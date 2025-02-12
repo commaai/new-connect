@@ -57,10 +57,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     }
   })
 
-  let videoRef: HTMLVideoElement
-
   function onTimelineChange(newTime: number) {
-    videoRef.currentTime = newTime
+    const video = videoRef()
+    if (video) video.currentTime = newTime
   }
 
   return (
