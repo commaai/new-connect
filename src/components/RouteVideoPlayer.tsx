@@ -1,6 +1,5 @@
 import { createEffect, createResource, onCleanup, onMount, type VoidComponent, createSignal } from 'solid-js'
 import clsx from 'clsx'
-import Hls from 'hls.js/dist/hls.light.mjs'
 import Icon from '~/components/material/Icon'
 import { formatDuration } from '~/utils/format'
 
@@ -19,19 +18,38 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+  const [hlsInstance, setHlsInstance] = createSignal<typeof import('hls.js/dist/hls.light.mjs')>()
   let video!: HTMLVideoElement
 
-  // Use requestAnimationFrame for smoother progress updates
-  function progressLoop() {
-    if (video && !video.paused) {
-      const currentProgress = (video.currentTime / video.duration) * 100
-      setProgress(currentProgress)
-      props.onProgress?.(video.currentTime)
-      requestAnimationFrame(progressLoop)
+  function initializeHlsLoader() {
+    if (window.MediaSource !== undefined && !hlsInstance()) {
+      void import('hls.js/dist/hls.light.mjs')
+        .then(module => setHlsInstance(module))
+        .catch(error => {
+          console.error('Failed to load HLS.js:', error)
+        })
     }
   }
 
-  function onTimeUpdate() {
+  function setupVideoSource() {
+    if (!streamUrl()) return
+
+    const hasNativeHlsSupport = video.canPlayType('application/vnd.apple.mpegurl')
+    if (hasNativeHlsSupport) {
+      video.src = streamUrl()!
+      return
+    }
+    
+    const hls = hlsInstance()?.default
+    if (hls && hls.isSupported()) {
+      const player = new hls()
+      player.loadSource(streamUrl()!)
+      player.attachMedia(video)
+      onCleanup(() => player.destroy())
+    }
+  }
+
+  function updateProgressOnTimeUpdate() {
     if (video.paused) {
       const currentProgress = (video.currentTime / video.duration) * 100
       setProgress(currentProgress)
@@ -39,11 +57,20 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   }
 
-  function onPlay() {
-    requestAnimationFrame(progressLoop)
+  function updateProgressContinuously() {
+    if (video && !video.paused) {
+      const currentProgress = (video.currentTime / video.duration) * 100
+      setProgress(currentProgress)
+      props.onProgress?.(video.currentTime)
+      requestAnimationFrame(updateProgressContinuously)
+    }
   }
 
-  function togglePlay() {
+  function startProgressTracking() {
+    requestAnimationFrame(updateProgressContinuously)
+  }
+
+  function togglePlayback() {
     if (video.paused) {
       void video.play()
       setIsPlaying(true)
@@ -53,29 +80,21 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   }
 
-  onMount(() => {
-    const timeUpdate = () => props.onProgress?.(video.currentTime)
-    video.addEventListener('timeupdate', timeUpdate)
-    onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
-    props.ref?.(video)
+  function setupVideoEventListeners() {
+    const handleTimeUpdate = () => props.onProgress?.(video.currentTime)
+    video.addEventListener('timeupdate', handleTimeUpdate)
+    onCleanup(() => video.removeEventListener('timeupdate', handleTimeUpdate))
+    
     video.addEventListener('loadedmetadata', () => {
       setDuration(video.duration)
     })
-  })
+    
+    props.ref?.(video)
+  }
 
-  createEffect(() => {
-    if (!streamUrl()) return
-    if (Hls.isSupported()) {
-      const hls = new Hls()
-      hls.loadSource(streamUrl()!)
-      hls.attachMedia(video)
-      onCleanup(() => hls.destroy())
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = streamUrl()!
-    } else {
-      console.error('Browser does not support hls')
-    }
-  })
+  onMount(setupVideoEventListeners)
+  createEffect(initializeHlsLoader)
+  createEffect(setupVideoSource)
 
   return (
     <div
@@ -92,9 +111,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         class="absolute inset-0 size-full object-cover"
         autoplay
         muted
-        onPlay={onPlay}
+        onPlay={startProgressTracking}
         onTimeUpdate={(e) => {
-          onTimeUpdate()
+          updateProgressOnTimeUpdate()
           setCurrentTime(e.currentTarget.currentTime)
         }}
         loop
@@ -109,7 +128,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="relative flex w-full items-center gap-4 pb-4 pl-1">
           <button
             class="bg-surface-container-highest/80 flex size-8 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-highest"
-            onClick={togglePlay}
+            onClick={togglePlayback}
           >
             <Icon>{isPlaying() ? 'pause' : 'play_arrow'}</Icon>
           </button>
