@@ -29,14 +29,12 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
 
     if (window.MediaSource !== undefined) {
-      void import('hls.js/dist/hls.light.mjs')
-        .then(({ default: Hls }) => {
-          if (Hls.isSupported()) {
-            const player = new Hls()
-            player.loadSource(streamUrl()!)
-            player.attachMedia(video)
-            onCleanup(() => player.destroy())
-          }
+      void import('~/hls/custom-hls')
+        .then(({ createHls }) => {
+          const player = createHls()
+          player.loadSource(streamUrl()!)
+          player.attachMedia(video)
+          onCleanup(() => player.destroy())
         })
         .catch(error => {
           console.error('Failed to load HLS.js:', error)
