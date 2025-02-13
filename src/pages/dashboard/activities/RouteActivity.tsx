@@ -30,6 +30,7 @@ type RouteActivityProps = {
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(0)
   const [expanded, setExpanded] = createSignal(false)
+  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
@@ -75,7 +76,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
               <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
             }
           >
-            <RouteVideoPlayer ref={ref => videoRef = ref} routeName={routeName()} onProgress={setSeekTime} />
+            <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} onProgress={setSeekTime} />
           </Suspense>
           <Timeline
             routeName={routeName()}
