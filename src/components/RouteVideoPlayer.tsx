@@ -1,5 +1,5 @@
 import { createEffect, createResource, onCleanup, onMount, type VoidComponent, createSignal } from 'solid-js'
-import { formatDuration } from '~/utils/format'
+import { formatVideoTime } from '~/utils/format'
 import Icon from '~/components/material/Icon'
 import clsx from 'clsx'
 
@@ -126,7 +126,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           </button>
 
           <div class="font-mono text-sm text-on-surface">
-            {formatDuration(currentTime())} / {formatDuration(duration())}
+            {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
         </div>
       </div>

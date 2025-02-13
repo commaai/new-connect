@@ -22,9 +22,23 @@ const _formatDuration = (duration: Duration): string => {
   }
 }
 
-export const formatDuration = (seconds: number): string => {
-  const minutes = Math.floor(seconds / 60)
+export const formatDuration = (minutes: number | undefined): string => {
+  if (minutes === undefined) return ''
+  const duration = dayjs.duration({
+    hours: Math.floor(minutes / 60),
+    minutes: Math.round(minutes % 60),
+  })
+  return _formatDuration(duration)
+}
+
+export const formatVideoTime = (seconds: number): string => {
+  const hours = Math.floor(seconds / 3600)
+  const minutes = Math.floor((seconds % 3600) / 60)
   const remainingSeconds = Math.floor(seconds % 60)
+  
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`
+  }
   return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`
 }
 
