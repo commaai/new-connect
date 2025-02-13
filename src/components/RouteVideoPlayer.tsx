@@ -1,7 +1,7 @@
 import { createEffect, createResource, onCleanup, onMount, type VoidComponent, createSignal } from 'solid-js'
-import clsx from 'clsx'
-import Icon from '~/components/material/Icon'
 import { formatDuration } from '~/utils/format'
+import Icon from '~/components/material/Icon'
+import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
 
@@ -18,32 +18,18 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
-  const [hlsInstance, setHlsInstance] = createSignal<typeof import('hls.js/dist/hls.light.mjs')>()
   let video!: HTMLVideoElement
-
-  function initializeHlsLoader() {
-    if (window.MediaSource !== undefined && !hlsInstance()) {
-      void import('hls.js/dist/hls.light.mjs')
-        .then(module => setHlsInstance(module))
-        .catch(error => {
-          console.error('Failed to load HLS.js:', error)
-        })
-    }
-  }
 
   function setupVideoSource() {
     if (!streamUrl()) return
 
-    // Try native HLS first - no extra code needed
     if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = streamUrl()!
       return
     }
 
-    // Only import HLS.js if we absolutely need it
     if (window.MediaSource !== undefined) {
-      // This should be the rare case for older browsers
-      import('hls.js/dist/hls.light.mjs')
+      void import('hls.js/dist/hls.light.mjs')
         .then(({ default: Hls }) => {
           if (Hls.isSupported()) {
             const player = new Hls()
@@ -51,6 +37,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
             player.attachMedia(video)
             onCleanup(() => player.destroy())
           }
+        })
+        .catch(error => {
+          console.error('Failed to load HLS.js:', error)
         })
     }
   }
@@ -99,7 +88,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   onMount(setupVideoEventListeners)
-  createEffect(initializeHlsLoader)
   createEffect(setupVideoSource)
 
   return (
