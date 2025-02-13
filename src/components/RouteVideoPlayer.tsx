@@ -14,7 +14,7 @@ type RouteVideoPlayerProps = {
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
-  const [isPlaying, setIsPlaying] = createSignal(true)
+  const [isPlaying, setIsPlaying] = createSignal(false)
   const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
@@ -77,20 +77,28 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const handleTimeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', handleTimeUpdate)
     
+    video.addEventListener('play', () => setIsPlaying(true))
+    video.addEventListener('pause', () => setIsPlaying(false))
+    video.addEventListener('ended', () => setIsPlaying(false))
+    
     video.addEventListener('stalled', () => {
       if (isPlaying()) {
-        void video.play().catch(() => {
-        })
+        void video.play()
       }
     })
     
     video.addEventListener('loadedmetadata', () => {
       setDuration(video.duration)
-      void video.play().catch(() => setIsPlaying(false))
+      if (!('ontouchstart' in window)) {
+        void video.play().catch(() => {})
+      }
     })
     
     onCleanup(() => {
       video.removeEventListener('timeupdate', handleTimeUpdate)
+      video.removeEventListener('play', () => setIsPlaying(true))
+      video.removeEventListener('pause', () => setIsPlaying(false))
+      video.removeEventListener('ended', () => setIsPlaying(false))
       video.removeEventListener('stalled', () => {})
     })
     
@@ -113,7 +121,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           props.ref?.(el)
         }}
         class="absolute inset-0 size-full object-cover z-0"
-        autoplay
         muted
         playsinline
         controls={false}
