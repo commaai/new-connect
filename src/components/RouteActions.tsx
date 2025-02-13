@@ -104,7 +104,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col rounded-md border-2 border-surface-container-high bg-surface-container-lowest p-4">
+    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-4">
       <div
         class="mb-4 ml-2 text-body-sm text-zinc-500"
         style={{'font-family':"'JetBrains Mono', monospace"}}
