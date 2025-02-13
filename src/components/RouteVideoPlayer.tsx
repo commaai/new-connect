@@ -34,18 +34,24 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   function setupVideoSource() {
     if (!streamUrl()) return
 
-    const hasNativeHlsSupport = video.canPlayType('application/vnd.apple.mpegurl')
-    if (hasNativeHlsSupport) {
+    // Try native HLS first - no extra code needed
+    if (video.canPlayType('application/vnd.apple.mpegurl')) {
       video.src = streamUrl()!
       return
     }
-    
-    const hls = hlsInstance()?.default
-    if (hls && hls.isSupported()) {
-      const player = new hls()
-      player.loadSource(streamUrl()!)
-      player.attachMedia(video)
-      onCleanup(() => player.destroy())
+
+    // Only import HLS.js if we absolutely need it
+    if (window.MediaSource !== undefined) {
+      // This should be the rare case for older browsers
+      import('hls.js/dist/hls.light.mjs')
+        .then(({ default: Hls }) => {
+          if (Hls.isSupported()) {
+            const player = new Hls()
+            player.loadSource(streamUrl()!)
+            player.attachMedia(video)
+            onCleanup(() => player.destroy())
+          }
+        })
     }
   }
 
