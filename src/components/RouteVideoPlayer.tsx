@@ -14,7 +14,7 @@ type RouteVideoPlayerProps = {
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
-  const [isPlaying, setIsPlaying] = createSignal(false)
+  const [isPlaying, setIsPlaying] = createSignal(true)
   const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
@@ -111,30 +111,34 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   return (
     <div
       class={clsx(
-        'relative flex aspect-[241/151] items-center justify-center self-stretch overflow-hidden rounded-t-md bg-surface-container-low',
+        'relative flex aspect-[241/151] items-center justify-center self-stretch overflow-hidden rounded-t-md bg-surface-container-low isolate',
         props.class,
       )}
     >
-      <video
-        ref={(el) => {
-          video = el
-          props.ref?.(el)
-        }}
-        class="absolute inset-0 size-full object-cover z-0"
-        muted
-        playsinline
-        controls={false}
-        disablepictureinpicture
-        onPlay={startProgressTracking}
-        onTimeUpdate={(e) => {
-          updateProgressOnTimeUpdate()
-          setCurrentTime(e.currentTarget.currentTime)
-        }}
-        loop
-      />
+      {/* Video as background */}
+      <div class="absolute inset-0 -z-10">
+        <video
+          ref={(el) => {
+            video = el
+            props.ref?.(el)
+          }}
+          class="size-full object-cover"
+          autoplay
+          muted
+          playsinline
+          controls={false}
+          disablepictureinpicture
+          onPlay={startProgressTracking}
+          onTimeUpdate={(e) => {
+            updateProgressOnTimeUpdate()
+            setCurrentTime(e.currentTarget.currentTime)
+          }}
+          loop
+        />
+      </div>
 
       {/* Controls overlay */}
-      <div class="absolute inset-0 flex items-end z-10">
+      <div class="absolute inset-0 flex items-end">
         {/* Controls background gradient */}
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
         
