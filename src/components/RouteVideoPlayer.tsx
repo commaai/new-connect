@@ -112,7 +112,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           video = el
           props.ref?.(el)
         }}
-        class="absolute inset-0 size-full object-cover"
+        class="absolute inset-0 size-full object-cover z-0"
         autoplay
         muted
         playsinline
@@ -127,7 +127,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       />
 
       {/* Controls overlay */}
-      <div class="absolute inset-0 flex items-end">
+      <div class="absolute inset-0 flex items-end z-10">
         {/* Controls background gradient */}
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
         
