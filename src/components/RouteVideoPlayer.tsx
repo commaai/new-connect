@@ -76,10 +76,22 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   function setupVideoEventListeners() {
     const handleTimeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', handleTimeUpdate)
-    onCleanup(() => video.removeEventListener('timeupdate', handleTimeUpdate))
+    
+    video.addEventListener('stalled', () => {
+      if (isPlaying()) {
+        void video.play().catch(() => {
+        })
+      }
+    })
     
     video.addEventListener('loadedmetadata', () => {
       setDuration(video.duration)
+      void video.play().catch(() => setIsPlaying(false))
+    })
+    
+    onCleanup(() => {
+      video.removeEventListener('timeupdate', handleTimeUpdate)
+      video.removeEventListener('stalled', () => {})
     })
     
     props.ref?.(video)
@@ -103,6 +115,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         class="absolute inset-0 size-full object-cover"
         autoplay
         muted
+        playsinline
+        controls={false}
+        disablepictureinpicture
         onPlay={startProgressTracking}
         onTimeUpdate={(e) => {
           updateProgressOnTimeUpdate()
