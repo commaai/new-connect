@@ -1,12 +1,10 @@
 import dayjs from 'dayjs'
 import advanced from 'dayjs/plugin/advancedFormat'
-import customParseFormat from 'dayjs/plugin/customParseFormat'
 import duration, { type Duration } from 'dayjs/plugin/duration'
 
 import type { Route } from '~/types'
 
 dayjs.extend(advanced)
-dayjs.extend(customParseFormat)
 dayjs.extend(duration)
 
 export { dayjs }
