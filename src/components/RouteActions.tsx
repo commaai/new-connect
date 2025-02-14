@@ -1,8 +1,6 @@
 import { createSignal, Show, type VoidComponent, createEffect } from 'solid-js'
-import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import { setRoutePublic, setRoutePreserved } from '~/api/route'
-import { USERADMIN_URL } from '~/api/config'
 
 interface RouteActionsProps {
   routeName: string
@@ -36,22 +34,6 @@ const ToggleButton: VoidComponent<{
       />
     </div>
   </button>
-)
-
-const ActionButton: VoidComponent<{
-  onClick: () => void
-  icon: string
-  label: string
-  iconClass?: string
-}> = (props) => (
-  <Button
-    class="flex-1 rounded-sm border-2 border-surface-container-high bg-surface-container-lowest py-8 text-on-surface-variant hover:bg-surface-container-low"
-    onClick={props.onClick}
-    leading={<Icon size="34" class={props.iconClass}>{props.icon}</Icon>}
-    noPadding
-  >
-    <span class="whitespace-pre-line">{props.label}</span>
-  </Button>
 )
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
@@ -98,19 +80,24 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  const openInUseradmin = () => {
-    const url = `${USERADMIN_URL}?${new URLSearchParams({ onebox: props.routeName }).toString()}`
-    window.open(url, '_blank')?.focus()
-  }
-
   return (
-    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-4">
+    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-5">
       <div
-        class="mb-4 ml-2 text-body-sm text-zinc-500"
+        class="text-body-md text-zinc-500"
         style={{'font-family':"'JetBrains Mono', monospace"}}
       >
-        <div>Route ID:</div>
-        <div class="mt-1 break-all md:text-body-md">{currentRouteId()}</div>
+        <h3 class="mb-2 ml-2">Route ID:</h3>
+        <button
+          onClick={() => void copyCurrentRouteId()}
+          class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-4 hover:bg-surface-container-low"
+        >
+          <div class="lg:text-body-lg">
+            {currentRouteId().split('/')[0] || ''}/
+            <br />
+            {currentRouteId().split('/')[1] || ''}
+          </div>
+          <Icon size="34" class={`mr-4 ${copied() ? 'text-green-300' : ''}`}>{copied() ? 'check' : 'file_copy'}</Icon>
+        </button>
       </div>
 
       <Show when={error()}>
@@ -120,7 +107,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         </div>
       </Show>
 
-      <div class="divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
+      <div class="mt-4 divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
           active={() => isPreservedLocal()}
@@ -130,20 +117,6 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           label="Public Access"
           active={() => isPublicLocal()}
           onToggle={() => void toggleRoute('public')}
-        />
-      </div>
-
-      <div class="mt-4 flex gap-[.75rem]">
-        <ActionButton
-          onClick={() => void copyCurrentRouteId()}
-          icon={copied() ? 'check' : 'file_copy'}
-          label={copied() ? 'Copied!' : 'Copy \nRoute ID'}
-          iconClass={copied() ? 'text-green-300' : ''}
-        />
-        <ActionButton
-          onClick={openInUseradmin}
-          icon="open_in_new"
-          label={'View in\nuseradmin'}
         />
       </div>
     </div>
