@@ -82,10 +82,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-5">
-      <div
-        class="text-body-md text-zinc-500"
-        style={{'font-family':"'JetBrains Mono', monospace"}}
-      >
+      <div class="font-mono text-body-md text-zinc-500">
         <h3 class="mb-2 ml-2">Route ID:</h3>
         <button
           onClick={() => void copyCurrentRouteId()}
@@ -103,7 +100,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       <Show when={error()}>
         <div class="mb-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
           <Icon class="mr-4 text-yellow-300">warning</Icon>
-          <span style={{'font-family': "'JetBrains Mono', monospace"}}>{error()}</span>
+          <span class="font-mono">{error()}</span>
         </div>
       </Show>
 
