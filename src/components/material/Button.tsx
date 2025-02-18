@@ -11,7 +11,6 @@ type ButtonProps = ButtonBaseProps & {
   loading?: boolean
   leading?: JSXElement
   trailing?: JSXElement
-  noPadding?: boolean
 }
 
 const Button: ParentComponent<ButtonProps> = (props) => {
@@ -40,8 +39,8 @@ const Button: ParentComponent<ButtonProps> = (props) => {
         'state-layer hover:elevation-1 inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
         colorClasses(),
         disabled() && 'cursor-not-allowed opacity-50',
-        !props.noPadding && (props.leading ? 'pl-4' : 'pl-6'),
-        !props.noPadding && (props.trailing ? 'pr-4' : 'pr-6'),
+        props.leading ? 'pl-4' : 'pl-6',
+        props.trailing ? 'pr-4' : 'pr-6',
         props.class,
       )}
       {...rest}
