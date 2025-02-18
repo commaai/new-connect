@@ -37,10 +37,8 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
 
       <button
         class={clsx(
-          'flex w-full cursor-pointer justify-center p-2 hover:bg-black/45',
-          expanded() 
-            ? 'rounded-b-md border-2 border-t-0 border-surface-container-high bg-surface-container-lowest'
-            : 'rounded-b-md bg-surface-container-lowest',
+          'flex w-full cursor-pointer justify-center rounded-b-md bg-surface-container-lowest p-2 hover:bg-black/45',
+          expanded() ? 'border-2 border-t-0 border-surface-container-high' : '',
         )}
         onClick={() => setExpanded(prev => !prev)}
       >
