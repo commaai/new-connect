@@ -12,7 +12,7 @@ interface RouteActionsProps {
 
 const ToggleButton: VoidComponent<{
   label: string
-  active: () => boolean | undefined
+  active: boolean | undefined
   onToggle: () => void
 }> = (props) => (
   <button
@@ -24,12 +24,12 @@ const ToggleButton: VoidComponent<{
     {/* Toggle Switch */}
     <div
       class={`relative h-7 w-12 rounded-full border-2 transition-colors ${
-        props.active() ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
+        props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
       }`}
     >
       <div
         class={`absolute top-1 size-4 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-          props.active() ? 'translate-x-6' : 'translate-x-1'
+          props.active ? 'translate-x-6' : 'translate-x-1'
         }`}
       />
     </div>
@@ -107,12 +107,12 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       <div class="mt-4 divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
-          active={() => isPreservedLocal()}
+          active={isPreservedLocal()}
           onToggle={() => void toggleRoute('preserved')}
         />
         <ToggleButton
           label="Public Access"
-          active={() => isPublicLocal()}
+          active={isPublicLocal()}
           onToggle={() => void toggleRoute('public')}
         />
       </div>
