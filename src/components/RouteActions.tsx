@@ -98,7 +98,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <Show when={error()}>
-        <div class="mb-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
+        <div class="my-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
           <Icon class="mr-4 text-yellow-300">warning</Icon>
           <span class="font-mono">{error()}</span>
         </div>
