@@ -4,10 +4,9 @@ import {
   lazy,
   Suspense,
   type VoidComponent,
-  createMemo,
 } from 'solid-js'
 
-import { getRoute, getPreservedRoutes } from '~/api/route'
+import { getRoute } from '~/api/route'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -29,28 +28,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
-  const [isPublic] = createResource(route, (route) => route.is_public)
-
-  const [preservedRoutes] = createResource(
-    () => props.dongleId,
-    getPreservedRoutes,
-  )
-
-  const isPreserved = createMemo(() => {
-    try {
-      const currentRoute = route()
-      const preserved = preservedRoutes()
-
-      if (!currentRoute) return undefined
-      if (currentRoute.is_preserved) return true
-      if (!preserved) return undefined
-
-      return preserved.some(r => r.fullname === currentRoute.fullname)
-    } catch (err) {
-      console.error('Error checking preserved status:', err)
-      return undefined
-    }
-  })
 
   let videoRef: HTMLVideoElement
 
@@ -85,16 +62,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
-          <Suspense fallback={<div class="skeleton-loader min-h-32 rounded-lg bg-surface-container-low" />}>
-            <RouteInfo
-              route={route()}
-              routeName={routeName()}
-              initialPublic={isPublic()}
-              initialPreserved={isPreserved()}
-              isPublic={isPublic}
-              isPreserved={isPreserved}
-            />
-          </Suspense>
+          <RouteInfo route={route()} routeName={routeName()} />
         </div>
 
         <div class="flex flex-col gap-2">

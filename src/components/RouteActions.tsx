@@ -1,13 +1,9 @@
-import { createSignal, Show, type VoidComponent, createEffect } from 'solid-js'
+import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
 import Icon from '~/components/material/Icon'
-import { setRoutePublic, setRoutePreserved } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getRoute, getPreservedRoutes } from '~/api/route'
 
 interface RouteActionsProps {
   routeName: string
-  initialPublic: boolean | undefined
-  initialPreserved: boolean | undefined
-  isPublic: () => boolean | undefined
-  isPreserved: () => boolean | undefined
 }
 
 const ToggleButton: VoidComponent<{
@@ -37,32 +33,57 @@ const ToggleButton: VoidComponent<{
 )
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [isPreservedLocal, setIsPreservedLocal] = createSignal(props.initialPreserved)
-  const [isPublicLocal, setIsPublicLocal] = createSignal(props.initialPublic)
+  const [routeResource] = createResource(() => props.routeName, getRoute)
+  const [preservedRoutesResource] = createResource(
+    () => props.routeName.split('|')[0],
+    getPreservedRoutes,
+  )
+
+  const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
+  const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
+
+  createEffect(() => {
+    const route = routeResource()
+    const preservedRoutes = preservedRoutesResource()
+    if (!route) return
+    setIsPublic(route.is_public)
+    if (route.is_preserved) {
+      setIsPreserved(true)
+    } else if (preservedRoutes) {
+      setIsPreserved(preservedRoutes.some(r => r.fullname === route.fullname))
+    } else {
+      setIsPreserved(undefined)
+    }
+  })
+
   const [error, setError] = createSignal<string | null>(null)
   const [copied, setCopied] = createSignal(false)
 
-  createEffect(() => {
-    const [publicValue, preservedValue] = [props.isPublic(), props.isPreserved()]
-    if (publicValue !== undefined) setIsPublicLocal(publicValue)
-    if (preservedValue !== undefined) setIsPreservedLocal(preservedValue)
-  })
-
-  const toggleRoute = async (type: 'public' | 'preserved') => {
+  const toggleRoute = async (property: 'public' | 'preserved') => {
     setError(null)
-    const [currentValue, setter, apiCall] = type === 'public'
-      ? [isPublicLocal(), setIsPublicLocal, setRoutePublic]
-      : [isPreservedLocal(), setIsPreservedLocal, setRoutePreserved]
-
-    if (currentValue === undefined) return
-
-    try {
-      const newValue = !currentValue
-      await apiCall(props.routeName, newValue)
-      setter(newValue)
-    } catch (err) {
-      console.error(err)
-      setError('Failed to update toggle')
+    if (property === 'public') {
+      const currentValue = isPublic()
+      if (currentValue === undefined) return
+      try {
+        const newValue = !currentValue
+        await setRoutePublic(props.routeName, newValue)
+        setIsPublic(newValue)
+      } catch (err) {
+        console.error('Failed to update public toggle', err)
+        setError('Failed to update toggle')
+      }
+    } else {
+      const currentValue = isPreserved()
+      if (currentValue === undefined) return
+      
+      try {
+        const newValue = !currentValue
+        await setRoutePreserved(props.routeName, newValue)
+        setIsPreserved(newValue)
+      } catch (err) {
+        console.error('Failed to update preserved toggle', err)
+        setError('Failed to update toggle')
+      }
     }
   }
 
@@ -107,12 +128,12 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       <div class="mt-4 divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
         <ToggleButton
           label="Preserve Route"
-          active={isPreservedLocal()}
+          active={isPreserved()}
           onToggle={() => void toggleRoute('preserved')}
         />
         <ToggleButton
           label="Public Access"
-          active={isPublicLocal()}
+          active={isPublic()}
           onToggle={() => void toggleRoute('public')}
         />
       </div>

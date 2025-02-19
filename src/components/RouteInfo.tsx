@@ -8,10 +8,6 @@ import RouteActions from './RouteActions'
 interface RouteInfoProps {
   route: Route | undefined
   routeName: string
-  initialPublic: boolean | undefined
-  initialPreserved: boolean | undefined
-  isPublic: () => boolean | undefined
-  isPreserved: () => boolean | undefined
 }
 
 const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
@@ -25,13 +21,7 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
 
       <Show when={expanded()}>
         <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
-          <RouteActions
-            routeName={props.routeName}
-            initialPublic={props.initialPublic}
-            initialPreserved={props.initialPreserved}
-            isPublic={props.isPublic}
-            isPreserved={props.isPreserved}
-          />
+          <RouteActions routeName={props.routeName} />
         </Suspense>
       </Show>
 
