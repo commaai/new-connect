@@ -20,7 +20,7 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
       </div>
 
       <Show when={expanded()}>
-        <Suspense fallback={<div class="skeleton-loader min-h-80 rounded-lg bg-surface-container-low" />}>
+        <Suspense fallback={<div class="skeleton-loader min-h-72 bg-surface-container-low" />}>
           <RouteActions routeName={props.routeName} />
         </Suspense>
       </Show>
