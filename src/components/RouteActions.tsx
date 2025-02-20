@@ -1,6 +1,8 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
-import Icon from '~/components/material/Icon'
+import clsx from 'clsx'
+
 import { setRoutePublic, setRoutePreserved, getRoute, getPreservedRoutes } from '~/api/route'
+import Icon from '~/components/material/Icon'
 
 interface RouteActionsProps {
   routeName: string
@@ -75,7 +77,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     } else {
       const currentValue = isPreserved()
       if (currentValue === undefined) return
-      
+
       try {
         const newValue = !currentValue
         await setRoutePreserved(props.routeName, newValue)
@@ -110,11 +112,14 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-4 hover:bg-surface-container-low"
         >
           <div class="lg:text-body-lg">
-            {currentRouteId().split('/')[0] || ''}/
-            <br />
-            {currentRouteId().split('/')[1] || ''}
+            <span class="break-keep inline-block">
+              {currentRouteId().split('/')[0] || ''}/
+            </span>
+            <span class="break-keep inline-block">
+              {currentRouteId().split('/')[1] || ''}
+            </span>
           </div>
-          <Icon size="24" class={`mr-5 ${copied() ? 'text-green-300' : ''}`}>{copied() ? 'check' : 'file_copy'}</Icon>
+          <Icon size="24" class={clsx('ml-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
         </button>
       </div>
 
