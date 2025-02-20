@@ -11,6 +11,10 @@ permissions:
   pull-requests: write
   checks: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   pr:
     name: Find PR number
@@ -144,7 +148,7 @@ jobs:
 
   update_pr_check:
     needs: preview
-    if: always() && github.event.workflow_run.event == 'pull_request'
+    if: always() && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - name: Update PR check

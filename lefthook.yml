@@ -2,5 +2,10 @@ pre-commit:
   parallel: true
   commands:
     lint:
-      glob: "*.{js,jsx,ts,tsx}"
+      glob: "*.{js,mjs,cjs,ts,jsx,tsx,cts,json,jsonc,css}"
       run: bun lint {staged_files}
+    lines:
+      run: bun lines
+
+skip_output:
+ - execution_out
