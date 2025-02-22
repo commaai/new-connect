@@ -14,7 +14,7 @@ const ToggleButton: VoidComponent<{
   onToggle: () => void
 }> = (props) => (
   <button
-    class="flex w-full items-center justify-between px-5 py-2 transition-colors hover:bg-surface-container-low"
+    class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
     onClick={() => props.onToggle()}
   >
     <span class="text-body-sm text-on-surface-variant">{props.label}</span>
@@ -27,7 +27,7 @@ const ToggleButton: VoidComponent<{
     >
       <div
         class={`absolute size-3 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-          props.active ? 'translate-x-4' : 'translate-x-1'
+          props.active ? 'translate-x-4' : 'translate-x-0'
         }`}
       />
     </div>
@@ -142,6 +142,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           onToggle={() => void toggleRoute('public')}
         />
       </div>
+      
     </div>
   )
 }
