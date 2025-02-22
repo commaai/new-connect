@@ -29,7 +29,7 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
         class="flex w-full cursor-pointer justify-center rounded-b-md bg-surface-container-low pb-2"
         onClick={() => setExpanded(prev => !prev)}
       >
-        <Icon class={expanded() ? 'text-zinc-700' : 'text-zinc-500'}>
+        <Icon class={expanded() ? 'text-zinc-600' : 'text-zinc-500'}>
           {expanded() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
         </Icon>
       </button>
