@@ -1,5 +1,4 @@
 import { createSignal, Show, type VoidComponent, Suspense } from 'solid-js'
-import clsx from 'clsx'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/types'
 import RouteStatistics from './RouteStatistics'
