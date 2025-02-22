@@ -82,6 +82,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
+  const startTime = () => pathParts()[2] ? Number(pathParts()[2]) : 0
 
   const pairToken = () => !!location.query.pair
 
@@ -119,7 +120,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                 <SettingsActivity dongleId={id} />
               </Match>
               <Match when={dateStr()} keyed>
-                {(date) => <RouteActivity dongleId={id} dateStr={date} />}
+                {(date) => <RouteActivity dongleId={id} dateStr={date} startTime={startTime()} />}
               </Match>
             </Switch>}
             paneTwoContent={!!dateStr()}
