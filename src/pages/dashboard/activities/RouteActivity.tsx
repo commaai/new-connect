@@ -1,5 +1,4 @@
 import {
-  createEffect,
   createResource,
   createSignal,
   lazy,

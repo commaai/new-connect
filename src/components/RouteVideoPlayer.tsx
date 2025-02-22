@@ -1,4 +1,4 @@
-import { Accessor, createEffect, createResource, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 import Hls from 'hls.js/dist/hls.light.mjs'
 
