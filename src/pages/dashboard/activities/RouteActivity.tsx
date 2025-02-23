@@ -20,10 +20,11 @@ const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 type RouteActivityProps = {
   dongleId: string
   dateStr: string
+  startTime: number
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(0)
+  const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
@@ -47,7 +48,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
           }
         >
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
         </Suspense>
 
         <div class="flex flex-col gap-2">

@@ -7,6 +7,7 @@ import { getQCameraStreamUrl } from '~/api/route'
 type RouteVideoPlayerProps = {
   class?: string
   routeName: string
+  startTime: number
   onProgress?: (seekTime: number) => void
   ref?: (el: HTMLVideoElement) => void
 }
@@ -19,6 +20,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const timeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', timeUpdate)
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
+    video.currentTime = props.startTime
     props.ref?.(video)
   })
 
