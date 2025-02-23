@@ -20,7 +20,7 @@ jobs:
         with:
           path: |
             ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}\
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}\
 
       - run: bun install --frozen-lockfile
       - run: bun playwright install
