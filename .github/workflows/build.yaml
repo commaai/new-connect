@@ -15,8 +15,16 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v1
 
+      - uses: actions/cache@v4
+        id: playwright-cache
+        with:
+          path: |
+            ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('**/package-lock.json') }}\
+
       - run: bun install --frozen-lockfile
       - run: bun playwright install
+        if: steps.playwright-cache.outputs.cache-hit != 'true'
       - run: bun run lint --reporter=github
       - run: bun run test
       - run: bun lines
