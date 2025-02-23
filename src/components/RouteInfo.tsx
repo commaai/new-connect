@@ -1,5 +1,4 @@
 import { createSignal, Show, type VoidComponent, Suspense } from 'solid-js'
-import clsx from 'clsx'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/types'
 import RouteStatistics from './RouteStatistics'
@@ -26,13 +25,10 @@ const RouteInfo: VoidComponent<RouteInfoProps> = (props) => {
       </Show>
 
       <button
-        class={clsx(
-          'flex w-full cursor-pointer justify-center rounded-b-md bg-surface-container-lowest p-2 hover:bg-black/45',
-          expanded() ? 'border-2 border-t-0 border-surface-container-high' : '',
-        )}
+        class="flex w-full cursor-pointer justify-center rounded-b-md bg-surface-container-low pb-2"
         onClick={() => setExpanded(prev => !prev)}
       >
-        <Icon class={expanded() ? 'text-yellow-400' : 'text-zinc-500'}>
+        <Icon class={expanded() ? 'text-zinc-600' : 'text-zinc-500'}>
           {expanded() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
         </Icon>
       </button>
