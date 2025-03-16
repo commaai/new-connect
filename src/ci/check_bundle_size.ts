@@ -13,7 +13,7 @@ if (!OUT_DIR) {
 const files = []
 for await (const path of $`find ${OUT_DIR} -type f ! -name '*.map'`.lines()) {
   if (!path) continue
-  const size = Number((await $`stat -c %s ${path}`.quiet()).text().trim())
+  const size = Number((await $`stat ${process.platform === 'darwin' ? '-f%z' : '-c %s'} ${path}`.quiet()).text().trim())
   const compressedSize = Number((await $`gzip -9c ${path} | wc -c`.quiet()).text().trim())
   files.push({
     path,
