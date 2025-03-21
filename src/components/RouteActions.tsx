@@ -104,7 +104,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest p-5">
+    <div class="flex flex-col border-2 border-t-0 rounded-b-md border-surface-container-high bg-surface-container-lowest p-5">
       <div class="font-mono text-body-md text-zinc-500">
         <h3 class="mb-2 ml-2">Route ID:</h3>
         <button

@@ -7,13 +7,14 @@ import {
 } from 'solid-js'
 
 import { getRoute } from '~/api/route'
+import { dayjs } from '~/utils/format'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
+import RouteStatistics from '~/components/RouteStatistics'
+import RouteActions from '~/components/RouteActions'
 import Timeline from '~/components/Timeline'
-import { dayjs } from '~/utils/format'
-import RouteInfo from '~/components/RouteInfo'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
@@ -63,7 +64,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
-          <RouteInfo route={route()} routeName={routeName()} />
+          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container-low">
+            <RouteStatistics class="p-5" route={route()} />
+
+            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+              <RouteActions routeName={routeName()} />
+            </Suspense>
+          </div>
         </div>
 
         <div class="flex flex-col gap-2">
