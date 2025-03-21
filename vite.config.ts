@@ -13,7 +13,6 @@ export default defineConfig({
       org: 'commaai',
       project: 'new-connect',
       telemetry: false,
-      disable: !process.env.CI,
     }),
   ],
   server: {
