@@ -17,17 +17,17 @@ const ToggleButton: VoidComponent<{
     class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
     onClick={() => props.onToggle()}
   >
-    <span class="text-body-lg">{props.label}</span>
+    <span class="text-body-md text-on-surface-variant">{props.label}</span>
 
     {/* Toggle Switch */}
     <div
-      class={`relative h-7 w-12 rounded-full border-2 transition-colors ${
+      class={`relative h-6 w-10 rounded-full border-2 transition-colors ${
         props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-high'
       }`}
     >
       <div
-        class={`absolute top-1 size-4 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
-          props.active ? 'translate-x-6' : 'translate-x-1'
+        class={`absolute top-1 size-3 rounded-full bg-surface-container-high transition-transform duration-500 ease-in-out ${
+          props.active ? 'translate-x-5' : 'translate-x-1'
         }`}
       />
     </div>
