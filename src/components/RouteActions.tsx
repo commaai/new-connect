@@ -104,14 +104,14 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col border-2 border-t-0 rounded-b-md border-surface-container-high bg-surface-container-lowest p-5">
-      <div class="font-mono text-body-md text-zinc-500">
-        <h3 class="mb-2 ml-2">Route ID:</h3>
+    <div class="flex flex-col rounded-b-md">
+      <div class="font-mono px-5 text-body-sm text-zinc-500">
+        <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
         <button
           onClick={() => void copyCurrentRouteId()}
-          class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-4 hover:bg-surface-container-low"
+          class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
-          <div class="lg:text-body-lg">
+          <div class="lg:text-body-md">
             <span class="break-keep inline-block">
               {currentRouteId().split('/')[0] || ''}/
             </span>
@@ -119,18 +119,18 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
               {currentRouteId().split('/')[1] || ''}
             </span>
           </div>
-          <Icon size="24" class={clsx('px-4', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
+          <Icon size="20" class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
         </button>
       </div>
 
       <Show when={error()}>
-        <div class="my-4 flex items-center rounded-md bg-red-900/30 p-4 text-red-500">
-          <Icon class="mr-4 text-yellow-300">warning</Icon>
-          <span class="font-mono">{error()}</span>
+        <div class="flex gap-2 rounded-sm bg-surface-container m-4 p-2 text-body-md text-on-surface">
+          <Icon class="text-error" size="20">error</Icon>
+          {error()}
         </div>
       </Show>
 
-      <div class="mt-4 divide-y-2 divide-surface-container-high overflow-hidden rounded-md border-2 border-surface-container-high">
+      <div class={clsx('overflow-hidden rounded-md pb-2', !error() && 'pt-4')}>
         <ToggleButton
           label="Preserve Route"
           active={isPreserved()}
