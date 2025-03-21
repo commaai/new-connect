@@ -122,7 +122,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
         if (trialClaimable) checkoutText += ' to claim trial'
       }
 
-      let chargeText: string
+      let chargeText: string = ''
       if (source.selectedPlan && trialClaimable) {
         chargeText = `Your first charge will be on ${formatDate(trialEndDate)}, then monthly thereafter.`
       }
