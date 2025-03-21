@@ -1,21 +1,11 @@
-FROM node:20-alpine AS base
-
-# Install Bun (check package.json for the specific version)
-ARG BUN_VERSION=1.2.5
-RUN npm install -g bun@$BUN_VERSION
+FROM oven/bun:1.2.5-alpine AS build
 WORKDIR /app
 
-
-FROM base AS build
-
-# Copy files needed for installation
-COPY package.json bun.lock ./
+# Copy app
+ADD . ./
 
 # Install dependencies
 RUN bun install --frozen-lockfile
-
-# Copy the rest of the application
-ADD . ./
 
 # Build arguments for environment variables
 ARG VITE_APP_GIT_SHA=unknown
@@ -27,9 +17,8 @@ ENV VITE_APP_GIT_TIMESTAMP $VITE_APP_GIT_TIMESTAMP
 ENV SENTRY_AUTH_TOKEN $SENTRY_AUTH_TOKEN
 ENV SENTRY_RELEASE $SENTRY_RELEASE
 
-# Build the application
+# Build
 RUN bun run build
-
 
 FROM nginx:1.24
 
