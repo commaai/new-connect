@@ -137,7 +137,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <Show when={error()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
           <Icon class="text-error" size="20">error</Icon>
           {error()}
         </div>
