@@ -103,12 +103,12 @@ jobs:
       - name: Push Screenshots
         working-directory: ${{ github.workspace }}/ci-artifacts
         run: |
-          git checkout -b new-connect/pr-${{ needs.pr.outputs.number }}
+          git checkout -b connect/pr-${{ needs.pr.outputs.number }}
           git config user.name "GitHub Actions Bot"
           git config user.email "<>"
           git add .
           git commit -m "screenshots for PR #${{ needs.pr.outputs.number }}"
-          git push origin new-connect/pr-${{ needs.pr.outputs.number }} --force
+          git push origin connect/pr-${{ needs.pr.outputs.number }} --force
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@v3
@@ -126,20 +126,20 @@ jobs:
             ### Mobile
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteList-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/Login-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteList-mobile.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-mobile.playwright.png"></td>
               </tr>
             </table>
 
             ### Desktop
             <table>
               <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/Login-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/RouteList-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/new-connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/Login-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteList-desktop.playwright.png"></td>
+                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-desktop.playwright.png"></td>
               </tr>
             </table>
           comment-tag: run_id
