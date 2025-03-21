@@ -103,6 +103,6 @@ jobs:
             SENTRY_RELEASE=${{ github.event_name == 'push' && github.sha || github.event.pull_request.head.sha }}
           builder: ${{ steps.buildx.outputs.name }}
           context: .
-          push: github.ref == 'refs/heads/master' && github.repository == 'commaai/connect'
+          push: ${{ github.ref == 'refs/heads/master' && github.repository == 'commaai/connect' }}
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
