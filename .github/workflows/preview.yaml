@@ -46,7 +46,7 @@ jobs:
           echo "PR number: ${{ steps.pr.outputs.number }}"
 
   preview:
-    if: github.repository == 'commaai/new-connect' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
+    if: github.repository == 'commaai/connect' && github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     needs: pr
     timeout-minutes: 2
@@ -118,8 +118,8 @@ jobs:
 
             # deployed preview: https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev
 
-            Welcome to new-connect! Make sure to:
-            * read the [contributing guidelines](https://github.com/commaai/new-connect?tab=readme-ov-file#contributing)
+            Welcome to connect! Make sure to:
+            * read the [contributing guidelines](https://github.com/commaai/connect?tab=readme-ov-file#contributing)
             * mark your PR as a draft until it's ready to review
             * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
 

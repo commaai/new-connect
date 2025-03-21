@@ -54,7 +54,7 @@ jobs:
           name: build-artifacts-${{ github.run_id }}
 
       - name: Deploy to Cloudflare Pages
-        if: github.ref == 'refs/heads/master' && github.repository == 'commaai/new-connect'
+        if: github.ref == 'refs/heads/master' && github.repository == 'commaai/connect'
         uses: cloudflare/wrangler-action@v3
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

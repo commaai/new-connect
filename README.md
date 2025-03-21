@@ -1,8 +1,10 @@
 # connect
 
-This is a rewrite of [comma connect](https://github.com/commaai/connect), the web (and mobile) experience for [openpilot](https://github.com/commaai/openpilot).
+connect is the web and mobile experience for [openpilot](https://github.com/commaai/openpilot).
 
 Try it out at https://new-connect.connect-d5y.pages.dev.
+
+This is a rewrite of [comma connect](https://github.com/commaai/connect-pwa-archive).
 
 ## Development
 
@@ -15,9 +17,9 @@ For a full fresh setup in `$HOME`:
 curl -fsSL https://bun.sh/install | bash
 
 cd ~
-git clone git@github.com:commaai/new-connect.git
+git clone git@github.com:commaai/connect.git
 
-cd new-connect
+cd connect
 bun install
 bun dev
 ```
@@ -37,13 +39,13 @@ References:
 * [API docs](https://api.comma.ai)
 * [openpilot docs](https://docs.comma.ai)
 * [Discord](https://discord.comma.ai)
-* [Bounties](https://comma.ai/bounties) 
+* [Bounties](https://comma.ai/bounties)
 
 ## Roadmap
 
 The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
 
-[This milestone](https://github.com/commaai/new-connect/milestone/1) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
+[This milestone](https://github.com/commaai/connect/milestone/1) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
 
 Once we've shipped v1, next up will be:
 * [Sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)

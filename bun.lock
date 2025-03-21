@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "connect-beta",
+      "name": "connect",
       "dependencies": {
         "@mapbox/polyline": "^1.2.1",
         "@sentry/solid": "^9.8.0",
