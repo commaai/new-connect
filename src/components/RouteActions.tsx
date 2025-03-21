@@ -14,7 +14,7 @@ const ToggleButton: VoidComponent<{
   onToggle: () => void
 }> = (props) => (
   <button
-    class="flex w-full items-center justify-between px-5 py-3 transition-colors hover:bg-surface-container-low"
+    class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low"
     onClick={() => props.onToggle()}
   >
     <span class="text-body-md text-on-surface-variant">{props.label}</span>
@@ -104,8 +104,8 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class="flex flex-col rounded-b-md">
-      <div class="font-mono px-5 text-body-sm text-zinc-500">
+    <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
+      <div class="font-mono text-body-sm text-zinc-500">
         <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
         <button
           onClick={() => void copyCurrentRouteId()}
@@ -124,13 +124,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <Show when={error()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container m-4 p-2 text-body-md text-on-surface">
+        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
           <Icon class="text-error" size="20">error</Icon>
           {error()}
         </div>
       </Show>
 
-      <div class={clsx('overflow-hidden rounded-md pb-2', !error() && 'pt-4')}>
+      <div class="flex flex-col gap-2">
         <ToggleButton
           label="Preserve Route"
           active={isPreserved()}
