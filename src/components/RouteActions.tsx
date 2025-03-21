@@ -123,13 +123,6 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         </button>
       </div>
 
-      <Show when={error()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-          <Icon class="text-error" size="20">error</Icon>
-          {error()}
-        </div>
-      </Show>
-
       <div class="flex flex-col gap-2">
         <ToggleButton
           label="Preserve Route"
@@ -142,6 +135,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           onToggle={() => void toggleRoute('public')}
         />
       </div>
+
+      <Show when={error()}>
+        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+          <Icon class="text-error" size="20">error</Icon>
+          {error()}
+        </div>
+      </Show>
     </div>
   )
 }
