@@ -151,4 +151,4 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   )
 }
 
-export default RouteUploadButtons 
+export default RouteUploadButtons
