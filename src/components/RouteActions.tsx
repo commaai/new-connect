@@ -189,7 +189,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       updateButtonStates(typesNotUploadedYet, 'loading')
 
       try {
-        await uploadAllSegments(props.routeName, route.segment_numbers.length, typesToUpload as [keyof typeof FileTypes])
+        await uploadAllSegments(props.routeName, route.segment_numbers.length, typesToUpload)
         updateButtonStates(typesNotUploadedYet, 'success')
       } catch (err) {
         console.error('Failed to upload', err)
@@ -200,10 +200,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
     setUploadStore('states', type, 'loading')
     
-    const fileType = buttonToFileTypeMap[type]
+    const fileTypesToUpload = buttonToFileTypeMap[type]
     
     try {
-      await uploadAllSegments(props.routeName, route.segment_numbers.length, fileType as [keyof typeof FileTypes])
+      await uploadAllSegments(props.routeName, route.segment_numbers.length, fileTypesToUpload)
       setUploadStore('states', type, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
