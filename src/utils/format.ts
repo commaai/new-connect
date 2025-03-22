@@ -22,8 +22,7 @@ const isImperial = (): boolean => {
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
   if (isImperial()) return `${miles.toFixed(1)} mi`
-  const kilometers = miles * MI_TO_KM
-  return `${kilometers.toFixed(1)} km`
+  return `${(miles * MI_TO_KM).toFixed(1)} km`
 }
 
 const _formatDuration = (duration: Duration): string => {
