@@ -5,7 +5,7 @@ for await (const path of $`find src -type f`.lines()) {
   if (!path) continue
   files.push({
     path,
-    lines: Number((await $`cat ${path} | sed '/^\s*$/d' | wc -l`.quiet()).text().trim().split(' ')[0]),
+    lines: Number((await $`cat ${path} | sed '/^\s*$/d' | wc -l`.quiet()).text().trim()),
     blankLines: Number((await $`cat ${path} | sed -n '/^$/p' | wc -l`.quiet()).text().trim()),
   })
 }
