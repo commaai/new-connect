@@ -10,25 +10,12 @@ export interface ReverseGeocodingResponse extends FeatureCollection<Point, Rever
 export type ReverseGeocodingFeature = ReverseGeocodingResponse['features'][number]
 
 interface ReverseGeocodingFeatureProperties {
-  // mapbox_id: string
   feature_type: 'country' | 'region' | 'postcode' | 'district' | 'place' | 'locality' | 'neighborhood' | 'street' | 'address'
   name: string
   name_preferred: string
   place_formatted: string
   full_address: string
   context: ReverseGeocodingContextObject
-  // coordinates: {
-  //   longitude: number
-  //   latitude: number
-  //   accuracy: 'rooftop' | 'parcel' | 'point' | 'interpolated' | 'approximate' | 'intersection'
-  //   routable_points: {
-  //     name: 'default' | string
-  //     longitude: number
-  //     latitude: number
-  //   }[]
-  // }
-  // bbox?: [number, number, number, number]
-  // match_code: object
 }
 
 /**
@@ -56,7 +43,5 @@ interface ReverseGeocodingContextObject<S = ReverseGeocodingContextSubObject> {
 }
 
 interface ReverseGeocodingContextSubObject {
-  // mapbox_id: string
   name: string
-  // wikidata_id?: string
 }
