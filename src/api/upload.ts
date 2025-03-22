@@ -3,23 +3,24 @@ import { uploadFilesToUrls } from './athena'
 import { getAlreadyUploadedFiles, requestToUploadFiles } from './file'
 import { parseRouteName } from './route'
 
-const FILE_TYPES = {
-  logs: ['rlog.bz2', 'rlog.zst'],
-  cameras: ['fcamera.hevc'],
-  dcameras: ['dcamera.hevc'],
-  ecameras: ['ecamera.hevc'],
+export const FileTypes = { 
+  logs: ["rlog.bz2", "rlog.zst"], 
+  cameras: ["fcamera.hevc"], 
+  dcameras: ["dcamera.hevc"], 
+  ecameras: ["ecamera.hevc"],
 }
 
-const getFiles = async (routeName: string, type?: keyof typeof FILE_TYPES) => {
+const getFiles = async (routeName: string, types?: [keyof typeof FileTypes]) => {
   const files = await getAlreadyUploadedFiles(routeName)
-  if (type) return [...files[type]]
-  return [...files.cameras, ...files.dcameras, ...files.ecameras, ...files.logs]
+  if (!types) return [...files.cameras, ...files.dcameras, ...files.ecameras, ...files.logs]
+  return types.flatMap(type => files[type])
 }
 
-const generateMissingFilePaths = (routeInfo: RouteInfo, segmentStart: number, segmentEnd: number, uploadedFiles: string[]): string[] => {
+const generateMissingFilePaths = (routeInfo: RouteInfo, segmentStart: number, segmentEnd: number, uploadedFiles: string[], types?: [keyof typeof FileTypes]): string[] => {
   const paths: string[] = []
   for (let i = segmentStart; i <= segmentEnd; i++) {
-    for (const fileName of Object.values(FILE_TYPES).flat()) {
+    const fileTypes = types ? types.flatMap(type => FileTypes[type]) : Object.values(FileTypes).flat()
+    for (const fileName of fileTypes) {
       const key = [routeInfo.dongleId, routeInfo.routeId, i, fileName].join('/')
       if (!uploadedFiles.find((path) => path.includes(key))) {
         paths.push(`${routeInfo.routeId}--${i}/${fileName}`)
@@ -32,13 +33,13 @@ const generateMissingFilePaths = (routeInfo: RouteInfo, segmentStart: number, se
 const prepareUploadRequests = (paths: string[], presignedUrls: UploadFileMetadata[]): UploadFile[] =>
   paths.map((path, i) => ({ filePath: path, ...presignedUrls[i] }))
 
-export const uploadAllSegments = (routeName: string, totalSegments: number, type?: keyof typeof FILE_TYPES) =>
-  uploadSegments(routeName, 0, totalSegments - 1, type)
+export const uploadAllSegments = (routeName: string, totalSegments: number, types?: [keyof typeof FileTypes]) => 
+  uploadSegments(routeName, 0, totalSegments - 1, types);
 
-export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, type?: keyof typeof FILE_TYPES) => {
+export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, types?: [keyof typeof FileTypes]) => {
   const routeInfo = parseRouteName(routeName)
-  const alreadyUploadedFiles = await getFiles(routeName, type)
-  const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles)
+  const alreadyUploadedFiles = await getFiles(routeName, types)
+  const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles, types)
   const pathPresignedUrls = await requestToUploadFiles(routeInfo.dongleId, paths)
   const athenaRequests = prepareUploadRequests(paths, pathPresignedUrls)
   return await uploadFilesToUrls(routeInfo.dongleId, athenaRequests)

@@ -1,8 +1,11 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
+import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
 import { setRoutePublic, setRoutePreserved, getRoute, getPreservedRoutes } from '~/api/route'
 import Icon from '~/components/material/Icon'
+import Button from './material/Button'
+import { FileTypes, uploadAllSegments } from '~/api/upload'
 
 interface RouteActionsProps {
   routeName: string
@@ -33,6 +36,47 @@ const ToggleButton: VoidComponent<{
     </div>
   </button>
 )
+
+const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
+  const state = () => props.state || 'idle'
+  
+  const handleUpload = () => {
+    if (state() !== 'idle' || props.disabled) return
+    
+    // Call the custom onClick handler if provided
+    if (props.onClick) {
+      props.onClick()
+    }
+  }
+  
+  return (
+    <Button
+      onClick={() => handleUpload()}
+      class="px-2 sm:px-3"
+      disabled={props.disabled}
+      leading={
+        <Show 
+          when={state() === 'idle'} 
+          fallback={
+            <Show 
+              when={state() === 'loading'}
+              fallback={<Icon size="20">check</Icon>}
+            >
+              <Icon size="20" class="animate-spin">progress_activity</Icon>
+            </Show>
+          }
+        >
+          <Icon size="20">{props.icon}</Icon>
+        </Show>
+      }
+      color="primary"
+    >
+      <span class="flex items-center gap-1">
+        {props.text}
+      </span>
+    </Button>
+  )
+}
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [routeResource] = createResource(() => props.routeName, getRoute)
@@ -103,6 +147,66 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
+  type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
+  
+  // Map button types to uploadAllSegments file types
+  const buttonToFileTypeMap = {
+    cameras: ['cameras', 'ecameras'],
+    driver: ['dcameras'],
+    logs: ['logs'],
+    route: undefined
+  } as Record<ButtonType, (keyof typeof FileTypes)[] | undefined>;
+  
+  const [uploadStore, setUploadStore] = createStore({
+    states: {
+      cameras: 'idle',
+      driver: 'idle',
+      logs: 'idle',
+      route: 'idle'
+    } as Record<ButtonType, 'idle' | 'loading' | 'success'>,
+    
+    disabled: {
+      cameras: false,
+      driver: false,
+      logs: false,
+      route: false
+    } as Record<ButtonType, boolean>
+  })
+  
+  const handleUpload = async (type: ButtonType) => {
+    if (uploadStore.disabled[type]) return
+    
+    if (type === 'route') {
+      // Disable all buttons
+      setUploadStore('disabled', {
+        cameras: true,
+        driver: true,
+        logs: true,
+        route: true
+      })
+
+      // Update only the route button state for cleaner UI
+      setUploadStore('states', 'route', 'loading')
+      
+      // Upload all file types
+      console.log('Uploading all data')
+      await uploadAllSegments(props.routeName, 3)
+
+      setTimeout(() => setUploadStore('states', 'route', 'success'), 1000)
+    } else {
+      setUploadStore('states', type, 'loading')
+      setUploadStore('disabled', type, true)
+      
+      // Get the correct file type for this button
+      const fileType = buttonToFileTypeMap[type]
+      console.log(`Uploading ${type} (${fileType})`)
+      
+      await uploadAllSegments(props.routeName, 3, fileType as [keyof typeof FileTypes])
+
+      setTimeout(() => setUploadStore('states', type, 'success'), 1000)
+    }
+  }
+
   return (
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
       <div class="font-mono text-body-sm text-zinc-500">
@@ -134,6 +238,37 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           active={isPublic()}
           onToggle={() => void toggleRoute('public')}
         />
+        
+        <div class="grid grid-cols-2 sm:flex sm:justify-center gap-2 w-full pt-2">
+          <UploadButton 
+            text="Cameras" 
+            icon="videocam"
+            state={uploadStore.states.cameras}
+            disabled={uploadStore.disabled.cameras}
+            onClick={() => handleUpload('cameras')}
+          />
+          <UploadButton 
+            text="Driver" 
+            icon="person"
+            state={uploadStore.states.driver}
+            disabled={uploadStore.disabled.driver}
+            onClick={() => handleUpload('driver')}
+          />
+          <UploadButton 
+            text="Logs" 
+            icon="description"
+            state={uploadStore.states.logs}
+            disabled={uploadStore.disabled.logs}
+            onClick={() => handleUpload('logs')}
+          />
+          <UploadButton 
+            text="Route" 
+            icon="upload"
+            state={uploadStore.states.route}
+            disabled={uploadStore.disabled.route}
+            onClick={() => handleUpload('route')}
+          />
+        </div>
       </div>
 
       <Show when={error()}>
