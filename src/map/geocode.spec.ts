@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 
-import { getFullAddress, getPlaceDetails, reverseGeocode } from './geocode'
+import { getFullAddress, getPlaceName, reverseGeocode } from './geocode'
 
 describe('reverseGeocode', () => {
   test('return null if coords are [0, 0]', async () => {
@@ -20,43 +20,16 @@ describe('getFullAddress', () => {
   })
 })
 
-describe('getPlaceDetails', () => {
+describe('getPlaceName', () => {
   test('return null if coords are [0, 0]', async () => {
-    expect(await getPlaceDetails([0, 0])).toBeNull()
+    expect(await getPlaceName([0, 0])).toBeNull()
   })
 
   test('normal usage', async () => {
-    expect(await getPlaceDetails([-117.168638, 32.723695])).toEqual({
-      name: 'Little Italy',
-      details: 'San Diego, CA',
-    })
-    expect(await getPlaceDetails([-118.192757, 33.763015])).toEqual({
-      name: 'Downtown Long Beach',
-      details: 'Long Beach, CA',
-    })
-    expect(await getPlaceDetails([-74.003225, 40.714057])).toEqual({
-      name: 'Civic Center',
-      details: 'New York, NY',
-    })
-    expect(await getPlaceDetails([-0.113643, 51.504546])).toEqual({
-      name: 'Waterloo',
-      details: 'London',
-    })
-    expect(await getPlaceDetails([5.572254, 50.644280])).toEqual({
-      name: 'Liege',
-      details: 'Liège',
-    })
-    expect(await getPlaceDetails([-2.236802, 53.480931])).toEqual({
-      name: 'Northern Quarter',
-      details: 'Manchester',
-    })
-    expect(await getPlaceDetails([-8.626736, 52.663829])).toEqual({
-      name: 'Prior\'s-Land',
-      details: 'Limerick',
-    })
-    expect(await getPlaceDetails([-75.704956, 45.410103])).toEqual({
-      name: 'Centretown',
-      details: 'Ottawa, ON',
-    })
+    expect(await getPlaceName([-117.168638, 32.723695])).toBe('1752 India Street')
+    expect(await getPlaceName([-118.192757, 33.763015])).toBe('110 Shoreline Drive')
+    expect(await getPlaceName([-0.113643, 51.504546])).toBe('A301')
+    expect(await getPlaceName([5.572254, 50.644280])).toBe('Rue Joffre 5b')
+    expect(await getPlaceName([-2.236802, 53.480931])).toBe('2 Piccadilly Gardens')
   })
 })
