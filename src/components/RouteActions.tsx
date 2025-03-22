@@ -1,8 +1,8 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
-import clsx from 'clsx'
+import { createSignal, Show, type VoidComponent, createEffect, createResource } from "solid-js"
+import clsx from "clsx"
 
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRouteWithSegments } from '~/api/route'
-import Icon from '~/components/material/Icon'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from "~/api/route"
+import Icon from "~/components/material/Icon"
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -10,20 +10,20 @@ const ToggleButton: VoidComponent<{
   onToggle: () => void
 }> = (props) => (
   <button
-    class='flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low'
+    class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low"
     onClick={() => props.onToggle()}
   >
-    <span class='text-body-md text-on-surface-variant'>{props.label}</span>
+    <span class="text-body-md text-on-surface-variant">{props.label}</span>
 
     {/* Toggle Switch */}
     <div
       class={`relative h-6 w-10 rounded-full border-2 transition-colors ${
-        props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-highest'
+        props.active ? "border-green-300 bg-green-300" : "border-surface-container-highest"
       }`}
     >
       <div
         class={`absolute top-1 size-3 rounded-full bg-surface-container-highest transition-transform duration-500 ease-in-out ${
-          props.active ? 'translate-x-5' : 'translate-x-1'
+          props.active ? "translate-x-5" : "translate-x-1"
         }`}
       />
     </div>
@@ -35,7 +35,7 @@ interface RouteActionsProps {
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRouteWithSegments)
+  const [routeResource] = createResource(() => props.routeName, getRoute)
   const [preservedRoutesResource] = createResource(
     () => parseRouteName(props.routeName).dongleId,
     getPreservedRoutes,
@@ -104,41 +104,41 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   }
 
   return (
-    <div class='flex flex-col rounded-b-md gap-4 mx-5 mb-4'>
-      <div class='font-mono text-body-sm text-zinc-500'>
-        <h3 class='mb-2 text-on-surface-variant'>Route ID:</h3>
+    <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
+      <div class="font-mono text-body-sm text-zinc-500">
+        <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
         <button
           onClick={() => void copyCurrentRouteId()}
-          class='flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low'
+          class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
-          <div class='lg:text-body-md'>
-            <span class='break-keep inline-block'>
-              {currentRouteId().split('/')[0] || ''}/
+          <div class="lg:text-body-md">
+            <span class="break-keep inline-block">
+              {currentRouteId().split('/')[0] || ''}
             </span>
-            <span class='break-keep inline-block'>
+            <span class="break-keep inline-block">
               {currentRouteId().split('/')[1] || ''}
             </span>
           </div>
-          <Icon size='20' class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
+          <Icon size="20" class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
         </button>
       </div>
 
-      <div class='flex flex-col gap-2'>
+      <div class="flex flex-col gap-2">
         <ToggleButton
-          label='Preserve Route'
+          label="Preserve Route"
           active={isPreserved()}
           onToggle={() => void toggleRoute('preserved')}
         />
         <ToggleButton
-          label='Public Access'
+          label="Public Access"
           active={isPublic()}
           onToggle={() => void toggleRoute('public')}
         />
       </div>
 
       <Show when={error()}>
-        <div class='flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface'>
-          <Icon class='text-error' size='20'>error</Icon>
+        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
+          <Icon class="text-error" size="20">error</Icon>
           {error()}
         </div>
       </Show>

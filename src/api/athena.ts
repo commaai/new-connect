@@ -3,7 +3,6 @@ import {
   CancelUploadResponse, UploadFile, UploadFilesToUrlsRequest, UploadFilesToUrlsResponse, UploadQueueItem,
 } from '~/types'
 import { fetcher } from '.'
-import { getAccessToken } from './auth/client'
 import { ATHENA_URL } from './config'
 
 // Higher number is lower priority
@@ -33,15 +32,10 @@ export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
   }, Math.floor(Date.now() / 1000) + EXPIRES_IN_SECONDS)
 
 export const makeAthenaCall = async <REQ, RES>(dongleId: string, method: string, params?: REQ, expiry?: number): Promise<AthenaCallResponse<RES>> => {
-  const opts = {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      Authorization: `JWT ${getAccessToken()}`,
-    },
-    body: JSON.stringify({ id: 0, jsonrpc: '2.0', method, params, expiry }),
-  }
-  const res = await fetcher<BackendAthenaCallResponse<RES> | BackendAthenaCallResponseError>(`/${dongleId}`, opts, ATHENA_URL)
+  const res = await fetcher<BackendAthenaCallResponse<RES> | BackendAthenaCallResponseError>(`/${dongleId}`, {
+      method: 'POST',
+      body: JSON.stringify({ id: 0, jsonrpc: '2.0', method, params, expiry }),
+    }, ATHENA_URL)
   if ('error' in res) {
     return { queued: false, error: res.error, result: undefined }
   }
