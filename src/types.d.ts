@@ -206,13 +206,3 @@ export interface UploadQueueItem {
   retry_count: number
   url: string
 }
-
-export interface UploadItem {
-  id: string
-  name: string
-  uploadUrl: string
-  progress: number
-  priority: number
-  retryCount: number
-  status: 'uploading' | 'completed' | 'error' | 'pending' | 'waiting_for_network'
-}
