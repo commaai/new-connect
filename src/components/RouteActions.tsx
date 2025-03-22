@@ -113,7 +113,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         >
           <div class="lg:text-body-md">
             <span class="break-keep inline-block">
-              {currentRouteId().split('/')[0] || ''}
+              {currentRouteId().split('/')[0] || ''}/
             </span>
             <span class="break-keep inline-block">
               {currentRouteId().split('/')[1] || ''}
