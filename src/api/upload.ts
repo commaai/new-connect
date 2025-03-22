@@ -3,11 +3,11 @@ import { uploadFilesToUrls } from './athena'
 import { getAlreadyUploadedFiles, requestToUploadFiles } from './file'
 import { parseRouteName } from './route'
 
-export const FileTypes = { 
-  logs: ["rlog.bz2", "rlog.zst"], 
-  cameras: ["fcamera.hevc"], 
-  dcameras: ["dcamera.hevc"], 
-  ecameras: ["ecamera.hevc"],
+export const FileTypes = {
+  logs: ['rlog.bz2', 'rlog.zst'],
+  cameras: ['fcamera.hevc'],
+  dcameras: ['dcamera.hevc'],
+  ecameras: ['ecamera.hevc'],
 }
 
 const getFiles = async (routeName: string, types?: [keyof typeof FileTypes]) => {

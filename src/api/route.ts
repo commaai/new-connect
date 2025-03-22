@@ -1,4 +1,4 @@
-import type { Route, RouteInfo, RouteShareSignature } from '~/types'
+import type { Route, RouteInfo, RouteShareSignature, RouteWithSegments } from '~/types'
 
 import { fetcher } from '.'
 import { BASE_URL } from './config'
@@ -10,6 +10,15 @@ export const parseRouteName = (routeName: string): RouteInfo => {
 
 export const getRoute = (routeName: Route['fullname']): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/`)
+
+export const getRouteWithSegments = async (routeName: Route['fullname']) => {
+  const { dongleId } = parseRouteName(routeName)
+  const routes = await fetcher<RouteWithSegments[]>(`/v1/devices/${dongleId}/routes_segments?${new URLSearchParams({ route_str: routeName }).toString()}`)
+  if (routes.length === 0) {
+    throw new Error('route does not exist')
+  }
+  return routes[0]
+}
 
 export const getRouteShareSignature = (routeName: string): Promise<RouteShareSignature> =>
   fetcher(`/v1/route/${routeName}/share_signature`)

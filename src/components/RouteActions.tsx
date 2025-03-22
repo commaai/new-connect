@@ -1,8 +1,8 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
+import { createSignal, Show, type VoidComponent, createEffect, createResource, batch } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
-import { setRoutePublic, setRoutePreserved, getRoute, getPreservedRoutes } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRouteWithSegments } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
@@ -17,10 +17,10 @@ const ToggleButton: VoidComponent<{
   onToggle: () => void
 }> = (props) => (
   <button
-    class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low"
+    class='flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low'
     onClick={() => props.onToggle()}
   >
-    <span class="text-body-md text-on-surface-variant">{props.label}</span>
+    <span class='text-body-md text-on-surface-variant'>{props.label}</span>
 
     {/* Toggle Switch */}
     <div
@@ -37,51 +37,53 @@ const ToggleButton: VoidComponent<{
   </button>
 )
 
+interface UploadButtonProps {
+  state: 'idle' | 'loading' | 'success' | 'error'
+  onClick?: () => void
+  icon: string
+  text: string
+}
+
 const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
-  const state = () => props.state || 'idle'
+  const icon = () => props.icon
+  const state = () => props.state
+  const loading = () => state() === 'loading'
+  const disabled = () => state() !== 'idle' && state() !== 'error'
   
   const handleUpload = () => {
-    if (state() !== 'idle' || props.disabled) return
+    if (disabled()) return
     
-    // Call the custom onClick handler if provided
     if (props.onClick) {
       props.onClick()
     }
+  }
+
+  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, string> = {
+    idle: icon(),
+    loading: 'progress_activity',
+    success: 'check',
+    error: 'error'
   }
   
   return (
     <Button
       onClick={() => handleUpload()}
-      class="px-2 sm:px-3"
-      disabled={props.disabled}
+      class='px-2 sm:px-3'
+      disabled={disabled()}
       leading={
-        <Show 
-          when={state() === 'idle'} 
-          fallback={
-            <Show 
-              when={state() === 'loading'}
-              fallback={<Icon size="20">check</Icon>}
-            >
-              <Icon size="20" class="animate-spin">progress_activity</Icon>
-            </Show>
-          }
-        >
-          <Icon size="20">{props.icon}</Icon>
-        </Show>
+        <Icon size='20' class={clsx(loading() && 'animate-spin')}>{stateToIcon[state()]}</Icon>
       }
-      color="primary"
+      color='primary'
     >
-      <span class="flex items-center gap-1">
-        {props.text}
-      </span>
+      <span class='flex items-center gap-1'>{props.text}</span>
     </Button>
   )
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRoute)
+  const [routeResource] = createResource(() => props.routeName, getRouteWithSegments)
   const [preservedRoutesResource] = createResource(
-    () => props.routeName.split('|')[0],
+    () => parseRouteName(props.routeName).dongleId,
     getPreservedRoutes,
   )
 
@@ -150,12 +152,12 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
   
   // Map button types to uploadAllSegments file types
-  const buttonToFileTypeMap = {
+  const buttonToFileTypeMap: Record<ButtonType, (keyof typeof FileTypes)[] | undefined> = {
     cameras: ['cameras', 'ecameras'],
     driver: ['dcameras'],
     logs: ['logs'],
     route: undefined
-  } as Record<ButtonType, (keyof typeof FileTypes)[] | undefined>;
+  };
   
   const [uploadStore, setUploadStore] = createStore({
     states: {
@@ -163,117 +165,113 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       driver: 'idle',
       logs: 'idle',
       route: 'idle'
-    } as Record<ButtonType, 'idle' | 'loading' | 'success'>,
-    
-    disabled: {
-      cameras: false,
-      driver: false,
-      logs: false,
-      route: false
-    } as Record<ButtonType, boolean>
+    } as Record<ButtonType, 'idle' | 'loading' | 'success' | 'error'>,
   })
+
+  const updateAllButtonsState = (state: 'loading' | 'success' | 'error') => {
+    batch(() => {
+      for (const key in uploadStore.states) {
+        setUploadStore('states', key as ButtonType, state)
+      }
+    })
+  }
   
   const handleUpload = async (type: ButtonType) => {
-    if (uploadStore.disabled[type]) return
-    
+    if (uploadStore.states[type] !== 'idle') return
+
+    const route = routeResource()
+    if (!route) return
+
     if (type === 'route') {
-      // Disable all buttons
-      setUploadStore('disabled', {
-        cameras: true,
-        driver: true,
-        logs: true,
-        route: true
-      })
+      updateAllButtonsState('loading')
 
-      // Update only the route button state for cleaner UI
-      setUploadStore('states', 'route', 'loading')
-      
-      // Upload all file types
-      console.log('Uploading all data')
-      await uploadAllSegments(props.routeName, 3)
-
-      setTimeout(() => setUploadStore('states', 'route', 'success'), 1000)
+      try {
+        await uploadAllSegments(props.routeName, route.segment_numbers.length)
+        updateAllButtonsState('success')
+      } catch (err) {
+        console.error('Failed to upload', err)
+        updateAllButtonsState('error')
+      }
     } else {
       setUploadStore('states', type, 'loading')
-      setUploadStore('disabled', type, true)
       
       // Get the correct file type for this button
       const fileType = buttonToFileTypeMap[type]
       console.log(`Uploading ${type} (${fileType})`)
       
-      await uploadAllSegments(props.routeName, 3, fileType as [keyof typeof FileTypes])
-
-      setTimeout(() => setUploadStore('states', type, 'success'), 1000)
+      try {
+        await uploadAllSegments(props.routeName, route.segment_numbers.length, fileType as [keyof typeof FileTypes])
+        setUploadStore('states', type, 'success')
+      } catch (err) {
+        console.error('Failed to upload', err)
+        setUploadStore('states', type, 'error')
+      }
     }
   }
 
   return (
-    <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
-      <div class="font-mono text-body-sm text-zinc-500">
-        <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
+    <div class='flex flex-col rounded-b-md gap-4 mx-5 mb-4'>
+      <div class='font-mono text-body-sm text-zinc-500'>
+        <h3 class='mb-2 text-on-surface-variant'>Route ID:</h3>
         <button
           onClick={() => void copyCurrentRouteId()}
-          class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
+          class='flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low'
         >
-          <div class="lg:text-body-md">
-            <span class="break-keep inline-block">
+          <div class='lg:text-body-md'>
+            <span class='break-keep inline-block'>
               {currentRouteId().split('/')[0] || ''}/
             </span>
-            <span class="break-keep inline-block">
+            <span class='break-keep inline-block'>
               {currentRouteId().split('/')[1] || ''}
             </span>
           </div>
-          <Icon size="20" class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
+          <Icon size='20' class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
         </button>
       </div>
 
-      <div class="flex flex-col gap-2">
+      <div class='flex flex-col gap-2'>
         <ToggleButton
-          label="Preserve Route"
+          label='Preserve Route'
           active={isPreserved()}
           onToggle={() => void toggleRoute('preserved')}
         />
         <ToggleButton
-          label="Public Access"
+          label='Public Access'
           active={isPublic()}
           onToggle={() => void toggleRoute('public')}
         />
         
-        <div class="grid grid-cols-2 sm:flex sm:justify-center gap-2 w-full pt-2">
+        <div class='grid grid-cols-2 sm:flex sm:justify-center gap-2 w-full pt-1'>
           <UploadButton 
-            text="Cameras" 
-            icon="videocam"
+            text='Cameras'
+            icon='videocam'
             state={uploadStore.states.cameras}
-            disabled={uploadStore.disabled.cameras}
             onClick={() => handleUpload('cameras')}
           />
           <UploadButton 
-            text="Driver" 
-            icon="person"
+            text='Driver'
+            icon='person'
             state={uploadStore.states.driver}
-            disabled={uploadStore.disabled.driver}
             onClick={() => handleUpload('driver')}
           />
           <UploadButton 
-            text="Logs" 
-            icon="description"
+            text='Logs'
+            icon='description'
             state={uploadStore.states.logs}
-            disabled={uploadStore.disabled.logs}
             onClick={() => handleUpload('logs')}
           />
           <UploadButton 
-            text="Route" 
-            icon="upload"
+            text='Route'
+            icon='upload'
             state={uploadStore.states.route}
-            disabled={uploadStore.disabled.route}
             onClick={() => handleUpload('route')}
           />
         </div>
       </div>
 
       <Show when={error()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
-          <Icon class="text-error" size="20">error</Icon>
+        <div class='flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface'>
+          <Icon class='text-error' size='20'>error</Icon>
           {error()}
         </div>
       </Show>
