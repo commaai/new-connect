@@ -304,29 +304,24 @@ function findClosestPointForTime(
   time: number
 ): GPSPathPoint | null {
   if (!points.length) return null;
+  
+  // Binary search is more efficient for longer routes
+  let closestPoint = points[0];
+  let minDiff = Math.abs(points[0].t - time);
 
-  // If points include timestamps, use those
-  if ("t" in points[0]) {
-    // Binary search is more efficient for longer routes
-    let closestPoint = points[0];
-    let minDiff = Math.abs(points[0].t - time);
-
-    for (let i = 1; i < points.length; i++) {
-      const diff = Math.abs(points[i].t - time);
-      if (diff < minDiff) {
-        minDiff = diff;
-        closestPoint = points[i];
-        // Early termination if we find an exact match
-        if (diff === 0) break;
-      }
-
-      // Early termination if we've gone past the current time
-      if (points[i].t > time) break;
+  for (let i = 1; i < points.length; i++) {
+    const t = points[i].t ?? 0;
+    const diff = Math.abs(t - time);
+    if (diff < minDiff) {
+      minDiff = diff;
+      closestPoint = points[i];
+      // Early termination if we find an exact match
+      if (diff === 0) break;
     }
 
-    return closestPoint;
+    // Early termination if we've gone past the current time
+    if (t > time) break;
   }
 
-  // Fallback to first point if timestamps aren't available
-  return points[0];
+  return closestPoint;
 }
