@@ -4,13 +4,14 @@ import clsx from 'clsx'
 import ButtonBase from '~/components/material/ButtonBase'
 
 type ListItemContentProps = {
+  class?: string
   headline: JSXElement
   subhead?: JSXElement
 }
 
 export const ListItemContent: VoidComponent<ListItemContentProps> = (props) => {
   return (
-    <div class="min-w-0">
+    <div class={clsx('min-w-0', props.class)}>
       <div class="truncate text-body-lg text-on-surface">{props.headline}</div>
       {props.subhead && <div class="text-body-md text-on-surface-variant">{props.subhead}</div>}
     </div>
@@ -34,8 +35,8 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
   const variantStyle = () =>
     ({
       '1-line': 'h-14',
-      '2-line': 'h-20',
-      '3-line': 'h-28',
+      '2-line': 'h-18',
+      '3-line': 'h-22',
       nav: 'h-14 gap-3 before:rounded-full before:duration-0',
     }[variant()])
   return (
