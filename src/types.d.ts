@@ -97,12 +97,12 @@ export interface Route extends ApiResponseBase {
 }
 
 export interface RouteInfo {
-  dongleId: string;
+  dongleId: string
   routeId: string
 }
 
 export interface RouteShareSignature extends Record<string, string> {
-  exp: string,
+  exp: string
   sig: string
 }
 
@@ -130,27 +130,27 @@ export interface AthenaOfflineQueueItemParams {
 }
 
 export interface AthenaOfflineQueueItem extends ApiResponseBase, AthenaCallRequest<UploadFilesToUrlsRequest> {
-  method: 'uploadFilesToUrls',
+  method: 'uploadFilesToUrls'
   expiry: number
 }
 
 export interface AthenaCallRequest<T> {
-  expiry?: number,
-  id: number,
-  jsonrpc: '2.0',
-  method: string,
+  expiry?: number
+  id: number
+  jsonrpc: '2.0'
+  method: string
   params: T
 }
 
 export interface AthenaCallResponse<T> {
-  queued: boolean,
-  error?: string,
+  queued: boolean
+  error?: string
   result?: T
 }
 
 export interface BackendAthenaCallResponse<T> {
-  id: string,
-  jsonrpc: '2.0',
+  id: string
+  jsonrpc: '2.0'
   result: T | string
 }
 
@@ -159,9 +159,9 @@ export interface BackendAthenaCallResponseError {
 }
 
 export interface DataFile {
-  allow_cellular: boolean,
-  fn: string,
-  headers: Record<string, string>,
+  allow_cellular: boolean
+  fn: string
+  headers: Record<string, string>
   url: string
 }
 
@@ -176,7 +176,7 @@ export interface UploadFilesToUrlsResponse {
 }
 
 export interface UploadFileMetadata {
-  headers: Record<string, string>,
+  headers: Record<string, string>
   url: string
 }
 
