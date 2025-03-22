@@ -33,9 +33,9 @@ export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
 
 export const makeAthenaCall = async <REQ, RES>(dongleId: string, method: string, params?: REQ, expiry?: number): Promise<AthenaCallResponse<RES>> => {
   const res = await fetcher<BackendAthenaCallResponse<RES> | BackendAthenaCallResponseError>(`/${dongleId}`, {
-      method: 'POST',
-      body: JSON.stringify({ id: 0, jsonrpc: '2.0', method, params, expiry }),
-    }, ATHENA_URL)
+    method: 'POST',
+    body: JSON.stringify({ id: 0, jsonrpc: '2.0', method, params, expiry }),
+  }, ATHENA_URL)
   if ('error' in res) {
     return { queued: false, error: res.error, result: undefined }
   }
