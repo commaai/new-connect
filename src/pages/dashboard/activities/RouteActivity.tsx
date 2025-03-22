@@ -14,6 +14,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import RouteActions from '~/components/RouteActions'
+import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
@@ -69,6 +70,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
               <RouteActions routeName={routeName()} />
+            </Suspense>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
+          <h3 class="text-label-sm uppercase">Upload Files</h3>
+          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container-low">
+            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+              <RouteUploadButtons routeName={routeName()} />
             </Suspense>
           </div>
         </div>

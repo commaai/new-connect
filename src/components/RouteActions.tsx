@@ -1,12 +1,8 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
-import clsx from 'clsx'
+import { createSignal, Show, type VoidComponent, createEffect, createResource } from "solid-js"
+import clsx from "clsx"
 
-import { setRoutePublic, setRoutePreserved, getRoute, getPreservedRoutes } from '~/api/route'
-import Icon from '~/components/material/Icon'
-
-interface RouteActionsProps {
-  routeName: string
-}
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from "~/api/route"
+import Icon from "~/components/material/Icon"
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -34,10 +30,14 @@ const ToggleButton: VoidComponent<{
   </button>
 )
 
+interface RouteActionsProps {
+  routeName: string
+}
+
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [routeResource] = createResource(() => props.routeName, getRoute)
   const [preservedRoutesResource] = createResource(
-    () => props.routeName.split('|')[0],
+    () => parseRouteName(props.routeName).dongleId,
     getPreservedRoutes,
   )
 
