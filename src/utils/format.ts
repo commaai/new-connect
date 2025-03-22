@@ -11,9 +11,18 @@ dayjs.extend(duration)
 
 export { dayjs }
 
+const MI_TO_KM = 1.609344
+
+const isImperial = (): boolean => {
+  if (typeof navigator === 'undefined') return true
+  const locale = navigator.language.toLowerCase()
+  return locale.startsWith('en-us') || locale.startsWith('en-gb')
+}
+
 export const formatDistance = (miles: number | undefined): string => {
   if (miles === undefined) return ''
-  return `${miles.toFixed(1)} mi`
+  if (isImperial()) return `${miles.toFixed(1)} mi`
+  return `${(miles * MI_TO_KM).toFixed(1)} km`
 }
 
 const _formatDuration = (duration: Duration): string => {
