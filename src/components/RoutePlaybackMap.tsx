@@ -101,6 +101,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Trigger a resize to ensure the map renders
     setTimeout(() => {
       leafletMap.invalidateSize();
+      setIsInteractive(false); // Reset interactivity back to false, since the initial zoom will enable it
     }, 100);
 
     setMap(leafletMap);
