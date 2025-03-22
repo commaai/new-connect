@@ -150,14 +150,6 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  // Map button types to uploadAllSegments file types
-  const buttonToFileTypeMap: Record<ButtonType, (keyof typeof FileTypes)[] | undefined> = {
-    cameras: ['cameras', 'ecameras'],
-    driver: ['dcameras'],
-    logs: ['logs'],
-    route: undefined
-  };
-  
   const [uploadStore, setUploadStore] = createStore({
     states: {
       cameras: 'idle',
@@ -174,6 +166,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       }
     })
   }
+
+  const buttonToFileTypeMap: Record<ButtonType, (keyof typeof FileTypes)[] | undefined> = {
+    cameras: ['cameras', 'ecameras'],
+    driver: ['dcameras'],
+    logs: ['logs'],
+    route: undefined
+  };
   
   const handleUpload = async (type: ButtonType) => {
     const route = routeResource()
