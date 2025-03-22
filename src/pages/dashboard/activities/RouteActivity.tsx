@@ -3,7 +3,7 @@ import { createResource, createSignal, lazy, Suspense, type VoidComponent } from
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import { getRoute } from '~/api/route'
+import { getRouteWithSegments } from '~/api/route'
 import { dayjs } from '~/utils/format'
 
 import IconButton from '~/components/material/IconButton'
@@ -27,7 +27,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
+  const [route] = createResource(routeName, getRouteWithSegments)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
   function onTimelineChange(newTime: number) {
