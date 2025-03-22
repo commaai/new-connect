@@ -37,7 +37,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   return (
     <Button
       onClick={() => handleUpload()}
-      class='px-2 md:px-3 lg:px-4'
+      class='px-2 md:px-3'
       disabled={disabled()}
       leading={
         <Icon size='20' class={clsx(state() === 'loading' && 'animate-spin')}>{stateToIcon[state()]}</Icon>
