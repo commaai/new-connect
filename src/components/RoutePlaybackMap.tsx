@@ -133,7 +133,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       );
       const polyline = Leaflet.polyline(latLngs, {
         color: "#DFDFFE",
-        weight: 4,
+        weight: 6,
         opacity: 0.8,
       }).addTo(currentMap);
 
@@ -157,14 +157,11 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const currentMarker = marker();
     const currentTime = props.currentTime;
 
-    console.log("currentTime", currentTime);
-
     if (!gpsPoints || !currentMarker || gpsPoints.length === 0) return;
 
     // Find closest GPS point for current time
     const point = findClosestPointForTime(gpsPoints, currentTime);
     if (point) {
-      console.log("point", point);
       currentMarker.setLatLng([point.lat, point.lng]);
     }
   });
