@@ -1,11 +1,11 @@
 import { $ } from 'bun'
 
 const files = []
-for await (const path of $`find src/ -type f`.lines()) {
+for await (const path of $`find src -type f`.lines()) {
   if (!path) continue
   files.push({
     path,
-    lines: Number((await $`wc -l ${path}`.quiet()).text().split(' ')[0]),
+    lines: Number((await $`wc -l ${path}`.quiet()).text().trim().split(' ')[0]),
   })
 }
 files.sort((a, b) => b.lines - a.lines)
