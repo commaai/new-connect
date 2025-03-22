@@ -10,7 +10,9 @@ export const FileTypes = {
   ecameras: ['ecamera.hevc'],
 }
 
-const getFiles = async (routeName: string, types?: (keyof typeof FileTypes)[]) => {
+type FileType = keyof typeof FileTypes
+
+const getFiles = async (routeName: string, types?: FileType[]) => {
   const files = await getAlreadyUploadedFiles(routeName)
   if (!types) return [...files.cameras, ...files.dcameras, ...files.ecameras, ...files.logs]
   return types.flatMap(type => files[type])
