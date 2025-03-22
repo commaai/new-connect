@@ -15,7 +15,9 @@ import { GPSPathPoint, getCoords } from "~/api/derived";
 import CircularProgress from "~/components/material/CircularProgress";
 import { getTileUrl } from "~/map";
 import type { Route } from "~/types";
+
 import Icon from "./material/Icon";
+import IconButton from "./material/IconButton";
 
 type RoutePlaybackMapProps = {
   class?: string;
@@ -32,6 +34,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     null
   );
   const [shouldInitMap, setShouldInitMap] = createSignal(false);
+  const [autoTracking, setAutoTracking] = createSignal(false);
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords);
@@ -88,6 +91,19 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Monitor resize events to prevent gray tiles
     const observer = new ResizeObserver(() => leafletMap.invalidateSize());
     observer.observe(mapRef);
+
+    // Disable tracking when user interacts with the map
+    leafletMap.on("drag", () => {
+      if (autoTracking()) {
+        setAutoTracking(false);
+      }
+    });
+
+    leafletMap.on("zoom", () => {
+      if (autoTracking()) {
+        centerMarker();
+      }
+    });
 
     onCleanup(() => {
       observer.disconnect();
@@ -155,22 +171,58 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   createEffect(() => {
     const gpsPoints = coords();
     const currentMarker = marker();
+    const currentMap = map();
     const currentTime = props.currentTime;
 
-    if (!gpsPoints || !currentMarker || gpsPoints.length === 0) return;
+    if (!gpsPoints || !currentMarker || !currentMap || gpsPoints.length === 0)
+      return;
 
     // Find closest GPS point for current time
     const point = findClosestPointForTime(gpsPoints, currentTime);
     if (point) {
-      currentMarker.setLatLng([point.lat, point.lng]);
+      const newLatLng = [point.lat, point.lng] as Leaflet.LatLngExpression;
+      currentMarker.setLatLng(newLatLng);
+      // Center map on marker if tracking is enabled
+      if (autoTracking()) {
+        currentMap.panTo(newLatLng);
+      }
     }
   });
+
+  // Toggle auto-tracking
+  const toggleAutoTracking = () => {
+    setAutoTracking(!autoTracking());
+    if (autoTracking()) {
+      centerMarker();
+    }
+  };
+
+  // Center map on marker
+  const centerMarker = () => {
+    if (marker() && map()) {
+      map()!.panTo(marker()!.getLatLng());
+    }
+  };
 
   return (
     <div
       class={clsx("relative h-full rounded-lg overflow-hidden", props.class)}
     >
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low" />
+
+      {/* Toggle auto tracking button */}
+      <div class="absolute bottom-4 right-4 z-[5000]">
+        <IconButton
+          class={clsx(
+            "bg-surface-variant",
+            autoTracking() && "text-primary bg-surface-container-high"
+          )}
+          onClick={toggleAutoTracking}
+          aria-label={autoTracking() ? "Disable tracking" : "Enable tracking"}
+        >
+          {autoTracking() ? "my_location" : "location_searching"}
+        </IconButton>
+      </div>
 
       <Show when={coords.loading}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
