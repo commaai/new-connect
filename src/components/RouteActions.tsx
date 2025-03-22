@@ -7,10 +7,6 @@ import Icon from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
 
-interface RouteActionsProps {
-  routeName: string
-}
-
 const ToggleButton: VoidComponent<{
   label: string
   active: boolean | undefined
@@ -78,6 +74,12 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       <span class='flex items-center gap-1'>{props.text}</span>
     </Button>
   )
+}
+
+type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
+
+interface RouteActionsProps {
+  routeName: string
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
@@ -149,8 +151,6 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
-  
   // Map button types to uploadAllSegments file types
   const buttonToFileTypeMap: Record<ButtonType, (keyof typeof FileTypes)[] | undefined> = {
     cameras: ['cameras', 'ecameras'],
