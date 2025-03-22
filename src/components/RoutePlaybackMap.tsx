@@ -29,12 +29,12 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   let mapRef!: HTMLDivElement;
   const [map, setMap] = createSignal<Leaflet.Map | null>(null);
   const [routePath, setRoutePath] = createSignal<Leaflet.Polyline | null>(null);
-  const [marker, setMarker] = createSignal<Leaflet.Marker | null>(null);
-  const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(
-    null
-  );
-  const [shouldInitMap, setShouldInitMap] = createSignal(false);
-  const [autoTracking, setAutoTracking] = createSignal(false);
+  const [marker, setMarker] = createSignal<Leaflet.Marker | null>(null); // The marker for the current replay time
+  const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(null); // The vehicle marker icon
+  const [shouldInitMap, setShouldInitMap] = createSignal(false); // Whether the map should be initialized (wait until mount to avoid lag)
+  const [autoTracking, setAutoTracking] = createSignal(false); // Is auto-tracking enabled
+  const [isInteractive, setIsInteractive] = createSignal(false); // Should the map be interactive (only for scrolling, to prevent scrolling/dragging the map when trying to scroll the page)
+  const [isTouchscreen, setIsTouchscreen] = createSignal(false); // Have we received any touch events
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords);
@@ -56,9 +56,30 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Fallback: initialize after 1.5 seconds even if not visible
     const timeout = setTimeout(() => setShouldInitMap(true), 1500);
 
+    // Handle clicks/scrolls outside the map and disable interactivity
+    const handleInteractionOutside = (event: Event) => {
+      // Check if is touch event
+      if (event.type.startsWith('touch')) {
+        setIsTouchscreen(true); // Any touch events means we're on a touchscreen
+      }
+      // Update interactivity
+      if (isInteractive() && mapRef && !mapRef.contains(event.target as Node)) {
+        setIsInteractive(false);
+        updateMapInteractivity();
+      }
+    };
+    
+    // Detect clicks/scrolls outside the map
+    document.addEventListener("click", handleInteractionOutside);
+    document.addEventListener("wheel", handleInteractionOutside, { passive: true });
+    document.addEventListener("touchstart", handleInteractionOutside, { passive: true });
+
     onCleanup(() => {
       observer.disconnect();
       clearTimeout(timeout);
+      document.removeEventListener("click", handleInteractionOutside);
+      document.removeEventListener("wheel", handleInteractionOutside);
+      document.removeEventListener("touchstart", handleInteractionOutside);
     });
   });
 
@@ -69,9 +90,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const tileUrl = getTileUrl();
     const tileLayer = Leaflet.tileLayer(tileUrl);
     const leafletMap = Leaflet.map(mapRef, {
+      layers: [tileLayer],
       attributionControl: false,
       zoomControl: true,
-      layers: [tileLayer],
     });
 
     // Set a default view if no coordinates are available yet
@@ -92,14 +113,16 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const observer = new ResizeObserver(() => leafletMap.invalidateSize());
     observer.observe(mapRef);
 
-    // Disable tracking when user interacts with the map
+    // Disable tracking when user drags the map
     leafletMap.on("drag", () => {
       if (autoTracking()) {
         setAutoTracking(false);
       }
     });
 
+    // Center marker when user zooms the map (also set interactive to true, since if the user zooms via the buttons it won't cause a regular click event)
     leafletMap.on("zoom", () => {
+      setIsInteractive(true);
       if (autoTracking()) {
         centerMarker();
       }
@@ -112,26 +135,6 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       leafletMap.remove();
     });
   });
-
-  // Create marker icon once
-  const createMarkerIcon = () => {
-    const el = document.createElement("div");
-    render(
-      () => (
-        <div class="flex size-[30px] items-center justify-center rounded-full bg-primary-container">
-          <Icon size="20">directions_car</Icon>
-        </div>
-      ),
-      el
-    );
-
-    return Leaflet.divIcon({
-      className: "border-none bg-none",
-      html: el.innerHTML,
-      iconSize: [20, 20],
-      iconAnchor: [15, 15],
-    });
-  };
 
   // Draw route path when coordinates are loaded
   createEffect(() => {
@@ -174,8 +177,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const currentMap = map();
     const currentTime = props.currentTime;
 
-    if (!gpsPoints || !currentMarker || !currentMap || gpsPoints.length === 0)
+    if (!gpsPoints?.length || !currentMarker || !currentMap) {
       return;
+    }
 
     // Find closest GPS point for current time
     const point = findClosestPointForTime(gpsPoints, currentTime);
@@ -189,12 +193,51 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
   });
 
+  // Update map interactivity when isInteractive changes
+  createEffect(() => {
+    updateMapInteractivity();
+  });
+
+  // Function to update map interactivity (mostly for scrolling)
+  const updateMapInteractivity = () => {
+    const currentMap = map();
+    if (!currentMap) return;
+
+    if (isInteractive()) {
+      currentMap.scrollWheelZoom.enable();
+      currentMap.dragging.enable();
+    } else {
+      currentMap.scrollWheelZoom.disable();
+      if (isTouchscreen()) {
+        currentMap.dragging.disable(); // Disable dragging on touch devices when interactivity is disabled
+      }
+    }
+  };
+
+  // Create marker icon once
+  const createMarkerIcon = () => {
+    const el = document.createElement("div");
+    render(
+      () => (
+        <div class="flex size-[30px] items-center justify-center rounded-full bg-primary-container">
+          <Icon size="20">directions_car</Icon>
+        </div>
+      ),
+      el
+    );
+
+    return Leaflet.divIcon({
+      className: "border-none bg-none",
+      html: el.innerHTML,
+      iconSize: [20, 20],
+      iconAnchor: [15, 15],
+    });
+  };
+
   // Toggle auto-tracking
   const toggleAutoTracking = () => {
     setAutoTracking(!autoTracking());
-    if (autoTracking()) {
-      centerMarker();
-    }
+    if (autoTracking()) centerMarker();
   };
 
   // Center map on marker
@@ -204,41 +247,51 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
   };
 
+  // Handle click on the map container
+  const handleMapClick = () => {
+    if (!isInteractive()) setIsInteractive(true);
+  };
+
   return (
     <div
-      class={clsx("relative h-full rounded-lg overflow-hidden", props.class)}
+      class={clsx(
+        "relative h-full rounded-lg overflow-hidden",
+        !isInteractive() && "cursor-pointer",
+        props.class
+      )}
+      onClick={handleMapClick}
     >
-      <div ref={mapRef} class="h-full w-full !bg-surface-container-low" />
+      <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
+        {/* Toggle auto tracking button */}
+        <div class="absolute bottom-4 right-4 z-[5000]">
+          <IconButton
+            class={clsx(
+              "bg-surface-variant",
+              autoTracking() && "text-primary bg-surface-container-high"
+            )}
+            onClick={toggleAutoTracking}
+            aria-label={autoTracking() ? "Disable tracking" : "Enable tracking"}
+          >
+            {autoTracking() ? "my_location" : "location_searching"}
+          </IconButton>
+        </div>
 
-      {/* Toggle auto tracking button */}
-      <div class="absolute bottom-4 right-4 z-[5000]">
-        <IconButton
-          class={clsx(
-            "bg-surface-variant",
-            autoTracking() && "text-primary bg-surface-container-high"
-          )}
-          onClick={toggleAutoTracking}
-          aria-label={autoTracking() ? "Disable tracking" : "Enable tracking"}
-        >
-          {autoTracking() ? "my_location" : "location_searching"}
-        </IconButton>
+        <Show when={coords.loading}>
+          <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
+            <CircularProgress color="primary" size={24} class="mr-2" />
+            <span class="text-sm">Loading map...</span>
+          </div>
+        </Show>
+
+        <Show when={(coords.error as Error)?.message}>
+          <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
+            <Icon class="mr-2" size="20">
+              error
+            </Icon>
+            <span class="text-sm">{(coords.error as Error).message}</span>
+          </div>
+        </Show>
       </div>
-
-      <Show when={coords.loading}>
-        <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
-          <CircularProgress color="primary" size={24} class="mr-2" />
-          <span class="text-sm">Loading map...</span>
-        </div>
-      </Show>
-
-      <Show when={(coords.error as Error)?.message}>
-        <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
-          <Icon class="mr-2" size="20">
-            error
-          </Icon>
-          <span class="text-sm">{(coords.error as Error).message}</span>
-        </div>
-      </Show>
     </div>
   );
 };
