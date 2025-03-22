@@ -245,7 +245,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         
         <div class='grid grid-cols-2 sm:flex sm:justify-center gap-2 w-full pt-1'>
           <UploadButton 
-            text='Cameras'
+            text='Road'
             icon='videocam'
             state={uploadStore.states.cameras}
             onClick={() => handleUpload('cameras')}
