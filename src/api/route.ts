@@ -3,7 +3,11 @@ import type { Route, RouteInfo, RouteShareSignature } from '~/types'
 import { fetcher } from '.'
 import { BASE_URL } from './config'
 
-export const parseRouteName = (routeName: string): RouteInfo => ({ dongleId: routeName.split('|')[0], routeId: routeName.split('|')[1] })
+export const parseRouteName = (routeName: string): RouteInfo => {
+  const [dongleId, routeId] = routeName.split('|')
+  return { dongleId, routeId }
+}
+
 export const getRoute = (routeName: Route['fullname']): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/`)
 
