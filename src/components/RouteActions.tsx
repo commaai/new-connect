@@ -70,7 +70,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       }
       color='primary'
     >
-      <span class='flex items-center gap-1'>{props.text}</span>
+      <span class='flex items-center gap-1 font-mono'>{props.text}</span>
     </Button>
   )
 }
@@ -242,6 +242,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           active={isPublic()}
           onToggle={() => void toggleRoute('public')}
         />
+      </div>
+      <div class='flex flex-col gap-3'>
+        <hr class='border-t border-surface-container-high' />
+        <h3 class='text-sm text-center text-on-surface-variant'>Upload Files</h3>
         
         <div class='grid grid-cols-2 sm:flex sm:justify-center gap-2 w-full pt-1'>
           <UploadButton 
@@ -263,7 +267,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
             onClick={() => handleUpload('logs')}
           />
           <UploadButton 
-            text='Route'
+            text='All'
             icon='upload'
             state={uploadStore.states.route}
             onClick={() => handleUpload('route')}
