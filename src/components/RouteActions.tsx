@@ -18,12 +18,12 @@ const ToggleButton: VoidComponent<{
     {/* Toggle Switch */}
     <div
       class={`relative h-6 w-10 rounded-full border-2 transition-colors ${
-        props.active ? "border-green-300 bg-green-300" : "border-surface-container-highest"
+        props.active ? 'border-green-300 bg-green-300' : 'border-surface-container-highest'
       }`}
     >
       <div
         class={`absolute top-1 size-3 rounded-full bg-surface-container-highest transition-transform duration-500 ease-in-out ${
-          props.active ? "translate-x-5" : "translate-x-1"
+          props.active ? 'translate-x-5' : 'translate-x-1'
         }`}
       />
     </div>

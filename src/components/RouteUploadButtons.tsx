@@ -120,29 +120,29 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   }
 
   return (
-    <div class='flex flex-col rounded-b-md m-5'>
-      <div class='grid grid-cols-2 gap-3 w-full lg:grid-cols-4'>
+    <div class="flex flex-col rounded-b-md m-5">
+      <div class="grid grid-cols-2 gap-3 w-full lg:grid-cols-4">
         <UploadButton 
-          text='Road'
-          icon='videocam'
+          text="Road"
+          icon="videocam"
           state={uploadStore.states.cameras}
           onClick={() => handleUpload('cameras')}
         />
         <UploadButton 
-          text='Driver'
-          icon='person'
+          text="Driver"
+          icon="person"
           state={uploadStore.states.driver}
           onClick={() => handleUpload('driver')}
         />
         <UploadButton 
-          text='Logs'
-          icon='description'
+          text="Logs"
+          icon="description"
           state={uploadStore.states.logs}
           onClick={() => handleUpload('logs')}
         />
         <UploadButton 
-          text='All'
-          icon='upload'
+          text="All"
+          icon="upload"
           state={uploadStore.states.route}
           onClick={() => handleUpload('route')}
         />
