@@ -43,8 +43,7 @@ interface UploadButtonProps {
 const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   const icon = () => props.icon
   const state = () => props.state
-  const loading = () => state() === 'loading'
-  const disabled = () => state() !== 'idle' && state() !== 'error'
+  const disabled = () => state() === 'loading' || state() === 'success'
   
   const handleUpload = () => {
     if (disabled()) return
@@ -67,7 +66,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       class='px-2 sm:px-3'
       disabled={disabled()}
       leading={
-        <Icon size='20' class={clsx(loading() && 'animate-spin')}>{stateToIcon[state()]}</Icon>
+        <Icon size='20' class={clsx(state() === 'loading' && 'animate-spin')}>{stateToIcon[state()]}</Icon>
       }
       color='primary'
     >
@@ -168,44 +167,48 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     } as Record<ButtonType, 'idle' | 'loading' | 'success' | 'error'>,
   })
 
-  const updateAllButtonsState = (state: 'loading' | 'success' | 'error') => {
+  const updateButtonStates = (types: ButtonType[], state: 'loading' | 'success' | 'error') => {
     batch(() => {
-      for (const key in uploadStore.states) {
-        setUploadStore('states', key as ButtonType, state)
+      for (const type of types) {
+        setUploadStore('states', type, state)
       }
     })
   }
   
   const handleUpload = async (type: ButtonType) => {
-    if (uploadStore.states[type] !== 'idle') return
-
     const route = routeResource()
     if (!route) return
 
     if (type === 'route') {
-      updateAllButtonsState('loading')
+      const typesNotUploadedYet = Object.entries(uploadStore.states)
+        .filter(([_, state]) => state !== 'loading' && state !== 'success')
+        .map(([type]) => type as ButtonType)
+        .filter(type => type !== undefined)
+
+      const typesToUpload = typesNotUploadedYet.flatMap(type => buttonToFileTypeMap[type]).filter(type => type !== undefined)
+
+      updateButtonStates(typesNotUploadedYet, 'loading')
 
       try {
-        await uploadAllSegments(props.routeName, route.segment_numbers.length)
-        updateAllButtonsState('success')
+        await uploadAllSegments(props.routeName, route.segment_numbers.length, typesToUpload as [keyof typeof FileTypes])
+        updateButtonStates(typesNotUploadedYet, 'success')
       } catch (err) {
         console.error('Failed to upload', err)
-        updateAllButtonsState('error')
+        updateButtonStates(typesNotUploadedYet, 'error')
       }
-    } else {
-      setUploadStore('states', type, 'loading')
-      
-      // Get the correct file type for this button
-      const fileType = buttonToFileTypeMap[type]
-      console.log(`Uploading ${type} (${fileType})`)
-      
-      try {
-        await uploadAllSegments(props.routeName, route.segment_numbers.length, fileType as [keyof typeof FileTypes])
-        setUploadStore('states', type, 'success')
-      } catch (err) {
-        console.error('Failed to upload', err)
-        setUploadStore('states', type, 'error')
-      }
+      return;
+    }
+
+    setUploadStore('states', type, 'loading')
+    
+    const fileType = buttonToFileTypeMap[type]
+    
+    try {
+      await uploadAllSegments(props.routeName, route.segment_numbers.length, fileType as [keyof typeof FileTypes])
+      setUploadStore('states', type, 'success')
+    } catch (err) {
+      console.error('Failed to upload', err)
+      setUploadStore('states', type, 'error')
     }
   }
 
