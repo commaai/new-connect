@@ -66,7 +66,7 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
       <div class="flex items-center justify-between gap-3">
         <div class="flex items-center gap-2 min-w-0 flex-1">
           <Icon class="text-on-surface-variant">
-            {props.item.priority === 0 ? 'face' : 'fire_hydrant'}
+            {props.item.priority === 0 ? 'face' : 'local_fire_department'}
           </Icon>
           <Show when={pathInfo().route} fallback={
             <span class="text-body-sm font-mono truncate text-on-surface">{props.item.name}</span>
@@ -105,7 +105,7 @@ const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class:
   );
 }
 
-const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: boolean; offline?: boolean }> = (props) => {
+const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: string; offline?: boolean }> = (props) => {
   const sortedItems = createMemo(() => {
     return [...props.items].sort((a, b) => {
       // First sort by status priority
@@ -137,16 +137,16 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: bool
           }
         >
           <Show
-            when={!props.error}
+            when={!(props.offline && props.items.length === 0)}
             fallback={
               <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                 <Icon>signal_disconnected</Icon>
-                <span>Error fetching queue</span>
+                <span>{props.error}</span>
               </div>
             }
           >
             <Show
-              when={sortedItems().length !== 0}
+              when={props.items.length > 0}
               fallback={
                 <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                   <Icon>cloud_done</Icon>
@@ -161,7 +161,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: bool
                   exitActiveClass="transition-all duration-300 ease-in-out"
                   enterClass="opacity-0 transform translate-x-4"
                   enterToClass="opacity-100 transform translate-x-0"
-                  exitClass="opacity-100 transform translate-x-0" 
+                  exitClass="opacity-100 transform translate-x-0"
                   exitToClass="opacity-0 transform -translate-x-4"
                   moveClass="transition-transform duration-300"
                 >
@@ -183,7 +183,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: bool
 }
 
 const UploadQueue: Component<UploadQueueProps> = (props) => {
-  const { items, loading, error, offline, clearQueue } = useUploadQueue(props.dongleId)
+  const { loading, error, items, offline, clearQueue } = useUploadQueue(props.dongleId)
 
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
