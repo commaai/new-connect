@@ -72,7 +72,7 @@ jobs:
             return response.data.id
 
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - name: Download build artifacts
         uses: actions/download-artifact@v4
@@ -111,7 +111,7 @@ jobs:
           git push origin connect/pr-${{ needs.pr.outputs.number }} --force
 
       - name: Comment URL on PR
-        uses: thollander/actions-comment-pull-request@v3
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->

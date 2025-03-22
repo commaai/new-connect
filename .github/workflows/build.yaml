@@ -13,7 +13,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - uses: actions/cache@v4
         id: playwright-cache
@@ -34,7 +34,7 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v4
-      - uses: oven-sh/setup-bun@v1
+      - uses: oven-sh/setup-bun@v2
 
       - run: bun install --frozen-lockfile
       - run: bun run build
@@ -94,7 +94,9 @@ jobs:
       - name: get date
         run: echo "GIT_TIMESTAMP=$(git show -s --format=%cI)" >> $GITHUB_ENV
 
-      - uses: docker/build-push-action@v5
+      - uses: docker/build-push-action@v6
+        env:
+          DOCKER_BUILD_SUMMARY: false
         with:
           build-args: |
             VITE_APP_GIT_SHA=${{ github.event_name == 'push' && github.sha || github.event.pull_request.head.sha }}
