@@ -1,21 +1,5 @@
-import {
-  createResource,
-  Match,
-  type ParentComponent,
-  Show,
-  Suspense,
-  Switch,
-  type Accessor,
-  type Setter,
-  type VoidComponent,
-  children,
-  createMemo,
-  For,
-  createSignal,
-  type Resource,
-  createEffect,
-  type JSXElement,
-} from 'solid-js'
+import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
+import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
@@ -158,11 +142,9 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       if (!source.device.eligible_features?.prime_data) {
         disabledDataPlanText = 'Standard plan is not available for your device.'
       } else if (!source.subscribeInfo.sim_id && source.subscribeInfo.device_online) {
-        disabledDataPlanText =
-          'Standard plan not available, no SIM was detected. Ensure SIM is securely inserted and try again.'
+        disabledDataPlanText = 'Standard plan not available, no SIM was detected. Ensure SIM is securely inserted and try again.'
       } else if (!source.subscribeInfo.sim_id) {
-        disabledDataPlanText =
-          'Standard plan not available, device could not be reached. Connect device to the internet and try again.'
+        disabledDataPlanText = 'Standard plan not available, device could not be reached. Connect device to the internet and try again.'
       } else if (!source.subscribeInfo.is_prime_sim || !source.subscribeInfo.sim_type) {
         disabledDataPlanText = 'Standard plan not available, detected a third-party SIM.'
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
@@ -335,8 +317,8 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                     <div class="flex flex-col gap-2">
                       <p class="font-semibold">comma prime activated</p>
                       <Show when={subscription()?.is_prime_sim} keyed>
-                        Connectivity will be enabled as soon as activation propogates to your local cell tower.
-                        Rebooting your device may help.
+                        Connectivity will be enabled as soon as activation propogates to your local cell tower. Rebooting your device may
+                        help.
                       </Show>
                     </div>
                   </div>
@@ -365,9 +347,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         </Switch>
 
         <Switch>
-          <Match when={subscription.state === 'errored'}>
-            Unable to fetch subscription details: {subscription.error}
-          </Match>
+          <Match when={subscription.state === 'errored'}>Unable to fetch subscription details: {subscription.error}</Match>
           <Match when={subscription()} keyed>
             {(subscription) => (
               <>
@@ -379,12 +359,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                 </div>
 
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <Button
-                    color="error"
-                    disabled={loading()}
-                    loading={cancelData.loading}
-                    onClick={() => setCancelDialog(true)}
-                  >
+                  <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>
                     Cancel subscription
                   </Button>
                   <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>
