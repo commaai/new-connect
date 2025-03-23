@@ -14,7 +14,7 @@ const processOfflineQueueData = (data: AthenaOfflineQueueItem[]): UploadItem[] =
       progress: 0,
       priority: file.priority,
       retryCount: 0,
-      status: 'waiting_for_network' as const
+      status: getUploadStatus(item)
     }))
   )
 
