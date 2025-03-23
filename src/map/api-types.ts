@@ -1,7 +1,7 @@
 import type { FeatureCollection, Point } from 'geojson'
 
 /**
- * @see https://docs.mapbox.com/api/search/geocoding/#geocoding-response-object
+ * @see {@link https://docs.mapbox.com/api/search/geocoding/#geocoding-response-object}
  */
 export interface ReverseGeocodingResponse extends FeatureCollection<Point, ReverseGeocodingFeatureProperties> {
   attribution: string
@@ -19,7 +19,7 @@ interface ReverseGeocodingFeatureProperties {
 }
 
 /**
- * @see https://docs.mapbox.com/api/search/geocoding/#the-context-object
+ * @see {@link https://docs.mapbox.com/api/search/geocoding/#the-context-object}
  */
 interface ReverseGeocodingContextObject<S = ReverseGeocodingContextSubObject> {
   country?: S & {
