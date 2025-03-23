@@ -57,7 +57,7 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-        <LinearProgress progress={props.item.progress} color={progressColor()} />
+        <LinearProgress progress={props.item.progress / 100} color={progressColor()} />
       </div>
     </div>
   )
