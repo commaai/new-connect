@@ -3,7 +3,8 @@ import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
-import { Icons } from '~/components/material/Icon'
+// noinspection ES6PreferShortImport
+import { Icons } from './src/components/material/Icon'
 
 export default defineConfig({
   plugins: [
