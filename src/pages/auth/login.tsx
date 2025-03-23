@@ -55,7 +55,7 @@ export default function Login() {
           <img src="/images/icon-comma-three-light.svg" alt="" width={32} height={32} />
         </div>
 
-        <Button onclick={loginAsDemoUser} trailing={<Icon>chevron_right</Icon>}>
+        <Button onclick={loginAsDemoUser} trailing={<Icon name="chevron_right" />}>
           Try the demo
         </Button>
       </div>

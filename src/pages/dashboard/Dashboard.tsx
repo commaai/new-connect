@@ -34,7 +34,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
         component="h1"
         leading={
           <Show when={modal()}>
-            <IconButton onClick={onClose}>arrow_back</IconButton>
+            <IconButton name="arrow_back" onClick={onClose} />
           </Show>
         }
       >
@@ -45,7 +45,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
         {(devices) => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
       </Show>
       <div class="grow" />
-      <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={onClose}>
+      <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
@@ -119,7 +119,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                 <Switch
                   fallback={
                     <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                      <Icon size="48">search</Icon>
+                      <Icon name="search" size="48" />
                       <span class="text-title-md">Select a route to view</span>
                     </div>
                   }

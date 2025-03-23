@@ -200,9 +200,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
       <Show when={stripeCancelled()}>
         <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-          <Icon class="text-error" size="20">
-            error
-          </Icon>
+          <Icon name="error" class="text-error" size="20" />
           Checkout cancelled
         </div>
       </Show>
@@ -220,7 +218,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       <Show when={uiState()?.disabledDataPlanText} keyed>
         {(text) => (
           <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-            <Icon size="20">info</Icon>
+            <Icon name="info" size="20" />
             {text}
           </div>
         )}
@@ -290,7 +288,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         <Switch>
           <Match when={stripeSession.state === 'errored'}>
             <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-body-md font-semibold text-error-container">
-              <Icon size="20">error</Icon>
+              <Icon name="error" size="20" />
               Unable to check payment status: {stripeSession.error}
             </div>
           </Match>
@@ -299,21 +297,21 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
               <Switch>
                 <Match when={paymentStatus === 'unpaid'}>
                   <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-                    <Icon size="20">payments</Icon>
+                    <Icon name="payments" size="20" />
                     Waiting for confirmed payment...
                   </div>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && !subscription()}>
                   <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-                    <Icon size="20">sync</Icon>
+                    <Icon name="sync" size="20" />
                     Processing subscription...
                   </div>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && subscription()}>
                   <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-body-md text-on-tertiary-container">
-                    <Icon size="20">check</Icon>
+                    <Icon name="check" size="20" />
                     <div class="flex flex-col gap-2">
                       <p class="font-semibold">comma prime activated</p>
                       <Show when={subscription()?.is_prime_sim} keyed>
@@ -331,16 +329,14 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         <Switch>
           <Match when={cancelData.state === 'errored'}>
             <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-              <Icon class="text-error" size="20">
-                error
-              </Icon>
+              <Icon class="text-error" name="error" size="20" />
               Failed to cancel subscription: {cancelData.error}
             </div>
           </Match>
 
           <Match when={cancelData.state === 'ready'}>
             <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-              <Icon size="20">check</Icon>
+              <Icon name="check" size="20" />
               Subscription cancelled
             </div>
           </Match>
@@ -407,15 +403,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   return (
     <>
-      <TopAppBar
-        leading={
-          <IconButton class="md:hidden" href={`/${props.dongleId}`}>
-            arrow_back
-          </IconButton>
-        }
-      >
-        Device Settings
-      </TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="max-w-lg px-4">
         <h2 class="mb-4 text-headline-sm">comma prime</h2>
         <Suspense>
