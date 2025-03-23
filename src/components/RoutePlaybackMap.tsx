@@ -8,8 +8,12 @@ import {
   type VoidComponent,
 } from "solid-js";
 import { render } from "solid-js/web";
-import Leaflet from "leaflet";
+import Leaflet, { type MapOptions } from "leaflet";
+import { GestureHandling } from "leaflet-gesture-handling";
 import clsx from "clsx";
+
+import "leaflet/dist/leaflet.css";
+import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 
 import { GPSPathPoint, getCoords } from "~/api/derived";
 import CircularProgress from "~/components/material/CircularProgress";
@@ -18,6 +22,8 @@ import type { Route } from "~/types";
 
 import Icon from "./material/Icon";
 import IconButton from "./material/IconButton";
+
+Leaflet.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 type RoutePlaybackMapProps = {
   class?: string;
@@ -34,8 +40,6 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(null); // The vehicle marker icon
   const [shouldInitMap, setShouldInitMap] = createSignal(false); // Whether the map should be initialized (wait until mount to avoid lag)
   const [autoTracking, setAutoTracking] = createSignal(false); // Is auto-tracking enabled
-  const [isInteractive, setIsInteractive] = createSignal(false); // Should the map be interactive (only for scrolling, to prevent scrolling/dragging the map when trying to scroll the page)
-  const [isTouchscreen, setIsTouchscreen] = createSignal(false); // Have we received any touch events
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords);
@@ -57,30 +61,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Fallback: initialize after 1.5 seconds even if not visible
     const timeout = setTimeout(() => setShouldInitMap(true), 1500);
 
-    // Handle clicks/scrolls outside the map and disable interactivity
-    const handleInteractionOutside = (event: Event) => {
-      // Check if is touch event
-      if (event.type.startsWith('touch')) {
-        setIsTouchscreen(true); // Any touch events means we're on a touchscreen
-      }
-      // Update interactivity
-      if (isInteractive() && mapRef && !mapRef.contains(event.target as Node)) {
-        setIsInteractive(false);
-        updateMapInteractivity();
-      }
-    };
-    
-    // Detect clicks/scrolls outside the map
-    document.addEventListener("click", handleInteractionOutside);
-    document.addEventListener("wheel", handleInteractionOutside, { passive: true });
-    document.addEventListener("touchstart", handleInteractionOutside, { passive: true });
-
     onCleanup(() => {
       observer.disconnect();
       clearTimeout(timeout);
-      document.removeEventListener("click", handleInteractionOutside);
-      document.removeEventListener("wheel", handleInteractionOutside);
-      document.removeEventListener("touchstart", handleInteractionOutside);
     });
   });
 
@@ -90,11 +73,13 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
 
     const tileUrl = getTileUrl();
     const tileLayer = Leaflet.tileLayer(tileUrl);
+
     const leafletMap = Leaflet.map(mapRef, {
       layers: [tileLayer],
       attributionControl: false,
       zoomControl: true,
-    });
+      gestureHandling: true,
+    } as MapOptions & { gestureHandling?: boolean });
 
     // Set a default view if no coordinates are available yet
     leafletMap.setView([0, 0], 10);
@@ -102,7 +87,6 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Trigger a resize to ensure the map renders
     setTimeout(() => {
       leafletMap.invalidateSize();
-      setIsInteractive(false); // Reset interactivity back to false, since the initial zoom will enable it
     }, 100);
 
     setMap(leafletMap);
@@ -122,9 +106,8 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       }
     });
 
-    // Center marker when user zooms the map (also set interactive to true, since if the user zooms via the buttons it won't cause a regular click event)
+    // Center marker when user zooms the map
     leafletMap.on("zoom", () => {
-      setIsInteractive(true);
       if (autoTracking()) {
         centerMarker();
       }
@@ -204,27 +187,6 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
   });
 
-  // Update map interactivity when isInteractive changes
-  createEffect(() => {
-    updateMapInteractivity();
-  });
-
-  // Function to update map interactivity (mostly for scrolling)
-  const updateMapInteractivity = () => {
-    const currentMap = map();
-    if (!currentMap) return;
-
-    if (isInteractive()) {
-      currentMap.scrollWheelZoom.enable();
-      currentMap.dragging.enable();
-    } else {
-      currentMap.scrollWheelZoom.disable();
-      if (isTouchscreen()) {
-        currentMap.dragging.disable(); // Disable dragging on touch devices when interactivity is disabled
-      }
-    }
-  };
-
   // Create marker icon once
   const createMarkerIcon = () => {
     const el = document.createElement("div");
@@ -258,20 +220,8 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
   };
 
-  // Handle click on the map container
-  const handleMapClick = () => {
-    if (!isInteractive()) setIsInteractive(true);
-  };
-
   return (
-    <div
-      class={clsx(
-        "relative h-full rounded-lg overflow-hidden",
-        !isInteractive() && "cursor-pointer",
-        props.class
-      )}
-      onClick={handleMapClick}
-    >
+    <div class={clsx("relative h-full rounded-lg overflow-hidden", props.class)}>
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
         {/* Toggle auto tracking button */}
         <div class="absolute bottom-4 right-4 z-[5000]">
