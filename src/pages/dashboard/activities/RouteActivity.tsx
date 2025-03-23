@@ -80,6 +80,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
               <RoutePlaybackMap 
                 route={route()}
                 currentTime={seekTime()}
+                setCurrentTime={(newTime) =>{
+                  setSeekTime(newTime);
+                  onTimelineChange(newTime);
+                }}
               />
             </Suspense>
           </div>

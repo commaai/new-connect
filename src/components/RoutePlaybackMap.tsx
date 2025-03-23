@@ -23,6 +23,7 @@ type RoutePlaybackMapProps = {
   class?: string;
   route: Route | undefined;
   currentTime: number;
+  setCurrentTime: (time: number) => void;
 };
 
 const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
@@ -157,6 +158,15 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
         opacity: 0.8,
       }).addTo(currentMap);
 
+      // Add click event listener to the polyline
+      polyline.on('click', (e) => {
+        const clickedLatLng = e.latlng;
+        const closestPoint = findClosestPointToLatLng(gpsPoints, clickedLatLng);
+        if (closestPoint) {
+          props.setCurrentTime(closestPoint.t);
+        }
+      });
+
       setRoutePath(polyline);
 
       // Fit map to route bounds
@@ -183,7 +193,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
 
     // Find closest GPS point for current time
-    const point = findClosestPointForTime(gpsPoints, currentTime);
+    const point = findClosestPointToTime(gpsPoints, currentTime);
     if (point) {
       const newLatLng = [point.lat, point.lng] as Leaflet.LatLngExpression;
       currentMarker.setLatLng(newLatLng);
@@ -300,28 +310,49 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
 export default RoutePlaybackMap;
 
 // Helper function to find closest GPS point at a specific time
-function findClosestPointForTime(
+function findClosestPointToTime(
   points: GPSPathPoint[],
   time: number
 ): GPSPathPoint | null {
   if (!points.length) return null;
   
-  // Binary search is more efficient for longer routes
   let closestPoint = points[0];
   let minDiff = Math.abs(points[0].t - time);
 
-  for (let i = 1; i < points.length; i++) {
-    const t = points[i].t ?? 0;
+  for (const point of points) {
+    const t = point.t ?? 0;
     const diff = Math.abs(t - time);
     if (diff < minDiff) {
       minDiff = diff;
-      closestPoint = points[i];
-      // Early termination if we find an exact match
-      if (diff === 0) break;
+      closestPoint = point;
+      if (diff === 0) break; // Break early if we find an exact match
     }
 
-    // Early termination if we've gone past the current time
+    // Break early if we've gone past the current time
     if (t > time) break;
+  }
+
+  return closestPoint;
+}
+
+// Helper function to find closest GPS point to a given lat/lng
+function findClosestPointToLatLng(
+  points: GPSPathPoint[],
+  latLng: Leaflet.LatLng
+): GPSPathPoint | null {
+  if (!points.length) return null;
+
+  let closestPoint = points[0];
+  let minDistance = Leaflet.latLng(points[0].lat ?? 0, points[0].lng ?? 0).distanceTo(latLng);
+
+  for (const point of points) {
+    const pointLatLng = Leaflet.latLng(point.lat ?? 0, point.lng ?? 0);
+    const distance = pointLatLng.distanceTo(latLng);
+    if (distance < minDistance) {
+      minDistance = distance;
+      closestPoint = point;
+      if (distance === 0) break; // Break early if we find an exact match
+    }
   }
 
   return closestPoint;
