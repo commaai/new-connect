@@ -4,7 +4,7 @@ import clsx from 'clsx'
 import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from '~/api/route'
 import Icon from '~/components/material/Icon'
 
-const ToggleButton: VoidComponent<{ label: string, active: boolean | undefined, onToggle: () => void }> = (props) => (
+const ToggleButton: VoidComponent<{ label: string; active: boolean | undefined; onToggle: () => void }> = (props) => (
   <button
     class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low"
     onClick={() => props.onToggle()}

@@ -24,11 +24,16 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
 
   const progressColor = createMemo(() => {
     switch (props.item.status) {
-      case 'uploading': return 'primary'
-      case 'queued': return 'secondary'
-      case 'completed': return 'tertiary'
-      case 'waiting_for_network': return 'secondary'
-      default: return 'primary'
+      case 'uploading':
+        return 'primary'
+      case 'queued':
+        return 'secondary'
+      case 'completed':
+        return 'tertiary'
+      case 'waiting_for_network':
+        return 'secondary'
+      default:
+        return 'primary'
     }
   })
 
@@ -36,11 +41,11 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
     <div class="flex flex-col mb-2 pt-2">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">
-            {props.item.priority === 0 ? 'face' : 'local_fire_department'}
-          </Icon>
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">{props.item.priority === 0 ? 'face' : 'local_fire_department'}</Icon>
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[props.item.route, props.item.segment, props.item.filename].join(' ')}</span>
+            <span class="text-body-sm font-mono truncate text-on-surface">
+              {[props.item.route, props.item.segment, props.item.filename].join(' ')}
+            </span>
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
@@ -55,20 +60,20 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
 }
 
 const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class: string }> = (props) => {
-  const uploadingCount = createMemo(() => props.loading ? undefined : props.items.filter(i => i.status === 'uploading').length)
-  const waitingCount = createMemo(() => props.loading ? undefined : props.items.filter(i => i.status === 'queued').length)
-  const queuedCount = createMemo(() => props.loading ? undefined : props.items.length)
+  const uploadingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'uploading').length))
+  const waitingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'queued').length))
+  const queuedCount = createMemo(() => (props.loading ? undefined : props.items.length))
 
   return (
     <StatisticBar
       class={props.class}
       statistics={[
-        { label: "Uploading", value: uploadingCount() },
-        { label: "Waiting", value: waitingCount() },
-        { label: "Queued", value: queuedCount() },
+        { label: 'Uploading', value: uploadingCount() },
+        { label: 'Waiting', value: waitingCount() },
+        { label: 'Queued', value: queuedCount() },
       ]}
     />
-  );
+  )
 }
 
 const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: string; offline?: boolean }> = (props) => {
@@ -136,7 +141,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
         </Show>
       </Transition>
     </div>
-  );
+  )
 }
 
 const UploadQueue: Component<UploadQueueProps> = (props) => {
@@ -146,32 +151,28 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto">
-            <QueueStatistics loading={loading()} items={items()} class="p-4" />
+          <QueueStatistics loading={loading()} items={items()} class="p-4" />
         </div>
         <div class="flex p-4">
-          <Show when={!clearQueueError()} fallback={
-            <IconButton onClick={() => void clearQueue()} disabled={clearingQueue()}>error</IconButton>
-          }>
-            <IconButton 
-              class={clsx(clearingQueue() && 'animate-spin')} 
-              onClick={() => void clearQueue()} 
-              disabled={clearingQueue()}
-            >
+          <Show
+            when={!clearQueueError()}
+            fallback={
+              <IconButton onClick={() => void clearQueue()} disabled={clearingQueue()}>
+                error
+              </IconButton>
+            }
+          >
+            <IconButton class={clsx(clearingQueue() && 'animate-spin')} onClick={() => void clearQueue()} disabled={clearingQueue()}>
               {clearingQueue() ? 'progress_activity' : 'delete'}
             </IconButton>
           </Show>
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
-        <QueueList
-          loading={loading()}
-          items={items()}
-          error={error()}
-          offline={offline()}
-        />
+        <QueueList loading={loading()} items={items()} error={error()} offline={offline()} />
       </div>
     </div>
-  );
+  )
 }
 
 export default UploadQueue

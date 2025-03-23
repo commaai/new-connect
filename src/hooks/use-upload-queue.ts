@@ -15,8 +15,8 @@ const parseUploadPath = (url: string) => {
 }
 
 const processOfflineQueueData = (data: AthenaOfflineQueueItem[]): UploadItem[] =>
-  data.flatMap(item =>
-    item.params.files_data.map(file => {
+  data.flatMap((item) =>
+    item.params.files_data.map((file) => {
       const { route, segment, filename } = parseUploadPath(file.url)
       return {
         id: file.fn, // not queued yet so not ID assigned
@@ -29,11 +29,11 @@ const processOfflineQueueData = (data: AthenaOfflineQueueItem[]): UploadItem[] =
         retryCount: 0,
         status: getUploadStatus(item),
       }
-    })
+    }),
   )
 
 const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
-  data.map(item => {
+  data.map((item) => {
     const { route, segment, filename } = parseUploadPath(item.url)
     return {
       id: item.id,
@@ -44,7 +44,7 @@ const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
       progress: item.progress,
       priority: item.priority,
       retryCount: item.retry_count,
-      status: getUploadStatus(item)
+      status: getUploadStatus(item),
     }
   })
 
@@ -72,7 +72,7 @@ const getStatusPriority = (status: UploadItem['status']): number => {
 }
 
 export const useUploadQueue = (dongleId: string) => {
-  const [items, setItems] = createStore({ online: [] as UploadItem[], offline: [] as UploadItem[], })
+  const [items, setItems] = createStore({ online: [] as UploadItem[], offline: [] as UploadItem[] })
   const [loading, setLoading] = createSignal(true)
   const [onlineQueueError, setOnlineQueueError] = createSignal<string | undefined>()
   const [onlineTimeout, setOnlineTimeout] = createSignal<Timer>()
@@ -81,8 +81,8 @@ export const useUploadQueue = (dongleId: string) => {
   const [clearQueueError, setClearQueueError] = createSignal<string | undefined>()
   const [clearingQueue, setClearingQueue] = createSignal(false)
 
-  const onlinePollInterval = createMemo(() => onlineQueueError() ? 5000 : 2000)
-  const offlinePollInterval = createMemo(() => offlineQueueError() ? 10000 : 5000)
+  const onlinePollInterval = createMemo(() => (onlineQueueError() ? 5000 : 2000))
+  const offlinePollInterval = createMemo(() => (offlineQueueError() ? 10000 : 5000))
 
   const clearQueue = async (items: UploadItem[]) => {
     if (clearingQueue() || items.length === 0) return
@@ -90,7 +90,10 @@ export const useUploadQueue = (dongleId: string) => {
     setClearingQueue(true)
 
     try {
-      await cancelUpload(dongleId, items.map(item => item.id))
+      await cancelUpload(
+        dongleId,
+        items.map((item) => item.id),
+      )
     } catch (err) {
       console.error('Error clearing queue:', err)
       setClearQueueError(`Error clearing queue: ${err}`)

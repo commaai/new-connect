@@ -57,7 +57,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
               width: `${props.progress * 100}%`,
             }}
           />
-          <div 
+          <div
             class="absolute inset-y-0 left-0 h-1 overflow-hidden"
             style={{
               width: `${props.progress * 100}%`,

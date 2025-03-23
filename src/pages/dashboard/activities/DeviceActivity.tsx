@@ -133,8 +133,8 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             )}
             onClick={() => setExpanded(!expanded())}
           >
-            <Icon class={clsx(expanded() ? "text-yellow-400" : "text-zinc-500")}>
-              {expanded() ? "keyboard_arrow_up" : "keyboard_arrow_down"}
+            <Icon class={clsx(expanded() ? 'text-yellow-400' : 'text-zinc-500')}>
+              {expanded() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
             </Icon>
           </button>
         </div>
@@ -170,9 +170,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         </div>
         <div class="flex flex-col gap-2">
           <span class="text-label-sm uppercase">Routes</span>
-            <Suspense>
-              <RouteList dongleId={props.dongleId} />
-            </Suspense>
+          <Suspense>
+            <RouteList dongleId={props.dongleId} />
+          </Suspense>
         </div>
       </div>
     </>
