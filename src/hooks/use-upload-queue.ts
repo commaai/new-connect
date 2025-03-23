@@ -19,7 +19,7 @@ const formatProgress = (item: AthenaOnlineUploadQueueItem | AthenaOfflineQueueIt
   return 0
 }
 
-const processOfflineQueueData = (data: AthenaOfflineQueueItem<unknown>[]): UploadItem[] =>
+const mapOfflineQueue = (data: AthenaOfflineQueueItem<unknown>[]): UploadItem[] =>
   data
     .filter((item) => item.method === 'uploadFilesToUrls')
     .flatMap((item) =>
@@ -27,7 +27,7 @@ const processOfflineQueueData = (data: AthenaOfflineQueueItem<unknown>[]): Uploa
         const { route, segment, filename } = parseUploadPath(file.url)
         const progress = formatProgress(item)
         return {
-          id: file.fn, // not queued yet so not ID assigned
+          id: file.url,
           route,
           segment,
           filename,
@@ -40,7 +40,7 @@ const processOfflineQueueData = (data: AthenaOfflineQueueItem<unknown>[]): Uploa
       }),
     )
 
-const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
+const mapOnineQueue = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
   data.map((item) => {
     const { route, segment, filename } = parseUploadPath(item.url)
     const progress = formatProgress(item)
@@ -117,7 +117,7 @@ export const useUploadQueue = (dongleId: string) => {
 
     try {
       const response = await getUploadQueue(dongleId)
-      setItems('online', reconcile(mapQueueData(response.result!)))
+      setItems('online', reconcile(mapOnineQueue(response.result!)))
       setOnlineQueueError(undefined)
     } catch (err) {
       if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
@@ -138,7 +138,7 @@ export const useUploadQueue = (dongleId: string) => {
 
     try {
       const offlineData = await getAthenaOfflineQueue(dongleId)
-      setItems('offline', reconcile(processOfflineQueueData(offlineData)))
+      setItems('offline', reconcile(mapOfflineQueue(offlineData)))
       setOfflineQueueError(undefined)
     } catch (err) {
       console.debug('Error polling offline queue:', err)
@@ -162,6 +162,8 @@ export const useUploadQueue = (dongleId: string) => {
 
   const sortedItems = createMemo(() => {
     const allItems = [...items.offline, ...(offline() ? [] : items.online)]
+
+    console.log(allItems)
 
     return allItems.sort((a, b) => {
       const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status)

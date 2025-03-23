@@ -3,13 +3,13 @@ import { For, Show, createMemo } from 'solid-js'
 import { Transition, TransitionGroup } from 'solid-transition-group'
 import type { Component } from 'solid-js'
 
+import { COMMA_CONNECT_PRIORITY } from '~/api/athena'
 import Icon from '~/components/material/Icon'
 import LinearProgress from '~/components/material/LinearProgress'
 import IconButton from '~/components/material/IconButton'
 import StatisticBar from '~/components/material/StatisticBar'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 import { UploadItem } from '~/types'
-import { COMMA_CONNECT_PRIORITY } from '~/api/athena'
 
 interface UploadQueueProps {
   dongleId: string
@@ -63,10 +63,10 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
   )
 }
 
-const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class: string }> = (props) => {
-  const uploadingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'uploading').length))
-  const waitingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'queued').length))
-  const totalCount = createMemo(() => (props.loading ? undefined : props.items.length))
+const QueueStatistics: Component<{ loading: boolean; items: () => UploadItem[]; class: string }> = (props) => {
+  const uploadingCount = createMemo(() => (props.loading ? undefined : props.items().filter((i) => i.status === 'uploading').length))
+  const waitingCount = createMemo(() => (props.loading ? undefined : props.items().filter((i) => i.status === 'queued').length))
+  const totalCount = createMemo(() => (props.loading ? undefined : props.items().length))
 
   return (
     <StatisticBar
@@ -80,17 +80,17 @@ const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class:
   )
 }
 
-const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: string; offline?: boolean }> = (props) => {
+const QueueList: Component<{ loading: boolean; items: () => UploadItem[]; error?: string; offline?: boolean }> = (props) => {
   return (
     <div class="relative h-[calc(8*2.25rem)]">
       <Transition
-        enterActiveClass="transition-all duration-300 ease-in-out"
-        exitActiveClass="transition-all duration-300 ease-in-out"
+        appear
+        enterActiveClass="transition-all duration-250 ease-in-out"
+        exitActiveClass="transition-all duration-250 ease-in-out"
         enterClass="opacity-0"
         enterToClass="opacity-100"
         exitClass="opacity-100"
         exitToClass="opacity-0"
-        appear={true}
       >
         <Show
           when={!props.loading}
@@ -101,7 +101,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
           }
         >
           <Show
-            when={!(props.offline && props.items.length === 0)}
+            when={!(props.offline && props.items().length === 0)}
             fallback={
               <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                 <Icon name="signal_disconnected" />
@@ -110,7 +110,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
             }
           >
             <Show
-              when={props.items.length > 0}
+              when={props.items().length > 0}
               fallback={
                 <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                   <Icon name="cloud_done" />
@@ -119,26 +119,26 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
               }
             >
               <div class="absolute inset-0 overflow-y-auto hide-scrollbar">
-                <TransitionGroup
-                  name="list"
-                  enterActiveClass="transition-all duration-300 ease-in-out"
-                  exitActiveClass="transition-all duration-300 ease-in-out"
-                  enterClass="opacity-0 transform translate-x-4"
-                  enterToClass="opacity-100 transform translate-x-0"
-                  exitClass="opacity-100 transform translate-x-0"
-                  exitToClass="opacity-0 transform -translate-x-4"
-                  moveClass="transition-transform duration-300"
-                >
-                  <div class="space-y-[-0.75rem]">
-                    <For each={props.items}>
+                <div class="space-y-[-0.75rem]">
+                  <TransitionGroup
+                    name="list"
+                    enterActiveClass="transition-all duration-300 ease-in-out"
+                    exitActiveClass="transition-all duration-300 ease-in-out"
+                    enterClass="opacity-0 transform translate-x-4"
+                    enterToClass="opacity-100 transform translate-x-0"
+                    exitClass="opacity-100 transform translate-x-0"
+                    exitToClass="opacity-0 transform -translate-x-4"
+                    moveClass="transition-transform duration-300"
+                  >
+                    <For each={props.items()}>
                       {(item) => (
-                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.id}>
+                        <div class="py-1 bg-surface-container-lowest rounded-md px-2">
                           <QueueItem item={item} />
                         </div>
                       )}
                     </For>
-                  </div>
-                </TransitionGroup>
+                  </TransitionGroup>
+                </div>
               </div>
             </Show>
           </Show>
@@ -155,7 +155,7 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto">
-          <QueueStatistics loading={loading()} items={items()} class="p-4" />
+          <QueueStatistics loading={loading()} items={items} class="p-4" />
         </div>
         <div class="flex p-4">
           <Show
@@ -172,7 +172,7 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
-        <QueueList loading={loading()} items={items()} error={error()} offline={offline()} />
+        <QueueList loading={loading()} items={items} error={error()} offline={offline()} />
       </div>
     </div>
   )
