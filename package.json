@@ -15,7 +15,8 @@
     "dev": "vite",
     "serve": "vite prefix",
     "lines": "bun src/ci/check_lines.ts",
-    "lint": "biome lint",
+    "check": "biome check",
+    "fix": "biome check --write",
     "test": "vitest run"
   },
   "packageManager": "bun@1.2.5",
