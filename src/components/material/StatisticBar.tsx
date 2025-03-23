@@ -1,7 +1,7 @@
 import clsx from "clsx"
 import { For, Show, VoidComponent } from "solid-js"
 
-interface StatisticWithActionBarProps {
+interface StatisticBarProps {
   class?: string
   statistics: {
     label: string
@@ -9,7 +9,7 @@ interface StatisticWithActionBarProps {
   }[]
 }
 
-const StatisticBar: VoidComponent<StatisticWithActionBarProps> = (props) => {
+const StatisticBar: VoidComponent<StatisticBarProps> = (props) => {
   return (
     <div class="flex flex-col">
       <div
@@ -23,13 +23,9 @@ const StatisticBar: VoidComponent<StatisticWithActionBarProps> = (props) => {
               </span>
               <Show
                 when={statistic.value !== undefined}
-                fallback={
-                  <div class="h-5 w-auto skeleton-loader bg-surface-container-low rounded-sm"></div>
-                }
+                fallback={<div class="h-5 w-auto skeleton-loader bg-surface-container-low rounded-sm"></div>}
               >
-                <span class="font-mono text-label-lg uppercase">
-                  {statistic.value?.toString()}
-                </span>
+                <span class="font-mono text-label-lg uppercase">{statistic.value?.toString()}</span>
               </Show>
             </div>
           )}

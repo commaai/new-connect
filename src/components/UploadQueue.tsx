@@ -1,10 +1,11 @@
-import { For, Show, createMemo, Suspense } from 'solid-js'
+import { For, Show, createMemo } from 'solid-js'
 import { Transition, TransitionGroup } from 'solid-transition-group'
 import type { Component } from 'solid-js'
-import Icon from './material/Icon'
-import LinearProgress from './material/LinearProgress'
-import IconButton from './material/IconButton'
-import StatisticBar from './material/StatisticBar'
+
+import Icon from '~/components/material/Icon'
+import LinearProgress from '~/components/material/LinearProgress'
+import IconButton from '~/components/material/IconButton'
+import StatisticBar from '~/components/material/StatisticBar'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 import { UploadItem } from '~/types'
 
@@ -182,9 +183,7 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto">
-          <Suspense fallback={<div class="skeleton-loader w-full" />}>
             <QueueStatistics loading={loading()} items={items()} class="p-4" />
-          </Suspense>
         </div>
         <div class="flex p-4">
           <IconButton onClick={() => void clearQueue()}>delete</IconButton>
