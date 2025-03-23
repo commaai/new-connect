@@ -42,9 +42,10 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
     <div class="flex flex-col mb-2 pt-2">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">
-            {props.item.priority === COMMA_CONNECT_PRIORITY ? 'face' : 'local_fire_department'}
-          </Icon>
+          <Icon
+            class="text-on-surface-variant flex-shrink-0 mr-2"
+            name={props.item.priority === COMMA_CONNECT_PRIORITY ? 'face' : 'local_fire_department'}
+          />
           <div class="flex min-w-0 gap-1">
             <span class="text-body-sm font-mono truncate text-on-surface">
               {[props.item.route, props.item.segment, props.item.filename].join(' ')}
@@ -95,7 +96,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
           when={!props.loading}
           fallback={
             <div class="flex justify-center items-center h-full animate-spin absolute inset-0">
-              <Icon>progress_activity</Icon>
+              <Icon name="progress_activity" />
             </div>
           }
         >
@@ -103,7 +104,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
             when={!(props.offline && props.items.length === 0)}
             fallback={
               <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
-                <Icon>signal_disconnected</Icon>
+                <Icon name="signal_disconnected" />
                 <span>{props.error}</span>
               </div>
             }
@@ -112,7 +113,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
               when={props.items.length > 0}
               fallback={
                 <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
-                  <Icon>cloud_done</Icon>
+                  <Icon name="cloud_done" />
                   <span>No files in queue</span>
                 </div>
               }
@@ -159,15 +160,14 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
         <div class="flex p-4">
           <Show
             when={!clearQueueError()}
-            fallback={
-              <IconButton onClick={() => void clearQueue()} disabled={clearingQueue()}>
-                error
-              </IconButton>
-            }
+            fallback={<IconButton name="error" onClick={() => void clearQueue()} disabled={clearingQueue()} />}
           >
-            <IconButton class={clsx(clearingQueue() && 'animate-spin')} onClick={() => void clearQueue()} disabled={clearingQueue()}>
-              {clearingQueue() ? 'progress_activity' : 'delete'}
-            </IconButton>
+            <IconButton
+              class={clsx(clearingQueue() && 'animate-spin')}
+              name={clearingQueue() ? 'progress_activity' : 'delete'}
+              onClick={() => void clearQueue()}
+              disabled={clearingQueue()}
+            />
           </Show>
         </div>
       </div>
