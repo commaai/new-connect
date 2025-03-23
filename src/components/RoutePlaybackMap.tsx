@@ -250,7 +250,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       // Visible line for display
       const visibleRouteLine = Leaflet.polyline(latLngs, {
         color: "#DFDFFE",
-        weight: 6,
+        weight: 5,
         opacity: 0.8,
       }).addTo(currentMap);
       // Wider, invisible line for touch
