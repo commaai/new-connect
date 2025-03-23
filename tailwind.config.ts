@@ -250,7 +250,7 @@ export default {
         indeterminate2: 'indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite',
         'circular-rotate': 'circular-rotate 1.4s linear infinite',
         'circular-dash': 'circular-dash 1.4s ease-in-out infinite',
-        shimmer: 'shimmer 2s infinite',
+        shimmer: 'shimmer 1s infinite',
       },
       transitionProperty: {
         indeterminate: 'transform, background-color',

@@ -58,7 +58,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
             }}
           />
           <div
-            class="absolute inset-y-0 left-0 h-1 overflow-hidden"
+            class="absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear overflow-hidden"
             style={{
               width: `${props.progress * 100}%`,
             }}
