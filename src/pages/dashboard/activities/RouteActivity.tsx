@@ -1,11 +1,6 @@
-import {
-  createResource,
-  createSignal,
-  lazy,
-  Suspense,
-  type VoidComponent,
-} from 'solid-js'
+import { createResource, createSignal, lazy, onMount, Suspense, type VoidComponent } from 'solid-js'
 
+import { setRouteViewed } from '~/api/athena'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
 
@@ -37,6 +32,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
+
+  onMount(async () => {
+    // FIXME: don't send for shared devices, unless superuser
+    await setRouteViewed(props.dongleId, props.dateStr)
+  })
 
   return (
     <>
