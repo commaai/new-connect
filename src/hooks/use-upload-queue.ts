@@ -2,7 +2,7 @@ import { createSignal, createMemo, onCleanup, onMount } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { getAthenaOfflineQueue } from '~/api/devices'
-import type { UploadItem } from '~/types'
+import type { UploadFilesToUrlsRequest, UploadItem } from '~/types'
 import { UploadQueueItem as AthenaOnlineUploadQueueItem, AthenaOfflineQueueItem } from '~/types'
 
 const parseUploadPath = (url: string) => {
@@ -14,29 +14,31 @@ const parseUploadPath = (url: string) => {
   return { route, segment, filename }
 }
 
-const formatProgress = (item: AthenaOnlineUploadQueueItem | AthenaOfflineQueueItem) => {
+const formatProgress = (item: AthenaOnlineUploadQueueItem | AthenaOfflineQueueItem<unknown>) => {
   if ('current' in item) return Math.round(item.progress * 100)
   return 0
 }
 
-const processOfflineQueueData = (data: AthenaOfflineQueueItem[]): UploadItem[] =>
-  data.flatMap((item) =>
-    item.params.files_data.map((file) => {
-      const { route, segment, filename } = parseUploadPath(file.url)
-      const progress = formatProgress(item)
-      return {
-        id: file.fn, // not queued yet so not ID assigned
-        route,
-        segment,
-        filename,
-        uploadUrl: file.url,
-        progress,
-        priority: file.priority,
-        retryCount: 0,
-        status: getUploadStatus(item, progress),
-      }
-    }),
-  )
+const processOfflineQueueData = (data: AthenaOfflineQueueItem<unknown>[]): UploadItem[] =>
+  data
+    .filter((item) => item.method === 'uploadFilesToUrls')
+    .flatMap((item) =>
+      (item as AthenaOfflineQueueItem<UploadFilesToUrlsRequest>).params.files_data.map((file) => {
+        const { route, segment, filename } = parseUploadPath(file.url)
+        const progress = formatProgress(item)
+        return {
+          id: file.fn, // not queued yet so not ID assigned
+          route,
+          segment,
+          filename,
+          uploadUrl: file.url,
+          progress,
+          priority: file.priority,
+          retryCount: 0,
+          status: getUploadStatus(item, progress),
+        }
+      }),
+    )
 
 const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
   data.map((item) => {
@@ -55,7 +57,7 @@ const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
     }
   })
 
-const getUploadStatus = (item: AthenaOnlineUploadQueueItem | AthenaOfflineQueueItem, progress: number): UploadItem['status'] => {
+const getUploadStatus = (item: AthenaOnlineUploadQueueItem | AthenaOfflineQueueItem<unknown>, progress: number): UploadItem['status'] => {
   if ('current' in item) {
     if (progress === 100) return 'completed'
     if (item.current) return 'uploading'
