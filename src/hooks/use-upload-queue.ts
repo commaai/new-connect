@@ -110,8 +110,7 @@ export const useUploadQueue = (dongleId: string) => {
   }
 
   const pollOnlineQueue = async () => {
-    const currentTimeout = onlineTimeout()
-    if (currentTimeout) clearTimeout(currentTimeout)
+    if (onlineTimeout()) clearTimeout(onlineTimeout())
     setOnlineTimeout(undefined)
 
     try {
@@ -132,8 +131,7 @@ export const useUploadQueue = (dongleId: string) => {
   }
 
   const pollOfflineQueue = async () => {
-    const currentTimeout = offlineTimeout()
-    if (currentTimeout) clearTimeout(currentTimeout)
+    if (offlineTimeout()) clearTimeout(offlineTimeout())
     setOfflineTimeout(undefined)
 
     try {
