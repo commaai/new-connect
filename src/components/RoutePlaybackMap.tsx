@@ -247,14 +247,21 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       const latLngs = gpsPoints.map(
         (point) => [point.lat, point.lng] as Leaflet.LatLngExpression
       );
-      const polyline = Leaflet.polyline(latLngs, {
+      // Visible line for display
+      const visibleRouteLine = Leaflet.polyline(latLngs, {
         color: "#DFDFFE",
         weight: 6,
         opacity: 0.8,
       }).addTo(currentMap);
+      // Wider, invisible line for touch
+      const touchRouteLine = Leaflet.polyline(latLngs, {
+        color: "#FF0000",  // Red for debugging
+        weight: 20,  // Wider line for easier touch
+        opacity: 0   // Completely transparent
+      }).addTo(currentMap);
 
-      // Add click event listener to the polyline
-      polyline.on('click', (e) => {
+      // Add click event listener to the invisible line
+      touchRouteLine.on('click', (e) => {
         const clickedLatLng = e.latlng;
         const closestPoint = findClosestPointToLatLng(gpsPoints, clickedLatLng);
         if (closestPoint) {
@@ -262,10 +269,10 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
         }
       });
 
-      setRoutePath(polyline);
+      setRoutePath(visibleRouteLine);
 
       // Fit map to route bounds
-      currentMap.fitBounds(polyline.getBounds(), { padding: [20, 20] });
+      currentMap.fitBounds(visibleRouteLine.getBounds(), { padding: [20, 20] });
 
       // Create position marker at initial position
       const initialMarker = Leaflet.marker(
