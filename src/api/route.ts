@@ -21,8 +21,7 @@ export const getRouteWithSegments = async (routeName: Route['fullname']) => {
   return routes[0]
 }
 
-export const getRouteShareSignature = (routeName: string): Promise<RouteShareSignature> =>
-  fetcher(`/v1/route/${routeName}/share_signature`)
+export const getRouteShareSignature = (routeName: string): Promise<RouteShareSignature> => fetcher(`/v1/route/${routeName}/share_signature`)
 
 export const createQCameraStreamUrl = (routeName: Route['fullname'], signature: RouteShareSignature): string =>
   `${BASE_URL}/v1/route/${routeName}/qcamera.m3u8?${new URLSearchParams(signature).toString()}`
@@ -39,8 +38,7 @@ export const setRoutePublic = (routeName: string, isPublic: boolean): Promise<Ro
     body: JSON.stringify({ is_public: isPublic }),
   })
 
-export const getPreservedRoutes = (dongleId: string): Promise<Route[]> =>
-  fetcher<Route[]>(`/v1/devices/${dongleId}/routes/preserved`)
+export const getPreservedRoutes = (dongleId: string): Promise<Route[]> => fetcher<Route[]>(`/v1/devices/${dongleId}/routes/preserved`)
 
 export const setRoutePreserved = (routeName: string, preserved: boolean): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/preserve`, { method: preserved ? 'POST' : 'DELETE' })

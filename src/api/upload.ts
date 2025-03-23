@@ -44,12 +44,7 @@ const prepareUploadRequests = (paths: string[], presignedUrls: UploadFileMetadat
 export const uploadAllSegments = (routeName: string, totalSegments: number, types?: FileType[]) =>
   uploadSegments(routeName, 0, totalSegments - 1, types)
 
-export const uploadSegments = async (
-  routeName: string,
-  segmentStart: number,
-  segmentEnd: number,
-  types?: FileType[],
-) => {
+export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, types?: FileType[]) => {
   const routeInfo = parseRouteName(routeName)
   const alreadyUploadedFiles = await getFiles(routeName, types)
   const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles, types)

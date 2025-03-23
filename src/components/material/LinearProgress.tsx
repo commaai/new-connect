@@ -51,10 +51,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
         </>
       ) : (
         <div
-          class={clsx(
-            'absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear',
-            barColourClass(),
-          )}
+          class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', barColourClass())}
           style={{
             width: `${props.progress * 100}%`,
           }}

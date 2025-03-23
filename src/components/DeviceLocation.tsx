@@ -210,12 +210,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
           <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
           <Button
             color="secondary"
-            onClick={() =>
-              window.open(
-                `https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`,
-                '_blank',
-              )
-            }
+            onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
             trailing={<Icon size="20">open_in_new</Icon>}
           >
             Open in Maps

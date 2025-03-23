@@ -56,10 +56,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
     >
       <svg class="block" viewBox={`${SIZE / 2} ${SIZE / 2} ${SIZE} ${SIZE}`}>
         <circle
-          class={clsx(
-            'stroke-current',
-            props.progress === undefined ? 'animate-circular-dash' : 'transition-[stroke-dashoffset]',
-          )}
+          class={clsx('stroke-current', props.progress === undefined ? 'animate-circular-dash' : 'transition-[stroke-dashoffset]')}
           style={circleStyle()}
           cx={SIZE}
           cy={SIZE}

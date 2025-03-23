@@ -33,12 +33,7 @@ type NavigationBarProps = {
 
 const NavigationBar: ParentComponent<NavigationBarProps> = (props) => {
   return (
-    <div
-      class={clsx(
-        'pb-safe elevation-2 z-20 flex h-20 w-full flex-row gap-x-2 bg-surface text-on-surface',
-        props.className,
-      )}
-    >
+    <div class={clsx('pb-safe elevation-2 z-20 flex h-20 w-full flex-row gap-x-2 bg-surface text-on-surface', props.className)}>
       {props.children}
     </div>
   )

@@ -1,14 +1,4 @@
-import {
-  createEffect,
-  createResource,
-  createSignal,
-  For,
-  Index,
-  onCleanup,
-  onMount,
-  Suspense,
-  type VoidComponent,
-} from 'solid-js'
+import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
@@ -40,11 +30,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 
   return (
-    <Card
-      class="max-w-none"
-      href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
-      activeClass="md:before:bg-primary"
-    >
+    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
           <div class="flex gap-2">
@@ -124,9 +110,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           return (
             <Suspense
               fallback={
-                <Index each={new Array(pageSize())}>
-                  {() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}
-                </Index>
+                <Index each={new Array(pageSize())}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
               <For each={routes()}>{(route) => <RouteCard route={route} />}</For>

@@ -63,9 +63,7 @@ type ListProps = {
 }
 
 const List: ParentComponent<ListProps> = (props) => {
-  return (
-    <div class={clsx('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
-  )
+  return <div class={clsx('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
 }
 
 export default List

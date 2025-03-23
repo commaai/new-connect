@@ -62,10 +62,7 @@ type CardProps = {
 const Card: ParentComponent<CardProps> = (props) => {
   const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface'
   return (
-    <Show
-      when={props.onClick || props.href}
-      fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}
-    >
+    <Show when={props.onClick || props.href} fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}>
       <ButtonBase
         class={clsx(cardStyle, (props.href || props.onClick) && 'state-layer', props.class)}
         onClick={props.onClick}

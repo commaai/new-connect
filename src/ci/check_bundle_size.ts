@@ -28,18 +28,13 @@ files.sort((a, b) => b.compressedSize - a.compressedSize)
 const totalSizeKB = (files.reduce((acc, file) => acc + file.size, 0) / 1024).toFixed(2)
 const totalCompressedSize = files.reduce((acc, file) => acc + file.compressedSize, 0)
 const totalCompressedSizeKB = (totalCompressedSize / 1024).toFixed(2)
-files.push(
-  { path: '', sizeKB: '', compressedSizeKB: '' },
-  { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalCompressedSizeKB },
-)
+files.push({ path: '', sizeKB: '', compressedSizeKB: '' }, { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalCompressedSizeKB })
 console.table(files, ['path', 'sizeKB', 'compressedSizeKB'])
 
 const lowerBoundKB = 200
 const upperBoundKB = 250
 if (totalCompressedSize < lowerBoundKB * 1024) {
-  console.warn(
-    `Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`,
-  )
+  console.warn(`Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`)
   process.exit(1)
 } else if (totalCompressedSize > upperBoundKB * 1024) {
   console.warn(`Exceeded bundle size limit! (${totalCompressedSizeKB}KB > ${upperBoundKB}KB)`)

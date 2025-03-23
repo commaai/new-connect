@@ -101,10 +101,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar
-        leading={<DrawerToggleButton />}
-        trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}
-      >
+      <TopAppBar leading={<DrawerToggleButton />} trailing={<IconButton href={`/${props.dongleId}/settings`}>settings</IconButton>}>
         {deviceName()}
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
