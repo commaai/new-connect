@@ -75,7 +75,6 @@
     "dayjs": "^1.11.13",
     "hls.js": "^1.5.20",
     "leaflet": "^1.9.4",
-    "leaflet-gesture-handling": "^1.2.2",
     "qr-scanner": "^1.4.2",
     "solid-js": "^1.9.5"
   },

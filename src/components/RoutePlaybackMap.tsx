@@ -9,11 +9,7 @@ import {
 } from "solid-js";
 import { render } from "solid-js/web";
 import Leaflet, { type MapOptions } from "leaflet";
-import { GestureHandling } from "leaflet-gesture-handling";
 import clsx from "clsx";
-
-import "leaflet/dist/leaflet.css";
-import "leaflet-gesture-handling/dist/leaflet-gesture-handling.css";
 
 import { GPSPathPoint, getCoords } from "~/api/derived";
 import CircularProgress from "~/components/material/CircularProgress";
@@ -22,8 +18,6 @@ import type { Route } from "~/types";
 
 import Icon from "./material/Icon";
 import IconButton from "./material/IconButton";
-
-Leaflet.Map.addInitHook("addHandler", "gestureHandling", GestureHandling);
 
 type RoutePlaybackMapProps = {
   class?: string;
@@ -34,12 +28,20 @@ type RoutePlaybackMapProps = {
 
 const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   let mapRef!: HTMLDivElement;
+  let mapContainerRef!: HTMLDivElement;
   const [map, setMap] = createSignal<Leaflet.Map | null>(null);
   const [routePath, setRoutePath] = createSignal<Leaflet.Polyline | null>(null);
   const [marker, setMarker] = createSignal<Leaflet.Marker | null>(null); // The marker for the current replay time
   const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(null); // The vehicle marker icon
   const [shouldInitMap, setShouldInitMap] = createSignal(false); // Whether the map should be initialized (wait until mount to avoid lag)
   const [autoTracking, setAutoTracking] = createSignal(false); // Is auto-tracking enabled
+  
+  // Gesture handling state
+  const [showScrollMessage, setShowScrollMessage] = createSignal(false); // Showing the scroll instruction message
+  const [isModifierPressed, setIsModifierPressed] = createSignal(false); // Whether the modifier key is pressed for zooming
+  const [isMacOS, setIsMacOS] = createSignal(false);
+  const [isTouchDevice, setIsTouchDevice] = createSignal(false);
+  const [isPointerOverMap, setIsPointerOverMap] = createSignal(false);
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords);
@@ -61,9 +63,40 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Fallback: initialize after 1.5 seconds even if not visible
     const timeout = setTimeout(() => setShouldInitMap(true), 1500);
 
+    // Detect OS for handling modifier keys
+    setIsMacOS(navigator.platform.toUpperCase().indexOf('MAC') >= 0);
+    
+    // Detect if we're on a touch device
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0);
+
+    // Set up key event listeners for modifier keys (Ctrl/Cmd)
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.ctrlKey || (isMacOS() && e.metaKey)) {
+        setIsModifierPressed(true);
+      }
+    };
+
+    const handleKeyUp = (e: KeyboardEvent) => {
+      if (!(e.ctrlKey || (isMacOS() && e.metaKey))) {
+        setIsModifierPressed(false);
+      }
+    };
+
+    // When window loses focus, reset the modifier key state
+    const handleBlur = () => {
+      setIsModifierPressed(false);
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('keyup', handleKeyUp);
+    window.addEventListener('blur', handleBlur);
+
     onCleanup(() => {
       observer.disconnect();
       clearTimeout(timeout);
+      window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('keyup', handleKeyUp);
+      window.removeEventListener('blur', handleBlur);
     });
   });
 
@@ -78,8 +111,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       layers: [tileLayer],
       attributionControl: false,
       zoomControl: true,
-      gestureHandling: true,
-    } as MapOptions & { gestureHandling?: boolean });
+      scrollWheelZoom: false, // Disable default scroll wheel zoom
+      dragging: true,
+    } as MapOptions);
 
     // Set a default view if no coordinates are available yet
     leafletMap.setView([0, 0], 10);
@@ -98,12 +132,85 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Monitor resize events to prevent gray tiles
     const observer = new ResizeObserver(() => leafletMap.invalidateSize());
     observer.observe(mapRef);
+    
+    // Track mouse position relative to map
+    const handleMouseEnter = () => setIsPointerOverMap(true);
+    const handleMouseLeave = () => setIsPointerOverMap(false);
+    mapContainerRef.addEventListener('mouseenter', handleMouseEnter);
+    mapContainerRef.addEventListener('mouseleave', handleMouseLeave);
+
+    // Custom wheel event handler for the map
+    const handleWheel = (e: WheelEvent) => {
+      // Only handle events when pointer is over the map
+      if (!isPointerOverMap()) return;
+      if (isModifierPressed()) {
+        // Allow zooming when modifier key is pressed
+        e.preventDefault(); // Prevent browser zoom
+        e.stopPropagation();
+        setShowScrollMessage(false);
+        
+        // Get the current map center and zoom
+        const currentCenter = leafletMap.getCenter();
+        const currentZoom = leafletMap.getZoom();
+
+        // Get mouse position in pixels
+        const containerPoint = leafletMap.mouseEventToContainerPoint(e);
+        // Get the geographic point under the cursor
+        const targetPoint = leafletMap.containerPointToLatLng(containerPoint);
+        
+        // Calculate new zoom level
+        const zoomDelta = e.deltaY > 0 ? -1 : 1;
+        const newZoom = Math.max(
+          leafletMap.getMinZoom(),
+          Math.min(leafletMap.getMaxZoom(), currentZoom + zoomDelta)
+        );
+        
+        // Calculate the scale factor between the old and new zoom
+        const scale = Math.pow(2, newZoom - currentZoom);
+        
+        // Calculate a new center that will keep the cursor point in place
+        // For zoom in: move center toward cursor, for zoom out: move away
+        const newCenter = Leaflet.latLng(
+          targetPoint.lat - (targetPoint.lat - currentCenter.lat) / scale,
+          targetPoint.lng - (targetPoint.lng - currentCenter.lng) / scale
+        );
+
+        // Apply the new zoom and center in a single operation
+        leafletMap.setView(newCenter, newZoom, { animate: true });
+      } else {
+        setShowScrollMessage(true);
+        // Hide message after a delay
+        clearTimeout(messageTimeout);
+        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000);
+      }
+    };
+    
+    let messageTimeout: NodeJS.Timer
+
+    const handleTouchMove = (e: TouchEvent) => {
+      if (e.touches.length === 1) {
+        // Single finger
+        leafletMap.dragging.disable(); // Disable dragging
+        setShowScrollMessage(true);
+        // Hide message after a delay
+        clearTimeout(messageTimeout);
+        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000);
+      } else {
+        leafletMap.dragging.enable(); // Enable dragging
+        setShowScrollMessage(false);
+      }
+    };
+
+    // Use capture phase for wheel to catch events before they propagate
+    mapContainerRef.addEventListener('wheel', handleWheel, { passive: false });
+    mapContainerRef.addEventListener('touchmove', handleTouchMove, { passive: true });
 
     // Disable tracking when user drags the map
     leafletMap.on("drag", () => {
       if (autoTracking()) {
         setAutoTracking(false);
       }
+      setShowScrollMessage(false);
     });
 
     // Center marker when user zooms the map
@@ -117,6 +224,11 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       observer.disconnect();
       if (routePath()) routePath()!.remove();
       if (marker()) marker()!.remove();
+      mapContainerRef.removeEventListener('wheel', handleWheel, { capture: true });
+      mapContainerRef.removeEventListener('touchmove', handleTouchMove);
+      mapContainerRef.removeEventListener('mouseenter', handleMouseEnter);
+      mapContainerRef.removeEventListener('mouseleave', handleMouseLeave);
+      clearTimeout(messageTimeout);
       leafletMap.remove();
     });
   });
@@ -220,9 +332,39 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     }
   };
 
+  // Get the instruction message based on device type
+  const getScrollMessage = () => {
+    if (isTouchDevice()) {
+      return "Use two fingers to pan and zoom";
+    } else {
+      return `Use ${isMacOS() ? '⌘ Cmd' : 'Ctrl'} + scroll to zoom`;
+    }
+  };
+
   return (
-    <div class={clsx("relative h-full rounded-lg overflow-hidden", props.class)}>
+    <div 
+      ref={mapContainerRef}
+      class={clsx("relative h-full rounded-lg overflow-hidden", props.class)}
+    >
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
+        {/* Scroll instruction overlay */}
+        <Show when={showScrollMessage()}>
+
+
+          {/* Dark overlay for the entire map - add animate-in fade-in */}
+          <div class="absolute inset-0 z-[5400] bg-black bg-opacity-30 transition-opacity duration-200 animate-in fade-in"></div>
+          
+
+
+          {/* Enhanced message styling - make semi-transparent with bg-opacity-90 */}
+          <div class="absolute left-1/2 top-12 z-[5500] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-xl bg-surface-container-high bg-opacity-90 backdrop-blur-sm px-6 py-3 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+            <Icon class="mr-3 text-primary" size="24">
+              {isTouchDevice() ? "touch_app" : "mouse"}
+            </Icon>
+            <span class="text-md font-medium">{getScrollMessage()}</span>
+          </div>
+        </Show>
+
         {/* Toggle auto tracking button */}
         <div class="absolute bottom-4 right-4 z-[5000]">
           <IconButton
