@@ -66,7 +66,7 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
 const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class: string }> = (props) => {
   const uploadingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'uploading').length))
   const waitingCount = createMemo(() => (props.loading ? undefined : props.items.filter((i) => i.status === 'queued').length))
-  const queuedCount = createMemo(() => (props.loading ? undefined : props.items.length))
+  const totalCount = createMemo(() => (props.loading ? undefined : props.items.length))
 
   return (
     <StatisticBar
@@ -74,7 +74,7 @@ const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class:
       statistics={[
         { label: 'Uploading', value: uploadingCount() },
         { label: 'Waiting', value: waitingCount() },
-        { label: 'Queued', value: queuedCount() },
+        { label: 'Queued', value: totalCount() },
       ]}
     />
   )
