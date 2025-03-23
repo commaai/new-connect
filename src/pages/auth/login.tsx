@@ -2,6 +2,7 @@ import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
 import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
+import Icon from '~/components/material/Icon'
 
 const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
 
@@ -86,13 +87,8 @@ export default function Login() {
         </div>
 
         <Button
-          class="gap-4"
           onclick={loginAsDemoUser}
-          trailing={
-            <span class="material-symbols-outlined icon-outline">
-              chevron_right
-            </span>
-          }
+          trailing={<Icon>chevron_right</Icon>}
         >
           Try the demo
         </Button>

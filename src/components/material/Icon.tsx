@@ -8,6 +8,13 @@ export type IconProps = {
   size?: '20' | '24' | '40' | '48'
 }
 
+/**
+ * Use an icon from the Material Symbols library.
+ *
+ * Note: Icon names <strong>must</strong> be added to the icons list in vite.config.ts.
+ *
+ * @see https://fonts.google.com/icons
+ */
 const Icon: Component<IconProps> = (props) => {
   // size-20, 24 etc. defined in root.css
   const size = () => `size-${props.size || '24'}`
