@@ -201,9 +201,15 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       }
     };
 
+    const handleTouchEnd = () => {
+      clearTimeout(messageTimeout);
+      setShowScrollMessage(false); // Hide immediately on touch end to avoid showing after finishing a drag and releasing one finger before the other (it still shows until you release the second finger)
+    };
+
     // Use capture phase for wheel to catch events before they propagate
     mapContainerRef.addEventListener('wheel', handleWheel, { passive: false });
     mapContainerRef.addEventListener('touchmove', handleTouchMove, { passive: true });
+    mapContainerRef.addEventListener('touchend', handleTouchEnd, { passive: true });
 
     // Disable tracking when user drags the map
     leafletMap.on("drag", () => {
@@ -226,6 +232,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       if (marker()) marker()!.remove();
       mapContainerRef.removeEventListener('wheel', handleWheel, { capture: true });
       mapContainerRef.removeEventListener('touchmove', handleTouchMove);
+      mapContainerRef.removeEventListener('touchend', handleTouchEnd);
       mapContainerRef.removeEventListener('mouseenter', handleMouseEnter);
       mapContainerRef.removeEventListener('mouseleave', handleMouseLeave);
       clearTimeout(messageTimeout);
