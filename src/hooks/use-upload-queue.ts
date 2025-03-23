@@ -49,7 +49,8 @@ const clearQueue = async (dongleId: string, items: UploadItem[]) => {
 
 
 export const useUploadQueue = (dongleId: string) => {
-  const [items, setItems] = createStore<UploadItem[]>([])
+  const [onlineItems, setOnlineItems] = createStore<UploadItem[]>([])
+  const [_, setOfflineItems] = createStore<UploadItem[]>([])
   const [loading, setLoading] = createSignal(true)
   const [onlineQueueError, setOnlineQueueError] = createSignal<string | undefined>()
   const [onlineTimeout, setOnlineTimeout] = createSignal<Timer>()
@@ -61,7 +62,7 @@ export const useUploadQueue = (dongleId: string) => {
   const pollOnlineQueue = async () => {
     try {
       const response = await getUploadQueue(dongleId)
-      setItems(reconcile(mapQueueData(response.result!)))
+      setOnlineItems(reconcile(mapQueueData(response.result!)))
       setOnlineQueueError(undefined)
     } catch (err) {
       console.error('Error polling online queue:', err)
@@ -75,7 +76,7 @@ export const useUploadQueue = (dongleId: string) => {
   const pollOfflineQueue = async () => {
     try {
       const offlineData = await getAthenaOfflineQueue(dongleId)
-      setItems(reconcile(processOfflineQueueData(offlineData)))
+      setOfflineItems(reconcile(processOfflineQueueData(offlineData)))
       setOfflineQueueError(undefined)
     } catch (err) {
       console.error('Error polling offline queue:', err)
@@ -97,9 +98,9 @@ export const useUploadQueue = (dongleId: string) => {
 
   return {
     loading,
-    items,
+    items: onlineItems,
     error: onlineQueueError,
     offline: () => onlineQueueError() !== undefined,
-    clearQueue: () => clearQueue(dongleId, items)
+    clearQueue: () => clearQueue(dongleId, onlineItems)
   }
 }
