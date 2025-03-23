@@ -1,8 +1,8 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from "solid-js"
-import clsx from "clsx"
+import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
+import clsx from 'clsx'
 
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from "~/api/route"
-import Icon from "~/components/material/Icon"
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from '~/api/route'
+import Icon from '~/components/material/Icon'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -36,10 +36,7 @@ interface RouteActionsProps {
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [routeResource] = createResource(() => props.routeName, getRoute)
-  const [preservedRoutesResource] = createResource(
-    () => parseRouteName(props.routeName).dongleId,
-    getPreservedRoutes,
-  )
+  const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
@@ -52,7 +49,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     if (route.is_preserved) {
       setIsPreserved(true)
     } else if (preservedRoutes) {
-      setIsPreserved(preservedRoutes.some(r => r.fullname === route.fullname))
+      setIsPreserved(preservedRoutes.some((r) => r.fullname === route.fullname))
     } else {
       setIsPreserved(undefined)
     }
@@ -112,33 +109,25 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
           <div class="lg:text-body-md">
-            <span class="break-keep inline-block">
-              {currentRouteId().split('/')[0] || ''}/
-            </span>
-            <span class="break-keep inline-block">
-              {currentRouteId().split('/')[1] || ''}
-            </span>
+            <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
+            <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
           </div>
-          <Icon size="20" class={clsx('px-2', copied() && 'text-green-300')}>{copied() ? 'check' : 'file_copy'}</Icon>
+          <Icon size="20" class={clsx('px-2', copied() && 'text-green-300')}>
+            {copied() ? 'check' : 'file_copy'}
+          </Icon>
         </button>
       </div>
 
       <div class="flex flex-col gap-2">
-        <ToggleButton
-          label="Preserve Route"
-          active={isPreserved()}
-          onToggle={() => void toggleRoute('preserved')}
-        />
-        <ToggleButton
-          label="Public Access"
-          active={isPublic()}
-          onToggle={() => void toggleRoute('public')}
-        />
+        <ToggleButton label="Preserve Route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
+        <ToggleButton label="Public Access" active={isPublic()} onToggle={() => void toggleRoute('public')} />
       </div>
 
       <Show when={error()}>
         <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
-          <Icon class="text-error" size="20">error</Icon>
+          <Icon class="text-error" size="20">
+            error
+          </Icon>
           {error()}
         </div>
       </Show>

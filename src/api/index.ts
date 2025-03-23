@@ -18,7 +18,7 @@ export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: s
     },
   })
   // TODO: validate responses
-  const json = await res.json() as T & { error?: string; description?: string }
+  const json = (await res.json()) as T & { error?: string; description?: string }
   if (json.error) {
     throw new Error(json.description, { cause: res })
   }

@@ -1,7 +1,7 @@
 #video-container {
   .scan-region-highlight {
     border-radius: 1em;
-    outline: rgba(0, 0, 0, .40) solid 50vmax;
+    outline: rgba(0, 0, 0, 0.4) solid 50vmax;
   }
 
   .scan-region-highlight-svg {

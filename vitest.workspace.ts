@@ -5,14 +5,8 @@ export default defineWorkspace([
   {
     extends: 'vite.config.ts',
     test: {
-      include: [
-        'src/**/*.{test,spec}.ts',
-        'src/**/*.unit.{test,spec}.ts',
-      ],
-      exclude: [
-        ...configDefaults.exclude,
-        '**/*.browser.{test,spec}.{ts,tsx}',
-      ],
+      include: ['src/**/*.{test,spec}.ts', 'src/**/*.unit.{test,spec}.ts'],
+      exclude: [...configDefaults.exclude, '**/*.browser.{test,spec}.{ts,tsx}'],
       name: 'unit',
       environment: 'node',
       env: loadEnv('development', '.'),
@@ -21,9 +15,7 @@ export default defineWorkspace([
   {
     extends: 'vite.config.ts',
     test: {
-      include: [
-        '**/*.browser.{test,spec}.{ts,tsx}',
-      ],
+      include: ['**/*.browser.{test,spec}.{ts,tsx}'],
       browser: {
         provider: 'playwright',
         enabled: true,

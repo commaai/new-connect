@@ -1,11 +1,6 @@
 import polyline from '@mapbox/polyline'
 
-import {
-  MAPBOX_USERNAME,
-  MAPBOX_LIGHT_STYLE_ID,
-  MAPBOX_DARK_STYLE_ID,
-  MAPBOX_TOKEN,
-} from './config'
+import { MAPBOX_USERNAME, MAPBOX_LIGHT_STYLE_ID, MAPBOX_DARK_STYLE_ID, MAPBOX_TOKEN } from './config'
 import { getThemeId } from '~/theme'
 
 export type Coords = [number, number][]
@@ -42,13 +37,8 @@ export function getPathStaticMapUrl(
 ): string {
   const styleId = getMapStyleId(themeId)
   const hidpiStr = hidpi ? '@2x' : ''
-  const encodedPolyline = polyline.encode(
-    prepareCoords(coords, POLYLINE_SAMPLE_SIZE),
-    POLYLINE_PRECISION,
-  )
-  const path = `path-${strokeWidth}+${color}-${opacity}(${encodeURIComponent(
-    encodedPolyline,
-  )})`
+  const encodedPolyline = polyline.encode(prepareCoords(coords, POLYLINE_SAMPLE_SIZE), POLYLINE_PRECISION)
+  const path = `path-${strokeWidth}+${color}-${opacity}(${encodeURIComponent(encodedPolyline)})`
   return `https://api.mapbox.com/styles/v1/${MAPBOX_USERNAME}/${styleId}/static/${path}/auto/${width}x${height}${hidpiStr}?logo=false&attribution=false&padding=30,30,30,30&access_token=${MAPBOX_TOKEN}`
 }
 

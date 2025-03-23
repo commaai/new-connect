@@ -4,7 +4,6 @@ import * as Sentry from '@sentry/browser'
 import type { ReverseGeocodingResponse, ReverseGeocodingFeature } from '~/map/api-types'
 import { MAPBOX_TOKEN } from '~/map/config'
 
-
 export async function reverseGeocode(position: Position): Promise<ReverseGeocodingFeature | null> {
   if (Math.abs(position[0]) < 0.001 && Math.abs(position[1]) < 0.001) {
     return null
@@ -28,7 +27,7 @@ export async function reverseGeocode(position: Position): Promise<ReverseGeocodi
   }
   try {
     // TODO: validate
-    const collection = await resp.json() as ReverseGeocodingResponse
+    const collection = (await resp.json()) as ReverseGeocodingResponse
     return collection?.features?.[0] ?? null
   } catch (error) {
     Sentry.captureException(new Error('Could not parse reverse geocode response', { cause: error }))
@@ -36,25 +35,27 @@ export async function reverseGeocode(position: Position): Promise<ReverseGeocodi
   }
 }
 
-
 export async function getFullAddress(position: Position): Promise<string | null> {
   const feature = await reverseGeocode(position)
   if (!feature) return null
   return feature.properties.full_address
 }
 
-
 export async function getPlaceName(position: Position): Promise<string | null> {
   const feature = await reverseGeocode(position)
   if (!feature) return null
-  const { properties: { context } } = feature
-  return [
-    context.street?.name,
-    context.neighborhood?.name,
-    context.place?.name,
-    context.locality?.name,
-    context.district?.name,
-    context.region?.name,
-    context.country?.name,
-  ].find(Boolean) || ''
+  const {
+    properties: { context },
+  } = feature
+  return (
+    [
+      context.street?.name,
+      context.neighborhood?.name,
+      context.place?.name,
+      context.locality?.name,
+      context.district?.name,
+      context.region?.name,
+      context.country?.name,
+    ].find(Boolean) || ''
+  )
 }

@@ -20,12 +20,7 @@ const Icon: Component<IconProps> = (props) => {
   const size = () => `size-${props.size || '24'}`
   return (
     <span
-      class={clsx(
-        'material-symbols-outlined flex',
-        props.filled ? 'icon-filled' : 'icon-outline',
-        size(),
-        props.class,
-      )}
+      class={clsx('material-symbols-outlined flex', props.filled ? 'icon-filled' : 'icon-outline', size(), props.class)}
     >
       {props.children}
     </span>

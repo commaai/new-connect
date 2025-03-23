@@ -10,9 +10,7 @@ type NavigationBarItemProps = {
   selected?: boolean
 }
 
-export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (
-  props,
-) => {
+export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (props) => {
   // TODO: active indicator
   return (
     <A
@@ -24,9 +22,7 @@ export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (
       <Icon class="flex transition-all" filled={props.selected}>
         {props.icon}
       </Icon>
-      <div class="mt-2 flex text-label-lg">
-        {props.children}
-      </div>
+      <div class="mt-2 flex text-label-lg">{props.children}</div>
     </A>
   )
 }

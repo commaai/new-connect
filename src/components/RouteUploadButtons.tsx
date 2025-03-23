@@ -18,10 +18,10 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   const icon = () => props.icon
   const state = () => props.state
   const disabled = () => state() === 'loading' || state() === 'success'
-  
+
   const handleUpload = () => {
     if (disabled()) return
-    
+
     if (props.onClick) {
       props.onClick()
     }
@@ -31,20 +31,22 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
     idle: icon(),
     loading: 'progress_activity',
     success: 'check',
-    error: 'error'
+    error: 'error',
   }
-  
+
   return (
     <Button
       onClick={() => handleUpload()}
-      class='px-2 md:px-3'
+      class="px-2 md:px-3"
       disabled={disabled()}
       leading={
-        <Icon size='20' class={clsx(state() === 'loading' && 'animate-spin')}>{stateToIcon[state()]}</Icon>
+        <Icon size="20" class={clsx(state() === 'loading' && 'animate-spin')}>
+          {stateToIcon[state()]}
+        </Icon>
       }
-      color='primary'
+      color="primary"
     >
-      <span class='flex items-center gap-1 font-mono'>{props.text}</span>
+      <span class="flex items-center gap-1 font-mono">{props.text}</span>
     </Button>
   )
 }
@@ -57,13 +59,13 @@ interface RouteUploadButtonsProps {
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   const [routeResource] = createResource(() => props.routeName, getRouteWithSegments)
-  
+
   const [uploadStore, setUploadStore] = createStore({
     states: {
       cameras: 'idle',
       driver: 'idle',
       logs: 'idle',
-      route: 'idle'
+      route: 'idle',
     } as Record<ButtonType, 'idle' | 'loading' | 'success' | 'error'>,
   })
 
@@ -79,9 +81,9 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     cameras: ['cameras', 'ecameras'],
     driver: ['dcameras'],
     logs: ['logs'],
-    route: undefined
-  };
-  
+    route: undefined,
+  }
+
   const handleUpload = async (type: ButtonType) => {
     const route = routeResource()
     if (!route) return
@@ -90,9 +92,11 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       const typesNotUploadedYet = Object.entries(uploadStore.states)
         .filter(([_, state]) => state !== 'loading' && state !== 'success')
         .map(([type]) => type as ButtonType)
-        .filter(type => type !== undefined)
+        .filter((type) => type !== undefined)
 
-      const typesToUpload = typesNotUploadedYet.flatMap(type => buttonToFileTypeMap[type]).filter(type => type !== undefined)
+      const typesToUpload = typesNotUploadedYet
+        .flatMap((type) => buttonToFileTypeMap[type])
+        .filter((type) => type !== undefined)
 
       updateButtonStates(typesNotUploadedYet, 'loading')
 
@@ -103,13 +107,13 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
         console.error('Failed to upload', err)
         updateButtonStates(typesNotUploadedYet, 'error')
       }
-      return;
+      return
     }
 
     setUploadStore('states', type, 'loading')
-    
+
     const fileTypesToUpload = buttonToFileTypeMap[type]
-    
+
     try {
       await uploadAllSegments(props.routeName, route.segment_numbers.length, fileTypesToUpload)
       setUploadStore('states', type, 'success')
@@ -122,30 +126,25 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   return (
     <div class="flex flex-col rounded-b-md m-5">
       <div class="grid grid-cols-2 gap-3 w-full lg:grid-cols-4">
-        <UploadButton 
+        <UploadButton
           text="Road"
           icon="videocam"
           state={uploadStore.states.cameras}
           onClick={() => handleUpload('cameras')}
         />
-        <UploadButton 
+        <UploadButton
           text="Driver"
           icon="person"
           state={uploadStore.states.driver}
           onClick={() => handleUpload('driver')}
         />
-        <UploadButton 
+        <UploadButton
           text="Logs"
           icon="description"
           state={uploadStore.states.logs}
           onClick={() => handleUpload('logs')}
         />
-        <UploadButton 
-          text="All"
-          icon="upload"
-          state={uploadStore.states.route}
-          onClick={() => handleUpload('route')}
-        />
+        <UploadButton text="All" icon="upload" state={uploadStore.states.route} onClick={() => handleUpload('route')} />
       </div>
     </div>
   )

@@ -10,7 +10,16 @@ export interface ReverseGeocodingResponse extends FeatureCollection<Point, Rever
 export type ReverseGeocodingFeature = ReverseGeocodingResponse['features'][number]
 
 interface ReverseGeocodingFeatureProperties {
-  feature_type: 'country' | 'region' | 'postcode' | 'district' | 'place' | 'locality' | 'neighborhood' | 'street' | 'address'
+  feature_type:
+    | 'country'
+    | 'region'
+    | 'postcode'
+    | 'district'
+    | 'place'
+    | 'locality'
+    | 'neighborhood'
+    | 'street'
+    | 'address'
   name: string
   name_preferred: string
   place_formatted: string

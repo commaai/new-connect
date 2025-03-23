@@ -15,7 +15,7 @@ const Avatar: ParentComponent<AvatarProps> = (props) => {
       tertiary: 'bg-tertiary-container text-on-tertiary-container',
       error: 'bg-error-container text-on-error-container',
       surface: 'bg-surface text-on-surface',
-    }[color()])
+    })[color()]
 
   return (
     <div

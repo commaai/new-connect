@@ -7,9 +7,7 @@ type FloatingActionButtonProps = ButtonBaseProps & {
   leading?: JSXElement
 }
 
-const FloatingActionButton: ParentComponent<FloatingActionButtonProps> = (
-  props,
-) => {
+const FloatingActionButton: ParentComponent<FloatingActionButtonProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(

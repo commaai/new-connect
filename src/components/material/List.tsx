@@ -37,7 +37,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       '2-line': 'h-20',
       '3-line': 'h-28',
       nav: 'h-14 gap-3 before:rounded-full before:duration-0',
-    }[variant()])
+    })[variant()]
   return (
     <ButtonBase
       class={clsx(
@@ -64,15 +64,7 @@ type ListProps = {
 
 const List: ParentComponent<ListProps> = (props) => {
   return (
-    <div
-      class={clsx(
-        'flex flex-col',
-        props.variant === 'nav' ? 'gap-0' : 'gap-2',
-        props.class,
-      )}
-    >
-      {props.children}
-    </div>
+    <div class={clsx('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
   )
 }
 

@@ -2,7 +2,6 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { formatDate, formatDistance, formatDuration } from './format'
 
-
 describe('formatDistance', () => {
   it('should format distance', () => {
     expect(formatDistance(0)).toBe('0.0 mi')
@@ -12,7 +11,6 @@ describe('formatDistance', () => {
     expect(formatDistance(undefined)).toBe('')
   })
 })
-
 
 describe('formatDuration', () => {
   it('should format duration', () => {
@@ -26,7 +24,6 @@ describe('formatDuration', () => {
     expect(formatDuration(undefined)).toBe('')
   })
 })
-
 
 describe('formatDate', () => {
   beforeEach(() => {

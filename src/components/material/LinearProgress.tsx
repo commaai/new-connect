@@ -15,14 +15,14 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
       secondary: 'before:bg-secondary',
       tertiary: 'before:bg-tertiary',
       error: 'before:bg-error',
-    }[color()])
+    })[color()]
   const barColourClass = () =>
     ({
       primary: 'bg-primary ',
       secondary: 'bg-secondary',
       tertiary: 'bg-tertiary',
       error: 'bg-error',
-    }[color()])
+    })[color()]
 
   return (
     <div

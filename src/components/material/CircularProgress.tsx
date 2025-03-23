@@ -19,7 +19,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
       tertiary: 'text-tertiary',
       error: 'text-error',
       inherit: '',
-    }[props.color || 'primary'])
+    })[props.color || 'primary']
 
   const size = () => `${props.size || 40}px`
   const thickness = () => props.thickness || 3.6
@@ -45,9 +45,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
       class={clsx(
         'inline-block',
         colorClass(),
-        props.progress === undefined
-          ? 'animate-circular-rotate'
-          : 'transition-transform',
+        props.progress === undefined ? 'animate-circular-rotate' : 'transition-transform',
         props.class,
       )}
       style={{
@@ -60,9 +58,7 @@ const CircularProgress: VoidComponent<CircularProgressProps> = (props) => {
         <circle
           class={clsx(
             'stroke-current',
-            props.progress === undefined
-              ? 'animate-circular-dash'
-              : 'transition-[stroke-dashoffset]',
+            props.progress === undefined ? 'animate-circular-dash' : 'transition-[stroke-dashoffset]',
           )}
           style={circleStyle()}
           cx={SIZE}

@@ -36,9 +36,7 @@ type CardTextContentProps = {
   class?: string
 }
 
-export const CardTextContent: ParentComponent<CardTextContentProps> = (
-  props,
-) => {
+export const CardTextContent: ParentComponent<CardTextContentProps> = (props) => {
   return (
     <div class={clsx('flex', props.class)}>
       <span class="text-body-md text-on-surface-variant">{props.children}</span>
@@ -69,11 +67,7 @@ const Card: ParentComponent<CardProps> = (props) => {
       fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}
     >
       <ButtonBase
-        class={clsx(
-          cardStyle,
-          (props.href || props.onClick) && 'state-layer',
-          props.class,
-        )}
+        class={clsx(cardStyle, (props.href || props.onClick) && 'state-layer', props.class)}
         onClick={props.onClick}
         href={props.href}
         activeClass={clsx('before:opacity-[.12]', props.activeClass)}
