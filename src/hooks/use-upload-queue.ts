@@ -110,6 +110,10 @@ export const useUploadQueue = (dongleId: string) => {
   }
 
   const pollOnlineQueue = async () => {
+    const currentTimeout = onlineTimeout()
+    if (currentTimeout) clearTimeout(currentTimeout)
+    setOnlineTimeout(undefined)
+
     try {
       const response = await getUploadQueue(dongleId)
       setItems('online', reconcile(mapQueueData(response.result!)))
@@ -128,6 +132,10 @@ export const useUploadQueue = (dongleId: string) => {
   }
 
   const pollOfflineQueue = async () => {
+    const currentTimeout = offlineTimeout()
+    if (currentTimeout) clearTimeout(currentTimeout)
+    setOfflineTimeout(undefined)
+
     try {
       const offlineData = await getAthenaOfflineQueue(dongleId)
       setItems('offline', reconcile(processOfflineQueueData(offlineData)))
