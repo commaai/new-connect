@@ -26,11 +26,9 @@ interface RouteItemProps {
 
 const RouteItem: VoidComponent<RouteItemProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
-  // const endTime = () => dayjs(props.route.end_time_utc_millis)
 
   const startPosition = () => [props.route.start_lng || 0, props.route.start_lat || 0] as number[]
   const [startName] = createResource(startPosition, getPlaceName)
-
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
 
   return (
@@ -134,7 +132,10 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           const [routes] = createResource(() => i(), getPage)
           return (
             <Suspense fallback={<Index each={new Array(pageSize())}>{() => <div class="skeleton-loader h-[68px]" />}</Index>}>
-              <For each={routes()}>{(route) => <RouteItem route={route} />}</For>
+              <For each={routes()}>{(route) => <>
+                <RouteItem route={route} />
+                <hr class="border-on-surface-variant opacity-20" />
+              </>}</For>
             </Suspense>
           )
         }}
