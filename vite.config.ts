@@ -17,6 +17,8 @@ export default defineConfig({
     {
       name: 'inject-material-symbols',
       transformIndexHtml(html) {
+        // Specify icon names to load only the necessary icons, reducing font payload.
+        // https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
         const icons = [
           'add', 'arrow_back', 'camera', 'check', 'chevron_right', 'clear', 'close', 'directions_car', 'download',
           'error', 'file_copy', 'info', 'menu', 'my_location', 'open_in_new', 'payments', 'person', 'progress_activity',
