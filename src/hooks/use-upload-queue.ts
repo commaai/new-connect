@@ -163,8 +163,6 @@ export const useUploadQueue = (dongleId: string) => {
   const sortedItems = createMemo(() => {
     const allItems = [...items.offline, ...(offline() ? [] : items.online)]
 
-    console.log(allItems)
-
     return allItems.sort((a, b) => {
       const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status)
       if (statusDiff !== 0) return statusDiff
