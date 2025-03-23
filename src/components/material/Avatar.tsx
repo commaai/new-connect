@@ -15,16 +15,10 @@ const Avatar: ParentComponent<AvatarProps> = (props) => {
       tertiary: 'bg-tertiary-container text-on-tertiary-container',
       error: 'bg-error-container text-on-error-container',
       surface: 'bg-surface text-on-surface',
-    }[color()])
+    })[color()]
 
   return (
-    <div
-      class={clsx(
-        'flex size-10 items-center justify-center rounded-full transition-colors',
-        colorClasses(),
-        props.class,
-      )}
-    >
+    <div class={clsx('flex size-10 items-center justify-center rounded-full transition-colors', colorClasses(), props.class)}>
       {props.children}
     </div>
   )

@@ -7,10 +7,7 @@ import { getRoute } from '~/api/route'
 import type { Route } from '~/types'
 import { getRouteDuration } from '~/utils/format'
 
-function renderTimelineEvents(
-  route: Route | undefined,
-  events: TimelineEvent[],
-) {
+function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
   if (!route) return null
 
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
@@ -104,11 +101,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   const [events] = createResource(route, getTimelineEvents)
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const duration = createMemo(() =>
-    route()
-      ? getRouteDuration(route()!)?.asSeconds() ?? 0
-      : 0,
-  )
+  const duration = createMemo(() => (route() ? (getRouteDuration(route()!)?.asSeconds() ?? 0) : 0))
 
   let ref: HTMLDivElement
   let handledTouchStart = false

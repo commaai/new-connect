@@ -32,22 +32,26 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
     <>
       <TopAppBar
         component="h1"
-        leading={<Show when={modal()}><IconButton onClick={onClose}>arrow_back</IconButton></Show>}
+        leading={
+          <Show when={modal()}>
+            <IconButton onClick={onClose}>arrow_back</IconButton>
+          </Show>
+        }
       >
         comma connect
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm uppercase">
-        Devices
-      </h2>
+      <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
       <Show when={props.devices} keyed>
-        {devices => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
+        {(devices) => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
       </Show>
       <div class="grow" />
       <Button class="m-4" leading={<Icon>add</Icon>} href="/pair" onClick={onClose}>
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
-      <Button class="m-4" color="error" href="/logout">Sign out</Button>
+      <Button class="m-4" color="error" href="/logout">
+        Sign out
+      </Button>
     </>
   )
 }
@@ -82,7 +86,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
   const dongleId = () => pathParts()[0]
   const dateStr = () => pathParts()[1]
-  const startTime = () => pathParts()[2] ? Number(pathParts()[2]) : 0
+  const startTime = () => (pathParts()[2] ? Number(pathParts()[2]) : 0)
 
   const pairToken = () => !!location.query.pair
 
@@ -107,25 +111,31 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={dongleId()} keyed>{(id) => (
-          <DashboardLayout
-            paneOne={<DeviceActivity dongleId={id} />}
-            paneTwo={<Switch
-              fallback={<div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                <Icon size="48">search</Icon>
-                <span class="text-title-md">Select a route to view</span>
-              </div>}
-            >
-              <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                <SettingsActivity dongleId={id} />
-              </Match>
-              <Match when={dateStr()} keyed>
-                {(date) => <RouteActivity dongleId={id} dateStr={date} startTime={startTime()} />}
-              </Match>
-            </Switch>}
-            paneTwoContent={!!dateStr()}
-          />
-        )}</Match>
+        <Match when={dongleId()} keyed>
+          {(id) => (
+            <DashboardLayout
+              paneOne={<DeviceActivity dongleId={id} />}
+              paneTwo={
+                <Switch
+                  fallback={
+                    <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                      <Icon size="48">search</Icon>
+                      <span class="text-title-md">Select a route to view</span>
+                    </div>
+                  }
+                >
+                  <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                    <SettingsActivity dongleId={id} />
+                  </Match>
+                  <Match when={dateStr()} keyed>
+                    {(date) => <RouteActivity dongleId={id} dateStr={date} startTime={startTime()} />}
+                  </Match>
+                </Switch>
+              }
+              paneTwoContent={!!dateStr()}
+            />
+          )}
+        </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
         </Match>

@@ -19,6 +19,7 @@ export default defineConfig({
       transformIndexHtml(html) {
         // Specify icon names to load only the necessary icons, reducing font payload.
         // https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
+        // biome-ignore format: the array should not be formatted
         const icons = [
           'add', 'arrow_back', 'camera', 'check', 'chevron_right', 'clear', 'close', 'description', 'directions_car', 'download',
           'error', 'file_copy', 'info', 'menu', 'my_location', 'open_in_new', 'payments', 'person', 'progress_activity',
@@ -26,16 +27,18 @@ export default defineConfig({
         ].toSorted().join(',')
         return {
           html,
-          tags: [{
-            tag: 'link',
-            attrs: {
-              rel: 'stylesheet',
-              href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
+          tags: [
+            {
+              tag: 'link',
+              attrs: {
+                rel: 'stylesheet',
+                href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
+              },
+              injectTo: 'head',
             },
-            injectTo: 'head',
-          }],
+          ],
         }
-      }
+      },
     },
   ],
   server: {

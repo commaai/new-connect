@@ -9,13 +9,7 @@ type AppBarProps = {
 const AppBar: ParentComponent<AppBarProps> = (props) => {
   const position = () => (props.relative ? 'relative' : 'absolute')
   return (
-    <div
-      class={clsx(
-        'inset-x-0 top-0 flex h-20 items-center bg-surface-variant px-8 text-on-surface-variant',
-        position(),
-        props.class,
-      )}
-    >
+    <div class={clsx('inset-x-0 top-0 flex h-20 items-center bg-surface-variant px-8 text-on-surface-variant', position(), props.class)}>
       {props.children}
     </div>
   )

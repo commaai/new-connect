@@ -1,6 +1,4 @@
-import {
-  createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Suspense, type VoidComponent,
-} from 'solid-js'
+import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
@@ -9,7 +7,6 @@ import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 import { useDimensions } from '~/utils/window'
-
 
 interface RouteCardProps {
   route: RouteSegments
@@ -22,21 +19,27 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
   const [startPlace] = createResource(startPosition, getPlaceName)
   const [endPlace] = createResource(endPosition, getPlaceName)
-  const [location] = createResource(() => [startPlace(), endPlace()], ([startPlace, endPlace]) => {
-    if (!startPlace && !endPlace) return ''
-    if (!endPlace || startPlace === endPlace) return startPlace
-    if (!startPlace) return endPlace
-    return `${startPlace} to ${endPlace}`
-  })
+  const [location] = createResource(
+    () => [startPlace(), endPlace()],
+    ([startPlace, endPlace]) => {
+      if (!startPlace && !endPlace) return ''
+      if (!endPlace || startPlace === endPlace) return startPlace
+      if (!startPlace) return endPlace
+      return `${startPlace} to ${endPlace}`
+    },
+  )
 
   return (
-    <Card
-      class="max-w-none"
-      href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
-      activeClass="md:before:bg-primary"
-    >
+    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
-        headline={<div class="flex gap-2"><span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;<span>{startTime().format('h:mm A')} to {endTime().format('h:mm A')}</span></div>}
+        headline={
+          <div class="flex gap-2">
+            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
+            <span>
+              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+            </span>
+          </div>
+        }
         subhead={location()}
       />
 
@@ -47,14 +50,13 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-
 type RouteListProps = {
   dongleId: string
 }
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 140), 1)
+  const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -84,11 +86,14 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
   })
 
   const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
-  const observer = new IntersectionObserver((entries) => {
-    if (entries[0].isIntersecting) {
-      setSize((prev) => prev + 1)
-    }
-  }, { threshold: 0.1 })
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (entries[0].isIntersecting) {
+        setSize((prev) => prev + 1)
+      }
+    },
+    { threshold: 0.1 },
+  )
   onMount(() => {
     const sentinelEl = sentinel()
     if (sentinelEl) {
@@ -104,13 +109,11 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           const [routes] = createResource(() => i(), getPage)
           return (
             <Suspense
-              fallback={<Index each={new Array(pageSize())}>{() => (
-                <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />
-              )}</Index>}
+              fallback={
+                <Index each={new Array(pageSize())}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+              }
             >
-              <For each={routes()}>
-                {(route) => <RouteCard route={route} />}
-              </For>
+              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
             </Suspense>
           )
         }}

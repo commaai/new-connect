@@ -2,10 +2,7 @@ import { BASE_URL } from '../config'
 
 const AUTH_KEY = 'ai.comma.api.authorization'
 
-export async function refreshAccessToken(
-  code: string,
-  provider: string,
-): Promise<void> {
+export async function refreshAccessToken(code: string, provider: string): Promise<void> {
   try {
     const resp = await fetch(`${BASE_URL}/v2/auth`, {
       method: 'POST',
@@ -20,7 +17,7 @@ export async function refreshAccessToken(
     }
 
     // TODO: validate response
-    const json = await resp.json() as Record<string, string>
+    const json = (await resp.json()) as Record<string, string>
     if (!json.access_token) {
       throw new Error('unknown error')
     }

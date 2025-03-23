@@ -6,5 +6,5 @@ export function getDeviceName(device: Device) {
 }
 
 export function deviceIsOnline(device: Device) {
-  return !!(device.last_athena_ping) && (device.last_athena_ping >= (device.fetched_at - 120))
+  return !!device.last_athena_ping && device.last_athena_ping >= device.fetched_at - 120
 }

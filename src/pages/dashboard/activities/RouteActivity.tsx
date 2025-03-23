@@ -37,34 +37,34 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
-  createResource(() => [device(), profile(), props.dateStr] as const, async ([device, profile, dateStr]) => {
-    if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-    await setRouteViewed(device.dongle_id, dateStr)
-  })
+  createResource(
+    () => [device(), profile(), props.dateStr] as const,
+    async ([device, profile, dateStr]) => {
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+      await setRouteViewed(device.dongle_id, dateStr)
+    },
+  )
 
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
+      <TopAppBar
+        leading={
+          <IconButton class="md:hidden" href={`/${props.dongleId}`}>
+            arrow_back
+          </IconButton>
+        }
+      >
         {startTime()}
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <Suspense
-          fallback={
-            <div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />
-          }
-        >
+        <Suspense fallback={<div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />}>
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
         </Suspense>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Timeline</h3>
-          <Timeline
-            class="mb-1"
-            routeName={routeName()}
-            seekTime={seekTime}
-            updateTime={onTimelineChange}
-          />
+          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime} updateTime={onTimelineChange} />
         </div>
 
         <div class="flex flex-col gap-2">

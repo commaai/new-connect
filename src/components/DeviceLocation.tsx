@@ -39,25 +39,25 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
   )
 
   onMount(() => {
-    navigator.permissions.query({ name: 'geolocation' }).then(permission => {
-      permission.addEventListener('change', requestUserLocation)
+    navigator.permissions
+      .query({ name: 'geolocation' })
+      .then((permission) => {
+        permission.addEventListener('change', requestUserLocation)
 
-      if (permission.state === 'granted') {
-        requestUserLocation()
-      }
-    }).catch(() => setUserPosition(null))
+        if (permission.state === 'granted') {
+          requestUserLocation()
+        }
+      })
+      .catch(() => setUserPosition(null))
 
     const tileUrl = getTileUrl()
     const tileLayer = L.tileLayer(tileUrl)
 
-    const m = L.map(
-      mapRef,
-      {
-        attributionControl: false,
-        zoomControl: false,
-        layers: [tileLayer],
-      },
-    )
+    const m = L.map(mapRef, {
+      attributionControl: false,
+      zoomControl: false,
+      layers: [tileLayer],
+    })
     m.setView(SAN_DIEGO, 10)
     m.on('click', () => setShowSelectedLocation(false))
 
@@ -74,65 +74,71 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     })
   })
 
-  const [locationData] = createResource(() => ({
-    map: map(),
-    deviceName: props.deviceName,
-    deviceLocation: deviceLocation(),
-    userPosition: userPosition(),
-  }), async (args) => {
-    if (!args.map) {
-      return []
-    }
-
-    const foundLocations: Location[] = []
-
-    const location = deviceLocation()
-    if (location) {
-      const address = await getFullAddress([location.lng, location.lat])
-      const deviceLoc: Location = {
-        lat: location.lat,
-        lng: location.lng,
-        label: args.deviceName,
-        address,
+  const [locationData] = createResource(
+    () => ({
+      map: map(),
+      deviceName: props.deviceName,
+      deviceLocation: deviceLocation(),
+      userPosition: userPosition(),
+    }),
+    async (args) => {
+      if (!args.map) {
+        return []
       }
 
-      addMarker(args.map, deviceLoc, 'directions_car')
-      foundLocations.push(deviceLoc)
-    }
+      const foundLocations: Location[] = []
 
-    if (args.userPosition) {
-      const { longitude, latitude } = args.userPosition.coords
-      const address = await getFullAddress([longitude, latitude])
-      const userLoc: Location = {
-        lat: latitude,
-        lng: longitude,
-        label: 'You',
-        address,
+      const location = deviceLocation()
+      if (location) {
+        const address = await getFullAddress([location.lng, location.lat])
+        const deviceLoc: Location = {
+          lat: location.lat,
+          lng: location.lng,
+          label: args.deviceName,
+          address,
+        }
+
+        addMarker(args.map, deviceLoc, 'directions_car')
+        foundLocations.push(deviceLoc)
       }
 
-      addMarker(args.map, userLoc, 'person', 'bg-primary')
-      foundLocations.push(userLoc)
-    }
+      if (args.userPosition) {
+        const { longitude, latitude } = args.userPosition.coords
+        const address = await getFullAddress([longitude, latitude])
+        const userLoc: Location = {
+          lat: latitude,
+          lng: longitude,
+          label: 'You',
+          address,
+        }
 
-    if (foundLocations.length > 1) {
-      args.map.fitBounds(L.latLngBounds(foundLocations.map(l => [l.lat, l.lng])), { padding: [50, 50] })
-    } else if (foundLocations.length === 1) {
-      args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
-    } else {
-      throw new Error('Offline')
-    }
+        addMarker(args.map, userLoc, 'person', 'bg-primary')
+        foundLocations.push(userLoc)
+      }
 
-    return foundLocations
-  })
+      if (foundLocations.length > 1) {
+        args.map.fitBounds(L.latLngBounds(foundLocations.map((l) => [l.lat, l.lng])), { padding: [50, 50] })
+      } else if (foundLocations.length === 1) {
+        args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
+      } else {
+        throw new Error('Offline')
+      }
 
+      return foundLocations
+    },
+  )
 
   const addMarker = (instance: L.Map, loc: Location, iconName: string, iconClass?: string) => {
     const el = document.createElement('div')
 
-    render(() =>
-      <div class={clsx('flex size-[40px] items-center justify-center rounded-full bg-primary-container', iconClass)}>
-        <Icon>{iconName}</Icon>
-      </div>, el)
+    render(
+      () => (
+        <div class={clsx('flex size-[40px] items-center justify-center rounded-full bg-primary-container', iconClass)}>
+          <Icon>{iconName}</Icon>
+        </div>
+      ),
+      el,
+    )
 
     const icon = L.divIcon({
       className: 'border-none bg-none',
@@ -150,13 +156,10 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
   }
 
   const requestUserLocation = () => {
-    navigator.geolocation.getCurrentPosition(
-      setUserPosition,
-      (err) => {
-        console.log('Error getting user\'s position', err)
-        setUserPosition(null)
-      },
-    )
+    navigator.geolocation.getCurrentPosition(setUserPosition, (err) => {
+      console.log("Error getting user's position", err)
+      setUserPosition(null)
+    })
   }
 
   return (
@@ -186,15 +189,19 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
       <Show when={(locationData.error as Error)?.message}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
-          <Icon class="mr-2" size="20">error</Icon>
+          <Icon class="mr-2" size="20">
+            error
+          </Icon>
           <span class="text-sm">{(locationData.error as Error).message}</span>
         </div>
       </Show>
 
-      <Card class={clsx(
-        'absolute inset-2 top-auto z-[9999] flex !bg-surface-container-high p-4 pt-3 transition-opacity duration-150',
-        showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
-      )}>
+      <Card
+        class={clsx(
+          'absolute inset-2 top-auto z-[9999] flex !bg-surface-container-high p-4 pt-3 transition-opacity duration-150',
+          showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
+        )}
+      >
         <div class="mb-2 flex flex-row items-center justify-between gap-4">
           <span class="truncate text-title-md">{selectedLocation()?.label}</span>
           <IconButton onClick={() => setShowSelectedLocation(false)}>close</IconButton>

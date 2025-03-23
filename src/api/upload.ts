@@ -15,13 +15,19 @@ type FileType = keyof typeof FileTypes
 const getFiles = async (routeName: string, types?: FileType[]) => {
   const files = await getAlreadyUploadedFiles(routeName)
   if (!types) return [...files.cameras, ...files.dcameras, ...files.ecameras, ...files.logs]
-  return types.flatMap(type => files[type])
+  return types.flatMap((type) => files[type])
 }
 
-const generateMissingFilePaths = (routeInfo: RouteInfo, segmentStart: number, segmentEnd: number, uploadedFiles: string[], types?: (keyof typeof FileTypes)[]): string[] => {
+const generateMissingFilePaths = (
+  routeInfo: RouteInfo,
+  segmentStart: number,
+  segmentEnd: number,
+  uploadedFiles: string[],
+  types?: FileType[],
+): string[] => {
   const paths: string[] = []
   for (let i = segmentStart; i <= segmentEnd; i++) {
-    const fileTypes = types ? types.flatMap(type => FileTypes[type]) : Object.values(FileTypes).flat()
+    const fileTypes = types ? types.flatMap((type) => FileTypes[type]) : Object.values(FileTypes).flat()
     for (const fileName of fileTypes) {
       const key = [routeInfo.dongleId, routeInfo.routeId, i, fileName].join('/')
       if (!uploadedFiles.find((path) => path.includes(key))) {
@@ -35,10 +41,10 @@ const generateMissingFilePaths = (routeInfo: RouteInfo, segmentStart: number, se
 const prepareUploadRequests = (paths: string[], presignedUrls: UploadFileMetadata[]): UploadFile[] =>
   paths.map((path, i) => ({ filePath: path, ...presignedUrls[i] }))
 
-export const uploadAllSegments = (routeName: string, totalSegments: number, types?: (keyof typeof FileTypes)[]) => 
-  uploadSegments(routeName, 0, totalSegments - 1, types);
+export const uploadAllSegments = (routeName: string, totalSegments: number, types?: FileType[]) =>
+  uploadSegments(routeName, 0, totalSegments - 1, types)
 
-export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, types?: (keyof typeof FileTypes)[]) => {
+export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, types?: FileType[]) => {
   const routeInfo = parseRouteName(routeName)
   const alreadyUploadedFiles = await getFiles(routeName, types)
   const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles, types)

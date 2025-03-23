@@ -24,12 +24,7 @@ type EventDriveEvent = IDriveEvent & {
   }
 }
 
-type OpenpilotState =
-  | 'disabled'
-  | 'preEnabled'
-  | 'enabled'
-  | 'softDisabling'
-  | 'overriding'
+type OpenpilotState = 'disabled' | 'preEnabled' | 'enabled' | 'softDisabling' | 'overriding'
 
 type AlertStatus = 0 | 1 | 2
 
@@ -73,11 +68,7 @@ type UserFlagTimelineEvent = {
   route_offset_millis: number
 }
 
-export type TimelineEvent =
-  | EngagedTimelineEvent
-  | AlertTimelineEvent
-  | OverridingTimelineEvent
-  | UserFlagTimelineEvent
+export type TimelineEvent = EngagedTimelineEvent | AlertTimelineEvent | OverridingTimelineEvent | UserFlagTimelineEvent
 
 export interface TimelineStatistics {
   duration: number
@@ -96,17 +87,12 @@ const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
 }
 
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
-  getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) =>
-    coords.flat(),
-  )
+  getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat())
 
 export const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
 
-const generateTimelineEvents = (
-  route: Route,
-  events: DriveEvent[],
-): TimelineEvent[] => {
+const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEvent[] => {
   const routeDuration = getRouteDuration(route)?.asMilliseconds() ?? 0
 
   // sort events by timestamp
@@ -120,8 +106,7 @@ const generateTimelineEvents = (
   let lastAlert: StateDriveEvent | undefined
   let lastOverride: StateDriveEvent | undefined
 
-  const isOverriding = (state: OpenpilotState) =>
-    ['overriding', 'preEnabled'].includes(state)
+  const isOverriding = (state: OpenpilotState) => ['overriding', 'preEnabled'].includes(state)
 
   events.forEach((ev) => {
     if (ev.type === 'state') {
@@ -200,10 +185,7 @@ const generateTimelineEvents = (
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-const generateTimelineStatistics = (
-  route: Route,
-  timeline: TimelineEvent[],
-): TimelineStatistics => {
+const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0
   let userFlags = 0
   timeline.forEach((ev) => {
@@ -221,9 +203,5 @@ const generateTimelineStatistics = (
   }
 }
 
-export const getTimelineStatistics = async (
-  route: Route,
-): Promise<TimelineStatistics> =>
-  getTimelineEvents(route).then((timeline) =>
-    generateTimelineStatistics(route, timeline),
-  )
+export const getTimelineStatistics = async (route: Route): Promise<TimelineStatistics> =>
+  getTimelineEvents(route).then((timeline) => generateTimelineStatistics(route, timeline))

@@ -178,8 +178,8 @@ export interface UploadFilesToUrlsRequest {
 }
 
 export interface UploadFilesToUrlsResponse {
-  enqueued: number,
-  failed: string[],
+  enqueued: number
+  failed: string[]
   items: UploadQueueItem[]
 }
 

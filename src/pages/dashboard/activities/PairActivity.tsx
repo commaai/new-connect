@@ -17,24 +17,26 @@ const PairActivity: VoidComponent = () => {
 
   const state = createMachine<{
     scanning: {
-      value: JSX.Element,
+      value: JSX.Element
       to: 'pairing' | 'error'
-    },
+    }
     pairing: {
-      input: { pairToken: string },
-      value: JSX.Element,
+      input: { pairToken: string }
+      value: JSX.Element
       to: 'error'
-    },
+    }
     error: {
       input: { error: Error }
-      value: JSX.Element,
+      value: JSX.Element
       to: 'scanning'
     }
   }>({
-    initial: pairToken ? {
-      type: 'pairing',
-      input: { pairToken },
-    } : 'scanning',
+    initial: pairToken
+      ? {
+          type: 'pairing',
+          input: { pairToken },
+        }
+      : 'scanning',
     states: {
       scanning(_input, to) {
         let videoRef!: HTMLVideoElement
@@ -57,16 +59,16 @@ const PairActivity: VoidComponent = () => {
         onCleanup(() => {
           try {
             qrScanner?.destroy()
-          } catch (_) { /* empty */ }
+          } catch (_) {
+            /* empty */
+          }
         })
 
         return (
           <div id="video-container" class="fixed inset-0 bg-black text-white">
             <video class="absolute inset-0 size-full object-cover" ref={videoRef} />
             <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
-              <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
-                Add new device
-              </TopAppBar>
+              <TopAppBar trailing={<IconButton href="/">close</IconButton>}>Add new device</TopAppBar>
               <h2 class="px-8 text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
             </div>
           </div>
@@ -94,7 +96,6 @@ const PairActivity: VoidComponent = () => {
 
             <div class="flex flex-col items-center gap-4">
               <CircularProgress class="m-4" color="primary" size={64} />
-
               Pairing your device...
             </div>
           </>
@@ -103,13 +104,10 @@ const PairActivity: VoidComponent = () => {
       error(input, to) {
         return (
           <>
-            <TopAppBar trailing={<IconButton href="/">close</IconButton>}>
-              Add new device
-            </TopAppBar>
+            <TopAppBar trailing={<IconButton href="/">close</IconButton>}>Add new device</TopAppBar>
 
             <div class="flex flex-col items-center gap-4">
               An error occurred: {input.error.message}
-
               <Button color="primary" onClick={() => to.scanning()}>
                 Retry
               </Button>

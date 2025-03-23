@@ -10,12 +10,13 @@
     "ignore": []
   },
   "formatter": {
-    "enabled": false,
+    "enabled": true,
+    "formatWithErrors": true,
     "indentStyle": "space",
     "useEditorconfig": true
   },
   "organizeImports": {
-    "enabled": true
+    "enabled": false
   },
   "linter": {
     "enabled": true,
@@ -47,7 +48,6 @@
   },
   "javascript": {
     "formatter": {
-      "lineWidth": 120,
       "quoteStyle": "single",
       "semicolons": "asNeeded"
     }

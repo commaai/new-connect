@@ -31,8 +31,8 @@ export interface SubscribeInfo {
   sim_id: string | null
   sim_type: string | null
   sim_usable: boolean | null
-  trial_end_data: number | null,
-  trial_end_nodata: number | null,
+  trial_end_data: number | null
+  trial_end_nodata: number | null
 }
 
 export const getSubscribeInfo = async (dongleId: string) => {
@@ -47,26 +47,27 @@ interface ActivateSubscriptionRequest {
   stripe_token: string
 }
 
-const getBilling = <T>(endpoint: string, init?: RequestInit): Promise<T> =>
-  fetcher<T>(endpoint, init, BILLING_URL)
+const getBilling = <T>(endpoint: string, init?: RequestInit): Promise<T> => fetcher<T>(endpoint, init, BILLING_URL)
 
 const postBilling = <T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T> => {
-  return fetcher(endpoint, {
-    ...init,
-    method: 'POST',
-    headers: {
-      ...init?.headers,
-      'Content-Type': 'application/json',
+  return fetcher(
+    endpoint,
+    {
+      ...init,
+      method: 'POST',
+      headers: {
+        ...init?.headers,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(body),
     },
-    body: JSON.stringify(body),
-  }, BILLING_URL)
+    BILLING_URL,
+  )
 }
 
-export const activateSubscription = async (body: ActivateSubscriptionRequest) =>
-  postBilling<{ success: 1 }>('/v1/prime/pay', body)
+export const activateSubscription = async (body: ActivateSubscriptionRequest) => postBilling<{ success: 1 }>('/v1/prime/pay', body)
 
-export const cancelSubscription = async (dongleId: string) =>
-  postBilling<{ success: 1 }>('/v1/prime/cancel', { dongle_id: dongleId })
+export const cancelSubscription = async (dongleId: string) => postBilling<{ success: 1 }>('/v1/prime/cancel', { dongle_id: dongleId })
 
 interface PaymentSource {
   brand: string
@@ -89,8 +90,9 @@ export const getStripeCheckout = async (dongleId: string, simId: string, plan: s
     plan,
   })
 
-export const getStripePortal = async (dongleId: string) =>
-  getBilling<{ url: string }>(`/v1/prime/stripe_portal?dongle_id=${dongleId}`)
+export const getStripePortal = async (dongleId: string) => getBilling<{ url: string }>(`/v1/prime/stripe_portal?dongle_id=${dongleId}`)
 
 export const getStripeSession = async (dongleId: string, sessionId: string) =>
-  getBilling<{ payment_status: 'no_payment_required' | 'paid' | 'unpaid' }>(`/v1/prime/stripe_session?dongle_id=${dongleId}&session_id=${sessionId}`)
+  getBilling<{ payment_status: 'no_payment_required' | 'paid' | 'unpaid' }>(
+    `/v1/prime/stripe_session?dongle_id=${dongleId}&session_id=${sessionId}`,
+  )
