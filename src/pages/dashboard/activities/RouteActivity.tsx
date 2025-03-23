@@ -1,11 +1,8 @@
-import {
-  createResource,
-  createSignal,
-  lazy,
-  Suspense,
-  type VoidComponent,
-} from 'solid-js'
+import { createResource, createSignal, lazy, Suspense, type VoidComponent } from 'solid-js'
 
+import { setRouteViewed } from '~/api/athena'
+import { getDevice } from '~/api/devices'
+import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
 
@@ -37,6 +34,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
+
+  const [device] = createResource(() => props.dongleId, getDevice)
+  const [profile] = createResource(getProfile)
+  createResource(() => [device(), profile(), props.dateStr] as const, async ([device, profile, dateStr]) => {
+    if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+    await setRouteViewed(device.dongle_id, dateStr)
+  })
 
   return (
     <>

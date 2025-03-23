@@ -31,6 +31,9 @@ export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
     })),
   }, Math.floor(Date.now() / 1000) + EXPIRES_IN_SECONDS)
 
+export const setRouteViewed = (dongleId: string, route: string) =>
+  makeAthenaCall<{ route: string }, void>(dongleId, 'setRouteViewed', { route })
+
 export const makeAthenaCall = async <REQ, RES>(dongleId: string, method: string, params?: REQ, expiry?: number): Promise<AthenaCallResponse<RES>> => {
   const res = await fetcher<BackendAthenaCallResponse<RES> | BackendAthenaCallResponseError>(`/${dongleId}`, {
     method: 'POST',
