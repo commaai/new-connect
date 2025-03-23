@@ -5,7 +5,6 @@ if (!OUT_DIR) {
   OUT_DIR = 'dist'
   if (!process.env.CI) {
     console.debug('Building...')
-    await $`rm -rf ${OUT_DIR}`
     await $`bun run build`.quiet()
   }
 }
