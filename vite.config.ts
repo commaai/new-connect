@@ -3,6 +3,8 @@ import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 
+import { Icons } from '~/components/material/Icon'
+
 export default defineConfig({
   plugins: [
     devtools(),
@@ -17,14 +19,7 @@ export default defineConfig({
     {
       name: 'inject-material-symbols',
       transformIndexHtml(html) {
-        // Specify icon names to load only the necessary icons, reducing font payload.
-        // https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
-        // biome-ignore format: the array should not be formatted
-        const icons = [
-          'add', 'arrow_back', 'camera', 'check', 'chevron_right', 'clear', 'close', 'description', 'directions_car', 'download',
-          'error', 'file_copy', 'info', 'menu', 'my_location', 'open_in_new', 'payments', 'person', 'progress_activity',
-          'satellite_alt', 'search', 'settings', 'sync', 'upload', 'videocam',
-        ].toSorted().join(',')
+        const icons = Icons.toSorted().join(',')
         return {
           html,
           tags: [

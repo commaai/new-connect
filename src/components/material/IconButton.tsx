@@ -1,17 +1,17 @@
-import type { Component } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import { splitProps } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase, { ButtonBaseProps } from './ButtonBase'
-import Icon, { IconProps } from '~/components/material/Icon'
+import Icon, { type IconName, type IconProps } from '~/components/material/Icon'
 
 type IconButtonProps = ButtonBaseProps & {
-  children: string
+  name: IconName
   filled?: IconProps['filled']
   size?: IconProps['size']
 }
 
-const IconButton: Component<IconButtonProps> = (props) => {
+const IconButton: VoidComponent<IconButtonProps> = (props) => {
   const size = () => props.size || '24'
   const buttonSize = () =>
     ({
@@ -30,9 +30,7 @@ const IconButton: Component<IconButtonProps> = (props) => {
       )}
       {...rest}
     >
-      <Icon filled={props.filled} size={size()}>
-        {props.children}
-      </Icon>
+      <Icon name={props.name} filled={props.filled} size={size()} />
     </ButtonBase>
   )
 }

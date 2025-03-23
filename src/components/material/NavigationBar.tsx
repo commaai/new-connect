@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import Icon, { IconProps } from '~/components/material/Icon'
 
 type NavigationBarItemProps = {
-  icon: IconProps['children']
+  icon: IconProps['name']
   href: string
   selected?: boolean
 }
@@ -19,9 +19,7 @@ export const NavigationBarItem: ParentComponent<NavigationBarItemProps> = (props
       activeClass="text-on-surface before:bg-on-surface before:opacity-[.12]"
       inactiveClass="text-on-surface-variant before:bg-on-surface-variant"
     >
-      <Icon class="flex transition-all" filled={props.selected}>
-        {props.icon}
-      </Icon>
+      <Icon class="flex transition-all" name={props.icon} filled={props.selected} />
       <div class="mt-2 flex text-label-lg">{props.children}</div>
     </A>
   )

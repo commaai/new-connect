@@ -8,6 +8,7 @@ import Button from './material/Button'
 
 import { getDeviceLocation } from '~/api/devices'
 import Card from '~/components/material/Card'
+import type { IconName } from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import { getTileUrl } from '~/map'
 import { getFullAddress } from '~/map/geocode'
@@ -128,13 +129,13 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     },
   )
 
-  const addMarker = (instance: L.Map, loc: Location, iconName: string, iconClass?: string) => {
+  const addMarker = (instance: L.Map, loc: Location, iconName: IconName, iconClass?: string) => {
     const el = document.createElement('div')
 
     render(
       () => (
         <div class={clsx('flex size-[40px] items-center justify-center rounded-full bg-primary-container', iconClass)}>
-          <Icon>{iconName}</Icon>
+          <Icon name={iconName} />
         </div>
       ),
       el,
@@ -175,7 +176,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
             onClick={() => void requestUserLocation()}
             trailing={<span class="pr-2 text-sm">Show my location</span>}
           >
-            <Icon size="20">my_location</Icon>
+            <Icon name="my_location" size="20" />
           </Button>
         </div>
       </Show>
@@ -189,9 +190,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
       <Show when={(locationData.error as Error)?.message}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
-          <Icon class="mr-2" size="20">
-            error
-          </Icon>
+          <Icon class="mr-2" name="error" size="20" />
           <span class="text-sm">{(locationData.error as Error).message}</span>
         </div>
       </Show>
@@ -204,14 +203,14 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       >
         <div class="mb-2 flex flex-row items-center justify-between gap-4">
           <span class="truncate text-title-md">{selectedLocation()?.label}</span>
-          <IconButton onClick={() => setShowSelectedLocation(false)}>close</IconButton>
+          <IconButton name="close" onClick={() => setShowSelectedLocation(false)} />
         </div>
         <div class="flex flex-col items-end gap-3 xs:flex-row">
           <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
           <Button
             color="secondary"
             onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
-            trailing={<Icon size="20">open_in_new</Icon>}
+            trailing={<Icon name="open_in_new" size="20" />}
           >
             Open in Maps
           </Button>

@@ -3,14 +3,14 @@ import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
 import { getRouteWithSegments } from '~/api/route'
-import Icon from '~/components/material/Icon'
+import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
 
 interface UploadButtonProps {
   state: 'idle' | 'loading' | 'success' | 'error'
   onClick?: () => void
-  icon: string
+  icon: IconName
   text: string
 }
 
@@ -27,7 +27,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
     }
   }
 
-  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, string> = {
+  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, IconName> = {
     idle: icon(),
     loading: 'progress_activity',
     success: 'check',
@@ -39,11 +39,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       onClick={() => handleUpload()}
       class="px-2 md:px-3"
       disabled={disabled()}
-      leading={
-        <Icon size="20" class={clsx(state() === 'loading' && 'animate-spin')}>
-          {stateToIcon[state()]}
-        </Icon>
-      }
+      leading={<Icon class={clsx(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
       color="primary"
     >
       <span class="flex items-center gap-1 font-mono">{props.text}</span>

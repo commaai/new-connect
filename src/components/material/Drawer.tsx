@@ -22,7 +22,7 @@ export const DrawerToggleButton: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   return (
     <Show when={modal()}>
-      <IconButton onClick={() => setOpen((prev) => !prev)}>menu</IconButton>
+      <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
     </Show>
   )
 }
