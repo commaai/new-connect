@@ -139,6 +139,8 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     mapContainerRef.addEventListener('mouseenter', handleMouseEnter);
     mapContainerRef.addEventListener('mouseleave', handleMouseLeave);
 
+    let messageTimeout: NodeJS.Timer
+
     // Custom wheel event handler for the map
     const handleWheel = (e: WheelEvent) => {
       // Only handle events when pointer is over the map
@@ -185,8 +187,6 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       }
     };
     
-    let messageTimeout: NodeJS.Timer
-
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         // Single finger
@@ -349,14 +349,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
         {/* Scroll instruction overlay */}
         <Show when={showScrollMessage()}>
-
-
           {/* Dark overlay for the entire map - add animate-in fade-in */}
           <div class="absolute inset-0 z-[5400] bg-black bg-opacity-30 transition-opacity duration-200 animate-in fade-in"></div>
-          
-
-
-          {/* Enhanced message styling - make semi-transparent with bg-opacity-90 */}
+          {/* Message box */}
           <div class="absolute left-1/2 top-12 z-[5500] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-xl bg-surface-container-high bg-opacity-90 backdrop-blur-sm px-6 py-3 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
             <Icon class="mr-3 text-primary" size="24">
               {isTouchDevice() ? "touch_app" : "mouse"}
