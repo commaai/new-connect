@@ -84,7 +84,7 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 140), 1)
+  const pageSize = () => Math.max(Math.ceil((dimensions().height / 2) / 68), 1)
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -133,12 +133,8 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
         {(_, i) => {
           const [routes] = createResource(() => i(), getPage)
           return (
-            <Suspense fallback={<Index each={new Array(pageSize())}>{() => (
-              <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />
-            )}</Index>}>
-              <For each={routes()}>
-                {(route) => <RouteItem route={route} />}
-              </For>
+            <Suspense fallback={<Index each={new Array(pageSize())}>{() => <div class="skeleton-loader h-[68px]" />}</Index>}>
+              <For each={routes()}>{(route) => <RouteItem route={route} />}</For>
             </Suspense>
           )
         }}
