@@ -58,7 +58,6 @@
     "wrangler": "^4.3.0"
   },
   "//dependencies": {
-    "@mapbox/polyline": "display series of map coordinates as a line",
     "@sentry/solid": "error monitoring",
     "@solidjs/router": "changes view based on browser url",
     "clsx": "construct className strings conditionally",
