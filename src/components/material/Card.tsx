@@ -5,8 +5,8 @@ import ButtonBase from '~/components/material/ButtonBase'
 
 type CardHeaderProps = {
   class?: string
-  headline?: string
-  subhead?: string
+  headline?: JSXElement
+  subhead?: JSXElement
   leading?: JSXElement
   trailing?: JSXElement
 }
