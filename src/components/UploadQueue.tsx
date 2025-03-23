@@ -9,6 +9,7 @@ import IconButton from '~/components/material/IconButton'
 import StatisticBar from '~/components/material/StatisticBar'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 import { UploadItem } from '~/types'
+import { COMMA_CONNECT_PRIORITY } from '~/api/athena'
 
 interface UploadQueueProps {
   dongleId: string
@@ -41,7 +42,9 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
     <div class="flex flex-col mb-2 pt-2">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">{props.item.priority === 0 ? 'face' : 'local_fire_department'}</Icon>
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">
+            {props.item.priority === COMMA_CONNECT_PRIORITY ? 'face' : 'local_fire_department'}
+          </Icon>
           <div class="flex min-w-0 gap-1">
             <span class="text-body-sm font-mono truncate text-on-surface">
               {[props.item.route, props.item.segment, props.item.filename].join(' ')}

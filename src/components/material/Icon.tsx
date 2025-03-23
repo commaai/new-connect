@@ -17,7 +17,6 @@ export type IconProps = {
   name: IconName
   filled?: boolean
   size?: '20' | '24' | '40' | '48'
-  tooltip?: string
 }
 
 /**
