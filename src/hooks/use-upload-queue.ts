@@ -49,8 +49,10 @@ const clearQueue = async (dongleId: string, items: UploadItem[]) => {
 
 
 export const useUploadQueue = (dongleId: string) => {
-  const [onlineItems, setOnlineItems] = createStore<UploadItem[]>([])
-  const [_, setOfflineItems] = createStore<UploadItem[]>([])
+  const [items, setItems] = createStore({
+    online: [] as UploadItem[],
+    offline: [] as UploadItem[],
+  })
   const [loading, setLoading] = createSignal(true)
   const [onlineQueueError, setOnlineQueueError] = createSignal<string | undefined>()
   const [onlineTimeout, setOnlineTimeout] = createSignal<Timer>()
@@ -62,11 +64,16 @@ export const useUploadQueue = (dongleId: string) => {
   const pollOnlineQueue = async () => {
     try {
       const response = await getUploadQueue(dongleId)
-      setOnlineItems(reconcile(mapQueueData(response.result!)))
+      setItems('online', reconcile(mapQueueData(response.result!)))
       setOnlineQueueError(undefined)
     } catch (err) {
-      console.error('Error polling online queue:', err)
-      setOnlineQueueError('Device offline')
+      // TODO: fix types here
+      if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
+        setOnlineQueueError('Device offline')
+      } else {
+        console.error('Error polling online queue:', err)
+        setOnlineQueueError(`${err}`)
+      }
     } finally {
       setLoading(false)
       setOnlineTimeout(setTimeout(pollOnlineQueue, pollInterval()))
@@ -76,10 +83,10 @@ export const useUploadQueue = (dongleId: string) => {
   const pollOfflineQueue = async () => {
     try {
       const offlineData = await getAthenaOfflineQueue(dongleId)
-      setOfflineItems(reconcile(processOfflineQueueData(offlineData)))
+      setItems('offline', reconcile(processOfflineQueueData(offlineData)))
       setOfflineQueueError(undefined)
     } catch (err) {
-      console.error('Error polling offline queue:', err)
+      console.debug('Error polling offline queue:', err)
       setOfflineQueueError(`${err}`)
     } finally {
       setOfflineTimeout(setTimeout(pollOfflineQueue, pollInterval()))
@@ -96,11 +103,14 @@ export const useUploadQueue = (dongleId: string) => {
     clearTimeout(offlineTimeout())
   })
 
+  const combined = createMemo(() => [...items.online, ...items.offline])
+  const offline = createMemo(() => onlineQueueError() !== undefined)
+
   return {
     loading,
-    items: onlineItems,
+    items: combined,
     error: onlineQueueError,
-    offline: () => onlineQueueError() !== undefined,
-    clearQueue: () => clearQueue(dongleId, onlineItems)
+    offline,
+    clearQueue: () => clearQueue(dongleId, items.online)
   }
 }
