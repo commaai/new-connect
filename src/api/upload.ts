@@ -23,7 +23,7 @@ const generateMissingFilePaths = (
   segmentStart: number,
   segmentEnd: number,
   uploadedFiles: string[],
-  types?: (keyof typeof FileTypes)[],
+  types?: FileType[],
 ): string[] => {
   const paths: string[] = []
   for (let i = segmentStart; i <= segmentEnd; i++) {
@@ -41,14 +41,14 @@ const generateMissingFilePaths = (
 const prepareUploadRequests = (paths: string[], presignedUrls: UploadFileMetadata[]): UploadFile[] =>
   paths.map((path, i) => ({ filePath: path, ...presignedUrls[i] }))
 
-export const uploadAllSegments = (routeName: string, totalSegments: number, types?: (keyof typeof FileTypes)[]) =>
+export const uploadAllSegments = (routeName: string, totalSegments: number, types?: FileType[]) =>
   uploadSegments(routeName, 0, totalSegments - 1, types)
 
 export const uploadSegments = async (
   routeName: string,
   segmentStart: number,
   segmentEnd: number,
-  types?: (keyof typeof FileTypes)[],
+  types?: FileType[],
 ) => {
   const routeInfo = parseRouteName(routeName)
   const alreadyUploadedFiles = await getFiles(routeName, types)
