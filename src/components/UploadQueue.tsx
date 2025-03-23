@@ -62,24 +62,23 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
   })
 
   return (
-    <div class="flex flex-col h-[2.25rem] gap-1">
-      <div class="flex items-center justify-between gap-3">
-        <div class="flex items-center gap-2 min-w-0 flex-1">
-          <Icon class="text-on-surface-variant">
+    <div class="flex flex-col mb-2 pt-2">
+      <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
+        <div class="flex items-center min-w-0 flex-1">
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2">
             {props.item.priority === 0 ? 'face' : 'local_fire_department'}
           </Icon>
           <Show when={pathInfo().route} fallback={
             <span class="text-body-sm font-mono truncate text-on-surface">{props.item.name}</span>
           }>
-            <span class="text-body-sm font-mono whitespace-nowrap text-on-surface-variant">{pathInfo().route}</span>
-            <span class="text-body-sm font-mono whitespace-nowrap text-on-surface-variant/75">{pathInfo().segment}</span>
-            <span class="text-body-sm font-mono truncate text-on-surface">{pathInfo().filename}</span>
+            <div class="flex min-w-0 gap-1">
+              <span class="text-body-sm font-mono truncate text-on-surface">{[pathInfo().route, pathInfo().segment, pathInfo().filename].join(' ')}</span>
+            </div>
           </Show>
         </div>
-        <Show when={props.item.retryCount > 0}>
-          <Icon class="text-on-surface-variant" tooltip={`Attempt ${props.item.retryCount + 1}`}>error</Icon>
-        </Show>
-        <span class="text-body-sm font-mono whitespace-nowrap">{progress()}</span>
+        <div class="flex items-center gap-2 flex-shrink-0 justify-end">
+          <span class="text-body-sm font-mono whitespace-nowrap">{progress()}</span>
+        </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
         <LinearProgress progress={props.item.progress} color={progressColor()} />
@@ -165,13 +164,15 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
                   exitToClass="opacity-0 transform -translate-x-4"
                   moveClass="transition-transform duration-300"
                 >
-                  <For each={sortedItems()}>
-                    {(item) => (
-                      <div class="py-1" data-id={item.id}>
-                        <QueueItem item={item} />
-                      </div>
-                    )}
-                  </For>
+                  <div class="space-y-[-0.75rem]">
+                    <For each={sortedItems()}>
+                      {(item) => (
+                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.id}>
+                          <QueueItem item={item} />
+                        </div>
+                      )}
+                    </For>
+                  </div>
                 </TransitionGroup>
               </div>
             </Show>
