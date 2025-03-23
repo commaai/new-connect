@@ -216,11 +216,12 @@ export interface UploadQueueItem {
 }
 
 export interface UploadItem {
-  id: string
-  name: string
+  route: string
+  segment: number
+  filename: string
   uploadUrl: string
   progress: number
   priority: number
   retryCount: number
-  status: 'uploading' | 'completed' | 'error' | 'pending' | 'waiting_for_network'
+  status: 'uploading' | 'completed' | 'error' | 'queued' | 'waiting_for_network'
 }

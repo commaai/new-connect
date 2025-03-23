@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { For, Show, createMemo } from 'solid-js'
 import { Transition, TransitionGroup } from 'solid-transition-group'
 import type { Component } from 'solid-js'
@@ -13,41 +14,18 @@ interface UploadQueueProps {
   dongleId: string
 }
 
-const parseUploadPath = (url: string) => {
-  const parts = new URL(url).pathname.split('/')
-  const route = parts[3]
-  const segment = parts[4]
-  const filename = parts[5]
-
-  return { route, segment, filename }
-}
-
-const getStatusPriority = (status: UploadItem['status']): number => {
-  switch (status) {
-    case 'pending': return 2
-    case 'waiting_for_network': return 2
-    default: return 1
-  }
-}
-
 const QueueItem: Component<{ item: UploadItem }> = (props) => {
   const progress = createMemo(() => {
     if (props.item.status === 'waiting_for_network') return 'Waiting for network'
-    if (props.item.status === 'pending') return 'Queued'
-
-    const progress = Math.round(props.item.progress * 100)
-    if (progress === 100) return 'Finishing'
-    return `${progress}%`
-  })
-
-  const pathInfo = createMemo(() => {
-    return parseUploadPath(props.item.uploadUrl)
+    if (props.item.status === 'queued') return 'Queued'
+    if (props.item.progress === 100) return 'Finishing'
+    return `${props.item.progress}%`
   })
 
   const progressColor = createMemo(() => {
     switch (props.item.status) {
       case 'uploading': return 'primary'
-      case 'pending': return 'secondary'
+      case 'queued': return 'secondary'
       case 'completed': return 'tertiary'
       case 'waiting_for_network': return 'secondary'
       default: return 'primary'
@@ -61,13 +39,9 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
           <Icon class="text-on-surface-variant flex-shrink-0 mr-2">
             {props.item.priority === 0 ? 'face' : 'local_fire_department'}
           </Icon>
-          <Show when={pathInfo().route} fallback={
-            <span class="text-body-sm font-mono truncate text-on-surface">{props.item.name}</span>
-          }>
-            <div class="flex min-w-0 gap-1">
-              <span class="text-body-sm font-mono truncate text-on-surface">{[pathInfo().route, pathInfo().segment, pathInfo().filename].join(' ')}</span>
-            </div>
-          </Show>
+          <div class="flex min-w-0 gap-1">
+            <span class="text-body-sm font-mono truncate text-on-surface">{[props.item.route, props.item.segment, props.item.filename].join(' ')}</span>
+          </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
           <span class="text-body-sm font-mono whitespace-nowrap">{progress()}</span>
@@ -82,7 +56,7 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
 
 const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class: string }> = (props) => {
   const uploadingCount = createMemo(() => props.loading ? undefined : props.items.filter(i => i.status === 'uploading').length)
-  const waitingCount = createMemo(() => props.loading ? undefined : props.items.filter(i => i.status === 'pending').length)
+  const waitingCount = createMemo(() => props.loading ? undefined : props.items.filter(i => i.status === 'queued').length)
   const queuedCount = createMemo(() => props.loading ? undefined : props.items.length)
 
   return (
@@ -98,17 +72,6 @@ const QueueStatistics: Component<{ loading: boolean; items: UploadItem[]; class:
 }
 
 const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: string; offline?: boolean }> = (props) => {
-  const sortedItems = createMemo(() => {
-    return [...props.items].sort((a, b) => {
-      // First sort by status priority
-      const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status)
-      if (statusDiff !== 0) return statusDiff
-      
-      // Then sort by ID for stability within same status
-      return a.id.localeCompare(b.id)
-    })
-  })
-
   return (
     <div class="relative h-[calc(8*2.25rem)]">
       <Transition
@@ -158,9 +121,9 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
                   moveClass="transition-transform duration-300"
                 >
                   <div class="space-y-[-0.75rem]">
-                    <For each={sortedItems()}>
+                    <For each={props.items}>
                       {(item) => (
-                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.id}>
+                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.uploadUrl}>
                           <QueueItem item={item} />
                         </div>
                       )}
@@ -177,7 +140,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
 }
 
 const UploadQueue: Component<UploadQueueProps> = (props) => {
-  const { loading, error, items, offline, clearQueue } = useUploadQueue(props.dongleId)
+  const { loading, error, items, offline, clearQueue, clearingQueue, clearQueueError } = useUploadQueue(props.dongleId)
 
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
@@ -186,7 +149,17 @@ const UploadQueue: Component<UploadQueueProps> = (props) => {
             <QueueStatistics loading={loading()} items={items()} class="p-4" />
         </div>
         <div class="flex p-4">
-          <IconButton onClick={() => void clearQueue()}>delete</IconButton>
+          <Show when={!clearQueueError()} fallback={
+            <IconButton onClick={() => void clearQueue()} disabled={clearingQueue()}>error</IconButton>
+          }>
+            <IconButton 
+              class={clsx(clearingQueue() && 'animate-spin')} 
+              onClick={() => void clearQueue()} 
+              disabled={clearingQueue()}
+            >
+              {clearingQueue() ? 'progress_activity' : 'delete'}
+            </IconButton>
+          </Show>
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
