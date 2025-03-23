@@ -216,6 +216,7 @@ export interface UploadQueueItem {
 }
 
 export interface UploadItem {
+  id: string
   route: string
   segment: number
   filename: string

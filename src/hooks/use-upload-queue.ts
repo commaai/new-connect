@@ -19,6 +19,7 @@ const processOfflineQueueData = (data: AthenaOfflineQueueItem[]): UploadItem[] =
     item.params.files_data.map(file => {
       const { route, segment, filename } = parseUploadPath(file.url)
       return {
+        id: file.fn, // not queued yet so not ID assigned
         route,
         segment,
         filename,
@@ -35,6 +36,7 @@ const mapQueueData = (data: AthenaOnlineUploadQueueItem[]): UploadItem[] =>
   data.map(item => {
     const { route, segment, filename } = parseUploadPath(item.url)
     return {
+      id: item.id,
       route,
       segment,
       filename,

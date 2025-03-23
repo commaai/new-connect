@@ -123,7 +123,7 @@ const QueueList: Component<{ loading: boolean; items: UploadItem[]; error?: stri
                   <div class="space-y-[-0.75rem]">
                     <For each={props.items}>
                       {(item) => (
-                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.uploadUrl}>
+                        <div class="py-1 bg-surface-container-lowest rounded-md px-2" data-id={item.id}>
                           <QueueItem item={item} />
                         </div>
                       )}
