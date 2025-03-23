@@ -11,6 +11,7 @@
   },
   "formatter": {
     "enabled": true,
+    "formatWithErrors": true,
     "indentStyle": "space",
     "useEditorconfig": true
   },
@@ -47,7 +48,6 @@
   },
   "javascript": {
     "formatter": {
-      "lineWidth": 120,
       "quoteStyle": "single",
       "semicolons": "asNeeded"
     }
