@@ -115,7 +115,6 @@ export const useUploadQueue = (dongleId: string) => {
       setItems('online', reconcile(mapQueueData(response.result!)))
       setOnlineQueueError(undefined)
     } catch (err) {
-      // TODO: fix types here
       if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
         setOnlineQueueError('Device offline')
       } else {
