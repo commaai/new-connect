@@ -1,0 +1,83 @@
+name: PR Diff
+
+on:
+  pull_request_target:
+    types: [assigned, opened, synchronize, reopened, edited]
+    branches: [master]
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.run_id }}
+  cancel-in-progress: true
+
+jobs:
+  check-branch:
+    name: Check PR branch status
+    runs-on: ubuntu-latest
+    outputs:
+      outdated: ${{ steps.status.output.outdated }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          fetch-depth: 0
+      - name: Check whether branch is up-to-date
+        id: status
+        run: |
+          git remote add commaai https://github.com/commaai/connect.git
+          git fetch commaai master
+          echo "${{ github.event.pull_request.head.sha }}"
+          git rev-list --left-right --count commaai/master...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'
+          count=$(git rev-list --left-right --count commaai/master...${{ github.event.pull_request.head.sha }} | awk '{print $1}')
+          if [ $count -gt 0 ]; then
+            echo "Current branch is behind commaai master branch!"
+            echo "outdated=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "outdated=false" >> "$GITHUB_OUTPUT"
+          fi
+
+  lines:
+    name: Lint count diff
+    permissions:
+      contents: read
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs: check-branch
+    if: needs.check-branch.outputs.outdated == 'false'
+    timeout-minutes: 2
+    steps:
+      - name: Checkout code from PR branch
+        uses: actions/checkout@v4
+        with:
+          repository: ${{ github.event.pull_request.head.repo.full_name }}
+          ref: ${{ github.event.pull_request.head.sha }}
+          path: pr
+      - name: Checkout code from commaai master
+        uses: actions/checkout@v4
+        with:
+          path: base
+      - uses: oven-sh/setup-bun@v2
+      - name: Create line count diff
+        run: bun ./base/src/ci/check_lines.ts ./base/src ./pr/src > diff.txt
+      - name: Comment diff
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          file-path: ./diff.txt
+          comment-tag: diff
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  rebase:
+    name: Rebase comment
+    permissions:
+      pull-requests: write
+    runs-on: ubuntu-latest
+    needs: check-branch
+    if: needs.check-branch.outputs.outdated == 'true'
+    timeout-minutes: 1
+    steps:
+      - name: Comment rebase
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          message: This branch is behind commaai/master. The line count diff bot is disabled.
+          comment-tag: diff
+          github-token: ${{ secrets.GITHUB_TOKEN }}
