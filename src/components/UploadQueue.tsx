@@ -39,7 +39,7 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
   })
 
   return (
-    <div class="flex flex-col mb-2 pt-2">
+    <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
           <Icon
@@ -82,7 +82,7 @@ const QueueStatistics: Component<{ loading: boolean; items: () => UploadItem[]; 
 
 const QueueList: Component<{ loading: boolean; items: () => UploadItem[]; error?: string; offline?: boolean }> = (props) => {
   return (
-    <div class="relative h-[calc(8*2.25rem)]">
+    <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)]">
       <Transition
         appear
         enterActiveClass="transition-all duration-250 ease-in-out"
@@ -119,26 +119,24 @@ const QueueList: Component<{ loading: boolean; items: () => UploadItem[]; error?
               }
             >
               <div class="absolute inset-0 overflow-y-auto hide-scrollbar">
-                <div class="space-y-[-0.75rem]">
-                  <TransitionGroup
-                    name="list"
-                    enterActiveClass="transition-all duration-300 ease-in-out"
-                    exitActiveClass="transition-all duration-300 ease-in-out"
-                    enterClass="opacity-0 transform translate-x-4"
-                    enterToClass="opacity-100 transform translate-x-0"
-                    exitClass="opacity-100 transform translate-x-0"
-                    exitToClass="opacity-0 transform -translate-x-4"
-                    moveClass="transition-transform duration-300"
-                  >
-                    <For each={props.items()}>
-                      {(item) => (
-                        <div class="py-1 bg-surface-container-lowest rounded-md px-2">
-                          <QueueItem item={item} />
-                        </div>
-                      )}
-                    </For>
-                  </TransitionGroup>
-                </div>
+                <TransitionGroup
+                  name="list"
+                  enterActiveClass="transition-all duration-300 ease-in-out"
+                  exitActiveClass="transition-all duration-300 ease-in-out"
+                  enterClass="opacity-0 transform translate-x-4"
+                  enterToClass="opacity-100 transform translate-x-0"
+                  exitClass="opacity-100 transform translate-x-0"
+                  exitToClass="opacity-0 transform -translate-x-4"
+                  moveClass="transition-transform duration-300"
+                >
+                  <For each={props.items()}>
+                    {(item) => (
+                      <div class="bg-surface-container-lowest rounded-md pb-1">
+                        <QueueItem item={item} />
+                      </div>
+                    )}
+                  </For>
+                </TransitionGroup>
               </div>
             </Show>
           </Show>
