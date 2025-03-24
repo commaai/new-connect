@@ -50,5 +50,6 @@ export const uploadSegments = async (routeName: string, segmentStart: number, se
   const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles, types)
   const pathPresignedUrls = await requestToUploadFiles(routeInfo.dongleId, paths)
   const athenaRequests = prepareUploadRequests(paths, pathPresignedUrls)
+  if (athenaRequests.length === 0) return []
   return await uploadFilesToUrls(routeInfo.dongleId, athenaRequests)
 }
