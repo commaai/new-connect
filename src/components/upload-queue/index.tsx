@@ -5,8 +5,8 @@ import type { Component } from 'solid-js'
 import IconButton from '~/components/material/IconButton'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 
-import QueueStatistics from './QueueStatistics'
 import QueueItemTable from './QueueItemTable'
+import QueueStatistics from './QueueStatistics'
 
 interface UploadQueueProps {
   dongleId: string
