@@ -6,19 +6,24 @@ import Icon from '~/components/material/Icon'
 import { UploadItem } from '~/types'
 
 import QueueItem from './QueueItem'
+import clsx from 'clsx'
+
+const animations = (slide: boolean) => {
+  return {
+    enterActiveClass: 'transition-all duration-300 ease-in-out',
+    exitActiveClass: 'transition-all duration-300 ease-in-out',
+    enterClass: clsx('opacity-0', slide && 'transform translate-x-4'),
+    enterToClass: clsx('opacity-100', slide && 'transform translate-x-0'),
+    exitClass: clsx('opacity-100', slide && 'transform translate-x-0'),
+    exitToClass: clsx('opacity-0', slide && 'transform -translate-x-4'),
+    moveClass: clsx(slide && 'transition-transform duration-300'),
+  }
+}
 
 const QueueItemTable: Component<{ loading: boolean; items: () => UploadItem[]; error?: string; offline?: boolean }> = (props) => {
   return (
     <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)]">
-      <Transition
-        appear
-        enterActiveClass="transition-all duration-250 ease-in-out"
-        exitActiveClass="transition-all duration-250 ease-in-out"
-        enterClass="opacity-0"
-        enterToClass="opacity-100"
-        exitClass="opacity-100"
-        exitToClass="opacity-0"
-      >
+      <Transition appear {...animations(false)}>
         <Show
           when={!props.loading}
           fallback={
@@ -46,16 +51,7 @@ const QueueItemTable: Component<{ loading: boolean; items: () => UploadItem[]; e
               }
             >
               <div class="absolute inset-0 overflow-y-auto hide-scrollbar">
-                <TransitionGroup
-                  name="list"
-                  enterActiveClass="transition-all duration-300 ease-in-out"
-                  exitActiveClass="transition-all duration-300 ease-in-out"
-                  enterClass="opacity-0 transform translate-x-4"
-                  enterToClass="opacity-100 transform translate-x-0"
-                  exitClass="opacity-100 transform translate-x-0"
-                  exitToClass="opacity-0 transform -translate-x-4"
-                  moveClass="transition-transform duration-300"
-                >
+                <TransitionGroup name="list" {...animations(true)}>
                   <For each={props.items()}>
                     {(item) => (
                       <div class="bg-surface-container-lowest rounded-md pb-1 sm:pb-2">
