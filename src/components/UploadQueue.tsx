@@ -131,7 +131,7 @@ const QueueList: Component<{ loading: boolean; items: () => UploadItem[]; error?
                 >
                   <For each={props.items()}>
                     {(item) => (
-                      <div class="bg-surface-container-lowest rounded-md pb-1">
+                      <div class="bg-surface-container-lowest rounded-md pb-1 sm:pb-2">
                         <QueueItem item={item} />
                       </div>
                     )}
