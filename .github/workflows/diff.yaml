@@ -14,7 +14,7 @@ jobs:
     name: Check PR branch status
     runs-on: ubuntu-latest
     outputs:
-      outdated: ${{ steps.status.output.outdated }}
+      outdated: ${{ steps.status.outputs.outdated }}
     steps:
       - uses: actions/checkout@v4
         with:
