@@ -14,7 +14,7 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 
 import RouteList from '../components/RouteList'
 import Icon from '~/components/material/Icon'
-import UploadQueue from '~/components/UploadQueue'
+import UploadQueue from '~/components/upload-queue'
 import clsx from 'clsx'
 
 type DeviceActivityProps = {
