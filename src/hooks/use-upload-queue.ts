@@ -104,7 +104,7 @@ export const useUploadQueue = (dongleId: string) => {
         items.map((item) => item.id),
       )
     } catch (err) {
-      console.error('Error clearing queue:', err)
+      console.debug('Error clearing queue:', err)
       setClearQueueError(`Error clearing queue: ${err}`)
     } finally {
       setClearingQueue(false)
