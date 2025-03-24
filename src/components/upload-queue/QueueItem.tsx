@@ -15,12 +15,10 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
 
   const progressColor = createMemo(() => {
     switch (props.item.status) {
-      case 'uploading':
-        return 'primary'
-      case 'queued':
-        return 'secondary'
       case 'completed':
         return 'tertiary'
+      case 'queued':
+        return 'secondary'
       case 'waiting_for_network':
         return 'secondary'
       default:
@@ -28,14 +26,13 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
     }
   })
 
+  const icon = createMemo(() => (props.item.priority === COMMA_CONNECT_PRIORITY ? 'face' : 'local_fire_department'))
+
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon
-            class="text-on-surface-variant flex-shrink-0 mr-2"
-            name={props.item.priority === COMMA_CONNECT_PRIORITY ? 'face' : 'local_fire_department'}
-          />
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={icon()} />
           <div class="flex min-w-0 gap-1">
             <span class="text-body-sm font-mono truncate text-on-surface">
               {[props.item.route, props.item.segment, props.item.filename].join(' ')}
