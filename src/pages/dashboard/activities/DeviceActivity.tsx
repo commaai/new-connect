@@ -1,4 +1,4 @@
-import { createResource, Suspense, Show, For, createSignal } from 'solid-js'
+import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
