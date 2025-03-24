@@ -13,7 +13,7 @@ import { fetcher } from '.'
 import { ATHENA_URL } from './config'
 
 // Higher number is lower priority
-const HIGH_PRIORITY = 0
+export const COMMA_CONNECT_PRIORITY = 1
 
 // Uploads expire after 1 week if device remains offline
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
@@ -34,7 +34,7 @@ export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
         allow_cellular: false,
         fn: file.filePath,
         headers: file.headers,
-        priority: HIGH_PRIORITY,
+        priority: COMMA_CONNECT_PRIORITY,
         url: file.url,
       })),
     },
