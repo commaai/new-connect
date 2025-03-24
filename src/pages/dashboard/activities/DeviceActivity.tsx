@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
@@ -7,15 +8,13 @@ import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
 import { DrawerToggleButton } from '~/components/material/Drawer'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-
-import RouteList from '../components/RouteList'
-import Icon from '~/components/material/Icon'
+import RouteList from '~/pages/dashboard/components/RouteList'
 import UploadQueue from '~/components/upload-queue'
-import clsx from 'clsx'
 
 type DeviceActivityProps = {
   dongleId: string
