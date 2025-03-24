@@ -14,13 +14,17 @@ const DrawerContext = createContext<DrawerContext>()
 
 export function useDrawerContext() {
   const context = useContext(DrawerContext)
-  if (!context) throw new Error('can\'t find DrawerContext')
+  if (!context) throw new Error("can't find DrawerContext")
   return context
 }
 
 export const DrawerToggleButton: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
-  return <Show when={modal()}><IconButton onClick={() => setOpen((prev) => !prev)}>menu</IconButton></Show>
+  return (
+    <Show when={modal()}>
+      <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
+    </Show>
+  )
 }
 
 const PEEK = 56

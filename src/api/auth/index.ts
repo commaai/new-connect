@@ -7,8 +7,7 @@ function stringify(obj: Record<string, string>): string {
 
 const GOOGLE_OAUTH_PARAMS = {
   type: 'web_server',
-  client_id:
-    '45471411055-ornt4svd2miog6dnopve7qtmh5mnu6id.apps.googleusercontent.com',
+  client_id: '45471411055-ornt4svd2miog6dnopve7qtmh5mnu6id.apps.googleusercontent.com',
   redirect_uri: `${BASE_URL}/v2/auth/g/redirect/`,
   response_type: 'code',
   scope: 'https://www.googleapis.com/auth/userinfo.email',

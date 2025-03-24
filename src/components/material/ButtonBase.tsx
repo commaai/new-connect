@@ -20,23 +20,14 @@ const ButtonBase: Component<ButtonBaseProps> = (props) => {
     <Show
       when={props.href}
       fallback={
-        <button
-          class={clsx('relative isolate overflow-hidden', props.class)}
-          onClick={onClick}
-          {...rest}
-        >
+        <button class={clsx('relative isolate overflow-hidden', props.class)} onClick={onClick} {...rest}>
           {props.children}
         </button>
       }
       keyed
     >
       {(href) => (
-        <A
-          class={clsx('relative isolate overflow-hidden', props.class)}
-          onClick={onClick}
-          href={href}
-          activeClass={props.activeClass}
-        >
+        <A class={clsx('relative isolate overflow-hidden', props.class)} onClick={onClick} href={href} activeClass={props.activeClass}>
           {props.children}
         </A>
       )}

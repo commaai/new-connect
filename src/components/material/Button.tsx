@@ -22,15 +22,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary',
       error: 'bg-error before:bg-on-error text-on-error',
     })[color()]
-  const [, rest] = splitProps(props, [
-    'color',
-    'leading',
-    'trailing',
-    'class',
-    'children',
-    'disabled',
-    'loading',
-  ])
+  const [, rest] = splitProps(props, ['color', 'leading', 'trailing', 'class', 'children', 'disabled', 'loading'])
   const disabled = () => props.disabled || props.loading
 
   return (

@@ -2,8 +2,10 @@ import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
 import { setAccessToken } from '~/api/auth/client'
 
 import Button from '~/components/material/Button'
+import Icon from '~/components/material/Icon'
 
-const ACCESS_TOKEN = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
+const ACCESS_TOKEN =
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJleHAiOjE3NDg1ODI0NjUsIm5iZiI6MTcxNzA0NjQ2NSwiaWF0IjoxNzE3MDQ2NDY1LCJpZGVudGl0eSI6IjBkZWNkZGNmZGYyNDFhNjAifQ.g3khyJgOkNvZny6Vh579cuQj1HLLGSDeauZbfZri9jw'
 
 export default function Login() {
   const loginAsDemoUser = () => {
@@ -14,12 +16,7 @@ export default function Login() {
   return (
     <div class="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-8">
-        <img
-          src="/images/logo-connect-light.svg"
-          alt="comma connect"
-          width={96}
-          height={96}
-        />
+        <img src="/images/logo-connect-light.svg" alt="comma connect" width={96} height={96} />
 
         <div class="flex flex-col items-center gap-2 text-center">
           <h1 class="text-display-sm font-extrabold md:mt-4">comma connect</h1>
@@ -30,42 +27,21 @@ export default function Login() {
           <Button
             class="h-14 gap-4 xs:h-16"
             href={getGoogleAuthUrl()}
-            leading={
-              <img
-                src="/images/logo-google.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            }
+            leading={<img src="/images/logo-google.svg" alt="" width={32} height={32} />}
           >
             Sign in with Google
           </Button>
           <Button
             class="h-14 gap-4 xs:h-16"
             href={getAppleAuthUrl()}
-            leading={
-              <img
-                src="/images/logo-apple.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            }
+            leading={<img src="/images/logo-apple.svg" alt="" width={32} height={32} />}
           >
             Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
             class="h-14 gap-4 xs:h-16"
             href={getGitHubAuthUrl()}
-            leading={
-              <img
-                src="/images/logo-github.svg"
-                alt=""
-                width={32}
-                height={32}
-              />
-            }
+            leading={<img src="/images/logo-github.svg" alt="" width={32} height={32} />}
           >
             Sign in with GitHub
           </Button>
@@ -73,27 +49,13 @@ export default function Login() {
 
         <div class="flex justify-between gap-4">
           <p class="text-body-md xs:text-body-lg">
-            Make sure to sign in with the same account if you have previously
-            paired your comma three.
+            Make sure to sign in with the same account if you have previously paired your comma three.
           </p>
 
-          <img
-            src="/images/icon-comma-three-light.svg"
-            alt=""
-            width={32}
-            height={32}
-          />
+          <img src="/images/icon-comma-three-light.svg" alt="" width={32} height={32} />
         </div>
 
-        <Button
-          class="gap-4"
-          onclick={loginAsDemoUser}
-          trailing={
-            <span class="material-symbols-outlined icon-outline">
-              chevron_right
-            </span>
-          }
-        >
+        <Button onclick={loginAsDemoUser} trailing={<Icon name="chevron_right" />}>
           Try the demo
         </Button>
       </div>

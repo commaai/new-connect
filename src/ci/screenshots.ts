@@ -19,7 +19,7 @@ async function takeScreenshots(deviceType: string, context: BrowserContext) {
     console.log(`${route}-${deviceType}.playwright.png`)
 
     if (route === 'Login') {
-      await page.click('button:has-text(\'Try the demo\')')
+      await page.click("button:has-text('Try the demo')")
       await page.waitForLoadState('networkidle')
       await page.waitForTimeout(375)
     }
@@ -35,13 +35,15 @@ async function main() {
 
   const contexts: [string, BrowserContextOptions][] = [
     ['mobile', devices['iPhone 13']],
-    ['desktop', { viewport: { width: 1920, height: 1080 }}],
+    ['desktop', { viewport: { width: 1920, height: 1080 } }],
   ]
-  await Promise.all(contexts.map(async ([deviceType, options]) => {
-    const context = await browser.newContext(options)
-    await takeScreenshots(deviceType, context)
-    await context.close()
-  }))
+  await Promise.all(
+    contexts.map(async ([deviceType, options]) => {
+      const context = await browser.newContext(options)
+      await takeScreenshots(deviceType, context)
+      await context.close()
+    }),
+  )
 
   await browser.close()
 }

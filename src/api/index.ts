@@ -12,12 +12,13 @@ export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: s
   const res = await fetch(`${apiUrl}${endpoint}`, {
     ...init,
     headers: {
+      'Content-Type': 'application/json',
       ...init?.headers,
       Authorization: `JWT ${getAccessToken()}`,
     },
   })
   // TODO: validate responses
-  const json = await res.json() as T & { error?: string; description?: string }
+  const json = (await res.json()) as T & { error?: string; description?: string }
   if (json.error) {
     throw new Error(json.description, { cause: res })
   }

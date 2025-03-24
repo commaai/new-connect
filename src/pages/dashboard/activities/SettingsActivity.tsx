@@ -1,9 +1,17 @@
-import { createResource, Match, type ParentComponent, Show, Suspense, Switch, type Accessor, type Setter, type VoidComponent, children, createMemo, For, createSignal, type Resource, createEffect, type JSXElement } from 'solid-js'
+import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
+import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice } from '~/api/devices'
-import { cancelSubscription, getStripeCheckout, getStripePortal, getStripeSession, getSubscribeInfo, getSubscriptionStatus } from '~/api/prime'
+import {
+  cancelSubscription,
+  getStripeCheckout,
+  getStripePortal,
+  getStripeSession,
+  getSubscribeInfo,
+  getSubscriptionStatus,
+} from '~/api/prime'
 import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
@@ -13,7 +21,6 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
-
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -57,26 +64,30 @@ const PlanSelector: ParentComponent<{
     return (Array.isArray(p) ? p : [p]) as unknown[] as PlanProps[]
   })
 
-  return <div class="relative">
-    <div class="flex w-full gap-2 xs:gap-4">
-      <For each={plans()}>
-        {(plan) => <ButtonBase
-          class={clsx(
-            'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
-            'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
-            (props.plan() === plan.name) && 'ring-4 ring-on-tertiary',
-            plan.disabled && 'cursor-not-allowed opacity-50',
+  return (
+    <div class="relative">
+      <div class="flex w-full gap-2 xs:gap-4">
+        <For each={plans()}>
+          {(plan) => (
+            <ButtonBase
+              class={clsx(
+                'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
+                'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
+                props.plan() === plan.name && 'ring-4 ring-on-tertiary',
+                plan.disabled && 'cursor-not-allowed opacity-50',
+              )}
+              onClick={() => props.setPlan(plan.name)}
+              disabled={plan.disabled || props.disabled}
+            >
+              <span class="text-body-lg">{PrimePlanName[plan.name].toLowerCase()}</span>
+              <span class="text-title-lg font-bold">{formatCurrency(plan.amount)}/month</span>
+              <span class="text-label-md">{plan.description}</span>
+            </ButtonBase>
           )}
-          onClick={() => props.setPlan(plan.name)}
-          disabled={plan.disabled || props.disabled}
-        >
-          <span class="text-body-lg">{PrimePlanName[plan.name].toLowerCase()}</span>
-          <span class="text-title-lg font-bold">{formatCurrency(plan.amount)}/month</span>
-          <span class="text-label-md">{plan.description}</span>
-        </ButtonBase>}
-      </For>
+        </For>
+      </div>
     </div>
-  </div>
+  )
 }
 
 const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
@@ -137,14 +148,26 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       } else if (!source.subscribeInfo.is_prime_sim || !source.subscribeInfo.sim_type) {
         disabledDataPlanText = 'Standard plan not available, detected a third-party SIM.'
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
-        disabledDataPlanText = ['Standard plan not available, old SIM type detected, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">shop</a>]
+        disabledDataPlanText = [
+          'Standard plan not available, old SIM type detected, new SIM cards are available in the ',
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+            shop
+          </a>,
+        ]
       } else if (source.subscribeInfo.sim_usable === false && source.subscribeInfo.sim_type === 'blue') {
-        disabledDataPlanText = ['Standard plan not available, SIM has been canceled and is therefore no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">shop</a>]
+        disabledDataPlanText = [
+          'Standard plan not available, SIM has been canceled and is therefore no longer usable, new SIM cards are available in the ',
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+            shop
+          </a>,
+        ]
       } else if (source.subscribeInfo.sim_usable === false) {
-        disabledDataPlanText = ['Standard plan not available, SIM is no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">shop</a>]
+        disabledDataPlanText = [
+          'Standard plan not available, SIM is no longer usable, new SIM cards are available in the ',
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+            shop
+          </a>,
+        ]
       }
 
       return {
@@ -157,58 +180,63 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
     },
   )
 
-  return <div class="grid gap-4">
-    <ul class="ml-8 list-disc">
-      <li>24/7 connectivity</li>
-      <li>Take pictures remotely</li>
-      <li>1 year storage of drive videos</li>
-      <li>Simple SSH for developers</li>
-      <li>Turn-by-turn navigation</li>
-    </ul>
+  return (
+    <div class="grid gap-4">
+      <ul class="ml-8 list-disc">
+        <li>24/7 connectivity</li>
+        <li>Take pictures remotely</li>
+        <li>1 year storage of drive videos</li>
+        <li>Simple SSH for developers</li>
+        <li>Turn-by-turn navigation</li>
+      </ul>
 
-    <p>
-      Learn more from our <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank">FAQ</a>.
-    </p>
+      <p>
+        Learn more from our{' '}
+        <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank">
+          FAQ
+        </a>
+        .
+      </p>
 
-    <Show when={stripeCancelled()}>
-      <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-        <Icon class="text-error" size="20">error</Icon>
-        Checkout cancelled
-      </div>
-    </Show>
+      <Show when={stripeCancelled()}>
+        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+          <Icon name="error" class="text-error" size="20" />
+          Checkout cancelled
+        </div>
+      </Show>
 
-    <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
-      <Plan
-        name="nodata"
-        amount={1000}
-        description="bring your own sim card"
-      />
-      <Plan
-        name="data"
-        amount={2400}
-        description="including data plan, only offered in the U.S."
-        disabled={!!uiState()?.disabledDataPlanText}
-      />
-    </PlanSelector>
+      <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
+        <Plan name="nodata" amount={1000} description="bring your own sim card" />
+        <Plan
+          name="data"
+          amount={2400}
+          description="including data plan, only offered in the U.S."
+          disabled={!!uiState()?.disabledDataPlanText}
+        />
+      </PlanSelector>
 
-    <Show when={uiState()?.disabledDataPlanText} keyed>{text => <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-      <Icon size="20">info</Icon>
-      {text}
-    </div>}</Show>
+      <Show when={uiState()?.disabledDataPlanText} keyed>
+        {(text) => (
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+            <Icon name="info" size="20" />
+            {text}
+          </div>
+        )}
+      </Show>
 
-    <Show when={uiState()?.checkoutText} keyed>{text =>
-      <Button
-        color="tertiary"
-        disabled={!selectedPlan()}
-        loading={checkoutData.loading}
-        onClick={checkout}
-      >
-        {text}
-      </Button>
-    }</Show>
+      <Show when={uiState()?.checkoutText} keyed>
+        {(text) => (
+          <Button color="tertiary" disabled={!selectedPlan()} loading={checkoutData.loading} onClick={checkout}>
+            {text}
+          </Button>
+        )}
+      </Show>
 
-    <Show when={uiState()?.chargeText} keyed>{text => <p class="text-label-lg">{text}</p>}</Show>
-  </div>
+      <Show when={uiState()?.chargeText} keyed>
+        {(text) => <p class="text-label-lg">{text}</p>}
+      </Show>
+    </div>
+  )
 }
 
 const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
@@ -247,115 +275,135 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     setTimeout(() => window.location.reload(), 5000)
   })
 
-  return <div class="flex flex-col gap-4">
-    <Suspense
-      fallback={<div class="my-2 flex flex-col items-center gap-4">
-        <CircularProgress />
-        Fetching subscription status...
-      </div>}
-    >
-      <Switch>
-        <Match when={stripeSession.state === 'errored'}>
-          <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-body-md font-semibold text-error-container">
-            <Icon size="20">error</Icon>
-            Unable to check payment status: {stripeSession.error}
+  return (
+    <div class="flex flex-col gap-4">
+      <Suspense
+        fallback={
+          <div class="my-2 flex flex-col items-center gap-4">
+            <CircularProgress />
+            Fetching subscription status...
           </div>
-        </Match>
-        <Match when={stripeSession()?.payment_status} keyed>{paymentStatus =>
-          <Switch>
-            <Match when={paymentStatus === 'unpaid'}>
-              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-                <Icon size="20">payments</Icon>
-                Waiting for confirmed payment...
-              </div>
-            </Match>
+        }
+      >
+        <Switch>
+          <Match when={stripeSession.state === 'errored'}>
+            <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-body-md font-semibold text-error-container">
+              <Icon name="error" size="20" />
+              Unable to check payment status: {stripeSession.error}
+            </div>
+          </Match>
+          <Match when={stripeSession()?.payment_status} keyed>
+            {(paymentStatus) => (
+              <Switch>
+                <Match when={paymentStatus === 'unpaid'}>
+                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+                    <Icon name="payments" size="20" />
+                    Waiting for confirmed payment...
+                  </div>
+                </Match>
 
-            <Match when={paymentStatus === 'paid' && !subscription()}>
-              <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-                <Icon size="20">sync</Icon>
-                Processing subscription...
-              </div>
-            </Match>
+                <Match when={paymentStatus === 'paid' && !subscription()}>
+                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+                    <Icon name="sync" size="20" />
+                    Processing subscription...
+                  </div>
+                </Match>
 
-            <Match when={paymentStatus === 'paid' && subscription()}>
-              <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-body-md text-on-tertiary-container">
-                <Icon size="20">check</Icon>
-                <div class="flex flex-col gap-2">
-                  <p class="font-semibold">comma prime activated</p>
-                  <Show when={subscription()?.is_prime_sim} keyed>
-                    Connectivity will be enabled as soon as activation propogates to your local cell tower.
-                    Rebooting your device may help.
-                  </Show>
+                <Match when={paymentStatus === 'paid' && subscription()}>
+                  <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-body-md text-on-tertiary-container">
+                    <Icon name="check" size="20" />
+                    <div class="flex flex-col gap-2">
+                      <p class="font-semibold">comma prime activated</p>
+                      <Show when={subscription()?.is_prime_sim} keyed>
+                        Connectivity will be enabled as soon as activation propogates to your local cell tower. Rebooting your device may
+                        help.
+                      </Show>
+                    </div>
+                  </div>
+                </Match>
+              </Switch>
+            )}
+          </Match>
+        </Switch>
+
+        <Switch>
+          <Match when={cancelData.state === 'errored'}>
+            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+              <Icon class="text-error" name="error" size="20" />
+              Failed to cancel subscription: {cancelData.error}
+            </div>
+          </Match>
+
+          <Match when={cancelData.state === 'ready'}>
+            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+              <Icon name="check" size="20" />
+              Subscription cancelled
+            </div>
+          </Match>
+        </Switch>
+
+        <Switch>
+          <Match when={subscription.state === 'errored'}>Unable to fetch subscription details: {subscription.error}</Match>
+          <Match when={subscription()} keyed>
+            {(subscription) => (
+              <>
+                <div class="flex list-none flex-col">
+                  <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
+                  <li>Amount: {formatCurrency(subscription.amount)}</li>
+                  <li>Joined: {formatDate(subscription.subscribed_at)}</li>
+                  <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
                 </div>
-              </div>
-            </Match>
-          </Switch>
-        }</Match>
-      </Switch>
 
-      <Switch>
-        <Match when={cancelData.state === 'errored'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-            <Icon class="text-error" size="20">error</Icon>
-            Failed to cancel subscription: {cancelData.error}
-          </div>
-        </Match>
+                <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+                  <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>
+                    Cancel subscription
+                  </Button>
+                  <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>
+                    Update payment method
+                  </Button>
+                </div>
+              </>
+            )}
+          </Match>
+        </Switch>
+      </Suspense>
 
-        <Match when={cancelData.state === 'ready'}>
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-            <Icon size="20">check</Icon>
-            Subscription cancelled
-          </div>
-        </Match>
-      </Switch>
-
-      <Switch>
-        <Match when={subscription.state === 'errored'}>
-          Unable to fetch subscription details: {subscription.error}
-        </Match>
-        <Match when={subscription()} keyed>{subscription =>
-          <>
-            <div class="flex list-none flex-col">
-              <li>Plan: {PrimePlanName[subscription.plan as PrimePlan] ?? 'unknown'}</li>
-              <li>Amount: {formatCurrency(subscription.amount)}</li>
-              <li>Joined: {formatDate(subscription.subscribed_at)}</li>
-              <li>Next payment: {formatDate(subscription.next_charge_at)}</li>
+      <Show when={cancelDialog()}>
+        <div
+          class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
+          onClick={() => setCancelDialog(false)}
+        >
+          <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
+            <h2 class="text-headline-sm">Cancel subscription</h2>
+            <p class="text-body-md">Are you sure you want to cancel your subscription?</p>
+            <div class="mt-4 flex flex-wrap justify-stretch gap-4">
+              <Button
+                color="error"
+                disabled={loading()}
+                loading={cancelData.loading}
+                onClick={() => {
+                  cancel()
+                  setCancelDialog(false)
+                }}
+              >
+                Yes, cancel subscription
+              </Button>
+              <Button color="secondary" disabled={loading()} onClick={() => setCancelDialog(false)}>
+                No, keep subscription
+              </Button>
             </div>
-
-            <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-              <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>Cancel subscription</Button>
-              <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>Update payment method</Button>
-            </div>
-          </>
-        }</Match>
-      </Switch>
-    </Suspense>
-
-    <Show when={cancelDialog()}>
-      <div class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm" onClick={() => setCancelDialog(false)}>
-        <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-          <h2 class="text-headline-sm">Cancel subscription</h2>
-          <p class="text-body-md">Are you sure you want to cancel your subscription?</p>
-          <div class="mt-4 flex flex-wrap justify-stretch gap-4">
-            <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => {
-              cancel()
-              setCancelDialog(false)
-            }}>Yes, cancel subscription</Button>
-            <Button color="secondary" disabled={loading()} onClick={() => setCancelDialog(false)}>No, keep subscription</Button>
           </div>
         </div>
-      </div>
-    </Show>
-  </div>
+      </Show>
+    </div>
+  )
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" href={`/${props.dongleId}`}>arrow_back</IconButton>}>
-        Device Settings
-      </TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="max-w-lg px-4">
         <h2 class="mb-4 text-headline-sm">comma prime</h2>
         <Suspense>

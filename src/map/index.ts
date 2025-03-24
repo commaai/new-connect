@@ -1,9 +1,4 @@
-import {
-  MAPBOX_USERNAME,
-  MAPBOX_LIGHT_STYLE_ID,
-  MAPBOX_DARK_STYLE_ID,
-  MAPBOX_TOKEN,
-} from './config'
+import { MAPBOX_USERNAME, MAPBOX_LIGHT_STYLE_ID, MAPBOX_DARK_STYLE_ID, MAPBOX_TOKEN } from './config'
 import { getThemeId } from '~/theme'
 
 export type Coords = [number, number][]

@@ -5,8 +5,8 @@ import ButtonBase from '~/components/material/ButtonBase'
 
 type CardHeaderProps = {
   class?: string
-  headline?: string
-  subhead?: string
+  headline?: JSXElement
+  subhead?: JSXElement
   leading?: JSXElement
   trailing?: JSXElement
 }
@@ -36,9 +36,7 @@ type CardTextContentProps = {
   class?: string
 }
 
-export const CardTextContent: ParentComponent<CardTextContentProps> = (
-  props,
-) => {
+export const CardTextContent: ParentComponent<CardTextContentProps> = (props) => {
   return (
     <div class={clsx('flex', props.class)}>
       <span class="text-body-md text-on-surface-variant">{props.children}</span>
@@ -64,16 +62,9 @@ type CardProps = {
 const Card: ParentComponent<CardProps> = (props) => {
   const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface'
   return (
-    <Show
-      when={props.onClick || props.href}
-      fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}
-    >
+    <Show when={props.onClick || props.href} fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}>
       <ButtonBase
-        class={clsx(
-          cardStyle,
-          (props.href || props.onClick) && 'state-layer',
-          props.class,
-        )}
+        class={clsx(cardStyle, (props.href || props.onClick) && 'state-layer', props.class)}
         onClick={props.onClick}
         href={props.href}
         activeClass={clsx('before:opacity-[.12]', props.activeClass)}

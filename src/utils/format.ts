@@ -58,7 +58,7 @@ export const formatRouteDuration = (route: Route | undefined): string => {
 const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
   if (typeof input === 'number') {
     // Assume number is unix timestamp, convert to seconds
-    return dayjs.unix(input >= 1E11 ? input / 1000 : input)
+    return dayjs.unix(input >= 1e11 ? input / 1000 : input)
   }
   return dayjs(input)
 }
