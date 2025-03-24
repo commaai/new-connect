@@ -18,7 +18,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
     })[color()]
   const barColourClass = () =>
     ({
-      primary: 'bg-primary',
+      primary: 'bg-primary ',
       secondary: 'bg-secondary',
       tertiary: 'bg-tertiary',
       error: 'bg-error',
@@ -50,19 +50,12 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
           />
         </>
       ) : (
-        <div class="relative">
-          <div
-            class={clsx(
-              'absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear overflow-hidden',
-              barColourClass(),
-            )}
-            style={{
-              width: `${props.progress * 100}%`,
-            }}
-          >
-            <div class="absolute inset-0 animate-shimmer -translate-x-full bg-gradient-to-r from-transparent via-white/80 to-transparent" />
-          </div>
-        </div>
+        <div
+          class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', barColourClass())}
+          style={{
+            width: `${props.progress * 100}%`,
+          }}
+        />
       )}
     </div>
   )

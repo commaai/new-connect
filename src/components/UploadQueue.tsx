@@ -7,7 +7,6 @@ import { COMMA_CONNECT_PRIORITY } from '~/api/athena'
 import Icon from '~/components/material/Icon'
 import LinearProgress from '~/components/material/LinearProgress'
 import IconButton from '~/components/material/IconButton'
-import StatisticBar from '~/components/material/StatisticBar'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 import { UploadItem } from '~/types'
 
@@ -69,14 +68,22 @@ const QueueStatistics: Component<{ loading: boolean; items: () => UploadItem[]; 
   const totalCount = createMemo(() => (props.loading ? undefined : props.items().length))
 
   return (
-    <StatisticBar
-      class={props.class}
-      statistics={[
-        { label: 'Uploading', value: uploadingCount() },
-        { label: 'Waiting', value: waitingCount() },
-        { label: 'Queued', value: totalCount() },
-      ]}
-    />
+    <div class={clsx('flex h-10 w-full', props.class)}>
+      <div class="flex grow flex-col justify-between">
+        <span class="text-body-sm text-on-surface-variant">Uploading</span>
+        <span class="font-mono text-label-lg uppercase">{uploadingCount()}</span>
+      </div>
+
+      <div class="flex grow flex-col justify-between">
+        <span class="text-body-sm text-on-surface-variant">Waiting</span>
+        <span class="font-mono text-label-lg uppercase">{waitingCount()}</span>
+      </div>
+
+      <div class="flex grow flex-col justify-between">
+        <span class="text-body-sm text-on-surface-variant">Queued</span>
+        <span class="font-mono text-label-lg uppercase">{totalCount()}</span>
+      </div>
+    </div>
   )
 }
 

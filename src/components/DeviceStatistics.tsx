@@ -2,7 +2,6 @@ import { createResource } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDeviceStats } from '~/api/devices'
-import StatisticBar from '~/components/material/StatisticBar'
 import { formatDistance, formatDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
 
