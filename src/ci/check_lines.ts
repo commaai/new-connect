@@ -71,7 +71,7 @@ if (import.meta.main) {
 
     const totalDiff = diff.reduce((sum, file) => sum + file.diff, 0)
     const total = prStats.reduce((sum, file) => sum + file.lines, 0)
-    console.log(`\nTotal lines: ${total} (${formatDiff(totalDiff)})`)
+    console.log(`\n**Total lines: ${total} (${formatDiff(totalDiff)})**` + (totalDiff < -100 ? ' 🔥' : ''))
   } else {
     // Regular mode - analyze a single directory
     const files = await generateStats(Bun.argv[2])
