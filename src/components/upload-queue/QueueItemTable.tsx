@@ -20,7 +20,9 @@ const animations = (slide: boolean) => {
   }
 }
 
-const QueueItemTable: Component<{ loading: boolean; items?: () => UploadItem[]; error?: string; offline?: boolean }> = (props) => {
+const QueueItemTable: Component<{ items?: () => UploadItem[] | undefined; error?: () => string | undefined; offline?: boolean }> = (
+  props,
+) => {
   return (
     <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)]">
       <Transition appear {...animations(false)}>
@@ -32,16 +34,16 @@ const QueueItemTable: Component<{ loading: boolean; items?: () => UploadItem[]; 
           }
         >
           <Show
-            when={!(props.offline && props.items?.().length === 0)}
+            when={!(props.offline && props.items?.()?.length === 0)}
             fallback={
               <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                 <Icon name="signal_disconnected" />
-                <span>{props.error}</span>
+                <span>{props.error?.()}</span>
               </div>
             }
           >
             <Show
-              when={props.items?.().length === 0}
+              when={props.items?.()?.length !== 0}
               fallback={
                 <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                   <Icon name="cloud_done" />
