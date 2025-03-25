@@ -224,5 +224,5 @@ export interface UploadItem {
   progress: number
   priority: number
   retryCount: number
-  status: 'uploading' | 'completed' | 'error' | 'queued' | 'waiting_for_network'
+  status: 'completed' | 'error' | 'queued' | 'uploading' | 'waiting_for_network'
 }
