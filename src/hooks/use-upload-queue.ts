@@ -108,7 +108,6 @@ export const useUploadQueue = async (dongleId: string) => {
         }
       }),
 
-    // Initial offline queue poll
     getAthenaOfflineQueue(dongleId)
       .then((offlineData) => {
         setItems('offline', reconcile(mapOfflineQueue(offlineData)))
@@ -153,7 +152,6 @@ export const useUploadQueue = async (dongleId: string) => {
   })
 
   createEffect(() => {
-    // Don't start polling until initial load is complete
     if (!initialLoadComplete()) return
 
     let timer: number
