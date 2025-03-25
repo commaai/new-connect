@@ -15,21 +15,19 @@ const UploadQueue: Component<{ dongleId: string }> = (props) => {
   const clearQueueError = () => queue()?.clearQueueError()
   const clearQueue = () => void queue()?.clearQueue()
 
+  const uploading = () => items()?.filter((i) => i.status === 'uploading').length
+  const queued = () => items()?.filter((i) => i.status === 'queued').length
+  const total = () => items()?.length
+
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto p-4">
           <StatisticBar
             statistics={[
-              {
-                label: 'Uploading',
-                value: () => items()?.filter((i) => i.status === 'uploading').length,
-              },
-              {
-                label: 'Waiting',
-                value: () => items()?.filter((i) => i.status === 'queued').length,
-              },
-              { label: 'Total', value: () => items()?.length },
+              { label: 'Uploading', value: uploading },
+              { label: 'Waiting', value: queued },
+              { label: 'Total', value: total },
             ]}
           />
         </div>
