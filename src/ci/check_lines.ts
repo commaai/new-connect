@@ -24,7 +24,6 @@ async function generateStats(root = 'src') {
 
 // biome-ignore lint/suspicious/noExplicitAny: it's okay for printing any data
 function printMarkdownTable(data: any[]) {
-  if (!data.length) return 'No changes'
   const keys = Object.keys(data[0])
   const alignments = keys.map((key) => (typeof data[0][key] === 'number' ? '---:' : ':---'))
   console.log(`| ${keys.join(' | ')} |\n| ${alignments.join(' | ')} |`)
@@ -67,7 +66,8 @@ if (import.meta.main) {
     diff.sort((a, b) => b.diff - a.diff)
 
     console.log('## Changes:')
-    printMarkdownTable(diff)
+    if (diff.length) printMarkdownTable(diff)
+    else console.log('No line counts changed')
 
     const totalDiff = diff.reduce((sum, file) => sum + file.diff, 0)
     const total = prStats.reduce((sum, file) => sum + file.lines, 0)
