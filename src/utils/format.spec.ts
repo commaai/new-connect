@@ -7,7 +7,7 @@ describe('formatDistance', () => {
     expect(formatDistance(0)).toBe('0.0 mi')
     expect(formatDistance(1.234)).toBe('1.2 mi')
   })
-  it('should be empty for undefined distance', () => {
+  it('should be blank for undefined distance', () => {
     expect(formatDistance(undefined)).toBe('')
   })
 })
@@ -20,7 +20,7 @@ describe('formatDuration', () => {
     expect(formatDuration(90)).toBe('1h 30m')
     expect(formatDuration(120)).toBe('2h 0m')
   })
-  it('should be emptyj for undefined duration', () => {
+  it('should be blank for undefined duration', () => {
     expect(formatDuration(undefined)).toBe('')
   })
 })
