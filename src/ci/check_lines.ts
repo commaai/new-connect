@@ -26,7 +26,8 @@ async function generateStats(root = 'src') {
 function printMarkdownTable(data: any[]) {
   if (!data.length) return 'No changes'
   const keys = Object.keys(data[0])
-  console.log(`| ${keys.join(' | ')} |\n| ${keys.map(() => '---').join(' | ')} |`)
+  const alignments = keys.map((key) => (typeof data[0][key] === 'number' ? '---:' : ':---'))
+  console.log(`| ${keys.join(' | ')} |\n| ${alignments.join(' | ')} |`)
   console.log(data.map((row) => `| ${keys.map((key) => row[key]).join(' | ')} |`).join('\n'))
 }
 
