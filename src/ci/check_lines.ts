@@ -28,7 +28,7 @@ function printMarkdownTable(data: any[]) {
   const keys = Object.keys(data[0])
   const alignments = keys.map((key) => (typeof data[0][key] === 'number' ? '---:' : ':---'))
   console.log(`| ${keys.join(' | ')} |\n| ${alignments.join(' | ')} |`)
-  console.log(data.map((row) => `| ${keys.map((key) => row[key]).join(' | ')} |`).join('\n'))
+  console.log(data.map((row) => `| ${keys.map((key) => (key === 'diff' ? formatDiff(row[key]) : row[key])).join(' | ')} |`).join('\n'))
 }
 
 const formatDiff = (count: number) => (count > 0 ? `+${count}` : count.toString())
@@ -67,7 +67,7 @@ if (import.meta.main) {
     diff.sort((a, b) => b.diff - a.diff)
 
     console.log('## Changes:')
-    printMarkdownTable(diff.map((row) => ({ ...row, diff: formatDiff(row.diff) })))
+    printMarkdownTable(diff)
 
     const totalDiff = diff.reduce((sum, file) => sum + file.diff, 0)
     const total = prStats.reduce((sum, file) => sum + file.lines, 0)
