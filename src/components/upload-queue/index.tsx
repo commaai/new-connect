@@ -6,20 +6,22 @@ import IconButton from '~/components/material/IconButton'
 import { useUploadQueue } from '~/hooks/use-upload-queue'
 
 import QueueItemTable from './QueueItemTable'
-import QueueStatistics from './QueueStatistics'
+import StatisticBar from '../StatisticBar'
 
-interface UploadQueueProps {
-  dongleId: string
-}
-
-const UploadQueue: Component<UploadQueueProps> = (props) => {
+const UploadQueue: Component<{ dongleId: string }> = (props) => {
   const { loading, error, items, offline, clearQueue, clearingQueue, clearQueueError } = useUploadQueue(props.dongleId)
 
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto">
-          <QueueStatistics loading={loading()} items={items} class="p-4" />
+          <StatisticBar
+            statistics={[
+              { label: 'Uploading', value: () => items().filter((i) => i.status === 'uploading').length },
+              { label: 'Waiting', value: () => items().filter((i) => i.status === 'queued').length },
+              { label: 'Total', value: () => items().length },
+            ]}
+          />
         </div>
         <div class="flex p-4">
           <Show
