@@ -1,4 +1,4 @@
-import { createSignal, createMemo, onCleanup, onMount } from 'solid-js'
+import { createSignal, createMemo, onCleanup, createEffect } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { getAthenaOfflineQueue } from '~/api/devices'
@@ -80,28 +80,123 @@ const getStatusPriority = (status: UploadItem['status']): number => {
   }
 }
 
-export const useUploadQueue = (dongleId: string) => {
+export const useUploadQueue = async (dongleId: string) => {
   const [items, setItems] = createStore({ online: [] as UploadItem[], offline: [] as UploadItem[] })
-  const [loading, setLoading] = createSignal(true)
   const [onlineQueueError, setOnlineQueueError] = createSignal<string | undefined>()
-  const [onlineTimeout, setOnlineTimeout] = createSignal<Timer>()
-  const [offlineTimeout, setOfflineTimeout] = createSignal<Timer>()
   const [offlineQueueError, setOfflineQueueError] = createSignal<string | undefined>()
   const [clearQueueError, setClearQueueError] = createSignal<string | undefined>()
   const [clearingQueue, setClearingQueue] = createSignal(false)
+  const [initialLoadComplete, setInitialLoadComplete] = createSignal(false)
 
   const onlinePollInterval = createMemo(() => (onlineQueueError() ? 5000 : 2000))
   const offlinePollInterval = createMemo(() => (offlineQueueError() ? 10000 : 5000))
 
-  const clearQueue = async (items: UploadItem[]) => {
-    if (clearingQueue() || items.length === 0) return
+  const offline = createMemo(() => onlineQueueError() !== undefined)
+
+  const initialLoadPromise = await Promise.all([
+    getUploadQueue(dongleId)
+      .then((response) => {
+        setItems('online', reconcile(mapOnineQueue(response.result!)))
+        setOnlineQueueError(undefined)
+      })
+      .catch((err) => {
+        if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
+          setOnlineQueueError('Device offline')
+        } else {
+          console.error('Error polling online queue:', err)
+          setOnlineQueueError(`Error checking device: ${err}`)
+        }
+      }),
+
+    // Initial offline queue poll
+    getAthenaOfflineQueue(dongleId)
+      .then((offlineData) => {
+        setItems('offline', reconcile(mapOfflineQueue(offlineData)))
+        setOfflineQueueError(undefined)
+      })
+      .catch((err) => {
+        console.debug('Error polling offline queue:', err)
+        setOfflineQueueError(`Error checking backlog: ${err}`)
+      }),
+  ]).finally(() => {
+    setInitialLoadComplete(true)
+  })
+
+  if (!initialLoadComplete()) {
+    throw initialLoadPromise
+  }
+
+  createEffect(() => {
+    if (!initialLoadComplete()) return
+
+    let timer: number
+
+    const pollOnlineQueue = async () => {
+      try {
+        const response = await getUploadQueue(dongleId)
+        setItems('online', reconcile(mapOnineQueue(response.result!)))
+        setOnlineQueueError(undefined)
+      } catch (err) {
+        if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
+          setOnlineQueueError('Device offline')
+        } else {
+          console.error('Error polling online queue:', err)
+          setOnlineQueueError(`Error checking device: ${err}`)
+        }
+      } finally {
+        timer = window.setTimeout(pollOnlineQueue, onlinePollInterval())
+      }
+    }
+
+    pollOnlineQueue()
+    onCleanup(() => clearTimeout(timer))
+  })
+
+  createEffect(() => {
+    // Don't start polling until initial load is complete
+    if (!initialLoadComplete()) return
+
+    let timer: number
+
+    const pollOfflineQueue = async () => {
+      try {
+        const offlineData = await getAthenaOfflineQueue(dongleId)
+        setItems('offline', reconcile(mapOfflineQueue(offlineData)))
+        setOfflineQueueError(undefined)
+      } catch (err) {
+        console.debug('Error polling offline queue:', err)
+        setOfflineQueueError(`Error checking backlog: ${err}`)
+      } finally {
+        timer = window.setTimeout(pollOfflineQueue, offlinePollInterval())
+      }
+    }
+
+    pollOfflineQueue()
+    onCleanup(() => clearTimeout(timer))
+  })
+
+  const sortedItems = createMemo(() => {
+    const allItems = [...items.offline, ...(offline() ? [] : items.online)]
+    return allItems.sort((a, b) => {
+      const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status)
+      if (statusDiff !== 0) return statusDiff
+      const routeDiff = a.route.localeCompare(b.route)
+      if (routeDiff !== 0) return routeDiff
+      const segmentDiff = a.segment - b.segment
+      if (segmentDiff !== 0) return segmentDiff
+      return a.filename.localeCompare(b.filename)
+    })
+  })
+
+  const clearQueue = async (queueItems: UploadItem[]) => {
+    if (clearingQueue() || queueItems.length === 0) return
     setClearQueueError(undefined)
     setClearingQueue(true)
 
     try {
       await cancelUpload(
         dongleId,
-        items.map((item) => item.id),
+        queueItems.map((item) => item.id),
       )
     } catch (err) {
       console.debug('Error clearing queue:', err)
@@ -111,79 +206,13 @@ export const useUploadQueue = (dongleId: string) => {
     }
   }
 
-  const pollOnlineQueue = async () => {
-    if (onlineTimeout()) clearTimeout(onlineTimeout())
-    setOnlineTimeout(undefined)
-
-    try {
-      const response = await getUploadQueue(dongleId)
-      setItems('online', reconcile(mapOnineQueue(response.result!)))
-      setOnlineQueueError(undefined)
-    } catch (err) {
-      if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
-        setOnlineQueueError('Device offline')
-      } else {
-        console.error('Error polling online queue:', err)
-        setOnlineQueueError(`Error checking device: ${err}`)
-      }
-    } finally {
-      setLoading(false)
-      setOnlineTimeout(setTimeout(pollOnlineQueue, onlinePollInterval()))
-    }
-  }
-
-  const pollOfflineQueue = async () => {
-    if (offlineTimeout()) clearTimeout(offlineTimeout())
-    setOfflineTimeout(undefined)
-
-    try {
-      const offlineData = await getAthenaOfflineQueue(dongleId)
-      setItems('offline', reconcile(mapOfflineQueue(offlineData)))
-      setOfflineQueueError(undefined)
-    } catch (err) {
-      console.debug('Error polling offline queue:', err)
-      setOfflineQueueError(`Error checking backlog: ${err}`)
-    } finally {
-      setOfflineTimeout(setTimeout(pollOfflineQueue, offlinePollInterval()))
-    }
-  }
-
-  onMount(() => {
-    pollOnlineQueue()
-    pollOfflineQueue()
-  })
-
-  onCleanup(() => {
-    clearTimeout(onlineTimeout())
-    clearTimeout(offlineTimeout())
-  })
-
-  const offline = createMemo(() => onlineQueueError() !== undefined)
-
-  const sortedItems = createMemo(() => {
-    const allItems = [...items.offline, ...(offline() ? [] : items.online)]
-
-    return allItems.sort((a, b) => {
-      const statusDiff = getStatusPriority(a.status) - getStatusPriority(b.status)
-      if (statusDiff !== 0) return statusDiff
-
-      const routeDiff = a.route.localeCompare(b.route)
-      if (routeDiff !== 0) return routeDiff
-
-      const segmentDiff = a.segment - b.segment
-      if (segmentDiff !== 0) return segmentDiff
-
-      return a.filename.localeCompare(b.filename)
-    })
-  })
-
   return {
     clearQueue: () => void clearQueue(items.online),
     clearingQueue,
     clearQueueError,
     error: onlineQueueError,
     items: sortedItems,
-    loading,
+    loading: () => !initialLoadComplete(),
     offline,
   }
 }
