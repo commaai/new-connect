@@ -94,7 +94,6 @@ export const useUploadQueue = async (dongleId: string) => {
   const offline = createMemo(() => onlineQueueError() !== undefined)
 
   const initialLoadPromise = await Promise.all([
-    new Promise((res) => setTimeout(res, 3999)),
     getUploadQueue(dongleId)
       .then((response) => {
         setItems('online', reconcile(mapOnineQueue(response.result!)))
