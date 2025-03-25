@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import type { Device } from '~/types'
 import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
@@ -21,11 +20,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-interface DashboardDrawerProps {
-  devices?: Device[]
-}
-
-const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
+const DashboardDrawer: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
   return (
@@ -41,9 +36,7 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
         comma connect
       </TopAppBar>
       <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
-      <Show when={props.devices} keyed>
-        {(devices) => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
-      </Show>
+      <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
@@ -103,7 +96,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+    <Drawer drawer={<DashboardDrawer />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={!!profile.error}>
           <Navigate href="/login" />
