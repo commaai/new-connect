@@ -1,8 +1,8 @@
 import { $ } from 'bun'
 
 interface FileStats {
-  path: string
   lines: number
+  path: string
 }
 
 interface FileStatsDiff extends FileStats {
