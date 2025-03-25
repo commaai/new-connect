@@ -1,4 +1,4 @@
-import { Component } from 'solid-js'
+import { Component, Suspense } from 'solid-js'
 import { For, Show } from 'solid-js'
 import { Transition, TransitionGroup } from 'solid-transition-group'
 
@@ -24,8 +24,7 @@ const QueueItemTable: Component<{ loading: boolean; items?: () => UploadItem[]; 
   return (
     <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)]">
       <Transition appear {...animations(false)}>
-        <Show
-          when={!props.loading}
+        <Suspense
           fallback={
             <div class="flex justify-center items-center h-full animate-spin absolute inset-0">
               <Icon name="progress_activity" />
@@ -63,7 +62,7 @@ const QueueItemTable: Component<{ loading: boolean; items?: () => UploadItem[]; 
               </div>
             </Show>
           </Show>
-        </Show>
+        </Suspense>
       </Transition>
     </div>
   )

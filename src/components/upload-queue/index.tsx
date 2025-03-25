@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, Show } from 'solid-js'
+import { createResource, Suspense } from 'solid-js'
 import type { Component } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
@@ -10,6 +10,10 @@ import StatisticBar from '../StatisticBar'
 
 const UploadQueue: Component<{ dongleId: string }> = (props) => {
   const [queue] = createResource(() => props.dongleId, useUploadQueue)
+  const items = () => queue()?.items()
+  const clearingQueue = () => queue()?.clearingQueue()
+  const clearQueueError = () => queue()?.clearQueueError()
+  const clearQueue = () => void queue()?.clearQueue()
 
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
@@ -19,34 +23,25 @@ const UploadQueue: Component<{ dongleId: string }> = (props) => {
             statistics={[
               {
                 label: 'Uploading',
-                value: () =>
-                  queue()
-                    ?.items()
-                    .filter((i) => i.status === 'uploading').length,
+                value: () => items()?.filter((i) => i.status === 'uploading').length,
               },
               {
                 label: 'Waiting',
-                value: () =>
-                  queue()
-                    ?.items()
-                    .filter((i) => i.status === 'queued').length,
+                value: () => items()?.filter((i) => i.status === 'queued').length,
               },
-              { label: 'Total', value: () => queue()?.items().length },
+              { label: 'Total', value: () => items()?.length },
             ]}
           />
         </div>
         <div class="flex p-4">
-          <Show
-            when={!queue()?.clearQueueError()}
-            fallback={<IconButton name="error" onClick={() => void queue()?.clearQueue()} disabled={queue()?.clearingQueue()} />}
-          >
+          <Suspense fallback={<IconButton name="delete" />}>
             <IconButton
-              class={clsx(queue()?.clearingQueue() && 'animate-spin')}
-              name={queue()?.clearingQueue() ? 'progress_activity' : 'delete'}
-              onClick={() => void queue()?.clearQueue()}
-              disabled={queue()?.clearingQueue()}
+              class={clsx(clearingQueue() && 'animate-spin')}
+              name={clearingQueue() ? 'progress_activity' : clearQueueError() ? 'error' : 'delete'}
+              onClick={() => void clearQueue()}
+              disabled={clearingQueue()}
             />
-          </Show>
+          </Suspense>
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
