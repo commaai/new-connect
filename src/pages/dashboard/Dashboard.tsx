@@ -45,11 +45,9 @@ const DashboardDrawer: VoidComponent = () => {
         Add new device
       </Button>
       <div class="flex max-w-full items-center px-3 rounded-md m-4 mt-0 outline outline-1 outline-outline-variant min-h-16">
-        <Icon
-          class="shrink-0 size-10 items-center justify-center rounded-full bg-primary-container text-on-primary-container"
-          name="person"
-          filled
-        />
+        <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+          <Icon name="person" filled />
+        </div>
         <div class="min-w-0 mx-3">
           <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
           <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
