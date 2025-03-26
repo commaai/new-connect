@@ -1,6 +1,6 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation, useNavigate } from '@solidjs/router'
+import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice, unpairDevice } from '~/api/devices'
@@ -401,13 +401,12 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const navigate = useNavigate()
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
 
   const [unpair, unpairData] = useAction(async () => {
-    await unpairDevice(props.dongleId)
-    await navigate('/')
+    const { success } = await unpairDevice(props.dongleId)
+    if (success) window.location.href = window.location.origin
   })
   return (
     <>
