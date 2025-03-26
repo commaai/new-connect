@@ -21,6 +21,7 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
+import { getDeviceName } from '~/utils/device'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -401,12 +402,18 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
+  const [deviceName] = createResource(device, getDeviceName)
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
-      <div class="max-w-lg px-4">
-        <h2 class="mb-4 text-headline-sm">comma prime</h2>
-        <Suspense>
+      <div class="flex flex-col gap-4 max-w-lg px-4">
+        <h2 class="text-headline-sm">{deviceName()}</h2>
+        <Button color="error" leading={<Icon name="delete" />}>
+          Unpair this device
+        </Button>
+        <hr class="mx-4 opacity-20" />
+        <h2 class="text-headline-sm">comma prime</h2>
+        <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>
               <PrimeCheckout dongleId={props.dongleId} />
