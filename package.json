@@ -62,8 +62,6 @@
   "//dependencies": {
     "@mapbox/polyline": "display series of map coordinates as a line",
     "@sentry/solid": "error monitoring",
-    "@solid-primitives/bounds": "track HTML element size and position on screen",
-    "@solid-primitives/state-machine": "create reactive state machine",
     "@solidjs/router": "changes view based on browser url",
     "clsx": "construct className strings conditionally",
     "dayjs": "work with dates (e.g., parse, validate, etc.)",
@@ -75,7 +73,6 @@
     "@mapbox/polyline": "^1.2.1",
     "@sentry/solid": "^9.8.0",
     "@sentry/vite-plugin": "^3.2.2",
-    "@solid-primitives/bounds": "^0.1.0",
     "@solid-primitives/state-machine": "^0.1.0",
     "@solidjs/router": "^0.15.3",
     "clsx": "^2.1.1",
