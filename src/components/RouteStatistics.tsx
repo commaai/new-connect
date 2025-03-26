@@ -22,7 +22,6 @@ const RouteStatistics: VoidComponent<{ class?: string; route: Route }> = (props)
         { label: 'Distance', value: () => formatDistance(props.route?.length) },
         { label: 'Duration', value: () => formatRouteDuration(props.route) },
         { label: 'Engaged', value: () => formatEngagement(timeline()) },
-        { label: 'User flags', value: () => timeline()?.userFlags },
       ]}
     />
   )
