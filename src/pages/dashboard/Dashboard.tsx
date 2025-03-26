@@ -1,16 +1,20 @@
-import { createResource, lazy, Match, Show, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
+import { createResource, lazy, Match, Show, SuspenseList, Switch } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
+import { getGravatarUrl } from '~/utils/profile'
 import storage from '~/utils/storage'
 
+import Avatar from '~/components/material/Avatar'
 import Button from '~/components/material/Button'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
+import Menu, { MenuItem } from '~/components/material/Menu'
+import * as Popover from '~/components/material/Popover'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
@@ -23,6 +27,13 @@ const PairActivity = lazy(() => import('./activities/PairActivity'))
 const DashboardDrawer: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
+
+  const [profile] = createResource(getProfile)
+  const [gravatarUrl] = createResource(
+    () => profile()?.email,
+    (email) => getGravatarUrl(email),
+  )
+
   return (
     <>
       <TopAppBar
@@ -42,9 +53,29 @@ const DashboardDrawer: VoidComponent = () => {
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
-      <Button class="m-4" color="error" href="/logout">
-        Sign out
-      </Button>
+      <div class="flex items-center gap-3 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant h-20">
+        <Avatar class="size-10 overflow-hidden shrink-0">
+          <Show when={gravatarUrl()} keyed>
+            {(url) => <img alt="Your gravatar profile image" src={url} />}
+          </Show>
+        </Avatar>
+        <div class="min-w-0">
+          <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+          <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+        </div>
+        <Popover.Root>
+          <Popover.Trigger>
+            <IconButton class="shrink-0" name="more_vert" />
+          </Popover.Trigger>
+          <Popover.Content position="top">
+            <Menu>
+              <MenuItem href="/logout" leading={<Icon name="logout" />}>
+                Logout
+              </MenuItem>
+            </Menu>
+          </Popover.Content>
+        </Popover.Root>
+      </div>
     </>
   )
 }

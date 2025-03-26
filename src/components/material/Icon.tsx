@@ -6,8 +6,8 @@ import clsx from 'clsx'
 // biome-ignore format: the array should not be formatted
 export const Icons = [
   'add', 'arrow_back', 'camera', 'check', 'chevron_right', 'clear', 'close', 'delete', 'description', 'directions_car', 'download', 'error',
-  'file_copy', 'info', 'menu', 'my_location', 'open_in_new', 'payments', 'person', 'progress_activity', 'satellite_alt', 'search',
-  'settings', 'sync', 'upload', 'videocam',
+  'file_copy', 'info', 'logout', 'menu', 'more_vert', 'my_location', 'open_in_new', 'payments', 'person', 'progress_activity',
+  'satellite_alt', 'search', 'settings', 'sync', 'upload', 'videocam',
 ] as const
 
 export type IconName = (typeof Icons)[number]
