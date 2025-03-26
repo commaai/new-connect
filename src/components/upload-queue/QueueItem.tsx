@@ -18,7 +18,6 @@ const QueueItem: Component<{ item: UploadItem }> = (props) => {
       case 'completed':
         return 'tertiary'
       case 'queued':
-        return 'secondary'
       case 'waiting_for_network':
         return 'secondary'
       default:
