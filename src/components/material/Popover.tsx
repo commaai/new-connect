@@ -62,19 +62,11 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
   const screenMargin = props.screenMargin ?? 8
 
   const contentStyle = createMemo((): JSX.CSSProperties => {
+    // biome-ignore format: not great
     if (
-      trigger.top === null ||
-      trigger.right === null ||
-      trigger.bottom === null ||
-      trigger.left === null ||
-      trigger.height === null ||
-      trigger.width === null ||
-      content.width === null ||
-      content.height === null
-    ) {
-      console.debug('not ready')
-      return { display: 'none' }
-    }
+      !trigger.top || !trigger.right || !trigger.bottom || !trigger.left ||
+      !trigger.height || !trigger.width || !content.width || !content.height
+    ) return { visibility: 'hidden' }
 
     let top: number, left: number
     switch (position) {
