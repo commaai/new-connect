@@ -1,8 +1,10 @@
-import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
+import { getTimelineStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
+import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
@@ -19,6 +21,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
   const [startPlace] = createResource(startPosition, getPlaceName)
   const [endPlace] = createResource(endPosition, getPlaceName)
+  const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(
     () => [startPlace(), endPlace()],
     ([startPlace, endPlace]) => {
@@ -41,6 +44,15 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
           </div>
         }
         subhead={location()}
+        trailing={
+          <Suspense>
+            <Show when={timeline()?.userFlags}>
+              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 ring-1 ring-amber-300 shadow-inner shadow-black/20">
+                <Icon class="text-yellow-300" size="20" name="flag" filled />
+              </div>
+            </Show>
+          </Suspense>
+        }
       />
 
       <CardContent>
