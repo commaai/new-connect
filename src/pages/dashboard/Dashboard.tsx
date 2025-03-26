@@ -1,4 +1,4 @@
-import { createResource, lazy, Match, Show, SuspenseList, Switch } from 'solid-js'
+import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -23,6 +23,9 @@ const PairActivity = lazy(() => import('./activities/PairActivity'))
 const DashboardDrawer: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
+
+  const [profile] = createResource(getProfile)
+
   return (
     <>
       <TopAppBar
@@ -41,10 +44,21 @@ const DashboardDrawer: VoidComponent = () => {
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
-      <hr class="mx-4 opacity-20" />
-      <Button class="m-4" color="error" href="/logout">
-        Sign out
-      </Button>
+      <div class="m-4 mt-0">
+        <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
+          <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
+            <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+              <Icon name="person" filled />
+            </div>
+            <div class="min-w-0 mx-3">
+              <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+              <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+            </div>
+            <div class="grow" />
+            <IconButton name="logout" href="/logout" />
+          </div>
+        </Suspense>
+      </div>
     </>
   )
 }
