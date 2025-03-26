@@ -44,16 +44,18 @@ const DashboardDrawer: VoidComponent = () => {
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
-      <hr class="mx-4 opacity-20" />
-      <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant min-h-16">
-        <div class="flex size-10 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-          <Icon name="person" filled />
-        </div>
-        <div class="min-w-0">
+      <div class="flex max-w-full items-center px-3 rounded-md m-4 mt-0 outline outline-1 outline-outline-variant min-h-16">
+        <Icon
+          class="shrink-0 size-10 items-center justify-center rounded-full bg-primary-container text-on-primary-container"
+          name="person"
+          filled
+        />
+        <div class="min-w-0 mx-3">
           <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
           <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
         </div>
-        <IconButton size="24" name="logout" href="/logout" />
+        <div class="grow" />
+        <IconButton name="logout" href="/logout" />
       </div>
     </>
   )
