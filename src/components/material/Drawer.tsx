@@ -66,7 +66,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       >
         {props.children}
         <div
-          class="absolute inset-0 z-[999] bg-background transition-drawer duration-500"
+          class="absolute inset-0 z-[9999] bg-background transition-drawer duration-500"
           style={{
             'pointer-events': modal() && open() ? 'auto' : 'none',
             opacity: modal() && open() ? 0.5 : 0,

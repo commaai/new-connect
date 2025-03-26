@@ -17,9 +17,9 @@ export const ListItemContent: VoidComponent<ListItemContentProps> = (props) => {
   )
 }
 
-export type ListItemProps = {
+type ListItemProps = {
   class?: string
-  variant?: '1-line' | '2-line' | '3-line' | 'nav' | 'menu'
+  variant?: '1-line' | '2-line' | '3-line' | 'nav'
   selected?: boolean
   leading?: JSXElement
   trailing?: JSXElement
@@ -37,12 +37,11 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       '2-line': 'h-20',
       '3-line': 'h-28',
       nav: 'h-14 gap-3 before:rounded-full before:duration-0',
-      menu: 'h-12 gap-3',
     })[variant()]
   return (
     <ButtonBase
       class={clsx(
-        'elevation-0 state-layer flex shrink-0 items-center gap-4 pl-4 pr-6 transition-colors before:bg-on-surface',
+        'elevation-0 state-layer flex shrink-0 items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
         variantStyle(),
         props.selected && 'before:opacity-[.12]',
         props.class,
@@ -60,15 +59,11 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
 
 type ListProps = {
   class?: string
-  variant?: 'nav' | 'menu'
+  variant?: 'nav'
 }
 
 const List: ParentComponent<ListProps> = (props) => {
-  return (
-    <div class={clsx('flex flex-col', props.variant === 'nav' || props.variant === 'menu' ? 'gap-0' : 'gap-2', props.class)}>
-      {props.children}
-    </div>
-  )
+  return <div class={clsx('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
 }
 
 export default List

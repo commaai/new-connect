@@ -242,7 +242,7 @@ export default {
         },
       },
       screens: {
-        // Larger screen phones (iPhone Pro Max, Galaxy Ultra, Pixel XL/Pro...)
+        // Larger screen phones (iPhone Pro/Max, Galaxy Ultra, Pixel XL/Pro...)
         xs: '411px',
       },
       animation: {
