@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import { getGravatarUrl } from '~/utils/profile'
 import storage from '~/utils/storage'
 
 import Avatar from '~/components/material/Avatar'
@@ -13,8 +12,6 @@ import Button from '~/components/material/Button'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
-import Menu, { MenuItem } from '~/components/material/Menu'
-import * as Popover from '~/components/material/Popover'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
@@ -29,10 +26,6 @@ const DashboardDrawer: VoidComponent = () => {
   const onClose = () => setOpen(false)
 
   const [profile] = createResource(getProfile)
-  const [gravatarUrl] = createResource(
-    () => profile()?.email,
-    (email) => getGravatarUrl(email),
-  )
 
   return (
     <>
@@ -54,28 +47,14 @@ const DashboardDrawer: VoidComponent = () => {
       </Button>
       <hr class="mx-4 opacity-20" />
       <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant min-h-16">
-        <Avatar class="overflow-hidden shrink-0">
-          <Show when={gravatarUrl()} keyed>
-            {(url) => <img alt="Your gravatar profile image" src={url} />}
-          </Show>
+        <Avatar>
+          <Icon name="person" filled />
         </Avatar>
         <div class="min-w-0">
           <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
           <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
         </div>
-        <Popover.Root>
-          <Popover.Trigger>
-            <Icon class="state-layer p-2 before:rounded-full before:bg-on-surface" name="more_vert" />
-            <span class="sr-only">User settings</span>
-          </Popover.Trigger>
-          <Popover.Content position="top">
-            <Menu>
-              <MenuItem href="/logout" leading={<Icon name="logout" />}>
-                Logout
-              </MenuItem>
-            </Menu>
-          </Popover.Content>
-        </Popover.Root>
+        <IconButton size="24" name="logout" href="/logout" />
       </div>
     </>
   )
