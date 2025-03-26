@@ -1,19 +1,28 @@
-import { createContext, createEffect, createMemo, createSignal, onCleanup, Show, useContext } from 'solid-js'
+import { createContext, createEffect, createMemo, createSignal, onCleanup, onMount, Show, useContext } from 'solid-js'
 import type { Accessor, JSX, ParentComponent, Setter } from 'solid-js'
 import { Portal } from 'solid-js/web'
+import { createElementBounds } from '@solid-primitives/bounds'
 
-type PopoverContext = { open: Accessor<boolean>; setOpen: Setter<boolean> }
+type PopoverContext = {
+  open: Accessor<boolean>
+  setOpen: Setter<boolean>
+  triggerRef: Accessor<HTMLElement | undefined>
+  setTriggerRef: Setter<HTMLElement | undefined>
+}
 
 const PopoverContext = createContext<PopoverContext>()
 
 export const Root: ParentComponent<{ onOpenChange?: (open: boolean) => void }> = (props) => {
   const [internalOpen, setInternalOpen] = createSignal(false)
+  const [triggerRef, setTriggerRef] = createSignal<HTMLElement>()
   const context = {
     open: internalOpen,
     setOpen: (setter: (prev: boolean) => boolean) => {
       const newValue = setInternalOpen(setter)
       props.onOpenChange?.(newValue)
     },
+    triggerRef,
+    setTriggerRef,
   }
   return <PopoverContext.Provider value={context}>{props.children}</PopoverContext.Provider>
 }
@@ -26,8 +35,16 @@ export const usePopover = () => {
 
 export const Trigger: ParentComponent<JSX.ButtonHTMLAttributes<HTMLButtonElement>> = (props) => {
   const context = usePopover()
+  // TODO: is this necessary?
+  onMount(() => onCleanup(() => context.setTriggerRef(undefined)))
   return (
-    <button aria-expanded={context.open()} aria-haspopup="dialog" onClick={() => context.setOpen(!context.open())} {...props}>
+    <button
+      ref={context.setTriggerRef}
+      aria-expanded={context.open()}
+      aria-haspopup="dialog"
+      onClick={() => context.setOpen(!context.open())}
+      {...props}
+    >
       {props.children}
     </button>
   )
@@ -38,18 +55,28 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
 ) => {
   const context = usePopover()
 
-  let triggerRef: Element, contentRef: Element
-  const [triggerRect, setTriggerRect] = createSignal<DOMRect>()
-  const [contentRect, setContentRect] = createSignal<DOMRect>()
+  const [contentRef, setContentRef] = createSignal<HTMLDivElement>()
+  const trigger = createElementBounds(context.triggerRef, { trackMutation: false })
+  const content = createElementBounds(contentRef, { trackScroll: false })
 
   const position = props.position ?? 'bottom'
   const offset = props.offset ?? 8
   const screenMargin = props.screenMargin ?? 8
 
   const contentStyle = createMemo(() => {
-    const trigger = triggerRect()
-    const content = contentRect()
-    if (!trigger || !content) return {}
+    if (
+      trigger.top === null ||
+      trigger.right === null ||
+      trigger.bottom === null ||
+      trigger.left === null ||
+      trigger.height === null ||
+      trigger.width === null ||
+      content.width === null ||
+      content.height === null
+    ) {
+      console.debug('not ready')
+      return { display: 'none' }
+    }
 
     let top: number, left: number
     switch (position) {
@@ -92,18 +119,11 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
   createEffect(() => {
     if (!context.open()) return
 
-    const triggerElement = document.querySelector('[aria-expanded="true"][aria-haspopup="dialog"]')
-    if (triggerElement) {
-      triggerRef = triggerElement
-      setTriggerRect(triggerElement.getBoundingClientRect())
-    }
+    const content = contentRef()
+    const trigger = context.triggerRef()
 
-    const handleResize = () => {
-      if (triggerRef) setTriggerRect(triggerRef.getBoundingClientRect())
-      if (contentRef) setContentRect(contentRef.getBoundingClientRect())
-    }
     const handleClickOutside = (e: MouseEvent) => {
-      if (!(e.target instanceof HTMLElement) || contentRef?.contains(e.target) || triggerRef?.contains(e.target)) return
+      if (!(e.target instanceof HTMLElement) || content?.contains(e.target) || trigger?.contains(e.target)) return
       context.setOpen(false)
     }
     const handleEscapeKey = (e: KeyboardEvent) => {
@@ -111,14 +131,10 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
       context.setOpen(false)
     }
 
-    window.addEventListener('resize', handleResize)
-    window.addEventListener('scroll', handleResize)
     document.addEventListener('mousedown', handleClickOutside)
     document.addEventListener('keydown', handleEscapeKey)
 
     onCleanup(() => {
-      window.removeEventListener('resize', handleResize)
-      window.removeEventListener('scroll', handleResize)
       document.removeEventListener('mousedown', handleClickOutside)
       document.removeEventListener('keydown', handleEscapeKey)
     })
@@ -127,17 +143,7 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
   return (
     <Show when={context.open()}>
       <Portal>
-        <div
-          ref={(el) => {
-            contentRef = el
-            setTimeout(() => setContentRect(el.getBoundingClientRect()), 0)
-          }}
-          role="dialog"
-          aria-modal="true"
-          tabIndex="-1"
-          style={contentStyle()}
-          {...props}
-        >
+        <div ref={setContentRef} role="dialog" aria-modal="true" tabIndex="-1" style={contentStyle()} {...props}>
           {props.children}
         </div>
       </Portal>
