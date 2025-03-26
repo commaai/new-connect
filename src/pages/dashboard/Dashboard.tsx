@@ -53,8 +53,8 @@ const DashboardDrawer: VoidComponent = () => {
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
-      <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant h-20">
-        <Avatar class="size-10 overflow-hidden shrink-0">
+      <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant min-h-14 xs:h-20">
+        <Avatar class="hidden xs:block overflow-hidden shrink-0">
           <Show when={gravatarUrl()} keyed>
             {(url) => <img alt="Your gravatar profile image" src={url} />}
           </Show>
@@ -66,6 +66,7 @@ const DashboardDrawer: VoidComponent = () => {
         <Popover.Root>
           <Popover.Trigger>
             <Icon class="state-layer p-2 before:rounded-full before:bg-on-surface" name="more_vert" />
+            <span class="sr-only">User settings</span>
           </Popover.Trigger>
           <Popover.Content position="top">
             <Menu>
