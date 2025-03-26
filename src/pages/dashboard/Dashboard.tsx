@@ -53,7 +53,7 @@ const DashboardDrawer: VoidComponent = () => {
         Add new device
       </Button>
       <hr class="mx-4 opacity-20" />
-      <div class="flex items-center gap-3 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant h-20">
+      <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant h-20">
         <Avatar class="size-10 overflow-hidden shrink-0">
           <Show when={gravatarUrl()} keyed>
             {(url) => <img alt="Your gravatar profile image" src={url} />}
