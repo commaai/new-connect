@@ -61,7 +61,7 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
   const offset = props.offset ?? 8
   const screenMargin = props.screenMargin ?? 8
 
-  const contentStyle = createMemo(() => {
+  const contentStyle = createMemo((): JSX.CSSProperties => {
     if (
       trigger.top === null ||
       trigger.right === null ||
@@ -110,8 +110,8 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
       position: 'absolute',
       top: `${top}px`,
       left: `${left}px`,
-      zIndex: 50,
-    } as JSX.CSSProperties
+      'z-index': 9999,
+    }
   })
 
   createEffect(() => {
