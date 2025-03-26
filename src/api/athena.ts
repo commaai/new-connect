@@ -55,6 +55,7 @@ export const makeAthenaCall = async <REQ, RES>(
     {
       method: 'POST',
       body: JSON.stringify({ id: 0, jsonrpc: '2.0', method, params, expiry }),
+      headers: { 'Content-Type': 'application/json' },
     },
     ATHENA_URL,
   )
