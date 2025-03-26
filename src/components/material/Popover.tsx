@@ -33,7 +33,9 @@ export const Trigger: ParentComponent<JSX.ButtonHTMLAttributes<HTMLButtonElement
   )
 }
 
-export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 'left'; offset?: number }> = (props) => {
+export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 'left'; offset?: number; screenMargin?: number }> = (
+  props,
+) => {
   const context = usePopover()
 
   let triggerRef: Element, contentRef: Element
@@ -42,6 +44,7 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
 
   const position = props.position ?? 'bottom'
   const offset = props.offset ?? 8
+  const screenMargin = props.screenMargin ?? 8
 
   const contentStyle = createMemo(() => {
     const trigger = triggerRect()
@@ -70,13 +73,13 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
 
     // Ensure the content doesn't go off-screen
     if (left + content.width > window.innerWidth) {
-      left = window.innerWidth - content.width - 8
+      left = window.innerWidth - content.width - screenMargin
     }
-    if (left < 8) left = 8
+    if (left < screenMargin) left = screenMargin
     if (top + content.height > window.innerHeight) {
-      top = window.innerHeight - content.height - 8
+      top = window.innerHeight - content.height - screenMargin
     }
-    if (top < 8) top = 8
+    if (top < screenMargin) top = screenMargin
 
     return {
       position: 'absolute',
