@@ -34,7 +34,7 @@ const QueueItemTable: Component<{ items?: () => UploadItem[] | undefined; error?
           }
         >
           <Switch>
-            <Match when={props.offline}>
+            <Match when={props.error?.() !== undefined && props.items?.()?.length === 0}>
               <div class="flex items-center justify-center h-full gap-2 text-on-surface-variant absolute inset-0">
                 <Icon name="signal_disconnected" />
                 <span>{props.error?.()}</span>

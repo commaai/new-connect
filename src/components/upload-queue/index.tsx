@@ -47,7 +47,7 @@ const UploadQueue: Component<{ dongleId: string }> = (props) => {
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
-        <QueueItemTable items={items} error={queue()?.clearQueueError} offline={queue()?.offline()} />
+        <QueueItemTable items={items} error={queue()?.error} offline={queue()?.offline()} />
       </div>
     </div>
   )

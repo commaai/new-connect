@@ -118,7 +118,7 @@ export const useUploadQueue = async (dongleId: string) => {
       if (err instanceof Error && err.cause instanceof Response && err.cause.status === 404) {
         setOnlineQueueError('Device offline')
       } else {
-        console.debug('Error polling online queue:', err)
+        console.error('Error polling online queue:', err)
         setOnlineQueueError(`Error polling online queue: ${err}`)
       }
     }
@@ -129,7 +129,7 @@ export const useUploadQueue = async (dongleId: string) => {
       const offlineItems = await getAthenaOfflineQueue(dongleId)
       setItems('offline', reconcile(mapOfflineQueue(offlineItems)))
     } catch (err) {
-      console.debug('Error polling offline queue:', err)
+      console.error('Error polling offline queue:', err)
     }
   }
 
