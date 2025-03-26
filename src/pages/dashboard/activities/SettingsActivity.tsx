@@ -1,9 +1,9 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation } from '@solidjs/router'
+import { useLocation, useNavigate } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice } from '~/api/devices'
+import { getDevice, unpairDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -401,14 +401,26 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
+  const navigate = useNavigate()
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
+
+  const [unpair, unpairData] = useAction(async () => {
+    await unpairDevice(props.dongleId)
+    await navigate('/')
+  })
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
         <h2 class="text-headline-sm">{deviceName()}</h2>
-        <Button color="error" leading={<Icon name="delete" />}>
+        <Show when={unpairData.error}>
+          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
+            <Icon class="text-error" name="error" size="20" />
+            {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
+          </div>
+        </Show>
+        <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
           Unpair this device
         </Button>
         <hr class="mx-4 opacity-20" />

@@ -28,6 +28,11 @@ export const getDevices = async () =>
     .then(sortDevices)
     .catch(() => [])
 
+export const unpairDevice = async (dongleId: string) =>
+  fetcher<{ success: number }>(`/v1/devices/${dongleId}/unpair`, {
+    method: 'POST',
+  })
+
 const validatePairToken = (
   input: string,
 ): {

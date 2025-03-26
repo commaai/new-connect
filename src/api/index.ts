@@ -17,8 +17,14 @@ export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: s
       Authorization: `JWT ${getAccessToken()}`,
     },
   })
-  // TODO: validate responses
-  const json = (await res.json()) as T & { error?: string; description?: string }
+  const text = await res.text()
+  // biome-ignore lint/suspicious/noImplicitAnyLet: TODO: validate server response
+  let json
+  try {
+    json = (await JSON.parse(text)) as T & { error?: string; description?: string }
+  } catch {
+    throw new Error(`Error: ${res.status} ${res.statusText}`, { cause: text })
+  }
   if (json.error) {
     throw new Error(json.description, { cause: res })
   }
