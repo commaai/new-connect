@@ -54,7 +54,7 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
   const context = usePopover()
 
   const [contentRef, setContentRef] = createSignal<HTMLDivElement>()
-  const trigger = createElementBounds(context.triggerRef, { trackMutation: false })
+  const trigger = createElementBounds(context.triggerRef)
   const content = createElementBounds(contentRef, { trackScroll: false })
 
   const position = props.position ?? 'bottom'
