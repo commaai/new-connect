@@ -7,7 +7,6 @@ import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 
-import Avatar from '~/components/material/Avatar'
 import Button from '~/components/material/Button'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -47,9 +46,9 @@ const DashboardDrawer: VoidComponent = () => {
       </Button>
       <hr class="mx-4 opacity-20" />
       <div class="flex items-center gap-2 px-4 justify-between rounded-md m-4 outline outline-1 outline-outline-variant min-h-16">
-        <Avatar>
+        <div class="flex size-10 items-center justify-center rounded-full bg-primary-container text-on-primary-container">
           <Icon name="person" filled />
-        </Avatar>
+        </div>
         <div class="min-w-0">
           <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
           <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
