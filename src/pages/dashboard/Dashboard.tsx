@@ -65,7 +65,7 @@ const DashboardDrawer: VoidComponent = () => {
         </div>
         <Popover.Root>
           <Popover.Trigger>
-            <IconButton class="shrink-0" name="more_vert" />
+            <Icon class="state-layer p-2 before:rounded-full before:bg-on-surface" name="more_vert" />
           </Popover.Trigger>
           <Popover.Content position="top">
             <Menu>

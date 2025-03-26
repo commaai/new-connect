@@ -1,4 +1,4 @@
-import { createContext, createEffect, createMemo, createSignal, onCleanup, onMount, Show, useContext } from 'solid-js'
+import { createContext, createEffect, createMemo, createSignal, onCleanup, Show, useContext } from 'solid-js'
 import type { Accessor, JSX, ParentComponent, Setter } from 'solid-js'
 import { Portal } from 'solid-js/web'
 import { createElementBounds } from '@solid-primitives/bounds'
@@ -35,14 +35,12 @@ export const usePopover = () => {
 
 export const Trigger: ParentComponent<JSX.ButtonHTMLAttributes<HTMLButtonElement>> = (props) => {
   const context = usePopover()
-  // TODO: is this necessary?
-  onMount(() => onCleanup(() => context.setTriggerRef(undefined)))
   return (
     <button
       ref={context.setTriggerRef}
       aria-expanded={context.open()}
       aria-haspopup="dialog"
-      onClick={() => context.setOpen(!context.open())}
+      onClick={() => context.setOpen((prev) => !prev)}
       {...props}
     >
       {props.children}
@@ -149,9 +147,4 @@ export const Content: ParentComponent<{ position?: 'top' | 'right' | 'bottom' | 
       </Portal>
     </Show>
   )
-}
-
-export const Close: ParentComponent = (props) => {
-  const context = usePopover()
-  return <button onClick={() => context.setOpen(false)}>{props.children}</button>
 }
