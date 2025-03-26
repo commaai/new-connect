@@ -139,9 +139,11 @@ export const useUploadQueue = async (dongleId: string) => {
     if (loading()) return
 
     let timer: Timer
-    pollQueues().finally(() => {
-      timer = setTimeout(() => pollQueues(), pollInterval())
-    })
+    const poll = () =>
+      pollQueues().finally(() => {
+        timer = setTimeout(poll, pollInterval())
+      })
+    poll()
 
     onCleanup(() => clearTimeout(timer))
   })
