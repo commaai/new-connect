@@ -11,39 +11,43 @@ import StatisticBar from '../StatisticBar'
 const UploadQueue: Component<{ dongleId: string }> = (props) => {
   const [queue] = createResource(() => props.dongleId, useUploadQueue)
   const items = () => queue()?.items()
-  const clearingQueue = () => queue()?.clearingQueue()
-  const clearQueueError = () => queue()?.clearQueueError()
-  const clearQueue = () => void queue()?.clearQueue()
-
-  const uploading = () => items()?.filter((i) => i.status === 'uploading').length
-  const queued = () => items()?.filter((i) => i.status === 'queued').length
-  const total = () => items()?.length
-
   return (
     <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
       <div class="flex">
         <div class="flex-auto p-4">
           <StatisticBar
             statistics={[
-              { label: 'Uploading', value: uploading },
-              { label: 'Waiting', value: queued },
-              { label: 'Total', value: total },
+              {
+                label: 'Uploading',
+                value: () =>
+                  queue()
+                    ?.items()
+                    .filter((i) => i.status === 'uploading').length,
+              },
+              {
+                label: 'Waiting',
+                value: () =>
+                  queue()
+                    ?.items()
+                    .filter((i) => i.status === 'queued').length,
+              },
+              { label: 'Total', value: () => queue()?.items().length },
             ]}
           />
         </div>
         <div class="flex p-4">
           <Suspense fallback={<IconButton name="delete" />}>
             <IconButton
-              class={clsx(clearingQueue() && 'animate-spin')}
-              name={clearingQueue() ? 'progress_activity' : clearQueueError() ? 'error' : 'delete'}
-              onClick={() => void clearQueue()}
-              disabled={clearingQueue()}
+              class={clsx(queue()?.clearingQueue() && 'animate-spin')}
+              name={queue()?.clearingQueue() ? 'progress_activity' : queue()?.clearQueueError() ? 'error' : 'delete'}
+              onClick={() => void queue()?.clearQueue()}
+              disabled={queue()?.clearingQueue()}
             />
           </Suspense>
         </div>
       </div>
       <div class="rounded-md border-2 border-surface-container-high mx-4 mb-4 p-4">
-        <QueueItemTable items={items} error={clearQueueError} offline={queue()?.offline()} />
+        <QueueItemTable items={items} error={queue()?.clearQueueError} offline={queue()?.offline()} />
       </div>
     </div>
   )
