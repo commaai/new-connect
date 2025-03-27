@@ -19,7 +19,7 @@ const parseUploadPath = (url: string) => {
 const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ item }) => {
   return (
     <div class="flex flex-col">
-      <div class={'flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0'}>
+      <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
           <Icon
             class="text-on-surface-variant flex-shrink-0 mr-2"
@@ -34,7 +34,7 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-        <LinearProgress progress={item.progress} color={'primary'} />
+        <LinearProgress progress={item.progress} color="primary" />
       </div>
     </div>
   )
