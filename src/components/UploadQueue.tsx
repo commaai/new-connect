@@ -16,30 +16,6 @@ const parseUploadPath = (url: string) => {
   return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5] }
 }
 
-const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ item }) => {
-  return (
-    <div class="flex flex-col">
-      <div class={'flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0'}>
-        <div class="flex items-center min-w-0 flex-1">
-          <Icon
-            class="text-on-surface-variant flex-shrink-0 mr-2"
-            name={item.priority === COMMA_CONNECT_PRIORITY ? 'person' : 'local_fire_department'}
-          />
-          <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
-          </div>
-        </div>
-        <div class="flex items-center gap-2 flex-shrink-0 justify-end">
-          <span class="text-body-sm font-mono whitespace-nowrap">{Math.round(item.progress * 100)}%</span>
-        </div>
-      </div>
-      <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-        <LinearProgress progress={item.progress} color={'primary'} />
-      </div>
-    </div>
-  )
-}
-
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const [loading, setLoading] = createSignal(true)
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
@@ -97,7 +73,31 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
             </Match>
             <Match when={true}>
               <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
-                <For each={items}>{(item) => <UploadQueueRow item={item} />}</For>
+                <For each={items}>
+                  {(item) => (
+                    <div class="flex flex-col">
+                      <div class={'flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0'}>
+                        <div class="flex items-center min-w-0 flex-1">
+                          <Icon
+                            class="text-on-surface-variant flex-shrink-0 mr-2"
+                            name={item.priority === COMMA_CONNECT_PRIORITY ? 'person' : 'local_fire_department'}
+                          />
+                          <div class="flex min-w-0 gap-1">
+                            <span class="text-body-sm font-mono truncate text-on-surface">
+                              {[item.route, item.segment, item.filename].join(' ')}
+                            </span>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-2 flex-shrink-0 justify-end">
+                          <span class="text-body-sm font-mono whitespace-nowrap">{Math.round(item.progress * 100)}%</span>
+                        </div>
+                      </div>
+                      <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
+                        <LinearProgress progress={item.progress} color={'primary'} />
+                      </div>
+                    </div>
+                  )}
+                </For>
               </div>
             </Match>
           </Switch>
