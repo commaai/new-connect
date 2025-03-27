@@ -41,9 +41,9 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
 }
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const [loading, setLoading] = createSignal(true)
-  const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
   const [error, setError] = createSignal<string | undefined>()
+  const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
+  const [loading, setLoading] = createSignal(true)
 
   let timeout: Timer | undefined
 
