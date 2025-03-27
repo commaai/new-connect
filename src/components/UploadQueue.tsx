@@ -44,9 +44,8 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
 const WAITING = 'Waiting for device to connect...'
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const [error, setError] = createSignal<string | undefined>()
+  const [error, setError] = createSignal<string | undefined>(WAITING)
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
-  const [loading, setLoading] = createSignal(true)
 
   let timeout: Timer | undefined
 
@@ -70,7 +69,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       })
       .finally(() => {
         if (!timeout) return
-        setLoading(false)
         timeout = setTimeout(fetch, 1000)
       })
   }
@@ -87,9 +85,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       <div class="flex flex-col flex-auto p-4 gap-4">
         <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
           <Switch>
-            <Match when={loading()}>
-              <Icon name="progress_activity" class="animate-spin" />
-            </Match>
             <Match when={error()}>
               <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
               <span class="ml-2">{error()}</span>
