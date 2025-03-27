@@ -1,5 +1,4 @@
 import Button from '~/components/material/Button'
-import Icon from '~/components/material/Icon'
 
 export default function OfflinePage() {
   return (
@@ -15,7 +14,7 @@ export default function OfflinePage() {
         </div>
       </div>
       <p class="text-body-lg">Please check your network connection</p>
-      <Button color="secondary" trailing={<Icon name="refresh" />} onClick={() => window.location.reload()}>
+      <Button color="secondary" onClick={() => window.location.reload()}>
         Try again
       </Button>
     </div>
