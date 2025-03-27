@@ -4,6 +4,7 @@ import './index.css'
 import * as Sentry from '@sentry/solid'
 import { render } from 'solid-js/web'
 import App from './App'
+import './pwa.ts'
 
 const environment = import.meta.env.VITE_SENTRY_ENVIRONMENT as string | undefined
 Sentry.init({

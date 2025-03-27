@@ -5,7 +5,7 @@
     {
       "src": "/images/icon-vector.svg",
       "type": "image/svg+xml",
-      "sizes": "512x512"
+      "sizes": "any"
     },
     {
       "src": "/images/icon-192.png",
@@ -26,6 +26,12 @@
       "src": "/images/icon-512.png",
       "type": "image/png",
       "sizes": "512x512"
+    },
+    {
+      "src": "/images/icon-maskable.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
     },
     {
       "src": "/images/icon-maskable.png",
