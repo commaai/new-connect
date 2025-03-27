@@ -47,7 +47,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
-              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 ring-1 ring-amber-300 shadow-inner shadow-black/20">
+              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
                 <Icon class="text-yellow-300" size="20" name="flag" filled />
               </div>
             </Show>
