@@ -35,7 +35,7 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-        <LinearProgress progress={item.progress} color="primary" />
+        <LinearProgress progress={item.progress} color={Math.round(item.progress * 100) === 100 ? 'tertiary' : 'primary'} />
       </div>
     </div>
   )
