@@ -82,25 +82,24 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   })
 
   return (
-    <div class="flex flex-col border-2 border-t-0 border-surface-container-high bg-surface-container-lowest">
-      <div class="flex flex-col flex-auto p-4 gap-4">
-        <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
-          <Switch>
-            <Match when={error()}>
-              <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
-              <span class="ml-2">{error()}</span>
-            </Match>
-            <Match when={items.length === 0}>
-              <Icon name="check" />
-              <span class="ml-2">Nothing to upload</span>
-            </Match>
-            <Match when={true}>
-              <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
-                <For each={items}>{(item) => <UploadQueueRow item={item} />}</For>
-              </div>
-            </Match>
-          </Switch>
-        </div>
+    <div class="flex flex-col p-4 gap-4 bg-surface-container-lowest">
+      <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
+        <Switch
+          fallback={
+            <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
+              <For each={items}>{(item) => <UploadQueueRow item={item} />}</For>
+            </div>
+          }
+        >
+          <Match when={error()}>
+            <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
+            <span class="ml-2">{error()}</span>
+          </Match>
+          <Match when={items.length === 0}>
+            <Icon name="check" />
+            <span class="ml-2">Nothing to upload</span>
+          </Match>
+        </Switch>
       </div>
     </div>
   )

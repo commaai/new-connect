@@ -128,8 +128,8 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Show>
           <button
             class={clsx(
-              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45',
-              queueVisible() ? 'border-2 border-t-0 border-surface-container-high' : '',
+              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+              queueVisible() && 'border-t-2 border-t-surface-container-low',
             )}
             onClick={() => setQueueVisible(!queueVisible())}
           >
