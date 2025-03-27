@@ -3,15 +3,16 @@ import { BASE_URL } from '../config'
 const AUTH_KEY = 'ai.comma.api.authorization'
 
 export async function refreshAccessToken(code: string, provider: string): Promise<void> {
-  console.log('refreshAccessToken', { code, provider })
   try {
-    const resp = await fetch(`${BASE_URL}/v2/auth`, {
+    const request = new Request(`${BASE_URL}/v2/auth`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
       },
       body: new URLSearchParams({ code, provider }),
     })
+    console.debug(request)
+    const resp = await fetch(request)
 
     if (!resp.ok) {
       throw new Error(`${resp.status}: ${await resp.text()}`)

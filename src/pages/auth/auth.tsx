@@ -1,4 +1,4 @@
-import { createEffect, Show } from 'solid-js'
+import { Show } from 'solid-js'
 import { Navigate, useNavigate, useSearchParams } from '@solidjs/router'
 
 import { refreshAccessToken } from '~/api/auth/client'
@@ -14,10 +14,6 @@ export default function Auth() {
   const { code, provider } = params
 
   console.log('auth', { code, provider })
-  createEffect(() => {
-    console.log('effect', { ...params })
-  })
-
   if (code && provider) {
     void refreshAccessToken(code, provider).then(() => {
       navigate('/')
