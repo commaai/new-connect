@@ -1,4 +1,4 @@
-import { Suspense, lazy, type VoidComponent } from 'solid-js'
+import { createSignal, lazy, onCleanup, Show, Suspense, type VoidComponent } from 'solid-js'
 import { Router, Route } from '@solidjs/router'
 import 'leaflet/dist/leaflet.css'
 
@@ -8,15 +8,24 @@ const Auth = lazy(() => import('./pages/auth/auth'))
 
 const Dashboard = lazy(() => import('./pages/dashboard'))
 
-const App: VoidComponent = () => {
-  return (
-    <Router root={(props) => <Suspense>{props.children}</Suspense>}>
-      <Route path="/login" component={Login} />
-      <Route path="/logout" component={Logout} />
-      <Route path="/auth" component={Auth} />
+import Offline from '~/pages/offline'
 
-      <Route path="/*dongleId" component={Dashboard} />
-    </Router>
+const App: VoidComponent = () => {
+  const [isOnline, setIsOnline] = createSignal(navigator.onLine)
+  const handleOnline = () => setIsOnline(true)
+  window.addEventListener('online', handleOnline)
+  onCleanup(() => window.removeEventListener('online', handleOnline))
+
+  return (
+    <Show when={isOnline()} fallback={<Offline />}>
+      <Router root={(props) => <Suspense>{props.children}</Suspense>}>
+        <Route path="/login" component={Login} />
+        <Route path="/logout" component={Logout} />
+        <Route path="/auth" component={Auth} />
+
+        <Route path="/*dongleId" component={Dashboard} />
+      </Router>
+    </Show>
   )
 }
 
