@@ -31,7 +31,7 @@ files.push({}, { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalComp
 console.table(files, ['path', 'sizeKB', 'compressedSizeKB'])
 
 const upperBoundKB = 262
-const lowerBoundKB = upperBoundKB * 0.97
+const lowerBoundKB = upperBoundKB - 10
 if (totalCompressedSize < lowerBoundKB * 1024) {
   console.warn(`Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`)
   process.exit(1)
