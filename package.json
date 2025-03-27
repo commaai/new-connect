@@ -34,6 +34,7 @@
     "tailwindcss": "css framework",
     "typescript": "js with types",
     "vite": "builds and serves app",
+    "vite-plugin-pwa": "generate the service worker for PWA",
     "vite-plugin-solid": "allows vite to properly compile solid components",
     "vitest": "testing framework compatible with vite (only used for App.jsx component)",
     "wrangler": "used for deploying assets to cloudflare"
