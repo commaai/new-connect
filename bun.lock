@@ -36,8 +36,6 @@
         "vite-plugin-pwa": "^0.21.2",
         "vite-plugin-solid": "^2.11.6",
         "vitest": "^3.0.9",
-        "workbox-precaching": "^7.3.0",
-        "workbox-strategies": "^7.3.0",
         "wrangler": "^4.3.0",
       },
     },
