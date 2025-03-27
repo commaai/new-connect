@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
@@ -6,6 +7,7 @@ import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
 import { DrawerToggleButton } from '~/components/material/Drawer'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
@@ -13,6 +15,7 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
+import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -28,6 +31,7 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
+  const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -119,6 +123,21 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
             </div>
           </div>
+          <Show when={queueVisible()}>
+            <UploadQueue dongleId={props.dongleId} />
+          </Show>
+          <button
+            class={clsx(
+              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2 hover:bg-black/45',
+              queueVisible() ? 'border-2 border-t-0 border-surface-container-high' : '',
+            )}
+            onClick={() => setQueueVisible(!queueVisible())}
+          >
+            <Icon
+              class={clsx(queueVisible() ? 'text-yellow-400' : 'text-zinc-500')}
+              name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
+            />
+          </button>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
