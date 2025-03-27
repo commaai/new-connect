@@ -1,48 +1,48 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, Suspense, type VoidComponent } from "solid-js";
 
-import { setRouteViewed } from '~/api/athena'
-import { getDevice } from '~/api/devices'
-import { getProfile } from '~/api/profile'
-import { getRoute } from '~/api/route'
-import { dayjs } from '~/utils/format'
+import { setRouteViewed } from "~/api/athena";
+import { getDevice } from "~/api/devices";
+import { getProfile } from "~/api/profile";
+import { getRoute } from "~/api/route";
+import { dayjs } from "~/utils/format";
 
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
-import RouteActions from '~/components/RouteActions'
-import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
-import RouteVideoPlayer from '~/components/RouteVideoPlayer'
-import RouteUploadButtons from '~/components/RouteUploadButtons'
-import Timeline from '~/components/Timeline'
+import IconButton from "~/components/material/IconButton";
+import TopAppBar from "~/components/material/TopAppBar";
+import RouteActions from "~/components/RouteActions";
+import RouteDynamicMap from "~/components/RouteDynamicMap";
+import RouteStatistics from "~/components/RouteStatistics";
+import RouteVideoPlayer from "~/components/RouteVideoPlayer";
+import RouteUploadButtons from "~/components/RouteUploadButtons";
+import Timeline from "~/components/Timeline";
 
 type RouteActivityProps = {
-  dongleId: string
-  dateStr: string
-  startTime: number
-}
+  dongleId: string;
+  dateStr: string;
+  startTime: number;
+};
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(props.startTime)
-  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
+  const [seekTime, setSeekTime] = createSignal(props.startTime);
+  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>();
 
-  const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+  const routeName = () => `${props.dongleId}|${props.dateStr}`;
+  const [route] = createResource(routeName, getRoute);
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format("ddd, MMM D, YYYY"));
 
   function onTimelineChange(newTime: number) {
-    const video = videoRef()
-    if (video) video.currentTime = newTime
+    const video = videoRef();
+    if (video) video.currentTime = newTime;
   }
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
+  const [device] = createResource(() => props.dongleId, getDevice);
+  const [profile] = createResource(getProfile);
   createResource(
     () => [device(), profile(), props.dateStr] as const,
     async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
-    },
-  )
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return;
+      await setRouteViewed(device.dongle_id, dateStr);
+    }
+  );
 
   return (
     <>
@@ -52,6 +52,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <Suspense fallback={<div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />}>
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
         </Suspense>
+
+        <div class="flex flex-col gap-2">
+          <h3 class="text-label-sm uppercase">Route Map</h3>
+          <div class="aspect-square max-h-64 overflow-hidden rounded-lg">
+            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
+              <RouteDynamicMap route={route()} routeName={routeName()} seekTime={seekTime} updateTime={onTimelineChange} />
+            </Suspense>
+          </div>
+        </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Timeline</h3>
@@ -77,18 +86,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             </Suspense>
           </div>
         </div>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm uppercase">Route Map</h3>
-          <div class="aspect-square overflow-hidden rounded-lg">
-            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-              <RouteStaticMap route={route()} />
-            </Suspense>
-          </div>
-        </div>
       </div>
     </>
-  )
-}
+  );
+};
 
-export default RouteActivity
+export default RouteActivity;
