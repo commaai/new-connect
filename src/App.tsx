@@ -13,8 +13,13 @@ import OfflinePage from '~/pages/offline'
 const App: VoidComponent = () => {
   const [isOnline, setIsOnline] = createSignal(navigator.onLine)
   const handleOnline = () => setIsOnline(true)
+  const handleOffline = () => setIsOnline(false)
   window.addEventListener('online', handleOnline)
-  onCleanup(() => window.removeEventListener('online', handleOnline))
+  window.addEventListener('offline', handleOffline)
+  onCleanup(() => {
+    window.removeEventListener('online', handleOnline)
+    window.removeEventListener('offline', handleOffline)
+  })
 
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
