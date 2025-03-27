@@ -62,7 +62,6 @@
     "wrangler": "^4.3.0"
   },
   "//dependencies": {
-    "@mapbox/polyline": "display series of map coordinates as a line",
     "@sentry/solid": "error monitoring",
     "@solidjs/router": "changes view based on browser url",
     "clsx": "construct className strings conditionally",
@@ -72,7 +71,6 @@
     "solid-js": "JS ui framework"
   },
   "dependencies": {
-    "@mapbox/polyline": "^1.2.1",
     "@sentry/solid": "^9.8.0",
     "@sentry/vite-plugin": "^3.2.2",
     "@solid-primitives/state-machine": "^0.1.0",
