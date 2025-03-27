@@ -2,7 +2,7 @@ import type { Config } from 'tailwindcss'
 import * as defaultTheme from 'tailwindcss/defaultTheme'
 
 export default {
-  content: ['./src/**/*.{ts,tsx}', './index.html'],
+  content: ['./src/**/*.{ts,tsx}', './template.html'],
   darkMode: ['class', '[data-theme="dark"]'],
   theme: {
     borderRadius: {

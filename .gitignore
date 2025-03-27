@@ -21,6 +21,10 @@ worker
 /build
 stats.html
 
+# generated
+index.html
+offline.html
+
 # misc
 .DS_Store
 *.pem
