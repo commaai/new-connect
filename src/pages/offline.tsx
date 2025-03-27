@@ -1,7 +1,7 @@
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 
-export default function Offline() {
+export default function OfflinePage() {
   return (
     <div class="flex min-h-screen flex-col gap-12 items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-4">

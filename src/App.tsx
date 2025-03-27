@@ -8,7 +8,7 @@ const Auth = lazy(() => import('./pages/auth/auth'))
 
 const Dashboard = lazy(() => import('./pages/dashboard'))
 
-import Offline from '~/pages/offline'
+import OfflinePage from '~/pages/offline'
 
 const App: VoidComponent = () => {
   const [isOnline, setIsOnline] = createSignal(navigator.onLine)
@@ -17,7 +17,7 @@ const App: VoidComponent = () => {
   onCleanup(() => window.removeEventListener('online', handleOnline))
 
   return (
-    <Show when={isOnline()} fallback={<Offline />}>
+    <Show when={isOnline()} fallback={<OfflinePage />}>
       <Router root={(props) => <Suspense>{props.children}</Suspense>}>
         <Route path="/login" component={Login} />
         <Route path="/logout" component={Logout} />
