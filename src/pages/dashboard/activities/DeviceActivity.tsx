@@ -133,10 +133,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             )}
             onClick={() => setQueueVisible(!queueVisible())}
           >
-            <Icon
-              class={clsx(queueVisible() ? 'text-yellow-400' : 'text-zinc-500')}
-              name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'}
-            />
+            <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
           </button>
         </div>
         <div class="flex flex-col gap-2">
