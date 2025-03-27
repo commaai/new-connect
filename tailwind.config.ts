@@ -92,36 +92,42 @@ export default {
           '45px',
           {
             lineHeight: '52px',
+            letterSpacing: 'initial',
           },
         ],
         'display-sm': [
           '36px',
           {
             lineHeight: '44px',
+            letterSpacing: 'initial',
           },
         ],
         'headline-lg': [
           '32px',
           {
             lineHeight: '40px',
+            letterSpacing: 'initial',
           },
         ],
         'headline-md': [
           '28px',
           {
             lineHeight: '36px',
+            letterSpacing: 'initial',
           },
         ],
         'headline-sm': [
           '24px',
           {
             lineHeight: '32px',
+            letterSpacing: 'initial',
           },
         ],
         'title-lg': [
           '22px',
           {
             lineHeight: '28px',
+            letterSpacing: 'initial',
           },
         ],
         'title-md': [
@@ -145,6 +151,7 @@ export default {
           {
             lineHeight: '20px',
             fontWeight: 500,
+            letterSpacing: 'initial',
           },
         ],
         'label-md': [
@@ -152,6 +159,7 @@ export default {
           {
             lineHeight: '18px',
             fontWeight: 500,
+            letterSpacing: 'initial',
           },
         ],
         'label-sm': [
