@@ -3,6 +3,7 @@ import { BASE_URL } from '../config'
 const AUTH_KEY = 'ai.comma.api.authorization'
 
 export async function refreshAccessToken(code: string, provider: string): Promise<void> {
+  console.log('refreshAccessToken', { code, provider })
   try {
     const resp = await fetch(`${BASE_URL}/v2/auth`, {
       method: 'POST',
