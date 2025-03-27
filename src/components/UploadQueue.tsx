@@ -68,7 +68,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       .finally(() => {
         if (!timeout) return
         setLoading(false)
-        timeout = setTimeout(fetch, 2000)
+        timeout = setTimeout(fetch, 1000)
       })
   }
 
