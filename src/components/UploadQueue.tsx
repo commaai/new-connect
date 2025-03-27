@@ -88,16 +88,12 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
               <Icon name="progress_activity" class="animate-spin" />
             </Match>
             <Match when={error()}>
-              <div class="flex items-center gap-2">
-                <Icon name="error" />
-                <span>{error()}</span>
-              </div>
+              <Icon name="error" />
+              <span class="ml-2">{error()}</span>
             </Match>
             <Match when={items.length === 0}>
-              <div class="flex items-center gap-2">
-                <Icon name="check" />
-                <span>Nothing to upload</span>
-              </div>
+              <Icon name="check" />
+              <span class="ml-2">Nothing to upload</span>
             </Match>
             <Match when={true}>
               <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
