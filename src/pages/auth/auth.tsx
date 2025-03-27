@@ -11,8 +11,8 @@ type AuthParams = {
 export default function Auth() {
   const navigate = useNavigate()
   const [params] = useSearchParams<AuthParams>()
-  const { code, provider } = params
 
+  const { code, provider } = params
   if (code && provider) {
     void refreshAccessToken(code, provider).then(() => {
       navigate('/')
