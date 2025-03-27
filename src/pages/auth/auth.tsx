@@ -45,7 +45,7 @@ export default function Auth() {
             </div>
           }
         >
-          <div class="flex gap-2 rounded-sm p-2 items-center">
+          <div class="flex gap-4 rounded-sm p-2 items-center">
             <Icon class="text-error shrink-0" name="error" size="24" />
             <span class="text-body-lg">{error()}</span>
           </div>
