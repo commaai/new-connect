@@ -4,6 +4,7 @@ import { UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon from './material/Icon'
 import { createStore, reconcile } from 'solid-js/store'
+import clsx from 'clsx'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -40,6 +41,8 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
   )
 }
 
+const WAITING = 'Waiting for device to connect...'
+
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const [error, setError] = createSignal<string | undefined>()
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
@@ -60,7 +63,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       })
       .catch((error) => {
         if (error instanceof Error && error.cause instanceof Response && error.cause.status === 404) {
-          setError('Device offline')
+          setError(WAITING)
           return
         }
         setError(error.toString())
@@ -88,7 +91,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
               <Icon name="progress_activity" class="animate-spin" />
             </Match>
             <Match when={error()}>
-              <Icon name="error" />
+              <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
               <span class="ml-2">{error()}</span>
             </Match>
             <Match when={items.length === 0}>
