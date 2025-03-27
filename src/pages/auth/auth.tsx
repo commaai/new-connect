@@ -40,12 +40,12 @@ export default function Auth() {
           when={error()}
           fallback={
             <div class="flex items-center gap-3">
-              <Icon class="animate-spin" name="sync" size="20" />
+              <Icon class="animate-spin" name="sync" size="24" />
               <p class="text-title-lg">authenticating</p>
             </div>
           }
         >
-          <div class="flex gap-4 rounded-sm p-2 items-center">
+          <div class="flex gap-4 items-center">
             <Icon class="text-error shrink-0" name="error" size="24" />
             <span class="text-body-lg">{error()}</span>
           </div>
