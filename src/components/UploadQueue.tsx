@@ -13,11 +13,7 @@ interface DecoratedUploadQueueItem extends UploadQueueItem {
 
 const parseUploadPath = (url: string) => {
   const parts = new URL(url).pathname.split('/')
-  const route = parts[3]
-  const segment = parseInt(parts[4], 10)
-  const filename = parts[5]
-
-  return { route, segment, filename }
+  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5] }
 }
 
 const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ item }) => {
@@ -89,13 +85,19 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
           <Switch>
             <Match when={loading()}>
-              <span>Loading...</span>
+              <Icon name="progress_activity" class="animate-spin" />
             </Match>
             <Match when={error()}>
-              <span>{error()}</span>
+              <div class="flex items-center gap-2">
+                <Icon name="error" />
+                <span>{error()}</span>
+              </div>
             </Match>
             <Match when={items.length === 0}>
-              <span>Queue is empty</span>
+              <div class="flex items-center gap-2">
+                <Icon name="check" />
+                <span>Nothing to upload</span>
+              </div>
             </Match>
             <Match when={true}>
               <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
