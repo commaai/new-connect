@@ -51,6 +51,7 @@ export default defineConfig({
       telemetry: false,
     }),
     VitePWA({
+      registerType: 'autoUpdate',
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         runtimeCaching: [
