@@ -32,10 +32,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     },
   )
 
-  createEffect(() => {
-    console.log("timeline updated", timeline());
-  });
-
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
@@ -75,7 +71,6 @@ type RouteListProps = {
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
   const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
-  // const pageSize = () => 1
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()

@@ -13,7 +13,6 @@ const formatEngagement = (timeline?: TimelineStatistics): string | undefined => 
 }
 
 const RouteStatistics: VoidComponent<{ class?: string; route?: Route | null; timeline?: TimelineStatistics }> = (props) => {
-  // const [timeline] = createResource(() => props.route, getTimelineStatistics)
   console.log("RouteStatistics route", props.route);
   console.log("RouteStatistics timeline", props.timeline);
 

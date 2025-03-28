@@ -99,7 +99,6 @@ interface TimelineProps {
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   const [route] = createResource(() => props.routeName, getRoute)
   const [events] = createResource(route, getTimelineEvents)
-  console.log("here!")
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const duration = createMemo(() => (route() ? (getRouteDuration(route()!)?.asSeconds() ?? 0) : 0))
@@ -168,25 +167,25 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         updateMarker(ev.touches[0].clientX, rect)
       }}
     >
-      {/*<Suspense fallback={<div class="skeleton-loader size-full" />}>*/}
-      {/*  <Show when={route()} keyed>*/}
-      {/*    {(route) => (*/}
-      {/*      <>*/}
-      {/*        <Show when={events()} keyed>*/}
-      {/*          {(events) => renderTimelineEvents(route, events)}*/}
-      {/*        </Show>*/}
-      {/*        <div*/}
-      {/*          class="absolute top-0 z-10 h-full"*/}
-      {/*          style={{*/}
-      {/*            'background-color': 'rgba(255,255,255,0.7)',*/}
-      {/*            width: '3px',*/}
-      {/*            left: `${markerOffsetPct()}%`,*/}
-      {/*          }}*/}
-      {/*        />*/}
-      {/*      </>*/}
-      {/*    )}*/}
-      {/*  </Show>*/}
-      {/*</Suspense>*/}
+      <Suspense fallback={<div class="skeleton-loader size-full" />}>
+        <Show when={route()} keyed>
+          {(route) => (
+            <>
+              <Show when={events()} keyed>
+                {(events) => renderTimelineEvents(route, events)}
+              </Show>
+              <div
+                class="absolute top-0 z-10 h-full"
+                style={{
+                  'background-color': 'rgba(255,255,255,0.7)',
+                  width: '3px',
+                  left: `${markerOffsetPct()}%`,
+                }}
+              />
+            </>
+          )}
+        </Show>
+      </Suspense>
     </div>
   )
 }
