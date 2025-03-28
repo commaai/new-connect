@@ -42,7 +42,6 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
   )
 }
 
-const OFFLINE = 'Device is offline'
 const WAITING = 'Waiting for device to connect...'
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
@@ -90,7 +89,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       })
       .catch((error) => {
         if (error instanceof Error && error.cause instanceof Response && error.cause.status === 404) {
-          setError(OFFLINE)
+          setError('Device is offline')
           return
         }
         setError(error.toString())
