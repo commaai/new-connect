@@ -86,11 +86,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
           return
         }
         setItems(
-          reconcile(
-            res.result
-              ?.map((item) => ({ ...item, ...parseUploadPath(item.url), offline: false }))
-              .sort((a, b) => b.progress - a.progress) || [],
-          ),
+          reconcile(res.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || []),
         )
         setError(undefined)
       })
