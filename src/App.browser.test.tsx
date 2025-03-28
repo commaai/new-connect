@@ -5,26 +5,28 @@ import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
 import { Routes } from './App'
 
+const DEMO_LOG_ID = '000000dd--455f14369d'
+
+const renderApp = (location: string) => render(() => <Routes />, { location })
+
 beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())
 
-const DEMO_LOG_ID = '000000dd--455f14369d'
-
 test('Show login page', async () => {
-  const { findByText } = render(() => <Routes />, { location: '/login' })
+  const { findByText } = renderApp('/login')
   expect(await findByText('Sign in with Google')).not.toBeFalsy()
 })
 
 describe('Demo mode', () => {
   beforeEach(() => setAccessToken(Demo.ACCESS_TOKEN))
 
-  test('Render dashboard', async () => {
-    const { findByText } = render(() => <Routes />, { location: '/' })
+  test('View dashboard', async () => {
+    const { findByText } = renderApp('/')
     expect(await findByText('demo 3X')).not.toBeFalsy()
   })
 
-  test('Render route', async () => {
-    const { findByText, findByTestId } = render(() => <Routes />, { location: `/${Demo.DONGLE_ID}/${DEMO_LOG_ID}` })
+  test('View demo route', async () => {
+    const { findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).not.toBeFalsy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
