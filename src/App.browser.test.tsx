@@ -13,7 +13,7 @@ beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())
 
 test('Show login page', async () => {
-  const { findByText } = renderApp('/login')
+  const { findByText } = renderApp('/')
   expect(await findByText('Sign in with Google')).not.toBeFalsy()
 })
 
@@ -30,5 +30,21 @@ describe('Demo mode', () => {
     expect(await findByText(DEMO_LOG_ID)).not.toBeFalsy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
+  })
+})
+
+describe('Public routes', () => {
+  test('View shared device', async () => {
+    const { findByText } = renderApp(`/${Demo.DONGLE_ID}`)
+    expect(await findByText('Not signed in')).toBeTruthy()
+    expect(await findByText('Shared Device')).toBeTruthy()
+  })
+
+  test('View public route without signing in', async () => {
+    const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
+    // Videos do not load, yet
+    // const video = (await findByTestId('route-video')) as HTMLVideoElement
+    // await waitFor(() => expect(video.src).toBeTruthy())
   })
 })
