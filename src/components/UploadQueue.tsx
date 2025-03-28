@@ -59,8 +59,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
             res
               .filter((r) => r.method === 'uploadFilesToUrls')
               .flatMap((item) => {
-                const params = item.params as UploadFilesToUrlsRequest
-                return params.files_data.map((file) => ({
+                return (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
                   ...file,
                   ...parseUploadPath(file.url),
                   path: file.fn,
