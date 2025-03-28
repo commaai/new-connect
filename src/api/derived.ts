@@ -204,8 +204,4 @@ const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): Ti
 }
 
 export const getTimelineStatistics = async (route: Route): Promise<TimelineStatistics> =>
-  getTimelineEvents(route).then((timeline) => {
-    const stats = generateTimelineStatistics(route, timeline);
-    console.log("getTimelineStatistics", route.fullname);
-    return stats;
-  });
+  getTimelineEvents(route).then((timeline) => generateTimelineStatistics(route, timeline))
