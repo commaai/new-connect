@@ -16,11 +16,12 @@ export default defineWorkspace([
     extends: 'vite.config.ts',
     test: {
       include: ['**/*.browser.{test,spec}.{ts,tsx}'],
+      name: 'browser',
+      includeTaskLocation: true,
       browser: {
         provider: 'playwright',
         enabled: true,
-        headless: true,
-        name: 'chromium',
+        instances: [{ browser: 'chromium' }],
       },
     },
   },
