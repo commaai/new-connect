@@ -13,7 +13,7 @@ beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())
 
 test('Show login page', async () => {
-  const { findByText } = renderApp('/login')
+  const { findByText } = renderApp('/')
   expect(await findByText('Sign in with Google')).not.toBeFalsy()
 })
 
