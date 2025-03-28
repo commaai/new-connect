@@ -81,7 +81,6 @@ const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
   if (route) {
     const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
     urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
-    console.log("urls", urls)
   }
   const results = urls.map((url) => fetch(url).then((res) => res.json() as T))
   return Promise.all(results)
@@ -185,7 +184,6 @@ const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEve
 
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
-
 
 const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0

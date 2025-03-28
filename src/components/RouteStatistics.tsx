@@ -13,9 +13,6 @@ const formatEngagement = (timeline?: TimelineStatistics): string | undefined => 
 }
 
 const RouteStatistics: VoidComponent<{ class?: string; route?: Route | null; timeline?: TimelineStatistics }> = (props) => {
-  console.log("RouteStatistics route", props.route);
-  console.log("RouteStatistics timeline", props.timeline);
-
   return (
     <StatisticBar
       class={props.class}
