@@ -305,7 +305,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
                 <Match when={paymentStatus === 'paid' && !subscription()}>
                   <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
-                    <Icon name="sync" size="20" />
+                    <Icon class="animate-spin" name="autorenew" size="20" />
                     Processing subscription...
                   </div>
                 </Match>
