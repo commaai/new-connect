@@ -41,6 +41,8 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
 
+  const useradminUrl = () => `https://useradmin.comma.ai/?onebox=${currentRouteId()}`
+
   createEffect(() => {
     const route = routeResource()
     const preservedRoutes = preservedRoutesResource()
@@ -103,7 +105,12 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   return (
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
       <div class="font-mono text-body-sm text-zinc-500">
-        <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
+        <div class="flex justify-between">
+          <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
+          <a href={useradminUrl()} class="text-blue-400 hover:text-blue-500 duration-200" target="_blank" rel="noopener noreferrer">
+            View in useradmin
+          </a>
+        </div>
         <button
           onClick={() => void copyCurrentRouteId()}
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
