@@ -112,9 +112,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer drawer={<DashboardDrawer />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={!!profile.error}>
-          <Navigate href="/login" />
-        </Match>
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
@@ -142,6 +139,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
               paneTwoContent={!!dateStr()}
             />
           )}
+        </Match>
+        <Match when={!!profile.error}>
+          <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
