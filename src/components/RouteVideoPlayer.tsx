@@ -46,7 +46,16 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         props.class,
       )}
     >
-      <video ref={video} class="absolute inset-0 size-full object-cover" autoplay muted controls playsinline loop />
+      <video
+        ref={video}
+        class="absolute inset-0 size-full object-cover"
+        data-testid="route-video"
+        autoplay
+        muted
+        controls
+        playsinline
+        loop
+      />
     </div>
   )
 }
