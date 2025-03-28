@@ -151,7 +151,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
             />
           )}
         </Match>
-        <Match when={!!profile.error}>
+        <Match when={profile() === null}>
           <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
