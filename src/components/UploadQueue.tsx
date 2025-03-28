@@ -29,7 +29,7 @@ const cancel = (dongleId: string, ids: string[]) => {
 
 const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQueueItem }> = ({ dongleId, item }) => {
   return (
-    <div class="flex flex-col px-4">
+    <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
           <Icon
@@ -130,10 +130,10 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
         <IconButton name="delete" onClick={cancelAll} />
       </div>
-      <div class="relative p-4 h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
+      <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
           fallback={
-            <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
+            <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
               <For each={items}>{(item) => <UploadQueueRow dongleId={props.dongleId} item={item} />}</For>
             </div>
           }
