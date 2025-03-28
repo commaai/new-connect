@@ -1,11 +1,13 @@
-import { createSignal, For, Match, onCleanup, Switch, VoidComponent } from 'solid-js'
-import { COMMA_CONNECT_PRIORITY, getUploadQueue } from '~/api/athena'
+import { createSignal, For, Match, onCleanup, Show, Switch, VoidComponent } from 'solid-js'
+import { cancelUpload, COMMA_CONNECT_PRIORITY, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon from './material/Icon'
 import { createStore, reconcile } from 'solid-js/store'
 import clsx from 'clsx'
 import { getAthenaOfflineQueue } from '~/api/devices'
+import IconButton from './material/IconButton'
+import StatisticBar from './StatisticBar'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -18,7 +20,14 @@ const parseUploadPath = (url: string) => {
   return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5] }
 }
 
-const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ item }) => {
+const cancel = (dongleId: string, ids: string[]) => {
+  if (ids.length === 0) return
+  cancelUpload(dongleId, ids).catch((error) => {
+    console.error('Error canceling uploads', error)
+  })
+}
+
+const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQueueItem }> = ({ dongleId, item }) => {
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
@@ -33,6 +42,9 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
           <span class="text-body-sm font-mono whitespace-nowrap">{item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}</span>
+          <Show when={item.id}>
+            <IconButton name="delete" onClick={() => cancel(dongleId, [item.id])} />
+          </Show>
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
@@ -50,6 +62,11 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
 
   let timeout: Timer | undefined
 
+  const cancelAll = () =>
+    cancel(
+      props.dongleId,
+      items.map((item) => item.id),
+    )
   const fetch = () => {
     getAthenaOfflineQueue(props.dongleId)
       .then((res) => {
@@ -57,7 +74,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         setItems(
           reconcile(
             res
-              .filter((r) => r.method === 'uploadFilesToUrls')
+              ?.filter((r) => r.method === 'uploadFilesToUrls')
               .flatMap((item) => {
                 return (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
                   ...file,
@@ -69,7 +86,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
                   progress: 0,
                   retry_count: 0,
                 }))
-              }),
+              }) || [],
           ),
         )
       })
@@ -108,12 +125,16 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   })
 
   return (
-    <div class="flex flex-col p-4 gap-4 bg-surface-container-lowest">
+    <div class="flex flex-col gap-4 bg-surface-container-lowest">
+      <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
+        <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
+        <IconButton name="delete" onClick={cancelAll} />
+      </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
           fallback={
-            <div class="absolute inset-0 flex flex-col gap-2 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow item={item} />}</For>
+            <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
+              <For each={items}>{(item) => <UploadQueueRow dongleId={props.dongleId} item={item} />}</For>
             </div>
           }
         >
