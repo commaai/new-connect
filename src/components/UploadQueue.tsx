@@ -89,7 +89,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       })
       .catch((error) => {
         if (error instanceof Error && error.cause instanceof Response && error.cause.status === 404) {
-          setError(WAITING)
+          setError('Device is offline')
           return
         }
         setError(error.toString())
