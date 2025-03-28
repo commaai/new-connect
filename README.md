@@ -8,9 +8,7 @@ This is a rewrite of [comma connect](https://github.com/commaai/connect-pwa-arch
 
 ## Development
 
-- Install bun: https://bun.sh
-- Install dependencies: `bun install`
-- Start dev server: `bun dev --open`
+`./live.sh` is probably all you want to use (it'll take care of setup).
 
 For a full fresh setup in `$HOME`:
 ```bash
