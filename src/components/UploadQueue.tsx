@@ -53,9 +53,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const fetch = () => {
     getAthenaOfflineQueue(props.dongleId)
       .then((res) => {
-        if (error() === undefined) {
-          return
-        }
+        if (!error()) return
         setItems(
           reconcile(
             res
