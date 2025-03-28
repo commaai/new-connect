@@ -50,7 +50,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         subhead={location()}
         trailing={
           <Suspense>
-            <Show when={true}>
+            <Show when={timeline()?.userFlags}>
               <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
                 <Icon class="text-yellow-300" size="20" name="flag" filled />
               </div>
@@ -74,8 +74,8 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  // const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
-  const pageSize = () => 1
+  const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
+  // const pageSize = () => 1
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
