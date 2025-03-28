@@ -23,7 +23,7 @@ const parseUploadPath = (url: string) => {
 const cancel = (dongleId: string, ids: string[]) => {
   if (ids.length === 0) return
   cancelUpload(dongleId, ids).catch((error) => {
-    console.error('Error canceling all uploads', error)
+    console.error('Error canceling uploads', error)
   })
 }
 
