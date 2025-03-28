@@ -40,7 +40,7 @@ export default function Auth() {
           when={error()}
           fallback={
             <div class="flex items-center gap-3">
-              <Icon class="animate-spin" name="sync" size="24" />
+              <Icon class="animate-spin" name="progress_activity" size="24" />
               <p class="text-title-lg">authenticating</p>
             </div>
           }
