@@ -1,15 +1,17 @@
-import { createSignal, For, Match, onCleanup, Switch, VoidComponent } from 'solid-js'
+import { createSignal, For, Match, onCleanup, Show, Switch, VoidComponent } from 'solid-js'
 import { COMMA_CONNECT_PRIORITY, getUploadQueue } from '~/api/athena'
-import { UploadQueueItem } from '~/types'
+import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon from './material/Icon'
 import { createStore, reconcile } from 'solid-js/store'
 import clsx from 'clsx'
+import { getAthenaOfflineQueue } from '~/api/devices'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
   segment: number
   filename: string
+  offline: boolean
 }
 
 const parseUploadPath = (url: string) => {
@@ -31,7 +33,9 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
-          <span class="text-body-sm font-mono whitespace-nowrap">{Math.round(item.progress * 100)}%</span>
+          <Show when={!item.offline} fallback={<span class="text-body-sm font-mono whitespace-nowrap">Queued</span>}>
+            <span class="text-body-sm font-mono whitespace-nowrap">{Math.round(item.progress * 100)}%</span>
+          </Show>
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
@@ -50,6 +54,35 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   let timeout: Timer | undefined
 
   const fetch = () => {
+    getAthenaOfflineQueue(props.dongleId)
+      .then((res) => {
+        if (error() === undefined) {
+          return
+        }
+        setItems(
+          reconcile(
+            res
+              .filter((r) => r.method === 'uploadFilesToUrls')
+              .flatMap((item) => {
+                const params = item.params as UploadFilesToUrlsRequest
+                return params.files_data.map((file) => ({
+                  ...file,
+                  ...parseUploadPath(file.url),
+                  path: file.fn,
+                  created_at: 0,
+                  current: false,
+                  id: '0',
+                  progress: 0,
+                  retry_count: 0,
+                  offline: true,
+                }))
+              }),
+          ),
+        )
+      })
+      .catch((error) => {
+        console.error('Error fetching offline queue', error)
+      })
     getUploadQueue(props.dongleId)
       .then((res) => {
         if (res.error) {
@@ -57,7 +90,11 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
           return
         }
         setItems(
-          reconcile(res.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || []),
+          reconcile(
+            res.result
+              ?.map((item) => ({ ...item, ...parseUploadPath(item.url), offline: false }))
+              .sort((a, b) => b.progress - a.progress) || [],
+          ),
         )
         setError(undefined)
       })
@@ -91,7 +128,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
             </div>
           }
         >
-          <Match when={error()}>
+          <Match when={error() && items.length === 0}>
             <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
             <span class="ml-2">{error()}</span>
           </Match>
