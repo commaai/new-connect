@@ -28,12 +28,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   createEffect(() => {
     if (!streamUrl()) return
 
-    if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = streamUrl()!
-      return
-    }
-
     if (!('MediaSource' in window)) {
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = streamUrl()!
+        return
+      }
       console.error('Browser does not support Media Source Extensions API')
       return
     }
