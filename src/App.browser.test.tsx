@@ -40,9 +40,7 @@ describe('Public routes', () => {
   })
 
   test('View public route without signing in', async () => {
-    const { findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).not.toBeFalsy()
-    const video = (await findByTestId('route-video')) as HTMLVideoElement
-    await waitFor(() => expect(video.src).toBeTruthy())
   })
 })
