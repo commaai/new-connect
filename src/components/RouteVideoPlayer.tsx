@@ -1,8 +1,8 @@
 import { createEffect, createResource, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
-import Hls from 'hls.js/dist/hls.light.mjs'
 
 import { getQCameraStreamUrl } from '~/api/route'
+import type Hls from '~/utils/hls'
 
 type RouteVideoPlayerProps = {
   class?: string
@@ -27,16 +27,23 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   createEffect(() => {
     if (!streamUrl()) return
-    if (Hls.isSupported()) {
-      const hls = new Hls()
-      hls.loadSource(streamUrl()!)
-      hls.attachMedia(video)
-      onCleanup(() => hls.destroy())
-    } else if (video.canPlayType('application/vnd.apple.mpegurl')) {
-      video.src = streamUrl()!
-    } else {
-      console.error('Browser does not support hls')
+
+    if (!('MediaSource' in window)) {
+      if (video.canPlayType('application/vnd.apple.mpegurl')) {
+        video.src = streamUrl()!
+        return
+      }
+      console.error('Browser does not support Media Source Extensions API')
+      return
     }
+
+    let player: Hls
+    void import('~/utils/hls').then(({ createHls }) => {
+      player = createHls()
+      player.loadSource(streamUrl()!)
+      player.attachMedia(video)
+    })
+    onCleanup(() => player?.destroy())
   })
 
   return (
