@@ -127,7 +127,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   return (
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
-        <StatisticBar statistics={[{ label: 'Uploading', value: () => items.length }]} />
+        <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
         <IconButton name="delete" onClick={cancelAll} />
       </div>
       <div class="relative p-4 h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
