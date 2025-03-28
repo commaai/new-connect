@@ -36,11 +36,12 @@ describe('Demo mode', () => {
 describe('Public routes', () => {
   test('View shared device', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}`)
-    expect(await findByText('Shared Device')).not.toBeFalsy()
+    expect(await findByText('Not signed in')).toBeTruthy()
+    expect(await findByText('Shared Device')).toBeTruthy()
   })
 
   test('View public route without signing in', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    expect(await findByText(DEMO_LOG_ID)).not.toBeFalsy()
+    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
   })
 })
