@@ -9,8 +9,7 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 
 const renderApp = (location: string) => render(() => <Routes />, { location })
 
-// need to make app load faster
-beforeAll(() => configure({ asyncUtilTimeout: 20000 }))
+beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())
 
 test('Show login page', async () => {

@@ -8,7 +8,7 @@ export const parseRouteName = (routeName: string): RouteInfo => {
   return { dongleId, routeId }
 }
 
-export const getRoute = (routeName: Route['fullname']): Promise<Route> => fetcher<Route>(`/v1/route/${routeName}/`)
+export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`).catch(() => null)
 
 export const getRouteWithSegments = async (routeName: Route['fullname']) => {
   const { dongleId } = parseRouteName(routeName)
