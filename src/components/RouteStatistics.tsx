@@ -1,7 +1,6 @@
-import { createResource } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
+import { TimelineStatistics } from '~/api/derived'
 import type { Route } from '~/types'
 import { formatDistance, formatRouteDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
