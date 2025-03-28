@@ -48,14 +48,25 @@ const DashboardDrawer: VoidComponent = () => {
         <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
           <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
             <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-              <Icon name="person" filled />
+              <Icon name={profile.latest === null ? 'person_off' : 'person'} filled />
             </div>
-            <div class="min-w-0 mx-3">
-              <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-              <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
-            </div>
-            <div class="grow" />
-            <IconButton name="logout" href="/logout" />
+            <Show
+              when={profile()}
+              fallback={
+                <>
+                  <div class="mx-3">Not signed in</div>
+                  <div class="grow" />
+                  <IconButton name="login" href="/login" />
+                </>
+              }
+            >
+              <div class="min-w-0 mx-3">
+                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+              </div>
+              <div class="grow" />
+              <IconButton name="logout" href="/logout" />
+            </Show>
           </div>
         </Suspense>
       </div>
