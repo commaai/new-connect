@@ -1,4 +1,4 @@
-import { createSignal, For, Match, onCleanup, Show, Switch, VoidComponent } from 'solid-js'
+import { createSignal, For, Match, onCleanup, Switch, VoidComponent } from 'solid-js'
 import { COMMA_CONNECT_PRIORITY, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
@@ -33,9 +33,7 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
-          <Show when={!item.offline} fallback={<span class="text-body-sm font-mono whitespace-nowrap">Queued</span>}>
-            <span class="text-body-sm font-mono whitespace-nowrap">{Math.round(item.progress * 100)}%</span>
-          </Show>
+          <span class="text-body-sm font-mono whitespace-nowrap">{item.offline ? 'Offline' : `${Math.round(item.progress * 100)}%`}</span>
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
