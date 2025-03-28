@@ -78,12 +78,19 @@ export interface TimelineStatistics {
 
 const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
   let urls: string[] = []
+  console.log("getDerived", fn)
+  console.log("route", route.fullname, route.maxqlog)
   if (route) {
     const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
     urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
+    console.log("urls", urls)
   }
   const results = urls.map((url) => fetch(url).then((res) => res.json() as T))
-  return Promise.all(results)
+  // console.log("results", route.fullname, fn, results)
+  // const results = urls.map((url) => fetch(url).then((res) => res.json().catch((e) => [])))
+  const ret = Promise.all(results)
+  // console.log("ret", ret)
+  return ret
 }
 
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
@@ -183,7 +190,12 @@ const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEve
 }
 
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
-  getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
+  getDriveEvents(route).then((events) => {
+    const timeline = generateTimelineEvents(route, events);
+    console.log("hi", route.fullname);
+    return timeline;
+  });
+
 
 const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0
@@ -204,4 +216,8 @@ const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): Ti
 }
 
 export const getTimelineStatistics = async (route: Route): Promise<TimelineStatistics> =>
-  getTimelineEvents(route).then((timeline) => generateTimelineStatistics(route, timeline))
+  getTimelineEvents(route).then((timeline) => {
+    const stats = generateTimelineStatistics(route, timeline);
+    console.log("getTimelineStatistics", route.fullname);
+    return stats;
+  });
