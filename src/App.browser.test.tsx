@@ -36,7 +36,7 @@ describe('Demo mode', () => {
 describe('Public routes', () => {
   test('View shared device', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}`)
-    expect(await findByText('Shared device')).not.toBeFalsy()
+    expect(await findByText('Shared Device')).not.toBeFalsy()
   })
 
   test('View public route without signing in', async () => {
