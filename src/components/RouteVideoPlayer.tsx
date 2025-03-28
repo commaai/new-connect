@@ -20,6 +20,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const timeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', timeUpdate)
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
+    if (Number.isNaN(props.startTime)) return
     video.currentTime = props.startTime
     props.ref?.(video)
   })
