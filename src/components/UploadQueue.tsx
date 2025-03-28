@@ -11,7 +11,6 @@ interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
   segment: number
   filename: string
-  offline: boolean
 }
 
 const parseUploadPath = (url: string) => {
@@ -33,7 +32,7 @@ const UploadQueueRow: VoidComponent<{ item: DecoratedUploadQueueItem }> = ({ ite
           </div>
         </div>
         <div class="flex items-center gap-2 flex-shrink-0 justify-end">
-          <span class="text-body-sm font-mono whitespace-nowrap">{item.offline ? 'Offline' : `${Math.round(item.progress * 100)}%`}</span>
+          <span class="text-body-sm font-mono whitespace-nowrap">{item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}</span>
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
@@ -69,10 +68,9 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
                   path: file.fn,
                   created_at: 0,
                   current: false,
-                  id: '0',
+                  id: '',
                   progress: 0,
                   retry_count: 0,
-                  offline: true,
                 }))
               }),
           ),
