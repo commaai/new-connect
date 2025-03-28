@@ -10,6 +10,16 @@ const Dashboard = lazy(() => import('./pages/dashboard'))
 
 import OfflinePage from '~/pages/offline'
 
+export const Routes = () => (
+  <>
+    <Route path="/login" component={Login} />
+    <Route path="/logout" component={Logout} />
+    <Route path="/auth" component={Auth} />
+
+    <Route path="/*dongleId" component={Dashboard} />
+  </>
+)
+
 const App: VoidComponent = () => {
   const [isOnline, setIsOnline] = createSignal(navigator.onLine)
   const handleOnline = () => setIsOnline(true)
@@ -24,11 +34,7 @@ const App: VoidComponent = () => {
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
       <Router root={(props) => <Suspense>{props.children}</Suspense>}>
-        <Route path="/login" component={Login} />
-        <Route path="/logout" component={Logout} />
-        <Route path="/auth" component={Auth} />
-
-        <Route path="/*dongleId" component={Dashboard} />
+        <Routes />
       </Router>
     </Show>
   )
