@@ -21,7 +21,12 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
   const [startPlace] = createResource(startPosition, getPlaceName)
   const [endPlace] = createResource(endPosition, getPlaceName)
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  const [timeline] = createResource(() => props.route, (route) =>
+    getTimelineStatistics(route).catch((err) => {
+      console.error("Error fetching timeline for route", route.fullname, err);
+      return undefined;
+    }),
+  );
   const [location] = createResource(
     () => [startPlace(), endPlace()],
     ([startPlace, endPlace]) => {
@@ -68,7 +73,7 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
+  const pageSize = () => 6;  // Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
