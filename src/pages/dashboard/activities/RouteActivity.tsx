@@ -56,7 +56,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Timeline</h3>
-          <Timeline class="mb-1" routeName={routeName()} seekTime={seekTime} updateTime={onTimelineChange} />
+          {/*<Suspense>*/}
+          <Timeline class="mb-1" routeName={routeName()} route={route} seekTime={seekTime} updateTime={onTimelineChange} />
+          {/*</Suspense>*/}
         </div>
 
         <div class="flex flex-col gap-2">
