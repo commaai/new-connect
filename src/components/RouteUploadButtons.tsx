@@ -1,8 +1,7 @@
-import { createResource, type VoidComponent, batch } from 'solid-js'
+import { type VoidComponent, batch } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
-import { getRouteWithSegments } from '~/api/route'
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
@@ -80,14 +79,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   }
 
   const handleUpload = async (type: ButtonType) => {
-    // const route = routeResource()
     if (!props.route) return
-    const log_count = props.route.maxqlog + 1
-    // if (route.segment_numbers.length !== (props.route.maxqlog + 1)) {
-    //   console.log("DIFF IS BAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-    // }
-    // console.log("route", route, route.segment_numbers.length)
-    // console.log("props.route", route.segment_numbers.length, props.route.maxqlog + 1)
 
     if (type === 'route') {
       const typesNotUploadedYet = Object.entries(uploadStore.states)
