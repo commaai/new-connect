@@ -82,7 +82,14 @@ const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
     const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
     urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
   }
-  const results = urls.map((url) => fetch(url).then((res) => res.json() as T))
+  const results = urls.map((url) =>
+    fetch(url)
+      .then((res) => res.json() as T)
+      .catch((err) => {
+        console.error('Error fetching file', url, err)
+        return [] as unknown as T
+      }),
+  )
   return Promise.all(results)
 }
 
