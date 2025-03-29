@@ -9,11 +9,11 @@
     "url": "https://github.com/commaai/connect.git"
   },
   "scripts": {
-    "build": "vite build",
+    "build": "bun run --bun vite build",
     "bundle-size": "bun src/ci/check_bundle_size.ts",
     "dependency-report": "bun src/ci/dependency_report.ts",
-    "dev": "vite",
-    "serve": "vite prefix",
+    "dev": "bun run --bun vite --open",
+    "serve": "vite preview",
     "lines": "bun src/ci/check_lines.ts",
     "check": "biome check",
     "fix": "biome check --write",

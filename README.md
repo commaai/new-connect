@@ -13,12 +13,13 @@ This is a rewrite of [comma connect](https://github.com/commaai/connect-pwa-arch
 For a full fresh setup in `$HOME`:
 ```bash
 curl -fsSL https://bun.sh/install | bash
+source ~/.bashrc  # or source ~/.zshrc
 
 cd ~
-git clone git@github.com:commaai/connect.git
+git clone https://github.com/commaai/connect.git
 
 cd connect
-bun install
+bun install  # sets up pre-commit hook
 bun dev
 ```
 
