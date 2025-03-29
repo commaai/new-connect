@@ -1,12 +1,13 @@
-import { For, createResource, createSignal, createEffect, createMemo, Show, Suspense, onMount, onCleanup } from 'solid-js'
-import type { VoidComponent, Accessor } from 'solid-js'
+import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
 import type { Route } from '~/types'
 import { getRouteDuration } from '~/utils/format'
 
-function renderTimelineEvents(route: Route, events: TimelineEvent[]) {
+function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
+  if (!route) return
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
     <For each={events}>
@@ -90,17 +91,17 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  routeName: string
-  route: Accessor<Route | undefined>
-  seekTime: Accessor<number>
-  updateTime: (newTime: number) => void
+  route?: Route
+  seekTime: number
+  updateTime: (time: number) => void
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const [events] = createResource(props.route, getTimelineEvents)
+  const route = () => props.route
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const duration = createMemo(() => (props.route() ? (getRouteDuration(props.route()!)?.asSeconds() ?? 0) : 0))
+  const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
 
   let ref!: HTMLDivElement
 
@@ -134,13 +135,13 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     }
 
     const onMouseDown = (ev: MouseEvent) => {
-      if (!props.route()) return
+      if (!props.route) return
       updateMarker(ev.clientX)
       onStart()
     }
 
     const onTouchStart = (ev: TouchEvent) => {
-      if (ev.touches.length !== 1 || !props.route()) return
+      if (ev.touches.length !== 1 || !props.route) return
       updateMarker(ev.touches[0].clientX)
       onStart()
     }
@@ -154,7 +155,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   createEffect(() => {
-    setMarkerOffsetPct((props.seekTime() / duration()) * 100)
+    setMarkerOffsetPct((props.seekTime / duration()) * 100)
   })
 
   return (
@@ -167,25 +168,15 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       )}
       title="Disengaged"
     >
-      <Suspense fallback={<div class="skeleton-loader size-full" />}>
-        <Show when={props.route()} keyed>
-          {(route) => (
-            <>
-              <Show when={events()} keyed>
-                {(events) => renderTimelineEvents(route, events)}
-              </Show>
-              <div
-                class="absolute top-0 z-10 h-full"
-                style={{
-                  'background-color': 'rgba(255,255,255,0.7)',
-                  width: `${MARKER_WIDTH}px`,
-                  left: `${markerOffsetPct()}%`,
-                }}
-              />
-            </>
-          )}
-        </Show>
-      </Suspense>
+      <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+      <div
+        class="absolute top-0 z-10 h-full"
+        style={{
+          'background-color': 'rgba(255,255,255,0.7)',
+          width: `${MARKER_WIDTH}px`,
+          left: `${markerOffsetPct()}%`,
+        }}
+      />
     </div>
   )
 }
