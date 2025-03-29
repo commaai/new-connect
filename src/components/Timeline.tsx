@@ -3,7 +3,6 @@ import type { VoidComponent, Accessor } from 'solid-js'
 import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
-import { getRoute } from '~/api/route'
 import type { Route } from '~/types'
 import { getRouteDuration } from '~/utils/format'
 
@@ -98,7 +97,6 @@ interface TimelineProps {
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  // const [route] = createResource(() => props.routeName, getRoute)
   const [events] = createResource(props.route, getTimelineEvents)
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
