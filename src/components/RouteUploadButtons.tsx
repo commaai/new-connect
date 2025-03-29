@@ -50,7 +50,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
 
 interface RouteUploadButtonsProps {
-  route: Route | null
+  route: Route | undefined
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
