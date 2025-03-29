@@ -36,7 +36,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
   const [userPosition, setUserPosition] = createSignal<GeolocationPosition | null>(null)
   const [deviceLocation] = createResource(
     () => props.dongleId,
-    (dongleId: string) => getDeviceLocation(dongleId).catch(() => null),
+    (dongleId: string) => getDeviceLocation(dongleId).catch(() => undefined),
   )
 
   onMount(() => {

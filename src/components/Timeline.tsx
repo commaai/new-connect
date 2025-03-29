@@ -6,9 +6,7 @@ import { TimelineEvent, getTimelineEvents } from '~/api/derived'
 import type { Route } from '~/types'
 import { getRouteDuration } from '~/utils/format'
 
-function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
-  if (!route) return null
-
+function renderTimelineEvents(route: Route, events: TimelineEvent[]) {
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
     <For each={events}>
