@@ -38,10 +38,10 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const [location] = createResource(
     () => [startPlace(), endPlace()],
     ([startPlace, endPlace]) => {
-      if (!startPlace && !endPlace) return ''
-      if (!endPlace || startPlace === endPlace) return startPlace
-      if (!startPlace) return endPlace
-      return `${startPlace} to ${endPlace}`
+      if (!startPlace && !endPlace) return { left: '', right: '' }
+      if (!endPlace || startPlace === endPlace) return { left: startPlace, right: '' }
+      if (!startPlace) return { left: '', right: endPlace }
+      return { left: startPlace, right: endPlace }
     },
   )
 
@@ -49,14 +49,17 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
-          <div class="flex gap-2">
-            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
+          <div className="flex justify-between w-full">
+            <span>{startTime().format('h:mm A')}</span>
+            <span>{endTime().format('h:mm A')}</span>
           </div>
         }
-        subhead={location()}
+        subhead={
+          <div class="flex justify-between">
+            <span class="truncate">{location()?.left}</span>
+            <span class="truncate">{location()?.right}</span>
+          </div>
+        }
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
