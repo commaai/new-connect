@@ -109,7 +109,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     const fileTypesToUpload = buttonToFileTypeMap[type]
 
     try {
-      await uploadAllSegments(props.routeName, route.segment_numbers.length, fileTypesToUpload)
+      await uploadAllSegments(props.routeName, route.maxqlog, fileTypesToUpload)
       setUploadStore('states', type, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
