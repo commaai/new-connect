@@ -1,16 +1,10 @@
 import { $ } from 'bun'
 
-console.debug('check_bundle_size')
-console.debug('cwd:', process.cwd())
-console.debug('argv:', process.argv)
-
 let OUT_DIR = process.argv[2]
 if (!OUT_DIR) {
-  OUT_DIR = 'dist'
-  if (!process.env.CI) {
-    console.debug('Building...')
-    await $`bun run build`.quiet()
-  }
+  OUT_DIR = './dist'
+  console.debug('Building...')
+  await $`bun run build`.quiet()
 }
 
 const files = []
