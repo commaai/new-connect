@@ -79,7 +79,7 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil(dimensions().height / 140), 1) * 2
+  const pageSize = () => Math.max(Math.ceil(dimensions().height / 140), 1) * 4
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
