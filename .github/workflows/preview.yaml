@@ -59,7 +59,7 @@ jobs:
         with:
           script: |
             const response = await github.rest.checks.create({
-              name: 'preview',
+              name: 'Deploy preview',
               head_sha: '${{ github.event.workflow_run.head_sha }}',
               status: 'in_progress',
               output: {
@@ -158,7 +158,7 @@ jobs:
         script: |
           github.rest.checks.update({
             check_run_id: ${{ needs.preview.outputs.check_id }},
-            name: 'preview',
+            name: 'Deploy preview',
             head_sha: '${{ github.event.workflow_run.head_sha }}',
             status: 'completed',
             conclusion: '${{ needs.preview.result }}',
