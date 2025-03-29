@@ -77,6 +77,7 @@ export interface TimelineStatistics {
 }
 
 const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
+  console.log(route.fullname, fn)
   let urls: string[] = []
   if (route) {
     const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)

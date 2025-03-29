@@ -6,6 +6,7 @@ import { getRouteWithSegments } from '~/api/route'
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
+import type { Route } from '~/types'
 
 interface UploadButtonProps {
   state: 'idle' | 'loading' | 'success' | 'error'
@@ -50,7 +51,8 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
 
 interface RouteUploadButtonsProps {
-  routeName: string
+  routeName: string,
+  route: any
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
@@ -83,6 +85,12 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   const handleUpload = async (type: ButtonType) => {
     const route = routeResource()
     if (!route) return
+    if (!props.route) return
+    if (route.segment_numbers.length !== (props.route.maxqlog + 1)) {
+      console.log("DIFF IS BAD!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+    }
+    console.log("route", route, route.segment_numbers.length)
+    console.log("props.route", props.route)
 
     if (type === 'route') {
       const typesNotUploadedYet = Object.entries(uploadStore.states)
