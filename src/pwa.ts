@@ -1,3 +1,4 @@
+/// <reference types="vite-plugin-pwa/client" />
 import { registerSW } from 'virtual:pwa-register'
 
 const intervalMS = 60 * 60 * 1000
