@@ -98,12 +98,6 @@ export interface Route extends ApiResponseBase {
   vin?: string
 }
 
-export interface RouteWithSegments extends Route {
-  segment_numbers: number[]
-  segment_start_times: number[]
-  segment_end_times: number[]
-}
-
 export interface RouteInfo {
   dongleId: string
   routeId: string
