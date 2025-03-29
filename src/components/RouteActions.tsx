@@ -33,7 +33,7 @@ const ToggleButton: VoidComponent<{
 
 interface RouteActionsProps {
   routeName: string
-  route: Route | null
+  route: Route | undefined
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {

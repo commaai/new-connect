@@ -48,7 +48,7 @@ const State = (props: {
 
 type RouteStaticMapProps = {
   class?: string
-  route?: Route | null
+  route?: Route | undefined
 }
 
 const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
