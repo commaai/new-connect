@@ -24,7 +24,7 @@ const createCarIcon = () => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex size-[40px] items-center justify-center rounded-full bg-primary-container">
+      <div class="flex size-[40px] items-center justify-center rounded-full bg-primary-container transition-transform duration-1000 ease-linear">
         <Icon name="directions_car" />
       </div>
     ),
@@ -59,8 +59,7 @@ export const PathMap: Component<{
   let marker: L.Marker | null = null
   let pastPolyline: L.Polyline | null = null
   let futurePolyline: L.Polyline | null = null
-  let pastHitboxPolyline: L.Polyline | null = null
-  let futureHitboxPolyline: L.Polyline | null = null
+  let hitboxPolyline: L.Polyline | null = null
 
   onMount(() => {
     const m = L.map(mapRef, {
@@ -78,8 +77,7 @@ export const PathMap: Component<{
 
     pastPolyline = L.polyline([], { color: props.color || '#6F707F', weight: props.strokeWidth || 4 }).addTo(m)
     futurePolyline = L.polyline([], { color: props.color || '#dfe0ff', weight: props.strokeWidth || 4 }).addTo(m)
-    pastHitboxPolyline = L.polyline([], { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
-    futureHitboxPolyline = L.polyline([], { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
+    hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
     marker = L.marker([props.coords[0].lat, props.coords[0].lng], { icon: createCarIcon(), draggable: true }).addTo(m)
 
     const updatePosition = (lng: number, lat: number) => {
@@ -104,16 +102,25 @@ export const PathMap: Component<{
       if (!isMapInteractive()) enableMap()
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
+      marker?.getElement()?.classList.add('no-transition')
     }
 
     marker
-      .on('dragstart', () => setIsDragging(true))
+      .on('dragstart', () => {
+        setIsDragging(true)
+        marker?.getElement()?.classList.add('no-transition')
+      })
       .on('drag', handleDrag)
-      .on('dragend', () => setIsDragging(false))
+      .on('dragend', () => {
+        setIsDragging(false)
+        marker?.getElement()?.classList.remove('no-transition')
+      })
 
-    m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => setIsDragging(false))
-    ;[pastHitboxPolyline, futureHitboxPolyline].forEach((poly) => poly?.on('mousedown', handleDrag))
-
+    m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => {
+      setIsDragging(false)
+      marker?.getElement()?.classList.remove('no-transition')
+    })
+    hitboxPolyline?.on('mousedown', handleDrag)
     setMap(m)
     onCleanup(() => m.remove())
   })
@@ -131,21 +138,34 @@ export const PathMap: Component<{
 
   createEffect(() => {
     if (!map() || !props.coords.length) return
-    const past = pastCoords()
-    const future = futureCoords()
-    const current = currentCoord()
 
-    pastPolyline?.setLatLngs(past)
-    futurePolyline?.setLatLngs(future)
-    pastHitboxPolyline?.setLatLngs(past)
-    futureHitboxPolyline?.setLatLngs(future)
-    marker?.setLatLng(current)
+    pastPolyline?.setLatLngs(pastCoords())
+    futurePolyline?.setLatLngs(futureCoords())
+    marker?.setLatLng(currentCoord())
 
-    if (isLocked() && !isDragging()) map()?.setView(current, map()?.getZoom())
+    if (isLocked() && !isDragging()) map()?.panTo(currentCoord(), { animate: true, duration: 2 })
   })
 
   return (
     <div ref={mapRef} class="h-full relative" style={{ 'background-color': 'rgb(19 19 24)' }}>
+      <style>
+        {`
+          .leaflet-marker-pane > * {
+            -webkit-transition: transform 1.2s linear;
+            -moz-transition: transform 1.2s linear;
+            -o-transition: transform 1.2s linear;
+            -ms-transition: transform 1.2s linear;
+            transition: transform 1.2s linear;
+          }
+          .leaflet-marker-pane > .no-transition {
+            -webkit-transition: none !important;
+            -moz-transition: none !important;
+            -o-transition: none !important;
+            -ms-transition: none !important;
+            transition: none !important;
+          }
+        `}
+      </style>
       <IconButton
         name="my_location"
         class={`absolute z-[1000] left-4 top-4 bg-primary-container ${isLocked() && 'hidden'}`}
