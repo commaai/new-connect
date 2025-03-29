@@ -8,6 +8,7 @@ import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
+import ButtonBase from '~/components/material/ButtonBase'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -45,30 +46,32 @@ const DashboardDrawer: VoidComponent = () => {
         Add new device
       </Button>
       <div class="m-4 mt-0">
-        <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
-          <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
-            <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-              <Icon name={profile.latest === null ? 'person_off' : 'person'} filled />
-            </div>
-            <Show
-              when={profile()}
-              fallback={
-                <>
-                  <div class="mx-3">Not signed in</div>
-                  <div class="grow" />
-                  <IconButton name="login" href="/login" />
-                </>
-              }
-            >
-              <div class="min-w-0 mx-3">
-                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+        <ButtonBase href="https://useradmin.comma.ai">
+          <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
+            <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
+              <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+                <Icon name={profile.latest === null ? 'person_off' : 'person'} filled />
               </div>
-              <div class="grow" />
-              <IconButton name="logout" href="/logout" />
-            </Show>
-          </div>
-        </Suspense>
+              <Show
+                when={profile()}
+                fallback={
+                  <>
+                    <div class="mx-3">Not signed in</div>
+                    <div class="grow" />
+                    <IconButton name="login" href="/login" />
+                  </>
+                }
+              >
+                <div class="min-w-0 mx-3">
+                  <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+                  <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+                </div>
+                <div class="grow" />
+                <IconButton name="logout" href="/logout" />
+              </Show>
+            </div>
+          </Suspense>
+        </ButtonBase>
       </div>
     </>
   )

@@ -35,7 +35,7 @@ interface DrawerProps {
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
   const dimensions = useDimensions()
-  const drawerWidth = () => Math.min(dimensions().width - PEEK, 360)
+  const drawerWidth = () => Math.min(dimensions().width - PEEK, 320)
   const modal = () => dimensions().width < 1280
   const contentWidth = () => `calc(100% - ${modal() ? 0 : drawerWidth()}px)`
 
