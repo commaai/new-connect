@@ -14,9 +14,11 @@ const sortDevices = (devices: Device[]) =>
     }
   })
 
+export const SHARED_DEVICE = 'Shared Device'
+
 const createSharedDevice = (dongleId: string): Device => ({
   dongle_id: dongleId,
-  alias: 'Shared Device',
+  alias: SHARED_DEVICE,
   serial: '',
   last_athena_ping: 0,
   ignore_uploads: null,
