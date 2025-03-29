@@ -49,9 +49,9 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
+          <span>
+            {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+          </span>
         }
         subhead={location()}
         trailing={
@@ -144,9 +144,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
                       {(group) => (
                         <>
                           <h2 class="px-4 text-xl font-bold">{group.day}</h2>
-                          <For each={group.segments}>
-                            {(route) => <RouteCard route={route} />}
-                          </For>
+                          <For each={group.segments}>{(route) => <RouteCard route={route} />}</For>
                         </>
                       )}
                     </For>
