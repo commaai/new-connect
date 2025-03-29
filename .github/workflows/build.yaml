@@ -16,25 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-
-      - uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}
-
-      - run: bun install --frozen-lockfile
-      - run: bun playwright install
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - name: Run linter and check formatting - check files tab for annotations (PR)
-        run: bun biome ci --reporter=github
-        if: github.event_name == 'pull_request'
-      - name: Run linter and check formatting (Push)
-        run: bun biome ci
-        if: github.event_name != 'pull_request'
-      - run: bun run test
-      - run: bun lines
+      - run: ./test.sh
 
   build:
     runs-on: ubuntu-latest
