@@ -1,48 +1,48 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from "solid-js";
+import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
-import { setRouteViewed } from "~/api/athena";
-import { getDevice } from "~/api/devices";
-import { getProfile } from "~/api/profile";
-import { getRoute } from "~/api/route";
-import { dayjs } from "~/utils/format";
+import { setRouteViewed } from '~/api/athena'
+import { getDevice } from '~/api/devices'
+import { getProfile } from '~/api/profile'
+import { getRoute } from '~/api/route'
+import { dayjs } from '~/utils/format'
 
-import IconButton from "~/components/material/IconButton";
-import TopAppBar from "~/components/material/TopAppBar";
-import RouteActions from "~/components/RouteActions";
-import RouteDynamicMap from "~/components/RouteDynamicMap";
-import RouteStatistics from "~/components/RouteStatistics";
-import RouteVideoPlayer from "~/components/RouteVideoPlayer";
-import RouteUploadButtons from "~/components/RouteUploadButtons";
-import Timeline from "~/components/Timeline";
+import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
+import RouteActions from '~/components/RouteActions'
+import RouteDynamicMap from '~/components/RouteDynamicMap'
+import RouteStatistics from '~/components/RouteStatistics'
+import RouteVideoPlayer from '~/components/RouteVideoPlayer'
+import RouteUploadButtons from '~/components/RouteUploadButtons'
+import Timeline from '~/components/Timeline'
 
 type RouteActivityProps = {
-  dongleId: string;
-  dateStr: string;
-  startTime: number;
-};
+  dongleId: string
+  dateStr: string
+  startTime: number
+}
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(props.startTime);
-  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>();
+  const [seekTime, setSeekTime] = createSignal(props.startTime)
+  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
-  const routeName = () => `${props.dongleId}|${props.dateStr}`;
-  const [route] = createResource(routeName, getRoute);
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format("ddd, MMM D, YYYY"));
+  const routeName = () => `${props.dongleId}|${props.dateStr}`
+  const [route] = createResource(routeName, getRoute)
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
   function onTimelineChange(newTime: number) {
-    const video = videoRef();
-    if (video) video.currentTime = newTime;
+    const video = videoRef()
+    if (video) video.currentTime = newTime
   }
 
-  const [device] = createResource(() => props.dongleId, getDevice);
-  const [profile] = createResource(getProfile);
+  const [device] = createResource(() => props.dongleId, getDevice)
+  const [profile] = createResource(getProfile)
   createResource(
     () => [device(), profile(), props.dateStr] as const,
     async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return;
-      await setRouteViewed(device.dongle_id, dateStr);
-    }
-  );
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+      await setRouteViewed(device.dongle_id, dateStr)
+    },
+  )
 
   return (
     <>
@@ -88,7 +88,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
       </div>
     </>
-  );
-};
+  )
+}
 
-export default RouteActivity;
+export default RouteActivity
