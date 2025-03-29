@@ -8,7 +8,6 @@ import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
-import { useDimensions } from '~/utils/window'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -62,14 +61,10 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-type RouteListProps = {
-  dongleId: string
-}
+const PAGE_SIZE = 10
 
-const RouteList: VoidComponent<RouteListProps> = (props) => {
-  const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
+const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
+  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
@@ -122,7 +117,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
           return (
             <Suspense
               fallback={
-                <Index each={new Array(pageSize())}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+                <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
               <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
