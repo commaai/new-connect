@@ -147,7 +147,7 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   update_pr_check:
-    name: Update preview check
+    name: Update PR check
     needs: preview
     if: always() && github.repository == 'commaai/connect' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
