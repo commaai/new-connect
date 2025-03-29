@@ -65,7 +65,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <RouteStatistics class="p-5" route={route()} />
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteActions routeName={routeName()} />
+              <RouteActions routeName={routeName()} route={route()} />
             </Suspense>
           </div>
         </div>
