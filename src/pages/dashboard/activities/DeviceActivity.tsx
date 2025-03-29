@@ -107,12 +107,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<DrawerToggleButton />} trailing={<IconButton name="settings" href={`/${props.dongleId}/settings`} />}>
-        {deviceName()}
+        <Suspense fallback={<div class="skeleton-loader size-full" />}>{deviceName()}</Suspense>
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+          <Show when={deviceName()}>
+            <Suspense fallback={<div class="skeleton-loader size-full" />}>
+              <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+            </Suspense>
           </Show>
           <Show when={isDeviceUser()}>
             <div class="flex">
@@ -169,7 +171,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           )}
         </div>
-        <RouteList dongleId={props.dongleId} />
+        <Suspense fallback={<div class="skeleton-loader size-full" />}>
+          <RouteList dongleId={props.dongleId} />
+        </Suspense>
       </div>
     </>
   )
