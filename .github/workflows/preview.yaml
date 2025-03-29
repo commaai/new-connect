@@ -59,7 +59,7 @@ jobs:
         with:
           script: |
             const response = await github.rest.checks.create({
-              name: 'preview',
+              name: 'Deploy preview',
               head_sha: '${{ github.event.workflow_run.head_sha }}',
               status: 'in_progress',
               output: {
@@ -147,9 +147,9 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
 
   update_pr_check:
-    name: Update preview check
+    name: Update PR check
     needs: preview
-    if: always()
+    if: always() && github.repository == 'commaai/connect' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - name: Update PR check
@@ -158,7 +158,7 @@ jobs:
         script: |
           github.rest.checks.update({
             check_run_id: ${{ needs.preview.outputs.check_id }},
-            name: 'preview',
+            name: 'Deploy preview',
             head_sha: '${{ github.event.workflow_run.head_sha }}',
             status: 'completed',
             conclusion: '${{ needs.preview.result }}',
