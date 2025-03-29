@@ -8,6 +8,7 @@ import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
+import ButtonBase from "~/components/material/ButtonBase";
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -28,50 +29,53 @@ const DashboardDrawer: VoidComponent = () => {
 
   return (
     <>
-      <TopAppBar
-        component="h1"
-        leading={
-          <Show when={modal()}>
-            <IconButton name="arrow_back" onClick={onClose} />
-          </Show>
-        }
-      >
-        comma connect
-      </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
-      <DeviceList class="overflow-y-auto p-2" />
-      <div class="grow" />
-      <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
-        Add new device
-      </Button>
-      <div class="m-4 mt-0">
-        <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
-          <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
-            <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-              <Icon name={profile.latest === null ? 'person_off' : 'person'} filled />
+    <TopAppBar
+      component="h1"
+      leading={
+        <Show when={modal()}>
+          <IconButton name="arrow_back" onClick={onClose}/>
+        </Show>
+      }
+    >
+      comma connect
+    </TopAppBar>
+    <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
+    <DeviceList class="overflow-y-auto p-2"/>
+    <div className="grow"/>
+    <Button class="m-4" leading={<Icon name="add"/>} href="/pair" onClick={onClose}>
+      Add new device
+    </Button>
+    <div className="m-4 mt-0">
+      <ButtonBase href="https://useradmin.comma.ai">
+        <Suspense fallback={<div className="min-h-16 rounded-md skeleton-loader"/>}>
+          <div className="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
+            <div
+              className="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+              <Icon name={profile.latest === null ? 'person_off' : 'person'} filled/>
             </div>
             <Show
               when={profile()}
               fallback={
                 <>
-                  <div class="mx-3">Not signed in</div>
-                  <div class="grow" />
-                  <IconButton name="login" href="/login" />
+                  <div className="mx-3">Not signed in</div>
+                  <div className="grow"/>
+                  <IconButton name="login" href="/login"/>
                 </>
               }
             >
-              <div class="min-w-0 mx-3">
-                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+              <div className="min-w-0 mx-3">
+                <div className="truncate text-body-md text-on-surface">{profile()?.email}</div>
+                <div className="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
               </div>
-              <div class="grow" />
-              <IconButton name="logout" href="/logout" />
+              <div className="grow"/>
+              <IconButton name="logout" href="/logout"/>
             </Show>
           </div>
         </Suspense>
-      </div>
-    </>
-  )
+    </ButtonBase>
+    </div>
+</>
+)
 }
 
 const DashboardLayout: Component<{
