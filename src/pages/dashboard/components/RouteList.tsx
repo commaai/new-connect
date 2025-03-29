@@ -25,8 +25,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     getTimelineStatistics(route).catch((err) => {
       console.error("Error fetching timeline for route", route.fullname, err);
       return undefined;
-    }),
-  );
+    }));
   const [location] = createResource(
     () => [startPlace(), endPlace()],
     ([startPlace, endPlace]) => {
