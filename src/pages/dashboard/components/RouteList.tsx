@@ -21,7 +21,14 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
   const [startPlace] = createResource(startPosition, getPlaceName)
   const [endPlace] = createResource(endPosition, getPlaceName)
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  const [timeline] = createResource(
+    () => props.route,
+    (route) =>
+      getTimelineStatistics(route).catch((err) => {
+        console.error('Error fetching timeline for route', route.fullname, err)
+        return undefined
+      }),
+  )
   const [location] = createResource(
     () => [startPlace(), endPlace()],
     ([startPlace, endPlace]) => {
