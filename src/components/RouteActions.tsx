@@ -35,7 +35,7 @@ interface RouteActionsProps {
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRoute)  // wtf with the duplicate queries, why not pass route in?
+  const [routeResource] = createResource(() => props.routeName, getRoute)
   const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
