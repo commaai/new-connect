@@ -1,11 +1,11 @@
-import { createResource, type VoidComponent, batch } from 'solid-js'
+import { type VoidComponent, batch } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
-import { getRouteWithSegments } from '~/api/route'
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { FileTypes, uploadAllSegments } from '~/api/upload'
+import type { Route } from '~/types'
 
 interface UploadButtonProps {
   state: 'idle' | 'loading' | 'success' | 'error'
@@ -50,12 +50,10 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
 
 interface RouteUploadButtonsProps {
-  routeName: string
+  route: Route | null
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRouteWithSegments)
-
   const [uploadStore, setUploadStore] = createStore({
     states: {
       cameras: 'idle',
@@ -81,8 +79,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   }
 
   const handleUpload = async (type: ButtonType) => {
-    const route = routeResource()
-    if (!route) return
+    if (!props.route) return
 
     if (type === 'route') {
       const typesNotUploadedYet = Object.entries(uploadStore.states)
@@ -95,7 +92,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       updateButtonStates(typesNotUploadedYet, 'loading')
 
       try {
-        await uploadAllSegments(props.routeName, route.segment_numbers.length, typesToUpload)
+        await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, typesToUpload)
         updateButtonStates(typesNotUploadedYet, 'success')
       } catch (err) {
         console.error('Failed to upload', err)
@@ -109,7 +106,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     const fileTypesToUpload = buttonToFileTypeMap[type]
 
     try {
-      await uploadAllSegments(props.routeName, route.segment_numbers.length, fileTypesToUpload)
+      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, fileTypesToUpload)
       setUploadStore('states', type, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
