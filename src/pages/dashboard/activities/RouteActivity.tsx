@@ -74,7 +74,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container-low">
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteUploadButtons routeName={routeName()} route={route()} />
+              <RouteUploadButtons route={route()} />
             </Suspense>
           </div>
         </div>
