@@ -140,6 +140,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
                   <>
                     <h2 class="px-4 text-xl font-bold">{group.day}</h2>
                     <For each={group.segments}>{(route) => <RouteCard route={route} />}</For>
+                    <div class="6 w-full" />
                   </>
                 )}
               </For>
