@@ -40,10 +40,10 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
             <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
           </div>
         </div>
-        <div class="flex items-center gap-2 flex-shrink-0 justify-end">
+        <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
           <span class="text-body-sm font-mono whitespace-nowrap">{item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}</span>
           <Show when={item.id}>
-            <IconButton name="delete" onClick={() => cancel(dongleId, [item.id])} />
+            <IconButton name="close_small" onClick={() => cancel(dongleId, [item.id])} />
           </Show>
         </div>
       </div>
@@ -128,7 +128,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
         <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
-        <IconButton name="delete" onClick={cancelAll} />
+        <IconButton name="close" onClick={cancelAll} />
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
