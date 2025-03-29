@@ -1,4 +1,4 @@
-import { createEffect, createResource, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -14,36 +14,45 @@ type RouteVideoPlayerProps = {
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
+  const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
 
   onMount(() => {
     const timeUpdate = () => props.onProgress?.(video.currentTime)
     video.addEventListener('timeupdate', timeUpdate)
     onCleanup(() => video.removeEventListener('timeupdate', timeUpdate))
-    if (Number.isNaN(props.startTime)) return
-    video.currentTime = props.startTime
+
+    if (!Number.isNaN(props.startTime)) {
+      video.currentTime = props.startTime
+    }
+
     props.ref?.(video)
+
+    if ('MediaSource' in window) {
+      import('~/utils/hls').then(({ createHls }) => {
+        const player = createHls()
+        player.attachMedia(video)
+        setHls(player)
+      })
+      onCleanup(() => hls()?.destroy())
+    } else {
+      setHls(null)
+      if (!video.canPlayType('application/vnd.apple.mpegurl')) {
+        console.error('Browser does not support Media Source Extensions API')
+      }
+    }
   })
 
   createEffect(() => {
-    if (!streamUrl()) return
+    const url = streamUrl()
+    const player = hls()
+    if (!url || player === undefined) return
 
-    if (!('MediaSource' in window)) {
-      if (video.canPlayType('application/vnd.apple.mpegurl')) {
-        video.src = streamUrl()!
-        return
-      }
-      console.error('Browser does not support Media Source Extensions API')
-      return
+    if (player) {
+      player.loadSource(url)
+    } else {
+      video.src = url
     }
-
-    let player: Hls
-    void import('~/utils/hls').then(({ createHls }) => {
-      player = createHls()
-      player.loadSource(streamUrl()!)
-      player.attachMedia(video)
-    })
-    onCleanup(() => player?.destroy())
   })
 
   return (
