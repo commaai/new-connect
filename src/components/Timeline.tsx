@@ -91,16 +91,16 @@ function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[])
 interface TimelineProps {
   class?: string
   routeName: string
-  route: Route | undefined
+  route: Accessor<Route | undefined>
   seekTime: Accessor<number>
   updateTime: (newTime: number) => void
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const [events] = createResource(() => props.route, getTimelineEvents)
+  const [events] = createResource(props.route, getTimelineEvents)
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const duration = createMemo(() => (props.route ? (getRouteDuration(props.route!)?.asSeconds() ?? 0) : 0))
+  const duration = createMemo(() => (props.route() ? (getRouteDuration(props.route()!)?.asSeconds() ?? 0) : 0))
 
   let ref: HTMLDivElement
   let handledTouchStart = false
@@ -115,7 +115,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   }
 
   function onMouseDownOrTouchStart(ev: MouseEvent | TouchEvent) {
-    if (handledTouchStart || !props.route) return
+    if (handledTouchStart || !props.route()) return
 
     const rect = ref.getBoundingClientRect()
 
@@ -161,13 +161,13 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         handledTouchStart = true
       }}
       onTouchMove={(ev) => {
-        if (ev.touches.length !== 1 || !props.route) return
+        if (ev.touches.length !== 1 || !props.route()) return
         const rect = ref.getBoundingClientRect()
         updateMarker(ev.touches[0].clientX, rect)
       }}
     >
       <Suspense fallback={<div class="skeleton-loader size-full" />}>
-        <Show when={props.route} keyed>
+        <Show when={props.route()} keyed>
           {(route) => (
             <>
               <Show when={events()} keyed>
