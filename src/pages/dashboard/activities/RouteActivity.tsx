@@ -14,12 +14,15 @@ import RouteActions from '~/components/RouteActions'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 
+import type { Route } from '~/types'
+
 const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
 type RouteActivityProps = {
   dongleId: string
   dateStr: string
   startTime: number
+  route: Route | null
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
@@ -65,7 +68,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <RouteStatistics class="p-5" route={route()} />
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteActions routeName={routeName()} />
+              <RouteActions routeName={routeName()} route={route()} />
             </Suspense>
           </div>
         </div>

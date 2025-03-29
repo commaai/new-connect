@@ -1,8 +1,9 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
 import clsx from 'clsx'
 
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
+import type { Route } from '~/types'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -32,10 +33,10 @@ const ToggleButton: VoidComponent<{
 
 interface RouteActionsProps {
   routeName: string
+  route: Route | null
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRoute)
   const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
@@ -44,14 +45,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const useradminUrl = () => `https://useradmin.comma.ai/?onebox=${currentRouteId()}`
 
   createEffect(() => {
-    const route = routeResource()
     const preservedRoutes = preservedRoutesResource()
-    if (!route) return
-    setIsPublic(route.is_public)
-    if (route.is_preserved) {
+    if (!props.route) return
+    setIsPublic(props.route.is_public)
+    if (props.route.is_preserved) {
       setIsPreserved(true)
     } else if (preservedRoutes) {
-      setIsPreserved(preservedRoutes.some((r) => r.fullname === route.fullname))
+      setIsPreserved(preservedRoutes.some((r) => r.fullname === props.route.fullname))
     } else {
       setIsPreserved(undefined)
     }
