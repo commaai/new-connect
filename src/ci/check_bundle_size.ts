@@ -2,7 +2,7 @@ import { $ } from 'bun'
 
 let OUT_DIR = process.argv[2]
 if (!OUT_DIR) {
-  OUT_DIR = 'dist'
+  OUT_DIR = './dist'
   if (!process.env.CI) {
     console.debug('Building...')
     await $`bun run build`.quiet()
