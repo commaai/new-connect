@@ -75,7 +75,7 @@
     --color-on-error: rgb(105 0 5);
     --color-error-container: rgb(147 0 10);
     --color-on-error-container: rgb(255 218 214);
-    --color-background: rgb(26 29 32);
+    --color-background: rgb(19 19 24);
     --color-on-background: rgb(228 225 233);
     --color-surface: rgb(19 19 24);
     --color-on-surface: rgb(228 225 233);
@@ -103,8 +103,8 @@
     --color-surface-dim: rgb(19 19 24);
     --color-surface-bright: rgb(57 57 63);
     --color-surface-container-lowest: rgb(13 14 19);
-    --color-surface-container-low: #1D2225;
-    --color-surface-container: rgb(38, 44, 48);
+    --color-surface-container-low: rgb(27 27 33);
+    --color-surface-container: rgb(35 35 41);
     --color-surface-container-high: rgb(41 41 47);
     --color-surface-container-highest: rgb(52 52 58);
   }
