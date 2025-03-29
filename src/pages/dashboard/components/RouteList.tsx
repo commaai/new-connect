@@ -10,10 +10,10 @@ import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 import { useDimensions } from '~/utils/window'
 
-/** Groups routes by formatted day string */
-function groupRoutesByDay(routes: RouteSegments[]): { day: string; segments: RouteSegments[] }[] {
+function groupRoutes(all_routes: RouteSegments[] | undefined): { day: string; segments: RouteSegments[] }[] {
+  if (!all_routes) return []
   const groups = new Map<string, RouteSegments[]>()
-  for (const route of routes()) {
+  for (const route of all_routes) {
     const day = dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
     if (!groups.has(day)) {
       groups.set(day, [])
