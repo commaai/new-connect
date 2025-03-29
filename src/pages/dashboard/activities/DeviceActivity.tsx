@@ -2,7 +2,7 @@ import clsx from 'clsx'
 import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice } from '~/api/devices'
+import { getDevice, SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
@@ -32,7 +32,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [isDeviceOwner] = createResource(device, (device) => device.is_owner)
+  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -114,7 +114,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Show>
-          <Show when={isDeviceOwner()}>
+          <Show when={isDeviceUser()}>
             <div class="flex">
               <div class="flex-auto">
                 <Suspense fallback={<div class="skeleton-loader size-full" />}>
@@ -125,19 +125,19 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                 <IconButton name="camera" onClick={() => void takeSnapshot()} />
               </div>
             </div>
+            <Show when={queueVisible()}>
+              <UploadQueue dongleId={props.dongleId} />
+            </Show>
+            <button
+              class={clsx(
+                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                queueVisible() && 'border-t-2 border-t-surface-container-low',
+              )}
+              onClick={() => setQueueVisible(!queueVisible())}
+            >
+              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </button>
           </Show>
-          <Show when={queueVisible()}>
-            <UploadQueue dongleId={props.dongleId} />
-          </Show>
-          <button
-            class={clsx(
-              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-              queueVisible() && 'border-t-2 border-t-surface-container-low',
-            )}
-            onClick={() => setQueueVisible(!queueVisible())}
-          >
-            <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-          </button>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
