@@ -16,6 +16,7 @@ function groupRoutes(all_routes: RouteSegments[] | undefined): { day: string; se
   for (const route of all_routes) {
     const day = dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
     if (!groups.has(day)) {
+      console.log("adding day", day)
       groups.set(day, [])
     }
     groups.get(day)!.push(route)
@@ -78,7 +79,7 @@ type RouteListProps = {
 
 const RouteList: VoidComponent<RouteListProps> = (props) => {
   const dimensions = useDimensions()
-  const pageSize = () => Math.max(Math.ceil(dimensions().height / 2 / 140), 1)
+  const pageSize = () => Math.max(Math.ceil(dimensions().height / 140), 1) * 2
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${pageSize()}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -126,6 +127,7 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
+      {/*TODO: this results in duplicate headers*/}
       <For each={pageNumbers()}>
         {(_, i) => {
           const [routes] = createResource(() => i(), getPage)
