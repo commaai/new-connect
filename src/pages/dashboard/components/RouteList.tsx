@@ -10,6 +10,19 @@ import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 import { useDimensions } from '~/utils/window'
 
+/** Groups routes by formatted day string */
+function groupRoutesByDay(routes: RouteSegments[]): { day: string; segments: RouteSegments[] }[] {
+  const groups = new Map<string, RouteSegments[]>()
+  for (const route of routes()) {
+    const day = dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
+    if (!groups.has(day)) {
+      groups.set(day, [])
+    }
+    groups.get(day)!.push(route)
+  }
+  return Array.from(groups, ([day, segments]) => ({ day, segments }))
+}
+
 interface RouteCardProps {
   route: RouteSegments
 }
@@ -125,7 +138,24 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
                 <Index each={new Array(pageSize())}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
+              <Show when={routes()}>
+                {(pageRoutes) => {
+                  // Group each page's routes by day
+                  const groups = groupRoutesByDay(pageRoutes)
+                  return (
+                    <For each={groups}>
+                      {(group) => (
+                        <>
+                          <h2 class="px-4 text-xl font-bold">{group.day}</h2>
+                          <For each={group.segments}>
+                            {(route) => <RouteCard route={route} />}
+                          </For>
+                        </>
+                      )}
+                    </For>
+                  )
+                }}
+              </Show>
             </Suspense>
           )
         }}
