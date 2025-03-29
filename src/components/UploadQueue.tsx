@@ -41,9 +41,13 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
-          <span class="text-body-sm font-mono whitespace-nowrap">{item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}</span>
-          <Show when={item.id}>
-            <IconButton name="close_small" onClick={() => cancel(dongleId, [item.id])} />
+          <Show
+            when={!item.id || item.progress !== 0}
+            fallback={<IconButton class="text-red-300" size="20" name="close_small" onClick={() => cancel(dongleId, [item.id])} />}
+          >
+            <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
+              {item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}
+            </span>
           </Show>
         </div>
       </div>
