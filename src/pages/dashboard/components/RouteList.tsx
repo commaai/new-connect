@@ -135,22 +135,16 @@ const RouteList: VoidComponent<RouteListProps> = (props) => {
                 <Index each={new Array(pageSize())}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <Show when={routes()}>
-                {(pageRoutes) => {
-                  // Group each page's routes by day
-                  const groups = groupRoutesByDay(pageRoutes)
-                  return (
-                    <For each={groups}>
-                      {(group) => (
-                        <>
-                          <h2 class="px-4 text-xl font-bold">{group.day}</h2>
-                          <For each={group.segments}>{(route) => <RouteCard route={route} />}</For>
-                        </>
-                      )}
+              <For each={groupRoutes(routes())}>
+                {(group) => (
+                  <>
+                    <h2 class="px-4 text-xl font-bold">{group.day}</h2>
+                    <For each={group.segments}>
+                      {(route) => <RouteCard route={route} />}
                     </For>
-                  )
-                }}
-              </Show>
+                  </>
+                )}
+              </For>
             </Suspense>
           )
         }}
