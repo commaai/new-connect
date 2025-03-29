@@ -1,5 +1,9 @@
 import { $ } from 'bun'
 
+console.debug('check_bundle_size')
+console.debug('cwd:', process.cwd())
+console.debug('argv:', process.argv)
+
 let OUT_DIR = process.argv[2]
 if (!OUT_DIR) {
   OUT_DIR = 'dist'
