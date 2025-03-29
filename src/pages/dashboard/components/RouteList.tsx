@@ -49,23 +49,18 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
-          <div className="grid grid-cols-3 gap-3">
-            <div className="flex basis-0 grow flex-col justify-between">
-              {startTime().format('h:mm A')}<br/>
-              {endTime().format('h:mm A')}
-            </div>
-            <div className="flex basis-0 grow flex-col justify-between">
-              {startPlace()}<br/>
-              {endPlace()}
-            </div>
-            <div className="flex basis-0 grow flex-col justify-between"></div>
+          <div class="flex gap-2">
+            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
+            <span>
+              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+            </span>
           </div>
         }
+        subhead={location()}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
-              <div
-                class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
+              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
                 <Icon class="text-yellow-300" size="20" name="flag" filled />
               </div>
             </Show>
