@@ -1,5 +1,5 @@
 import { createSignal, For, Match, onCleanup, Show, Switch, VoidComponent } from 'solid-js'
-import { cancelUpload, COMMA_CONNECT_PRIORITY, getUploadQueue } from '~/api/athena'
+import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon from './material/Icon'
@@ -13,11 +13,16 @@ interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
   segment: number
   filename: string
+  isFirehose: boolean
 }
 
 const parseUploadPath = (url: string) => {
-  const parts = new URL(url).pathname.split('/')
-  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5] }
+  const parsed = new URL(url)
+  const parts = parsed.pathname.split('/')
+  if (parsed.hostname === 'upload.commadotai.com') {
+    return { route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
+  }
+  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehouse: false }
 }
 
 const cancel = (dongleId: string, ids: string[]) => {
@@ -32,10 +37,7 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon
-            class="text-on-surface-variant flex-shrink-0 mr-2"
-            name={item.priority === COMMA_CONNECT_PRIORITY ? 'person' : 'local_fire_department'}
-          />
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item.isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
             <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
           </div>
