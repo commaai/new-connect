@@ -85,10 +85,10 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
       .then((res) => res.json() as T)
       .catch((err) => {
         console.error('Error fetching file', url, err)
-        return null
+        return undefined
       }),
   )
-  return (await Promise.all(results)).filter((it) => it !== null)
+  return (await Promise.all(results)).filter((it) => it !== undefined)
 }
 
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
