@@ -1,5 +1,5 @@
 import { createQuery } from '@tanstack/solid-query'
-import { createEffect, For, Show, Suspense, VoidComponent } from 'solid-js'
+import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
@@ -62,6 +62,13 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
   )
 }
 
+const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message: string }> = (props) => (
+  <div class="flex items-center gap-2">
+    <Icon name={props.icon} class={clsx(props.iconClass)} />
+    <div>{props.message}</div>
+  </div>
+)
+
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
   const onlineQueue = createQuery(() => ({
@@ -97,53 +104,51 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
 
   const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
   createEffect(() => {
-    // only check data (triggering suspense boundary) if haven't fetched yet
     const online = !onlineQueue.isFetched || onlineQueue.status === 'success' ? (onlineQueue.data ?? []) : []
     const offline = offlineQueue.data ?? []
 
     setItemStore(reconcile([...online, ...offline]))
   })
 
-  const cancelAll = () =>
-    cancel(
-      dongleId(),
-      itemStore.map((item) => item.id),
-    )
-
-  const StatusMessage = (props: { iconClass?: string; icon: IconName; message: string }) => (
-    <div class="flex items-center gap-2">
-      <Icon name={props.icon} class={clsx('mr-2', props.iconClass)} />
-      <div>{props.message}</div>
-    </div>
-  )
-
   return (
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
-        <StatisticBar statistics={[{ label: 'Queued', value: () => itemStore.length }]} />
-        <Button onClick={cancelAll} class="px-2 md:px-3" leading={<Icon name="close" size="20" />} color="primary">
+        <StatisticBar statistics={[{ label: "Queued", value: () => itemStore.length }]} />
+        <Button
+          onClick={() =>
+            cancel(
+              dongleId(),
+              itemStore.filter((item) => item.id).map((item) => item.id)
+            )
+          }
+          class="px-2 md:px-3"
+          leading={<Icon name="close" size="20" />}
+          color="primary"
+        >
           <span class="flex items-center gap-1 font-mono">Cancel All</span>
         </Button>
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
-        <Suspense fallback={<StatusMessage iconClass="animate-spin" icon="autorenew" message="Waiting for device to connect..." />}>
-          <Show
-            when={itemStore.length > 0}
-            fallback={
-              <StatusMessage
-                icon={onlineQueue.isFetched && !onlineQueue.isSuccess ? 'error' : 'check'}
-                message={onlineQueue.isFetched && !onlineQueue.isSuccess ? 'Device offline' : 'Nothing to upload'}
-              />
-            }
-          >
+        <Switch
+          fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
               <For each={itemStore}>{(item) => <UploadQueueRow dongleId={dongleId()} item={item} />}</For>
             </div>
-          </Show>
-        </Suspense>
+          }
+        >
+          <Match when={!onlineQueue.isFetched && !offlineQueue.isFetched}>
+            <StatusMessage iconClass="animate-spin" icon="autorenew" message="Waiting for device to connect..." />
+          </Match>
+          <Match when={onlineQueue.isFetched && !onlineQueue.isSuccess && itemStore.length === 0}>
+            <StatusMessage icon="error" message="Device offline" />
+          </Match>
+          <Match when={itemStore.length === 0}>
+            <StatusMessage icon="check" message="Nothing to upload" />
+          </Match>
+        </Switch>
       </div>
     </div>
-  )
+  );
 }
 
 export default UploadQueue
