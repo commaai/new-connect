@@ -63,7 +63,7 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
   const onlineQueueKey = createMemo(() => ['online_queue', dongleId])
-  const [shouldPollOfflineQueue, setShouldPollOfflineQueue] = createSignal(false)
+  const [offlineQueueEnabled, setOfflineQueueEnabled] = createSignal(false)
 
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
@@ -76,7 +76,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
   const offlineQueue = createQuery(() => ({
     queryKey: ['offline_queue', dongleId],
     queryFn: () => getAthenaOfflineQueue(dongleId),
-    enabled: shouldPollOfflineQueue(),
+    enabled: offlineQueueEnabled(),
     select: (data) =>
       data
         ?.filter((item) => item.method === 'uploadFilesToUrls')
@@ -101,7 +101,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
     const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
     // keep polling offline queue until it's empty to wait for athena to flush requests to device
-    setShouldPollOfflineQueue(!onlineQueue.isSuccess || (onlineQueue.isSuccess && offline.length !== 0))
+    setOfflineQueueEnabled(!onlineQueue.isSuccess || (onlineQueue.isSuccess && offline.length !== 0))
     setItems(reconcile([...online, ...offline]))
   })
 
