@@ -62,8 +62,8 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
-  const [shouldPollOfflineQueue, setShouldPollOfflineQueue] = createSignal(false)
   const onlineQueueKey = createMemo(() => ['online_queue', dongleId])
+  const [shouldPollOfflineQueue, setShouldPollOfflineQueue] = createSignal(false)
 
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
