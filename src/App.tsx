@@ -1,4 +1,4 @@
-import { createSignal, lazy, onCleanup, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createSignal, lazy, onCleanup, Show, Suspense, type ParentComponent, type VoidComponent } from 'solid-js'
 import { Router, Route } from '@solidjs/router'
 import 'leaflet/dist/leaflet.css'
 
@@ -10,17 +10,7 @@ const Dashboard = lazy(() => import('./pages/dashboard'))
 
 import OfflinePage from '~/pages/offline'
 
-export const Routes = () => (
-  <>
-    <Route path="/login" component={Login} />
-    <Route path="/logout" component={Logout} />
-    <Route path="/auth" component={Auth} />
-
-    <Route path="/*dongleId" component={Dashboard} />
-  </>
-)
-
-const App: VoidComponent = () => {
+export const AppLayout: ParentComponent = (props) => {
   const [isOnline, setIsOnline] = createSignal(navigator.onLine)
   const handleOnline = () => setIsOnline(true)
   const handleOffline = () => setIsOnline(false)
@@ -33,11 +23,25 @@ const App: VoidComponent = () => {
 
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
-      <Router root={(props) => <Suspense>{props.children}</Suspense>}>
-        <Routes />
-      </Router>
+      <Suspense>{props.children}</Suspense>
     </Show>
   )
 }
+
+export const Routes = () => (
+  <>
+    <Route path="/login" component={Login} />
+    <Route path="/logout" component={Logout} />
+    <Route path="/auth" component={Auth} />
+
+    <Route path="/*dongleId" component={Dashboard} />
+  </>
+)
+
+const App: VoidComponent = () => (
+  <Router root={AppLayout}>
+    <Routes />
+  </Router>
+)
 
 export default App
