@@ -6,7 +6,7 @@ import { getDevice, SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
-import { DrawerToggleButton } from '~/components/material/Drawer'
+import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -104,9 +104,20 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     setSnapshot({ ...snapshot(), error: null })
   }
 
+  const { modal } = useDrawerContext()
+
   return (
     <>
-      <TopAppBar leading={<DrawerToggleButton />}>comma connect</TopAppBar>
+      <TopAppBar
+        class="font-bold"
+        leading={
+          <Show when={!modal()} fallback={<DrawerToggleButton />}>
+            <img alt="" src="/images/comma-white.png" class="h-8" />
+          </Show>
+        }
+      >
+        connect
+      </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
@@ -114,9 +125,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Show>
           <div class="flex items-center justify-between p-4">
             <div class="text-xl font-bold">{deviceName()}</div>
-            <div class="flex gap-2">
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+            <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
+              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
           <Show when={isDeviceUser()}>
