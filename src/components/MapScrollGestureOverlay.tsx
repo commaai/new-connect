@@ -4,13 +4,11 @@ import Leaflet from 'leaflet'
 import Icon from './material/Icon'
 
 interface MapGestureOverlayProps {
-  map: Leaflet.Map | null
+  map: () => Leaflet.Map | null // Signal function to get the map instance
   mapContainerRef: HTMLElement
 }
 
 const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
-  const { map, mapContainerRef } = props
-
   const [showScrollMessage, setShowScrollMessage] = createSignal(false)
   const [isModifierPressed, setIsModifierPressed] = createSignal(false)
   const [isMacOS, setIsMacOS] = createSignal(false)
@@ -46,6 +44,8 @@ const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
 
   // Setup the map event handlers
   createEffect(() => {
+    const { mapContainerRef } = props
+    const map = props.map() // Get the map instance from the signal
     if (!map || !mapContainerRef) return // Skip if map not loaded
 
     let messageTimeout: NodeJS.Timer // Used to hide the scroll message after a delay
@@ -106,9 +106,7 @@ const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
     mapContainerRef.addEventListener('click', handleClick)
 
     // Hide the scroll message immediately when the map is dragged (helps with mobile)
-    map.on('drag', () => {
-      hideScrollMessage()
-    })
+    map.on('drag', () => hideScrollMessage())
 
     return () => {
       // Cleanup map event listeners

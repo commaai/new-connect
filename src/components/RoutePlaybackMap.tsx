@@ -204,7 +204,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     <div ref={mapContainerRef} class={clsx('relative h-full rounded-lg overflow-hidden', props.class)}>
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
         {/* Scroll instruction overlay */}
-        <MapScrollGestureOverlay map={map()} mapContainerRef={mapContainerRef} />
+        <MapScrollGestureOverlay map={map} mapContainerRef={mapContainerRef} />
 
         {/* Toggle auto tracking button */}
         <div class="absolute bottom-4 right-4 z-[5000]">
