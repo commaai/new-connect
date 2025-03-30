@@ -1,5 +1,5 @@
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
-import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
+import { createEffect, createSignal, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
@@ -63,6 +63,7 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
+  const [shouldPollOfflineQueue, setShouldPollOfflineQueue] = createSignal(false)
 
   const onlineQueue = createQuery(() => ({
     queryKey: ['online_queue', dongleId()],
@@ -75,7 +76,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => ({
     queryKey: ['offline_queue', dongleId()],
     queryFn: () => getAthenaOfflineQueue(dongleId()),
-    enabled: !onlineQueue.isSuccess,
+    enabled: shouldPollOfflineQueue(),
     select: (data) =>
       data
         ?.filter((item) => item.method === 'uploadFilesToUrls')
@@ -95,19 +96,20 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     refetchInterval: 1000,
   }))
 
+  const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
+  createEffect(() => {
+    const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
+    const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
+    // keep polling offline queue until it's empty to wait for athena to flush requests to device
+    setShouldPollOfflineQueue(!onlineQueue.isSuccess || (onlineQueue.isSuccess && offline.length !== 0))
+    setItemStore(reconcile([...online, ...offline]))
+  })
+
   const queryClient = useQueryClient()
   const cancelMutation = createMutation(() => ({
     mutationFn: (ids: string[]) => cancelUpload(dongleId(), ids),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['online_queue', dongleId()] }),
   }))
-
-  const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
-  createEffect(() => {
-    const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
-    const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
-    setItemStore(reconcile([...online, ...offline]))
-  })
-
   const cancelOne = (id: string) => cancelMutation.mutate([id])
   const cancelAll = () => {
     const ids = itemStore.filter((item) => item.id).map((item) => item.id)
