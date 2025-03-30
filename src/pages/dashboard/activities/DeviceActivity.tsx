@@ -107,7 +107,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   return (
     <>
       <TopAppBar leading={<DrawerToggleButton />} trailing={<IconButton name="settings" href={`/${props.dongleId}/settings`} />}>
-        {deviceName()}
+        comma connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
@@ -117,13 +117,18 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <Show when={isDeviceUser()}>
             <div class="flex">
               <div class="flex-auto">
+                <TopAppBar leading={<DrawerToggleButton />} trailing={<span><IconButton name="settings" href={`/${props.dongleId}/settings`} /> <IconButton name="camera" onClick={() => void takeSnapshot()} /></span>}>
+                  {deviceName()}
+                </TopAppBar>
+                <h1 style='font-size: 24px; margin-left: 12px; margin-top: 12px' class='mr-5'>{deviceName()}</h1>
+                {/*Add a title for device name:*/}
                 <Suspense fallback={<div class="skeleton-loader size-full" />}>
                   <DeviceStatistics dongleId={props.dongleId} class="p-4" />
                 </Suspense>
               </div>
-              <div class="flex p-4">
-                <IconButton name="camera" onClick={() => void takeSnapshot()} />
-              </div>
+              {/*<div class="flex p-4">*/}
+              {/*  <IconButton name="camera" onClick={() => void takeSnapshot()} />*/}
+              {/*</div>*/}
             </div>
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
