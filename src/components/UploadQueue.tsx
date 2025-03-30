@@ -70,6 +70,7 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const dongleId = () => props.dongleId
+
   const onlineQueue = createQuery(() => ({
     queryKey: ['online_queue', dongleId()],
     queryFn: () => getUploadQueue(dongleId()),
@@ -103,10 +104,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
 
   const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
   createEffect(() => {
-    const online = !onlineQueue.isFetched || onlineQueue.status === 'success' ? (onlineQueue.data ?? []) : []
-    const offline = offlineQueue.data ?? []
-
-    setItemStore(reconcile([...online, ...offline]))
+    setItemStore(reconcile([...(onlineQueue.data ?? []), ...(offlineQueue.data ?? [])]))
   })
 
   const cancelAll = () =>
