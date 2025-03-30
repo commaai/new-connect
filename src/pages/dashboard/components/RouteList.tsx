@@ -10,7 +10,7 @@ import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 
 // Track rendered dates at module level to persist between renders
-const seenDates = new Set<string>()
+const renderedDateHeaders = new Set<string>()
 
 interface RouteCardProps {
   route: RouteSegments
@@ -96,7 +96,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      seenDates.clear() // Clear tracked dates when dongleId changes
+      renderedDateHeaders.clear()
     }
   })
 
@@ -131,8 +131,8 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
               <For each={routes() || []}>
                 {(route) => {
                   const date = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
-                  const isFirstForDate = !seenDates.has(date)
-                  if (isFirstForDate) seenDates.add(date)
+                  const isFirstForDate = !renderedDateHeaders.has(date)
+                  if (isFirstForDate) renderedDateHeaders.add(date)
                   return <RouteCard route={route} showDateHeader={isFirstForDate} />
                 }}
               </For>
