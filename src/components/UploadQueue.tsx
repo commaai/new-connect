@@ -103,7 +103,9 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
 
   const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
   createEffect(() => {
-    setItemStore(reconcile([...(onlineQueue.data ?? []), ...(offlineQueue.data ?? [])]))
+    const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
+    const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
+    setItemStore(reconcile([...online, ...offline]))
   })
 
   const cancelOne = (id: string) => cancelMutation.mutate([id])
