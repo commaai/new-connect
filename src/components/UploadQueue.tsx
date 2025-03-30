@@ -57,7 +57,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: Decora
 const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message: string }> = (props) => (
   <div class="flex items-center gap-2">
     <Icon name={props.icon} class={props.iconClass} />
-    <div>{props.message}</div>
+    <span class="text-body-lg">{props.message}</span>
   </div>
 )
 
