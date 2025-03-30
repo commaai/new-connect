@@ -5,6 +5,7 @@ import clsx from 'clsx'
 
 import { GPSPathPoint, getCoords } from '~/api/derived'
 import CircularProgress from '~/components/material/CircularProgress'
+import { useMapGestures } from '~/hooks/useMapGestures'
 import { getTileUrl } from '~/map'
 import type { Route } from '~/types'
 
@@ -26,14 +27,10 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   const [marker, setMarker] = createSignal<Leaflet.Marker | null>(null) // The marker for the current replay time
   const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(null) // The vehicle marker icon
   const [shouldInitMap, setShouldInitMap] = createSignal(false) // Whether the map should be initialized (wait until mount to avoid lag)
-  const [autoTracking, setAutoTracking] = createSignal(false) // Is auto-tracking enabled
+  const [autoTracking, setAutoTracking] = createSignal(false)
 
-  // Gesture handling state
-  const [showScrollMessage, setShowScrollMessage] = createSignal(false) // Showing the scroll instruction message
-  const [isModifierPressed, setIsModifierPressed] = createSignal(false) // Whether the modifier key is pressed for zooming
-  const [isMacOS, setIsMacOS] = createSignal(false)
-  const [isTouchDevice, setIsTouchDevice] = createSignal(false)
-  const [isPointerOverMap, setIsPointerOverMap] = createSignal(false)
+  // Use our custom map gestures hook
+  const { bindGestureControls, getScrollMessage, showScrollMessage, isTouchDevice } = useMapGestures()
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords)
@@ -55,40 +52,9 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     // Fallback: initialize after 1.5 seconds even if not visible
     const timeout = setTimeout(() => setShouldInitMap(true), 1500)
 
-    // Detect OS for handling modifier keys
-    setIsMacOS(navigator.platform.toUpperCase().indexOf('MAC') >= 0)
-
-    // Detect if we're on a touch device
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-
-    // Set up key event listeners for modifier keys (Ctrl/Cmd)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || (isMacOS() && e.metaKey)) {
-        setIsModifierPressed(true)
-      }
-    }
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || (isMacOS() && e.metaKey))) {
-        setIsModifierPressed(false)
-      }
-    }
-
-    // When window loses focus, reset the modifier key state
-    const handleBlur = () => {
-      setIsModifierPressed(false)
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    window.addEventListener('blur', handleBlur)
-
     onCleanup(() => {
       observer.disconnect()
       clearTimeout(timeout)
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('blur', handleBlur)
     })
   })
 
@@ -125,106 +91,24 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const observer = new ResizeObserver(() => leafletMap.invalidateSize())
     observer.observe(mapRef)
 
-    // Track mouse position relative to map
-    const handleMouseEnter = () => setIsPointerOverMap(true)
-    const handleMouseLeave = () => setIsPointerOverMap(false)
-    mapContainerRef.addEventListener('mouseenter', handleMouseEnter)
-    mapContainerRef.addEventListener('mouseleave', handleMouseLeave)
-
-    let messageTimeout: NodeJS.Timer
-
-    // Custom wheel event handler for the map
-    const handleWheel = (e: WheelEvent) => {
-      // Only handle events when pointer is over the map
-      if (!isPointerOverMap()) return
-      if (isModifierPressed()) {
-        // Allow zooming when modifier key is pressed
-        e.preventDefault() // Prevent browser zoom
-        e.stopPropagation()
-        setShowScrollMessage(false)
-
-        // Get the current map center and zoom
-        const currentCenter = leafletMap.getCenter()
-        const currentZoom = leafletMap.getZoom()
-
-        // Get mouse position in pixels
-        const containerPoint = leafletMap.mouseEventToContainerPoint(e)
-        // Get the geographic point under the cursor
-        const targetPoint = leafletMap.containerPointToLatLng(containerPoint)
-
-        // Calculate new zoom level
-        const zoomDelta = e.deltaY > 0 ? -1 : 1
-        const newZoom = Math.max(leafletMap.getMinZoom(), Math.min(leafletMap.getMaxZoom(), currentZoom + zoomDelta))
-
-        // Calculate the scale factor between the old and new zoom
-        const scale = Math.pow(2, newZoom - currentZoom)
-
-        // Calculate a new center that will keep the cursor point in place
-        // For zoom in: move center toward cursor, for zoom out: move away
-        const newCenter = Leaflet.latLng(
-          targetPoint.lat - (targetPoint.lat - currentCenter.lat) / scale,
-          targetPoint.lng - (targetPoint.lng - currentCenter.lng) / scale,
-        )
-
-        // Apply the new zoom and center in a single operation
-        leafletMap.setView(newCenter, newZoom, { animate: true })
-      } else {
-        setShowScrollMessage(true)
-        // Hide message after a delay
-        clearTimeout(messageTimeout)
-        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000)
-      }
-    }
-
-    const handleTouchMove = (e: TouchEvent) => {
-      if (e.touches.length === 1) {
-        // Single finger
-        leafletMap.dragging.disable() // Disable dragging
-        setShowScrollMessage(true)
-        // Hide message after a delay
-        clearTimeout(messageTimeout)
-        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000)
-      } else {
-        leafletMap.dragging.enable() // Enable dragging
-        setShowScrollMessage(false)
-      }
-    }
-
-    const handleTouchEnd = () => {
-      clearTimeout(messageTimeout)
-      setShowScrollMessage(false) // Hide immediately on touch end to avoid showing after finishing a drag and releasing one finger before the other (it still shows until you release the second finger)
-    }
-
-    // Use capture phase for wheel to catch events before they propagate
-    mapContainerRef.addEventListener('wheel', handleWheel, { passive: false })
-    mapContainerRef.addEventListener('touchmove', handleTouchMove, { passive: true })
-    mapContainerRef.addEventListener('touchend', handleTouchEnd, { passive: true })
-
     // Disable tracking when user drags the map
     leafletMap.on('drag', () => {
-      if (autoTracking()) {
-        setAutoTracking(false)
-      }
-      setShowScrollMessage(false)
+      if (autoTracking()) setAutoTracking(false)
     })
 
-    // Center marker when user zooms the map
+    // Re-center marker when user zooms the map with auto tracking enabled
     leafletMap.on('zoom', () => {
-      if (autoTracking()) {
-        centerMarker()
-      }
+      if (autoTracking()) centerMarker()
     })
+
+    // Bind all gesture controls
+    const cleanupGestures = bindGestureControls(mapContainerRef, leafletMap)
 
     onCleanup(() => {
       observer.disconnect()
       if (routePath()) routePath()!.remove()
       if (marker()) marker()!.remove()
-      mapContainerRef.removeEventListener('wheel', handleWheel, { capture: true })
-      mapContainerRef.removeEventListener('touchmove', handleTouchMove)
-      mapContainerRef.removeEventListener('touchend', handleTouchEnd)
-      mapContainerRef.removeEventListener('mouseenter', handleMouseEnter)
-      mapContainerRef.removeEventListener('mouseleave', handleMouseLeave)
-      clearTimeout(messageTimeout)
+      cleanupGestures()
       leafletMap.remove()
     })
   })
@@ -281,9 +165,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     const currentMap = map()
     const currentTime = props.currentTime
 
-    if (!gpsPoints?.length || !currentMarker || !currentMap) {
-      return
-    }
+    if (!gpsPoints?.length || !currentMarker || !currentMap) return
 
     // Find closest GPS point for current time
     const point = findClosestPointToTime(gpsPoints, currentTime)
@@ -317,25 +199,10 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     })
   }
 
-  // Toggle auto-tracking
-  const toggleAutoTracking = () => {
-    setAutoTracking(!autoTracking())
-    if (autoTracking()) centerMarker()
-  }
-
   // Center map on marker
   const centerMarker = () => {
     if (marker() && map()) {
       map()!.panTo(marker()!.getLatLng())
-    }
-  }
-
-  // Get the instruction message based on device type
-  const getScrollMessage = () => {
-    if (isTouchDevice()) {
-      return 'Use two fingers to pan and zoom'
-    } else {
-      return `Use ${isMacOS() ? '⌘ Cmd' : 'Ctrl'} + scroll to zoom`
     }
   }
 
@@ -358,11 +225,16 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
           <IconButton
             class={clsx('bg-surface-variant', autoTracking() && 'text-primary bg-surface-container-high')}
             name={autoTracking() ? 'my_location' : 'location_searching'}
-            onClick={toggleAutoTracking}
+            onClick={() => {
+              const isTracking = !autoTracking()
+              setAutoTracking(isTracking)
+              if (isTracking) centerMarker()
+            }}
             aria-label={autoTracking() ? 'Disable tracking' : 'Enable tracking'}
           ></IconButton>
         </div>
 
+        {/* Loading indicator */}
         <Show when={coords.loading}>
           <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
             <CircularProgress color="primary" size={24} class="mr-2" />
@@ -370,6 +242,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
           </div>
         </Show>
 
+        {/* Error message */}
         <Show when={(coords.error as Error)?.message}>
           <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
             <Icon class="mr-2" name="error" size="20" />
