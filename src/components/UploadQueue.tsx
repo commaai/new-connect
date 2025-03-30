@@ -8,6 +8,7 @@ import clsx from 'clsx'
 import { getAthenaOfflineQueue } from '~/api/devices'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
+import Button from "~/components/material/Button";
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -133,16 +134,36 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   return (
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
-        <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
-        <IconButton name="close" onClick={cancelAll} />
+        <StatisticBar statistics={[{label: 'Queued', value: () => items.length}]}/>
+
+        {/*<button*/}
+        {/*    class={clsx(*/}
+        {/*        'flex cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',*/}
+
+        {/*    )}*/}
+        {/*    onClick={cancelAll}*/}
+        {/*>*/}
+        {/*    <p class="mr-2">Cancel All</p>*/}
+        {/*    <Icon class="text-zinc-500" name='close'/>*/}
+        {/*</button>*/}
+
+        <Button
+            onClick={cancelAll}
+            class="px-2 md:px-3"
+            leading={<Icon name='close' size="20" />}
+            color="primary"
+        >
+          <span class="flex items-center gap-1 font-mono">Cancel All</span>
+        </Button>
+        {/*<IconButton name="close" onClick={cancelAll}/>*/}
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
-          fallback={
-            <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow dongleId={props.dongleId} item={item} />}</For>
-            </div>
-          }
+            fallback={
+              <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
+                <For each={items}>{(item) => <UploadQueueRow dongleId={props.dongleId} item={item}/>}</For>
+              </div>
+            }
         >
           <Match when={error() && items.length === 0}>
             <Icon class={clsx(error() === WAITING && 'animate-spin')} name={error() === WAITING ? 'progress_activity' : 'error'} />
