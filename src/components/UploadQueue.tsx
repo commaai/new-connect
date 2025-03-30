@@ -9,7 +9,6 @@ import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
 import { createStore, reconcile } from 'solid-js/store'
-import clsx from 'clsx'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -57,7 +56,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: Decora
 
 const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message: string }> = (props) => (
   <div class="flex items-center gap-2">
-    <Icon name={props.icon} class={clsx(props.iconClass)} />
+    <Icon name={props.icon} class={props.iconClass} />
     <div>{props.message}</div>
   </div>
 )
