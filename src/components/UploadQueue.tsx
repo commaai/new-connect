@@ -61,19 +61,19 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
   </div>
 )
 
-const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
-  const onlineQueueKey = createMemo(() => ['online_queue', dongleId])
+const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
+  const onlineQueueKey = createMemo(() => ['online_queue', props.dongleId])
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
-    queryFn: () => getUploadQueue(dongleId),
+    queryFn: () => getUploadQueue(props.dongleId),
     select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || [],
     retry: false,
     refetchInterval: 1000,
   }))
 
   const offlineQueue = createQuery(() => ({
-    queryKey: ['offline_queue', dongleId],
-    queryFn: () => getAthenaOfflineQueue(dongleId),
+    queryKey: ['offline_queue', props.dongleId],
+    queryFn: () => getAthenaOfflineQueue(props.dongleId),
     select: (data) =>
       data
         ?.filter((item) => item.method === 'uploadFilesToUrls')
@@ -102,7 +102,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
 
   const queryClient = useQueryClient()
   const cancelMutation = createMutation(() => ({
-    mutationFn: (ids: string[]) => cancelUpload(dongleId, ids),
+    mutationFn: (ids: string[]) => cancelUpload(props.dongleId, ids),
     onSettled: () => queryClient.invalidateQueries({ queryKey: onlineQueueKey() }),
   }))
   const cancelAll = () => {
