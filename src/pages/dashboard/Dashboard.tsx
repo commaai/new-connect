@@ -29,17 +29,16 @@ const DashboardDrawer: VoidComponent = () => {
 
   return (
     <>
-      {/*<TopAppBar*/}
-      {/*  component="h1"*/}
-      {/*  leading={*/}
-      {/*    <Show when={modal()}>*/}
-      {/*      <IconButton name="arrow_back" onClick={onClose} />*/}
-      {/*    </Show>*/}
-      {/*  }*/}
-      {/*>*/}
-      {/*  comma connect*/}
-      {/*</TopAppBar>*/}
-      {/*<h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>*/}
+      <TopAppBar
+        component="h1"
+        leading={
+          <Show when={modal()}>
+            <IconButton name="arrow_back" onClick={onClose} />
+          </Show>
+        }
+      >
+        Devices
+      </TopAppBar>
       <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
