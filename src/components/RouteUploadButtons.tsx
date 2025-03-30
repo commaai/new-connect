@@ -1,4 +1,4 @@
-import type { VoidComponent } from 'solid-js'
+import { createEffect, createSignal, on, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
@@ -7,7 +7,8 @@ import Button from './material/Button'
 import { uploadAllSegments, type FileType } from '~/api/upload'
 import type { Route } from '~/types'
 
-type ButtonType = 'road' | 'driver' | 'logs' | 'route'
+const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
+type ButtonType = (typeof BUTTON_TYPES)[number]
 type ButtonState = 'idle' | 'loading' | 'success' | 'error'
 
 const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
@@ -66,9 +67,28 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       route: 'idle',
     } as Record<ButtonType, ButtonState>,
   })
+  const [abortController, setAbortController] = createSignal(new AbortController())
+
+  createEffect(
+    on(
+      () => props.route,
+      () => {
+        abortController().abort()
+        setAbortController(new AbortController())
+        setUploadStore('states', BUTTON_TYPES, 'idle')
+      },
+    ),
+  )
 
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
+    const { fullname, maxqlog } = props.route
+    const { signal } = abortController()
+
+    const updateButtonStates = (types: readonly ButtonType[], state: ButtonState) => {
+      if (signal.aborted) return
+      setUploadStore('states', types, state)
+    }
 
     const uploadButtonTypes: ButtonType[] = [type]
     const uploadFileTypes: FileType[] = []
@@ -79,13 +99,13 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
     }
 
-    setUploadStore('states', uploadButtonTypes, 'loading')
+    updateButtonStates(uploadButtonTypes, 'loading')
     try {
-      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, uploadFileTypes)
-      setUploadStore('states', uploadButtonTypes, 'success')
+      await uploadAllSegments(fullname, maxqlog + 1, uploadFileTypes)
+      updateButtonStates(uploadButtonTypes, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
-      setUploadStore('states', uploadButtonTypes, 'error')
+      updateButtonStates(uploadButtonTypes, 'error')
     }
   }
 
