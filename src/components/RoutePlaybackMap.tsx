@@ -5,7 +5,7 @@ import clsx from 'clsx'
 
 import { GPSPathPoint, getCoords } from '~/api/derived'
 import CircularProgress from '~/components/material/CircularProgress'
-import { useMapGestures } from '~/hooks/useMapGestures'
+import MapScrollGestureOverlay from '~/components/MapScrollGestureOverlay'
 import { getTileUrl } from '~/map'
 import type { Route } from '~/types'
 
@@ -22,15 +22,13 @@ type RoutePlaybackMapProps = {
 const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
   let mapRef!: HTMLDivElement
   let mapContainerRef!: HTMLDivElement
+
   const [map, setMap] = createSignal<Leaflet.Map | null>(null)
   const [routePath, setRoutePath] = createSignal<Leaflet.Polyline | null>(null)
   const [marker, setMarker] = createSignal<Leaflet.Marker | null>(null) // The marker for the current replay time
   const [markerIcon, setMarkerIcon] = createSignal<Leaflet.DivIcon | null>(null) // The vehicle marker icon
   const [shouldInitMap, setShouldInitMap] = createSignal(false) // Whether the map should be initialized (wait until mount to avoid lag)
   const [autoTracking, setAutoTracking] = createSignal(false)
-
-  // Use our custom map gestures hook
-  const { bindGestureControls, getScrollMessage, showScrollMessage, isTouchDevice } = useMapGestures()
 
   // Get GPS coordinates for the route
   const [coords] = createResource(() => props.route, getCoords)
@@ -101,14 +99,10 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
       if (autoTracking()) centerMarker()
     })
 
-    // Bind all gesture controls
-    const cleanupGestures = bindGestureControls(mapContainerRef, leafletMap)
-
     onCleanup(() => {
       observer.disconnect()
       if (routePath()) routePath()!.remove()
       if (marker()) marker()!.remove()
-      cleanupGestures()
       leafletMap.remove()
     })
   })
@@ -210,15 +204,7 @@ const RoutePlaybackMap: VoidComponent<RoutePlaybackMapProps> = (props) => {
     <div ref={mapContainerRef} class={clsx('relative h-full rounded-lg overflow-hidden', props.class)}>
       <div ref={mapRef} class="h-full w-full !bg-surface-container-low">
         {/* Scroll instruction overlay */}
-        <Show when={showScrollMessage()}>
-          {/* Dark overlay for the entire map - add animate-in fade-in */}
-          <div class="absolute inset-0 z-[5400] bg-black bg-opacity-30 transition-opacity duration-200 animate-in fade-in"></div>
-          {/* Message box */}
-          <div class="absolute left-1/2 top-12 z-[5500] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-xl bg-surface-container-high bg-opacity-90 backdrop-blur-sm px-6 py-3 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
-            <Icon class="mr-3 text-primary" name={isTouchDevice() ? 'touch_app' : 'mouse'} size="24" />
-            <span class="text-md font-medium">{getScrollMessage()}</span>
-          </div>
-        </Show>
+        <MapScrollGestureOverlay map={map()} mapContainerRef={mapContainerRef} />
 
         {/* Toggle auto tracking button */}
         <div class="absolute bottom-4 right-4 z-[5000]">

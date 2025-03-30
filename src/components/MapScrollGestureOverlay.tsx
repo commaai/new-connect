@@ -1,17 +1,64 @@
-import { createSignal, onMount, onCleanup } from 'solid-js'
+import { createEffect, createSignal, onMount, onCleanup, Show, type Component } from 'solid-js'
 import Leaflet from 'leaflet'
 
-export function useMapGestures() {
-  // Gesture handling state
+import Icon from './material/Icon'
+
+interface MapGestureOverlayProps {
+  map: Leaflet.Map | null
+  mapContainerRef: HTMLElement
+}
+
+const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
+  const { map, mapContainerRef } = props
+
   const [showScrollMessage, setShowScrollMessage] = createSignal(false)
   const [isModifierPressed, setIsModifierPressed] = createSignal(false)
   const [isMacOS, setIsMacOS] = createSignal(false)
   const [isTouchDevice, setIsTouchDevice] = createSignal(false)
   const [isPointerOverMap, setIsPointerOverMap] = createSignal(false)
 
-  // Function to bind all gesture controls to a map
-  const bindGestureControls = (mapContainerRef: HTMLElement, leafletMap: Leaflet.Map) => {
-    let messageTimeout: NodeJS.Timer
+  onMount(() => {
+    // Detect platform
+    setIsMacOS(navigator.platform.toUpperCase().indexOf('MAC') >= 0)
+    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
+
+    // Set up key event listeners for modifier keys (Ctrl/Cmd)
+    const handleKeyUpOrDown = (e: KeyboardEvent) => {
+      setIsModifierPressed(e.ctrlKey || (isMacOS() && e.metaKey))
+    }
+
+    // When window loses focus, reset the modifier key state
+    const handleBlur = () => setIsModifierPressed(false)
+
+    // Add event listeners for the modifier keys
+    window.addEventListener('keydown', handleKeyUpOrDown)
+    window.addEventListener('keyup', handleKeyUpOrDown)
+    window.addEventListener('blur', handleBlur)
+
+    // Remove event listeners on unmount
+    onCleanup(() => {
+      // Cleanup window event listeners
+      window.removeEventListener('keydown', handleKeyUpOrDown)
+      window.removeEventListener('keyup', handleKeyUpOrDown)
+      window.removeEventListener('blur', handleBlur)
+    })
+  })
+
+  // Setup the map event handlers
+  createEffect(() => {
+    if (!map || !mapContainerRef) return // Skip if map not loaded
+
+    let messageTimeout: NodeJS.Timer // Used to hide the scroll message after a delay
+
+    // Hide the scroll message with an optional delay
+    const hideScrollMessage = (delay?: number) => {
+      clearTimeout(messageTimeout) // Clear any existing timeout
+      if (delay) {
+        messageTimeout = setTimeout(() => setShowScrollMessage(false), delay) // Hide after delay
+      } else {
+        setShowScrollMessage(false) // Hide immediately
+      }
+    }
 
     // Set up events for detecting pointer over map
     const handleMouseEnter = () => setIsPointerOverMap(true)
@@ -27,93 +74,52 @@ export function useMapGestures() {
         // Allow zooming when modifier key is pressed
         e.preventDefault() // Prevent browser zoom
         e.stopPropagation()
-        setShowScrollMessage(false)
+        hideScrollMessage()
         // Zoom in towards the cursor position (we have to manually calculate the zoom since we're overriding the scroll event)
-        const { newZoom, newCenter } = getNewZoomAndCenter(leafletMap, e)
-        leafletMap.setView(newCenter, newZoom, { animate: true })
+        const { newZoom, newCenter } = getNewZoomAndCenter(map, e)
+        map.setView(newCenter, newZoom, { animate: true })
       } else {
         setShowScrollMessage(true)
-        // Hide message after a delay
-        clearTimeout(messageTimeout)
-        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000)
+        hideScrollMessage(1000) // Hide message after a delay
       }
     }
 
     const handleTouchMove = (e: TouchEvent) => {
       if (e.touches.length === 1) {
         // Single finger
-        leafletMap.dragging.disable() // Disable dragging
+        map.dragging.disable() // Disable dragging
         setShowScrollMessage(true)
-        // Hide message after a delay
-        clearTimeout(messageTimeout)
-        messageTimeout = setTimeout(() => setShowScrollMessage(false), 1000)
+        hideScrollMessage(1000)
       } else {
-        leafletMap.dragging.enable() // Enable dragging
-        setShowScrollMessage(false)
+        map.dragging.enable() // Enable dragging
+        hideScrollMessage()
       }
     }
 
-    const handleTouchEnd = () => {
-      clearTimeout(messageTimeout)
-      setShowScrollMessage(false) // Hide immediately on touch end
-    }
+    const handleTouchEnd = () => hideScrollMessage() // Hide immediately on touch end
+    const handleClick = () => hideScrollMessage() // Hide immediately on click
 
     // Use capture phase for wheel to catch events before they propagate
     mapContainerRef.addEventListener('wheel', handleWheel, { passive: false })
     mapContainerRef.addEventListener('touchmove', handleTouchMove, { passive: true })
     mapContainerRef.addEventListener('touchend', handleTouchEnd, { passive: true })
+    mapContainerRef.addEventListener('click', handleClick)
 
     // Hide the scroll message immediately when the map is dragged (helps with mobile)
-    leafletMap.on('drag', () => {
-      setShowScrollMessage(false)
+    map.on('drag', () => {
+      hideScrollMessage()
     })
 
-    // Return cleanup function
     return () => {
+      // Cleanup map event listeners
       mapContainerRef.removeEventListener('wheel', handleWheel, { capture: true })
       mapContainerRef.removeEventListener('touchmove', handleTouchMove)
       mapContainerRef.removeEventListener('touchend', handleTouchEnd)
+      mapContainerRef.removeEventListener('click', handleClick)
       mapContainerRef.removeEventListener('mouseenter', handleMouseEnter)
       mapContainerRef.removeEventListener('mouseleave', handleMouseLeave)
       clearTimeout(messageTimeout)
     }
-  }
-
-  // Initialize platform detection and keyboard modifiers
-  onMount(() => {
-    // Detect OS for handling modifier keys
-    setIsMacOS(navigator.platform.toUpperCase().indexOf('MAC') >= 0)
-
-    // Detect if we're on a touch device
-    setIsTouchDevice('ontouchstart' in window || navigator.maxTouchPoints > 0)
-
-    // Set up key event listeners for modifier keys (Ctrl/Cmd)
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey || (isMacOS() && e.metaKey)) {
-        setIsModifierPressed(true)
-      }
-    }
-
-    const handleKeyUp = (e: KeyboardEvent) => {
-      if (!(e.ctrlKey || (isMacOS() && e.metaKey))) {
-        setIsModifierPressed(false)
-      }
-    }
-
-    // When window loses focus, reset the modifier key state
-    const handleBlur = () => {
-      setIsModifierPressed(false)
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    window.addEventListener('keyup', handleKeyUp)
-    window.addEventListener('blur', handleBlur)
-
-    onCleanup(() => {
-      window.removeEventListener('keydown', handleKeyDown)
-      window.removeEventListener('keyup', handleKeyUp)
-      window.removeEventListener('blur', handleBlur)
-    })
   })
 
   // Get the instruction message based on device type
@@ -125,8 +131,20 @@ export function useMapGestures() {
     }
   }
 
-  return { showScrollMessage, isTouchDevice, isMacOS, bindGestureControls, getScrollMessage }
+  return (
+    <Show when={showScrollMessage()}>
+      {/* Dark overlay for the entire map */}
+      <div class="absolute inset-0 z-[5400] bg-black bg-opacity-30 transition-opacity duration-200 animate-in fade-in"></div>
+      {/* Message box */}
+      <div class="absolute left-1/2 top-12 z-[5500] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-xl bg-surface-container-high bg-opacity-90 backdrop-blur-sm px-6 py-3 shadow-xl animate-in fade-in slide-in-from-bottom-4 duration-200">
+        <Icon class="mr-3 text-primary" name={isTouchDevice() ? 'touch_app' : 'mouse'} size="24" />
+        <span class="text-md font-medium">{getScrollMessage()}</span>
+      </div>
+    </Show>
+  )
 }
+
+export default MapScrollGestureOverlay
 
 /** Utility function to calculate a new zoom value and center location for the given map and scroll wheel event.
  * It zooms into the mouse cursor position instead of the center of the map.
