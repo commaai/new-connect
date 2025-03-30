@@ -45,14 +45,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   const takeSnapshot = async () => {
     setSnapshot({ error: null, fetching: true, images: [] })
-
     try {
       const payload = {
         method: 'takeSnapshot',
         jsonrpc: '2.0',
         id: 0,
       }
-
       const response = await fetch(`${ATHENA_URL}/${props.dongleId}`, {
         method: 'POST',
         headers: {
@@ -61,17 +59,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         },
         body: JSON.stringify(payload),
       })
-
       if (!response.ok) {
         throw new Error(`HTTP error! status: ${response.status}`)
       }
-
-      const resp: SnapshotResponse = (await response.json()) as SnapshotResponse
+      const resp: SnapshotResponse = await response.json()
       const images = []
-
       if (resp.result?.jpegFront) images.push(resp.result.jpegFront)
       if (resp.result?.jpegBack) images.push(resp.result.jpegBack)
-
       if (images.length > 0) {
         setSnapshot({ error: null, fetching: false, images })
       } else {
@@ -106,45 +100,44 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<DrawerToggleButton />} trailing={<IconButton name="settings" href={`/${props.dongleId}/settings`} />}>
+      <TopAppBar leading={<DrawerToggleButton />}>
         comma connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
+          {/* Map */}
           <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Show>
-          <Show when={isDeviceUser()}>
-            <div class="flex">
-              <div class="flex-auto">
-                <TopAppBar leading={<DrawerToggleButton />} trailing={<span><IconButton name="settings" href={`/${props.dongleId}/settings`} /> <IconButton name="camera" onClick={() => void takeSnapshot()} /></span>}>
-                  {deviceName()}
-                </TopAppBar>
-                <h1 style='font-size: 24px; margin-left: 12px; margin-top: 12px' class='mr-5'>{deviceName()}</h1>
-                {/*Add a title for device name:*/}
-                <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                  <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-                </Suspense>
+          {/* Header row */}
+          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
+            <div class="flex items-center justify-between p-4">
+              <div class="text-xl font-bold">{deviceName()}</div>
+              <div class="flex gap-2">
+                <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+                <IconButton name="camera" onClick={() => void takeSnapshot()} />
               </div>
-              {/*<div class="flex p-4">*/}
-              {/*  <IconButton name="camera" onClick={() => void takeSnapshot()} />*/}
-              {/*</div>*/}
             </div>
-            <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
-            </Show>
-            <button
-              class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-                queueVisible() && 'border-t-2 border-t-surface-container-low',
-              )}
-              onClick={() => setQueueVisible(!queueVisible())}
-            >
-              <p class="mr-2">Upload Queue</p>
-              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-            </button>
           </Show>
+          {/* Device statistics */}
+          <Suspense fallback={<div class="skeleton-loader size-full" />}>
+            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+          </Suspense>
+          <Show when={queueVisible()}>
+            <UploadQueue dongleId={props.dongleId} />
+          </Show>
+          <button
+            class={clsx(
+              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+              queueVisible() && 'border-t-2 border-t-surface-container-low'
+            )}
+            onClick={() => setQueueVisible(!queueVisible())}
+          >
+            <p class="mr-2">Upload Queue</p>
+            <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+          </button>
         </div>
+        <RouteList dongleId={props.dongleId} />
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
             {(image, index) => (
@@ -175,7 +168,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           )}
         </div>
-        <RouteList dongleId={props.dongleId} />
       </div>
     </>
   )
