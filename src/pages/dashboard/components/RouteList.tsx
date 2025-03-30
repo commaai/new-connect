@@ -14,7 +14,7 @@ const renderedDateHeaders = new Set<string>()
 
 interface RouteCardProps {
   route: RouteSegments
-  showDateHeader: boolean
+  isFirstRouteOfDate: boolean
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
@@ -37,7 +37,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 
   return (
     <>
-      {props.showDateHeader && <h2 class="text-lg font-medium mt-6 mb-2 px-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
+      {props.isFirstRouteOfDate && <h2 class="text-lg font-medium mt-6 mb-2 px-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
       <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
         <CardHeader
           headline={
@@ -133,7 +133,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                   const date = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
                   const isFirstForDate = !renderedDateHeaders.has(date)
                   if (isFirstForDate) renderedDateHeaders.add(date)
-                  return <RouteCard route={route} showDateHeader={isFirstForDate} />
+                  return <RouteCard route={route} isFirstRouteOfDate={isFirstForDate} />
                 }}
               </For>
             </Suspense>
