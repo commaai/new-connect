@@ -9,12 +9,11 @@ import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 
-// Track rendered dates at module level to persist between renders
-const renderedDateHeaders = new Set<string>()
+const shownDateHeaders = new Set<string>()
 
 interface RouteCardProps {
   route: RouteSegments
-  isFirstRouteOfDate: boolean
+  shouldShowDateHeader: boolean
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
@@ -37,7 +36,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
 
   return (
     <>
-      {props.isFirstRouteOfDate && <h2 class="text-lg font-medium mt-6 mb-2 px-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
+      {props.shouldShowDateHeader && <h2 class="text-lg font-medium mt-6 mb-2 px-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
       <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
         <CardHeader
           headline={
@@ -96,7 +95,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
-      renderedDateHeaders.clear()
+      shownDateHeaders.clear()
     }
   })
 
@@ -130,10 +129,10 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
             >
               <For each={routes() || []}>
                 {(route) => {
-                  const date = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
-                  const isFirstForDate = !renderedDateHeaders.has(date)
-                  if (isFirstForDate) renderedDateHeaders.add(date)
-                  return <RouteCard route={route} isFirstRouteOfDate={isFirstForDate} />
+                  const dateString = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
+                  const isUniqueDate = !shownDateHeaders.has(dateString)
+                  if (isUniqueDate) shownDateHeaders.add(dateString)
+                  return <RouteCard route={route} shouldShowDateHeader={isUniqueDate} />
                 }}
               </For>
             </Suspense>
