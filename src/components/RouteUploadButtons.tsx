@@ -70,7 +70,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
 
-    const uploadButtonTypes: ButtonType[] = []
+    const uploadButtonTypes: ButtonType[] = [type]
     const uploadFileTypes: FileType[] = []
     for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
       const state = uploadStore.states[check]
