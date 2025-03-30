@@ -1,6 +1,7 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
 import clsx from 'clsx'
 
+import { USERADMIN_URL } from '~/api/config'
 import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/types'
@@ -42,7 +43,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
 
-  const useradminUrl = () => `https://useradmin.comma.ai/?onebox=${currentRouteId()}`
+  const useradminUrl = () => `${USERADMIN_URL}/?onebox=${currentRouteId()}`
 
   createEffect(() => {
     const preservedRoutes = preservedRoutesResource()

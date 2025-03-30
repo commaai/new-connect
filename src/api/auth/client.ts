@@ -1,10 +1,10 @@
-import { BASE_URL } from '../config'
+import { API_URL } from '../config'
 
 const AUTH_KEY = 'ai.comma.api.authorization'
 
 export async function refreshAccessToken(code: string, provider: string): Promise<void> {
   try {
-    const resp = await fetch(`${BASE_URL}/v2/auth/`, {
+    const resp = await fetch(`${API_URL}/v2/auth/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
