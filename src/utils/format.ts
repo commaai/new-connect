@@ -19,8 +19,8 @@ const isImperial = (): boolean => {
   return locale.startsWith('en-us') || locale.startsWith('en-gb')
 }
 
-export const formatDistance = (miles: number | undefined): string => {
-  if (miles === undefined) return ''
+export const formatDistance = (miles: number | undefined): string | undefined => {
+  if (miles === undefined) return undefined
   if (isImperial()) return `${miles.toFixed(1)} mi`
   return `${(miles * MI_TO_KM).toFixed(1)} km`
 }
@@ -33,8 +33,8 @@ const _formatDuration = (duration: Duration): string => {
   }
 }
 
-export const formatDuration = (minutes: number | undefined): string => {
-  if (minutes === undefined) return ''
+export const formatDuration = (minutes: number | undefined): string | undefined => {
+  if (minutes === undefined) return undefined
   const duration = dayjs.duration({
     hours: Math.floor(minutes / 60),
     minutes: Math.round(minutes % 60),

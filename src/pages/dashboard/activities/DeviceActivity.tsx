@@ -1,11 +1,13 @@
+import clsx from 'clsx'
 import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice } from '~/api/devices'
+import { getDevice, SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
 import { DrawerToggleButton } from '~/components/material/Drawer'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
@@ -13,6 +15,7 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
+import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
@@ -28,6 +31,8 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
+  const [queueVisible, setQueueVisible] = createSignal(false)
+  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -109,16 +114,31 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Show>
-          <div class="flex">
-            <div class="flex-auto">
-              <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-              </Suspense>
+          <Show when={isDeviceUser()}>
+            <div class="flex">
+              <div class="flex-auto">
+                <Suspense fallback={<div class="skeleton-loader size-full" />}>
+                  <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+                </Suspense>
+              </div>
+              <div class="flex p-4">
+                <IconButton name="camera" onClick={() => void takeSnapshot()} />
+              </div>
             </div>
-            <div class="flex p-4">
-              <IconButton name="camera" onClick={() => void takeSnapshot()} />
-            </div>
-          </div>
+            <Show when={queueVisible()}>
+              <UploadQueue dongleId={props.dongleId} />
+            </Show>
+            <button
+              class={clsx(
+                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                queueVisible() && 'border-t-2 border-t-surface-container-low',
+              )}
+              onClick={() => setQueueVisible(!queueVisible())}
+            >
+              <p class="mr-2">Upload Queue</p>
+              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </button>
+          </Show>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
@@ -150,10 +170,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           )}
         </div>
-        <div class="flex flex-col gap-2">
-          <span class="text-label-sm uppercase">Routes</span>
-          <RouteList dongleId={props.dongleId} />
-        </div>
+        <RouteList dongleId={props.dongleId} />
       </div>
     </>
   )

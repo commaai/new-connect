@@ -14,19 +14,58 @@ const sortDevices = (devices: Device[]) =>
     }
   })
 
+export const SHARED_DEVICE = 'Shared Device'
+
+const createSharedDevice = (dongleId: string): Device => ({
+  dongle_id: dongleId,
+  alias: SHARED_DEVICE,
+  serial: '',
+  last_athena_ping: 0,
+  ignore_uploads: null,
+  is_paired: true,
+  is_owner: false,
+  public_key: '',
+  prime: false,
+  prime_type: 0,
+  trial_claimed: false,
+  device_type: '',
+  openpilot_version: '',
+  sim_id: '',
+  sim_type: 0,
+  eligible_features: {
+    prime: false,
+    prime_data: false,
+    nav: false,
+  },
+  fetched_at: Math.floor(Date.now() / 1000),
+})
+
+export const getDevice = async (dongleId: string) => {
+  try {
+    return await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+  } catch {
+    return createSharedDevice(dongleId)
+  }
+}
+
 export const getAthenaOfflineQueue = async (dongleId: string) =>
-  fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`)
+  fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`).catch(() => undefined)
 
-export const getDevice = async (dongleId: string) => fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+export const getDeviceLocation = async (dongleId: string) =>
+  fetcher<DeviceLocation>(`/v1/devices/${dongleId}/location`).catch(() => undefined)
 
-export const getDeviceLocation = async (dongleId: string) => fetcher<DeviceLocation>(`/v1/devices/${dongleId}/location`)
-
-export const getDeviceStats = async (dongleId: string) => fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`)
+export const getDeviceStats = async (dongleId: string) =>
+  fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`).catch(() => undefined)
 
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
     .catch(() => [])
+
+export const unpairDevice = async (dongleId: string) =>
+  fetcher<{ success: number }>(`/v1/devices/${dongleId}/unpair`, {
+    method: 'POST',
+  })
 
 const validatePairToken = (
   input: string,

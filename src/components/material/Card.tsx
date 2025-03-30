@@ -60,7 +60,7 @@ type CardProps = {
 }
 
 const Card: ParentComponent<CardProps> = (props) => {
-  const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container-low text-on-surface before:bg-on-surface'
+  const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container text-on-surface before:bg-on-surface'
   return (
     <Show when={props.onClick || props.href} fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}>
       <ButtonBase

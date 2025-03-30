@@ -5,6 +5,8 @@ on:
     branches:
       - master
   pull_request:
+  merge_group:
+    types: [checks_requested]
   workflow_dispatch:
 
 jobs:
@@ -14,20 +16,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
-
-      - uses: actions/cache@v4
-        id: playwright-cache
-        with:
-          path: |
-            ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}
-
-      - run: bun install --frozen-lockfile
-      - run: bun playwright install
-        if: steps.playwright-cache.outputs.cache-hit != 'true'
-      - run: bun check --reporter=github
-      - run: bun run test
-      - run: bun lines
+      - run: ./test.sh
 
   build:
     runs-on: ubuntu-latest

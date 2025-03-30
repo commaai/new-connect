@@ -2,11 +2,9 @@ import { $ } from 'bun'
 
 let OUT_DIR = process.argv[2]
 if (!OUT_DIR) {
-  OUT_DIR = 'dist'
-  if (!process.env.CI) {
-    console.debug('Building...')
-    await $`bun run build`.quiet()
-  }
+  OUT_DIR = './dist'
+  console.debug('Building...')
+  await $`bun run build`.quiet()
 }
 
 const files = []
@@ -27,11 +25,11 @@ files.sort((a, b) => b.compressedSize - a.compressedSize)
 const totalSizeKB = (files.reduce((acc, file) => acc + file.size, 0) / 1024).toFixed(2)
 const totalCompressedSize = files.reduce((acc, file) => acc + file.compressedSize, 0)
 const totalCompressedSizeKB = (totalCompressedSize / 1024).toFixed(2)
-files.push({ path: '', sizeKB: '', compressedSizeKB: '' }, { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalCompressedSizeKB })
+files.push({}, { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalCompressedSizeKB })
 console.table(files, ['path', 'sizeKB', 'compressedSizeKB'])
 
-const lowerBoundKB = 200
-const upperBoundKB = 250
+const upperBoundKB = 265
+const lowerBoundKB = upperBoundKB - 10
 if (totalCompressedSize < lowerBoundKB * 1024) {
   console.warn(`Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`)
   process.exit(1)

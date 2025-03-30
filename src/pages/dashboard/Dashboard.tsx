@@ -1,14 +1,14 @@
-import { createResource, lazy, Match, Show, SuspenseList, Switch } from 'solid-js'
+import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import type { Device } from '~/types'
 import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
+import ButtonBase from '~/components/material/ButtonBase'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -21,13 +21,12 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-interface DashboardDrawerProps {
-  devices?: Device[]
-}
-
-const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
+const DashboardDrawer: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
+
+  const [profile] = createResource(getProfile)
+
   return (
     <>
       <TopAppBar
@@ -41,17 +40,39 @@ const DashboardDrawer: VoidComponent<DashboardDrawerProps> = (props) => {
         comma connect
       </TopAppBar>
       <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
-      <Show when={props.devices} keyed>
-        {(devices) => <DeviceList class="overflow-y-auto p-2" devices={devices} />}
-      </Show>
+      <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
-      <hr class="mx-4 opacity-20" />
-      <Button class="m-4" color="error" href="/logout">
-        Sign out
-      </Button>
+      <div class="m-4 mt-0">
+        <ButtonBase href="https://useradmin.comma.ai">
+          <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
+            <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
+              <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+                <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+              </div>
+              <Show
+                when={profile()}
+                fallback={
+                  <>
+                    <div class="mx-3">Not signed in</div>
+                    <div class="grow" />
+                    <IconButton name="login" href="/login" />
+                  </>
+                }
+              >
+                <div class="min-w-0 mx-3">
+                  <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+                  <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+                </div>
+                <div class="grow" />
+                <IconButton name="logout" href="/logout" />
+              </Show>
+            </div>
+          </Suspense>
+        </ButtonBase>
+      </div>
     </>
   )
 }
@@ -103,11 +124,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+    <Drawer drawer={<DashboardDrawer />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={!!profile.error}>
-          <Navigate href="/login" />
-        </Match>
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
@@ -127,14 +145,17 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
                     <SettingsActivity dongleId={id} />
                   </Match>
-                  <Match when={dateStr()} keyed>
-                    {(date) => <RouteActivity dongleId={id} dateStr={date} startTime={startTime()} />}
+                  <Match when={dateStr()}>
+                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
                   </Match>
                 </Switch>
               }
               paneTwoContent={!!dateStr()}
             />
           )}
+        </Match>
+        <Match when={!profile.loading && !profile.latest}>
+          <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}

@@ -7,4 +7,5 @@ export const requestToUploadFiles = (dongleId: string, paths: string[], expiryDa
   fetcher<UploadFileMetadataResponse>(`/v1/${dongleId}/upload_urls/`, {
     method: 'POST',
     body: JSON.stringify({ expiry_days: expiryDays, paths }),
+    headers: { 'Content-Type': 'application/json' },
   })

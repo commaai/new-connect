@@ -76,14 +76,19 @@ export interface TimelineStatistics {
   userFlags: number
 }
 
-const getDerived = <T>(route: Route, fn: string): Promise<T[]> => {
-  let urls: string[] = []
-  if (route) {
-    const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
-    urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
-  }
-  const results = urls.map((url) => fetch(url).then((res) => res.json() as T))
-  return Promise.all(results)
+const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
+  if (!route) return []
+  const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
+  const urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
+  const results = urls.map((url) =>
+    fetch(url)
+      .then((res) => res.json() as T)
+      .catch((err) => {
+        console.error('Error fetching file', url, err)
+        return undefined
+      }),
+  )
+  return (await Promise.all(results)).filter((it) => it !== undefined)
 }
 
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>

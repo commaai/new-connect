@@ -1,8 +1,9 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
 import clsx from 'clsx'
 
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName, getRoute } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
+import type { Route } from '~/types'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -32,24 +33,26 @@ const ToggleButton: VoidComponent<{
 
 interface RouteActionsProps {
   routeName: string
+  route?: Route
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [routeResource] = createResource(() => props.routeName, getRoute)
   const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
 
+  const useradminUrl = () => `https://useradmin.comma.ai/?onebox=${currentRouteId()}`
+
   createEffect(() => {
-    const route = routeResource()
     const preservedRoutes = preservedRoutesResource()
-    if (!route) return
-    setIsPublic(route.is_public)
-    if (route.is_preserved) {
+    if (!props.route) return
+    setIsPublic(props.route.is_public)
+    if (props.route.is_preserved) {
       setIsPreserved(true)
     } else if (preservedRoutes) {
-      setIsPreserved(preservedRoutes.some((r) => r.fullname === route.fullname))
+      const { fullname } = props.route
+      setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
     } else {
       setIsPreserved(undefined)
     }
@@ -103,7 +106,12 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   return (
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
       <div class="font-mono text-body-sm text-zinc-500">
-        <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
+        <div class="flex justify-between">
+          <h3 class="mb-2 text-on-surface-variant">Route ID:</h3>
+          <a href={useradminUrl()} class="text-blue-400 hover:text-blue-500 duration-200" target="_blank" rel="noopener noreferrer">
+            View in useradmin
+          </a>
+        </div>
         <button
           onClick={() => void copyCurrentRouteId()}
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
