@@ -1,5 +1,5 @@
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
-import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
+import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
@@ -62,7 +62,7 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueueKey = createMemo(() => ['online_queue', props.dongleId])
+  const onlineQueueKey = () => ['online_queue', props.dongleId]
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
     queryFn: () => getUploadQueue(props.dongleId),
