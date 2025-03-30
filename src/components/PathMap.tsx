@@ -24,7 +24,7 @@ const createCarIcon = () => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex size-[40px] items-center justify-center rounded-full bg-primary-container transition-transform duration-1000 ease-linear">
+      <div class="flex size-[40px] items-center justify-center rounded-full bg-primary-container">
         <Icon name="directions_car" />
       </div>
     ),
@@ -56,6 +56,7 @@ export const PathMap: Component<{
   const futureCoords = () => mapCoords().slice(position())
   const currentCoord = () => mapCoords()[position()]
 
+  let lastSeekTime = 0
   let marker: L.Marker | null = null
   let pastPolyline: L.Polyline | null = null
   let futurePolyline: L.Polyline | null = null
@@ -70,6 +71,7 @@ export const PathMap: Component<{
       doubleClickZoom: false,
       scrollWheelZoom: false,
       boxZoom: false,
+      maxZoom: 17,
     })
 
     L.tileLayer(getTileUrl()).addTo(m)
@@ -106,20 +108,11 @@ export const PathMap: Component<{
     }
 
     marker
-      .on('dragstart', () => {
-        setIsDragging(true)
-        marker?.getElement()?.classList.add('no-transition')
-      })
+      .on('dragstart', () => setIsDragging(true))
       .on('drag', handleDrag)
-      .on('dragend', () => {
-        setIsDragging(false)
-        marker?.getElement()?.classList.remove('no-transition')
-      })
+      .on('dragend', () => setIsDragging(false))
 
-    m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => {
-      setIsDragging(false)
-      marker?.getElement()?.classList.remove('no-transition')
-    })
+    m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => setIsDragging(false))
     hitboxPolyline?.on('mousedown', handleDrag)
     setMap(m)
     onCleanup(() => m.remove())
@@ -127,6 +120,12 @@ export const PathMap: Component<{
 
   createEffect(() => {
     const t = props.seekTime()
+    if (t - lastSeekTime > 0.3 || t - lastSeekTime < 0) {
+      marker?.getElement()?.classList.add('no-transition')
+    } else {
+      marker?.getElement()?.classList.remove('no-transition')
+    }
+    lastSeekTime = t
     if (!props.coords.length) return
     if (t < props.coords[0].t) {
       setPosition(0)
@@ -172,7 +171,7 @@ export const PathMap: Component<{
         onClick={() => {
           setIsLocked(true)
           map()?.setView(currentCoord(), map()?.getZoom())
-          setIsMapInteractive(false) // Reset to non-interactable
+          setIsMapInteractive(false)
           const m = map()
           if (m) {
             m.dragging.disable()
