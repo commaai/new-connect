@@ -33,7 +33,7 @@ const ToggleButton: VoidComponent<{
 
 interface RouteActionsProps {
   routeName: string
-  route: Route | undefined
+  route?: Route
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
@@ -51,7 +51,8 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     if (props.route.is_preserved) {
       setIsPreserved(true)
     } else if (preservedRoutes) {
-      setIsPreserved(preservedRoutes.some((r) => r.fullname === props.route.fullname))
+      const { fullname } = props.route
+      setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
     } else {
       setIsPreserved(undefined)
     }

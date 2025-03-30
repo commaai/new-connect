@@ -8,7 +8,7 @@ export const parseRouteName = (routeName: string): RouteInfo => {
   return { dongleId, routeId }
 }
 
-export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`).catch(() => null)
+export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`).catch(() => undefined)
 
 export const getRouteShareSignature = (routeName: string) => fetcher<RouteShareSignature>(`/v1/route/${routeName}/share_signature`)
 
@@ -18,7 +18,7 @@ export const createQCameraStreamUrl = (routeName: Route['fullname'], signature: 
 export const getQCameraStreamUrl = (routeName: Route['fullname']) =>
   getRouteShareSignature(routeName)
     .then((signature) => createQCameraStreamUrl(routeName, signature))
-    .catch(() => null)
+    .catch(() => undefined)
 
 export const setRoutePublic = (routeName: string, isPublic: boolean): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/`, {

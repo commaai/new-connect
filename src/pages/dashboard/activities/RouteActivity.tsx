@@ -1,4 +1,4 @@
-import { createResource, createSignal, lazy, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -8,13 +8,12 @@ import { dayjs } from '~/utils/format'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import RouteActions from '~/components/RouteActions'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
-import RouteActions from '~/components/RouteActions'
+import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-
-const RouteVideoPlayer = lazy(() => import('~/components/RouteVideoPlayer'))
 
 type RouteActivityProps = {
   dongleId: string
@@ -56,7 +55,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm">Timeline</h3>
-          <Timeline class="mb-1" routeName={routeName()} route={route} seekTime={seekTime} updateTime={onTimelineChange} />
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} />
         </div>
 
         <div class="flex flex-col gap-2">

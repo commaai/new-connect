@@ -37,9 +37,8 @@ const DashboardDrawer: VoidComponent = () => {
           </Show>
         }
       >
-        comma connect
+        Devices
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
       <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
@@ -50,7 +49,7 @@ const DashboardDrawer: VoidComponent = () => {
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
             <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
               <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-                <Icon name={profile.latest === null ? 'person_off' : 'person'} filled />
+                <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
               </div>
               <Show
                 when={profile()}
@@ -145,8 +144,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
                     <SettingsActivity dongleId={id} />
                   </Match>
-                  <Match when={dateStr()} keyed>
-                    {(date) => <RouteActivity dongleId={id} dateStr={date} startTime={startTime()} />}
+                  <Match when={dateStr()}>
+                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
                   </Match>
                 </Switch>
               }
@@ -154,7 +153,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
             />
           )}
         </Match>
-        <Match when={profile() === null}>
+        <Match when={!profile.loading && !profile.latest}>
           <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
