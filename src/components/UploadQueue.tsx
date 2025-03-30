@@ -1,5 +1,5 @@
 import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
-import { createEffect, createMemo, createSignal, For, Match, Show, Switch, VoidComponent } from 'solid-js'
+import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
@@ -63,8 +63,6 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
   const onlineQueueKey = createMemo(() => ['online_queue', dongleId])
-  const [offlineQueueEnabled, setOfflineQueueEnabled] = createSignal(false)
-
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
     queryFn: () => getUploadQueue(dongleId),
@@ -76,7 +74,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
   const offlineQueue = createQuery(() => ({
     queryKey: ['offline_queue', dongleId],
     queryFn: () => getAthenaOfflineQueue(dongleId),
-    enabled: offlineQueueEnabled(),
     select: (data) =>
       data
         ?.filter((item) => item.method === 'uploadFilesToUrls')
@@ -100,8 +97,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
     const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
-    // keep polling offline queue until it's empty to wait for athena to flush requests to device
-    setOfflineQueueEnabled(!onlineQueue.isSuccess || (onlineQueue.isSuccess && offline.length !== 0))
     setItems(reconcile([...online, ...offline]))
   })
 
