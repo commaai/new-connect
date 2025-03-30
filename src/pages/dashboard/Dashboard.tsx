@@ -3,6 +3,7 @@ import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
+import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
@@ -37,16 +38,15 @@ const DashboardDrawer: VoidComponent = () => {
           </Show>
         }
       >
-        comma connect
+        Devices
       </TopAppBar>
-      <h2 class="mx-4 mb-2 text-label-sm uppercase">Devices</h2>
       <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
       <div class="m-4 mt-0">
-        <ButtonBase href="https://useradmin.comma.ai">
+        <ButtonBase href={USERADMIN_URL}>
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
             <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
               <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
