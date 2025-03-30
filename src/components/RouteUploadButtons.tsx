@@ -34,7 +34,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
     props.onClick?.()
   }
 
-  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, IconName> = {
+  const stateToIcon: Record<ButtonState, IconName> = {
     idle: icon(),
     loading: 'progress_activity',
     success: 'check',
