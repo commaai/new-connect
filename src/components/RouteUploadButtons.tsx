@@ -1,4 +1,4 @@
-import { type VoidComponent, batch } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
@@ -10,11 +10,10 @@ import type { Route } from '~/types'
 type ButtonType = 'road' | 'driver' | 'logs' | 'route'
 type ButtonState = 'idle' | 'loading' | 'success' | 'error'
 
-const BUTTON_TO_FILE_TYPES: Record<ButtonType, FileType[] | undefined> = {
+const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
   road: ['cameras', 'ecameras'],
   driver: ['dcameras'],
   logs: ['logs'],
-  route: undefined,
 }
 
 interface UploadButtonProps {
@@ -68,47 +67,25 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     } as Record<ButtonType, ButtonState>,
   })
 
-  const updateButtonStates = (types: ButtonType[], state: ButtonState) => {
-    batch(() => {
-      for (const type of types) {
-        setUploadStore('states', type, state)
-      }
-    })
-  }
-
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
 
-    if (type === 'route') {
-      const typesNotUploadedYet = Object.entries(uploadStore.states)
-        .filter(([_, state]) => state !== 'loading' && state !== 'success')
-        .map(([type]) => type as ButtonType)
-        .filter((type) => type !== undefined)
-
-      const typesToUpload = typesNotUploadedYet.flatMap((type) => BUTTON_TO_FILE_TYPES[type]).filter((type) => type !== undefined)
-
-      updateButtonStates(typesNotUploadedYet, 'loading')
-
-      try {
-        await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, typesToUpload)
-        updateButtonStates(typesNotUploadedYet, 'success')
-      } catch (err) {
-        console.error('Failed to upload', err)
-        updateButtonStates(typesNotUploadedYet, 'error')
-      }
-      return
+    const uploadButtonTypes: ButtonType[] = [type]
+    const uploadFileTypes: FileType[] = []
+    for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
+      const state = uploadStore.states[check]
+      if (state === 'loading' || state === 'success') continue
+      uploadButtonTypes.push(check)
+      uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
     }
 
-    setUploadStore('states', type, 'loading')
-
-    const fileTypesToUpload = BUTTON_TO_FILE_TYPES[type]
-
+    setUploadStore('states', uploadButtonTypes, 'loading')
     try {
-      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, fileTypesToUpload)
-      setUploadStore('states', type, 'success')
+      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, uploadFileTypes)
+      setUploadStore('states', uploadButtonTypes, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
-      setUploadStore('states', type, 'error')
+      setUploadStore('states', uploadButtonTypes, 'error')
     }
   }
 
