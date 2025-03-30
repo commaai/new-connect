@@ -91,12 +91,12 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     }
 
     const uploadButtonTypes: ButtonType[] = [type]
-    const uploadFileTypes: FileType[] = []
+    let uploadFileTypes: FileType[] = []
     for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
       const state = uploadStore.states[check]
       if (state === 'loading' || state === 'success') continue
       uploadButtonTypes.push(check)
-      uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
+      uploadFileTypes = uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
     }
 
     updateButtonStates(uploadButtonTypes, 'loading')
