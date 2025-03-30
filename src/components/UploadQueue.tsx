@@ -15,6 +15,7 @@ interface DecoratedUploadQueueItem extends UploadQueueItem {
   segment: number
   filename: string
   isFirehose: boolean
+  pendingDeletion: boolean
 }
 
 const parseUploadPath = (url: string) => {
@@ -28,7 +29,7 @@ const parseUploadPath = (url: string) => {
 
 const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
   return (
-    <div class="flex flex-col">
+    <div class={clsx('flex flex-col', item.pendingDeletion && 'opacity-50 transition-opacity duration-150')}>
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
           <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item.isFirehose ? 'local_fire_department' : 'person'} />
@@ -67,7 +68,10 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const onlineQueue = createQuery(() => ({
     queryKey: ['online_queue', dongleId()],
     queryFn: () => getUploadQueue(dongleId()),
-    select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || [],
+    select: (data) =>
+      data.result
+        ?.map((item) => ({ ...item, ...parseUploadPath(item.url), pendingDeletion: false }))
+        .sort((a, b) => b.progress - a.progress) || [],
     retry: false,
     refetchInterval: 1000,
   }))
@@ -89,6 +93,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
             id: '',
             progress: 0,
             retry_count: 0,
+            pendingDeletion: false,
           })),
         ) || [],
     retry: false,
@@ -98,6 +103,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const queryClient = useQueryClient()
   const cancelMutation = createMutation(() => ({
     mutationFn: (ids: string[]) => cancelUpload(dongleId(), ids),
+    onMutate: (ids: string[]) => setItemStore((item) => ids.includes(item.id) && !item.current, 'pendingDeletion', true),
     onSettled: () => queryClient.invalidateQueries({ queryKey: ['online_queue', dongleId()] }),
   }))
 
