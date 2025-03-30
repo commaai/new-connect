@@ -70,21 +70,22 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
 
-    const uploadButtonTypes = type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]
+    const uploadButtonTypes: ButtonType[] = []
     const uploadFileTypes: FileType[] = []
-    for (const type of uploadButtonTypes) {
-      const state = uploadStore.states[type]
+    for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
+      const state = uploadStore.states[check]
       if (state === 'loading' || state === 'success') continue
-      uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[type])
+      uploadButtonTypes.push(check)
+      uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
     }
 
     setUploadStore('states', uploadButtonTypes, 'loading')
     try {
       await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, uploadFileTypes)
-      setUploadStore('states', type, 'success')
+      setUploadStore('states', uploadButtonTypes, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
-      setUploadStore('states', type, 'error')
+      setUploadStore('states', uploadButtonTypes, 'error')
     }
   }
 
