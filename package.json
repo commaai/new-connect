@@ -23,7 +23,6 @@
   "type": "module",
   "//devDependencies": {
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
-    "@types/mapbox__polyline": "types for mapbox elements",
     "@vitest/browser": "run vitest suite in browser using playwright",
     "autoprefixer": "adds css vendor prefixes automatically",
     "jsdom": "js implementation of the dom (used in testing env which we don't really make use of)",
@@ -45,7 +44,6 @@
     "@types/bun": "^1.2.5",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.16",
-    "@types/mapbox__polyline": "^1.0.5",
     "@vitest/browser": "^3.0.9",
     "autoprefixer": "^10.4.21",
     "jsdom": "^26.0.0",
@@ -62,7 +60,6 @@
     "wrangler": "^4.3.0"
   },
   "//dependencies": {
-    "@mapbox/polyline": "display series of map coordinates as a line",
     "@sentry/solid": "error monitoring",
     "@solidjs/router": "changes view based on browser url",
     "clsx": "construct className strings conditionally",
@@ -72,7 +69,6 @@
     "solid-js": "JS ui framework"
   },
   "dependencies": {
-    "@mapbox/polyline": "^1.2.1",
     "@sentry/solid": "^9.8.0",
     "@sentry/vite-plugin": "^3.2.2",
     "@solid-primitives/state-machine": "^0.1.0",
