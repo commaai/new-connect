@@ -10,5 +10,5 @@ if [ ! -d "$HOME/.bun" ]; then
 fi
 
 bun upgrade
-bun install --frozen-lockfile
+bun install
 bun dev
