@@ -11,4 +11,4 @@ fi
 
 bun upgrade
 bun install
-bun dev --open
+bun dev
