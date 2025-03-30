@@ -9,6 +9,7 @@ import { getAthenaOfflineQueue } from '~/api/devices'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
+import { OFFLINE_QUEUE, ONLINE_QUEUE } from '~/utils/query-client'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -62,17 +63,15 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueueKey = () => ['online_queue', props.dongleId]
+  const onlineQueueKey = () => [ONLINE_QUEUE, props.dongleId]
   const onlineQueue = createQuery(() => ({
     queryKey: onlineQueueKey(),
     queryFn: () => getUploadQueue(props.dongleId),
     select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || [],
-    retry: false,
-    refetchInterval: 1000,
   }))
 
   const offlineQueue = createQuery(() => ({
-    queryKey: ['offline_queue', props.dongleId],
+    queryKey: [OFFLINE_QUEUE, props.dongleId],
     queryFn: () => getAthenaOfflineQueue(props.dongleId),
     select: (data) =>
       data
@@ -89,8 +88,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
             retry_count: 0,
           })),
         ) || [],
-    retry: false,
-    refetchInterval: 1000,
   }))
 
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
