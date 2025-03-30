@@ -105,7 +105,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
     mutationFn: (ids: string[]) => cancelUpload(dongleId, ids),
     onSettled: () => queryClient.invalidateQueries({ queryKey: onlineQueueKey() }),
   }))
-  const cancelOne = (id: string) => cancelMutation.mutate([id])
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
@@ -124,7 +123,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = ({ dongleId }) => {
         <Switch
           fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow cancel={cancelOne} item={item} />}</For>
+              <For each={items}>{(item) => <UploadQueueRow cancel={(id) => cancelMutation.mutate([id])} item={item} />}</For>
             </div>
           }
         >
