@@ -119,18 +119,8 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   return (
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
-        <StatisticBar statistics={[{ label: "Queued", value: () => itemStore.length }]} />
-        <Button
-          onClick={() =>
-            cancel(
-              dongleId(),
-              itemStore.filter((item) => item.id).map((item) => item.id)
-            )
-          }
-          class="px-2 md:px-3"
-          leading={<Icon name="close" size="20" />}
-          color="primary"
-        >
+        <StatisticBar statistics={[{ label: 'Queued', value: () => itemStore.length }]} />
+        <Button onClick={() => cancelAll()} class="px-2 md:px-3" leading={<Icon name="close" size="20" />} color="primary">
           <span class="flex items-center gap-1 font-mono">Cancel All</span>
         </Button>
       </div>
@@ -154,7 +144,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         </Switch>
       </div>
     </div>
-  );
+  )
 }
 
 export default UploadQueue
