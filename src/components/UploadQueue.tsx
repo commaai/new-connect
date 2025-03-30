@@ -1,4 +1,4 @@
-import { createQuery } from '@tanstack/solid-query'
+import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
@@ -26,14 +26,7 @@ const parseUploadPath = (url: string) => {
   return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
 }
 
-const cancel = (dongleId: string, ids: string[]) => {
-  if (ids.length === 0) return
-  cancelUpload(dongleId, ids).catch((error) => {
-    console.error('Error canceling uploads', error)
-  })
-}
-
-const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQueueItem }> = ({ dongleId, item }) => {
+const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
@@ -46,7 +39,7 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
           <Show
             when={!item.id || item.progress !== 0}
-            fallback={<IconButton class="text-red-300" size="20" name="close_small" onClick={() => cancel(dongleId, [item.id])} />}
+            fallback={<IconButton class="text-red-300" size="20" name="close_small" onClick={() => cancel(item.id)} />}
           >
             <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
               {item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}
@@ -82,7 +75,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => ({
     queryKey: ['offline_queue', dongleId()],
     queryFn: () => getAthenaOfflineQueue(dongleId()),
-    enabled: onlineQueue.status !== 'success',
+    enabled: !onlineQueue.isSuccess,
     select: (data) =>
       data
         ?.filter((item) => item.method === 'uploadFilesToUrls')
@@ -99,7 +92,13 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
           })),
         ) || [],
     retry: false,
-    refetchInterval: 5000,
+    refetchInterval: 1000,
+  }))
+
+  const queryClient = useQueryClient()
+  const cancelMutation = createMutation(() => ({
+    mutationFn: (ids: string[]) => cancelUpload(dongleId(), ids),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: ['online_queue', dongleId()] }),
   }))
 
   const [itemStore, setItemStore] = createStore<DecoratedUploadQueueItem[]>([])
@@ -107,33 +106,34 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     setItemStore(reconcile([...(onlineQueue.data ?? []), ...(offlineQueue.data ?? [])]))
   })
 
-  const cancelAll = () =>
-    cancel(
-      dongleId(),
-      itemStore.filter((item) => item.id).map((item) => item.id),
-    )
+  const cancelOne = (id: string) => cancelMutation.mutate([id])
+  const cancelAll = () => {
+    const ids = itemStore.filter((item) => item.id).map((item) => item.id)
+    if (ids.length === 0) return
+    cancelMutation.mutate(ids)
+  }
 
   return (
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
         <StatisticBar statistics={[{ label: 'Queued', value: () => itemStore.length }]} />
-        <IconButton name="close" onClick={cancelAll} />
+        <IconButton name="close" onClick={() => cancelAll()} />
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
           fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={itemStore}>{(item) => <UploadQueueRow dongleId={dongleId()} item={item} />}</For>
+              <For each={itemStore}>{(item) => <UploadQueueRow cancel={cancelOne} item={item} />}</For>
             </div>
           }
         >
-          <Match when={!onlineQueue.isFetched && !offlineQueue.isFetched}>
+          <Match when={!onlineQueue.isFetched}>
             <StatusMessage iconClass="animate-spin" icon="autorenew" message="Waiting for device to connect..." />
           </Match>
           <Match when={onlineQueue.isFetched && !onlineQueue.isSuccess && itemStore.length === 0}>
             <StatusMessage icon="error" message="Device offline" />
           </Match>
-          <Match when={itemStore.length === 0}>
+          <Match when={onlineQueue.isFetched && onlineQueue.isSuccess && itemStore.length === 0}>
             <StatusMessage icon="check" message="Nothing to upload" />
           </Match>
         </Switch>
