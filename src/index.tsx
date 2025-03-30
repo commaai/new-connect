@@ -2,8 +2,6 @@
 import './index.css'
 
 import * as Sentry from '@sentry/solid'
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
-import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
 import { render } from 'solid-js/web'
 import App from './App'
 import './pwa.ts'
@@ -19,12 +17,4 @@ const root = document.getElementById('root')
 
 if (!root) throw new Error('No #root element found in the DOM.')
 
-render(
-  () => (
-    <QueryClientProvider client={new QueryClient()}>
-      <SolidQueryDevtools />
-      <App />
-    </QueryClientProvider>
-  ),
-  root,
-)
+render(() => <App />, root)
