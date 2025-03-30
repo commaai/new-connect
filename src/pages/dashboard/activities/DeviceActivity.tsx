@@ -137,9 +137,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                   <DeviceStatistics dongleId={props.dongleId} class="p-4" />
                 </Suspense>
               </div>
-              {/*<div class="flex p-4">*/}
-              {/*  <IconButton name="camera" onClick={() => void takeSnapshot()} />*/}
-              {/*</div>*/}
             </div>
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
