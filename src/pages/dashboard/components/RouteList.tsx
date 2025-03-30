@@ -9,8 +9,12 @@ import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 
+// Track rendered dates at module level to persist between renders
+const seenDates = new Set<string>()
+
 interface RouteCardProps {
   route: RouteSegments
+  showDateHeader: boolean
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
@@ -32,32 +36,35 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 
   return (
-    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
-      <CardHeader
-        headline={
-          <div class="flex gap-2">
-            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
-          </div>
-        }
-        subhead={location()}
-        trailing={
-          <Suspense>
-            <Show when={timeline()?.userFlags}>
-              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
-                <Icon class="text-yellow-300" size="20" name="flag" filled />
-              </div>
-            </Show>
-          </Suspense>
-        }
-      />
+    <>
+      {props.showDateHeader && <h2 class="text-lg font-medium mt-6 mb-2 px-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
+      <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
+        <CardHeader
+          headline={
+            <div class="flex gap-2">
+              <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
+              <span>
+                {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+              </span>
+            </div>
+          }
+          subhead={location()}
+          trailing={
+            <Suspense>
+              <Show when={timeline()?.userFlags}>
+                <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
+                  <Icon class="text-yellow-300" size="20" name="flag" filled />
+                </div>
+              </Show>
+            </Suspense>
+          }
+        />
 
-      <CardContent>
-        <RouteStatistics route={props.route} />
-      </CardContent>
-    </Card>
+        <CardContent>
+          <RouteStatistics route={props.route} />
+        </CardContent>
+      </Card>
+    </>
   )
 }
 
@@ -89,6 +96,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (props.dongleId) {
       pages.length = 0
       setSize(1)
+      seenDates.clear() // Clear tracked dates when dongleId changes
     }
   })
 
@@ -120,7 +128,14 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
+              <For each={routes() || []}>
+                {(route) => {
+                  const date = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
+                  const isFirstForDate = !seenDates.has(date)
+                  if (isFirstForDate) seenDates.add(date)
+                  return <RouteCard route={route} showDateHeader={isFirstForDate} />
+                }}
+              </For>
             </Suspense>
           )
         }}
