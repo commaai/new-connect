@@ -41,7 +41,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         <CardHeader
           headline={
             <div class="flex gap-2">
-              <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
               <span>
                 {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
               </span>
