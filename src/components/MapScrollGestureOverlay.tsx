@@ -53,11 +53,7 @@ const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
     // Hide the scroll message with an optional delay
     const hideScrollMessage = (delay?: number) => {
       clearTimeout(messageTimeout) // Clear any existing timeout
-      if (delay) {
-        messageTimeout = setTimeout(() => setShowScrollMessage(false), delay) // Hide after delay
-      } else {
-        setShowScrollMessage(false) // Hide immediately
-      }
+      messageTimeout = setTimeout(() => setShowScrollMessage(false), delay) // Hide after delay
     }
 
     // Set up events for detecting pointer over map
@@ -97,23 +93,21 @@ const MapScrollGestureOverlay: Component<MapGestureOverlayProps> = (props) => {
     }
 
     const handleTouchEnd = () => hideScrollMessage() // Hide immediately on touch end
-    const handleClick = () => hideScrollMessage() // Hide immediately on click
 
     // Use capture phase for wheel to catch events before they propagate
     mapContainerRef.addEventListener('wheel', handleWheel, { passive: false })
     mapContainerRef.addEventListener('touchmove', handleTouchMove, { passive: true })
     mapContainerRef.addEventListener('touchend', handleTouchEnd, { passive: true })
-    mapContainerRef.addEventListener('click', handleClick)
 
     // Hide the scroll message immediately when the map is dragged (helps with mobile)
     map.on('drag', () => hideScrollMessage())
+    map.on('click', () => hideScrollMessage())
 
     return () => {
       // Cleanup map event listeners
       mapContainerRef.removeEventListener('wheel', handleWheel, { capture: true })
       mapContainerRef.removeEventListener('touchmove', handleTouchMove)
       mapContainerRef.removeEventListener('touchend', handleTouchEnd)
-      mapContainerRef.removeEventListener('click', handleClick)
       mapContainerRef.removeEventListener('mouseenter', handleMouseEnter)
       mapContainerRef.removeEventListener('mouseleave', handleMouseLeave)
       clearTimeout(messageTimeout)
