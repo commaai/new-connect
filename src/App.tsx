@@ -13,8 +13,6 @@ const Dashboard = lazy(() => import('./pages/dashboard'))
 
 import OfflinePage from '~/pages/offline'
 
-const QUERY_CLIENT = new QueryClient()
-
 export const Routes = () => (
   <>
     <Route path="/login" component={Login} />
@@ -37,19 +35,20 @@ export const AppLayout: ParentComponent = (props) => {
   })
 
   return (
-    <QueryClientProvider client={QUERY_CLIENT}>
-      <SolidQueryDevtools />
-      <Show when={isOnline()} fallback={<OfflinePage />}>
-        <Suspense>{props.children}</Suspense>
-      </Show>
-    </QueryClientProvider>
+    <Show when={isOnline()} fallback={<OfflinePage />}>
+      <Suspense>{props.children}</Suspense>
+    </Show>
   )
 }
 
+const QUERY_CLIENT = new QueryClient()
 const App: VoidComponent = () => (
-  <Router root={AppLayout}>
-    <Routes />
-  </Router>
+  <QueryClientProvider client={QUERY_CLIENT}>
+    <SolidQueryDevtools />
+    <Router root={AppLayout}>
+      <Routes />
+    </Router>
+  </QueryClientProvider>
 )
 
 export default App

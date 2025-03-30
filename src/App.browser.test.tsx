@@ -4,10 +4,18 @@ import { configure, render, waitFor } from '@solidjs/testing-library'
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
+import { JSX } from 'solid-js'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
+const QUERY_CLIENT = new QueryClient()
 
-const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
+const wrapper = (props: { children: JSX.Element }) => (
+  <QueryClientProvider client={QUERY_CLIENT}>
+    <AppLayout>{props.children}</AppLayout>
+  </QueryClientProvider>
+)
+const renderApp = (location: string) => render(() => <Routes />, { location, wrapper })
 
 beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())
