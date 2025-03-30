@@ -72,7 +72,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 2
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
@@ -81,12 +81,25 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (previousPageData.length === 0) return undefined
     return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
   }
-  const getPage = (page: number): Promise<RouteSegments[]> => {
+  const days = new Map<string, RouteSegments[]>()
+  const getDay = (page: number): Promise<RouteSegments[]> => {
     if (pages[page] === undefined) {
       pages[page] = (async () => {
-        const previousPageData = page > 0 ? await getPage(page - 1) : undefined
+        const previousPageData = page > 0 ? await getDay(page - 1) : undefined
         const key = getKey(previousPageData)
-        return key ? fetcher<RouteSegments[]>(key) : []
+        const data = key ? await fetcher<RouteSegments[]>(key) : [];
+        for (const route of data) {
+          const day = dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
+          if (!days.has(day)) {
+            console.log("adding day123", day)
+            days.set(day, [])
+          }
+          days.get(day)!.push(route)
+          console.log("days", days)
+        }
+        // Append the fetched data to the flat allRoutes array:
+        // setAllRoutes(prev => [...prev, ...data]);
+        return data;
       })()
     }
     return pages[page]
@@ -94,7 +107,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
 
   const pages: Promise<RouteSegments[]>[] = []
   const [size, setSize] = createSignal(1)
-  const pageNumbers = () => Array.from({ length: size() })
+  const dayNumbers = () => Array.from({ length: size() })
 
   createEffect(() => {
     if (props.dongleId) {
@@ -123,9 +136,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       {/*TODO: this results in duplicate headers*/}
-      <For each={pageNumbers()}>
+      <For each={dayNumbers()}>
         {(_, i) => {
-          const [routes] = createResource(() => i(), getPage)
+          const [routes] = createResource(() => i(), getDay)
           return (
             <Suspense
               fallback={
