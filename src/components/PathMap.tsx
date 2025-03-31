@@ -85,6 +85,7 @@ export const PathMap: Component<{
     }
 
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
+      setIsDragging(true)
       setIsLocked(false)
       m.dragging.enable()
       marker?.getElement()?.classList.add('no-transition')
@@ -92,14 +93,9 @@ export const PathMap: Component<{
       updatePosition(lng, lat)
     }
 
-    marker
-      .on('dragstart', () => setIsDragging(true))
-      .on('drag', handleDrag)
-      .on('dragend', () => setIsDragging(false))
-
-    m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => setIsDragging(false))
-
-    hitboxPolyline?.on('mousedown', handleDrag)
+    marker.on('drag', handleDrag).on('dragend', () => setIsDragging(false))
+    hitboxPolyline?.on('click', handleDrag)
+    m.on('mouseup', () => setIsDragging(false))
     setMap(m)
     onCleanup(() => m.remove())
   })
