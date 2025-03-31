@@ -2,7 +2,7 @@ import { createEffect, createResource, createSignal, onCleanup, onMount, type Vo
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
-import Icon from '~/components/material/Icon'
+import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
 
@@ -153,13 +153,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
         {/* Controls container */}
-        <div class="relative flex w-full items-center gap-4 pb-3 px-1">
-          <button
-            class="bg-surface-container-highest/80 flex size-8 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-highest"
-            onClick={togglePlayback}
-          >
-            <Icon name={isPlaying() ? 'pause' : 'play_arrow'} filled />
-          </button>
+        <div class="relative flex w-full items-center gap-4 pb-3 px-2">
+          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled onClick={togglePlayback} />
 
           <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
