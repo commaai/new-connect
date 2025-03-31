@@ -59,7 +59,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => uploadQueue.getOffline(props.dongleId))
   const cancel = uploadQueue.cancelUpload(props.dongleId)
 
-  const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
+  const [items, setItems] = createStore<UploadQueueItem[]>([])
 
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
