@@ -22,7 +22,7 @@ export default defineConfig({
       resizeOptions: { background: '#131318' },
     },
     appleSplashScreens: createAppleSplashScreens({
-      padding: 0.3,
+      padding: 0.5,
       resizeOptions: { fit: 'contain', background: '#131318' },
       linkMediaOptions: {
         log: true,
