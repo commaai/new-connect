@@ -207,9 +207,6 @@ export interface UploadQueueItem {
   progress: number
   retry_count: number
   url: string
-}
-
-export interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
   segment: number
   filename: string

@@ -5,7 +5,6 @@ import {
   BackendAthenaCallResponseError,
   CancelUploadRequest,
   CancelUploadResponse,
-  DecoratedUploadQueueItem,
   UploadFile,
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
@@ -21,9 +20,6 @@ export const COMMA_CONNECT_PRIORITY = 1
 // Uploads expire after 1 week if device remains offline
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
 
-const transformUploadQueueToDecoratedUploadQueueItems = (data: AthenaCallResponse<UploadQueueItem[]>): DecoratedUploadQueueItem[] =>
-  data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })) || []
-
 export const athena = {
   prefix: ['athena'],
   uploadQueue: () => [...athena.prefix, 'upload_queue'],
@@ -32,7 +28,7 @@ export const athena = {
     queryOptions({
       queryKey: athena.uploadQueueForDongle(dongleId),
       queryFn: () => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue'),
-      select: transformUploadQueueToDecoratedUploadQueueItems,
+      select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })) || [],
     }),
   cancelUpload: (dongleId: string) => {
     const queryClient = useQueryClient()

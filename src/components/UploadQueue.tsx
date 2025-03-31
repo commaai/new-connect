@@ -3,14 +3,14 @@ import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { athena } from '~/api/athena'
 import { devices } from '~/api/devices'
-import { DecoratedUploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
+import { UploadQueueItem } from '~/types'
 
-const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
+const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItem }> = ({ cancel, item }) => {
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
@@ -50,7 +50,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => devices.getOfflineQueue(props.dongleId))
   const cancel = athena.cancelUpload(props.dongleId)
 
-  const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
+  const [items, setItems] = createStore<UploadQueueItem[]>([])
 
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
