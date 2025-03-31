@@ -106,10 +106,19 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   })
   onCleanup(() => observer.disconnect())
 
+  // Group and display headers for each day
   let prevDayHeader: string | null = null
   function getDayHeader(route: RouteSegments): string | null {
     const date = dayjs(route.start_time_utc_millis)
-    const dayHeader = date.format(date.year() === dayjs().year() ? 'dddd, MMM D' : 'dddd, MMM D, YYYY')
+    let dayHeader = null
+    if (date.isSame(dayjs(), 'day')) {
+      dayHeader = 'Today'
+    } else if (date.year() === dayjs().year()) {
+      dayHeader = date.format('dddd, MMM D')
+    } else {
+      dayHeader = date.format('dddd, MMM D, YYYY')
+    }
+
     if (dayHeader !== prevDayHeader) {
       prevDayHeader = dayHeader
       return dayHeader
