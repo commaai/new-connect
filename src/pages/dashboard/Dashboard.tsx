@@ -136,8 +136,10 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={isSharedDevice() && !dateStr()}>
-          <Navigate href="/" />
+        <Match when={isSharedDevice()}>
+          <Show when={dateStr()} fallback={<Navigate href="/" />}>
+            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+          </Show>
         </Match>
         <Match when={dongleId()} keyed>
           {(id) => (
