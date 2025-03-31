@@ -58,6 +58,9 @@ export const PathMap: Component<{
   let hitboxPolyline: L.Polyline | null = null
 
   onMount(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'))
+    }, 1000)
     const m = L.map(mapRef, {
       zoomControl: true,
       attributionControl: false,
