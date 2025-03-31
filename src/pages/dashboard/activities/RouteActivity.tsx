@@ -9,7 +9,7 @@ import { dayjs } from '~/utils/format'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteActions from '~/components/RouteActions'
-import RouteStaticMap from '~/components/RouteStaticMap'
+import RoutePlaybackMap from '~/components/RoutePlaybackMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
@@ -82,7 +82,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-              <RouteStaticMap route={route()} />
+              <RoutePlaybackMap
+                route={route()}
+                currentTime={seekTime()}
+                setCurrentTime={(newTime) => {
+                  setSeekTime(newTime)
+                  onTimelineChange(newTime)
+                }}
+              />
             </Suspense>
           </div>
         </div>
