@@ -23,13 +23,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
-  const [progress, setProgress] = createSignal(0)
 
-  const updateProgress = () => {
-    const currentProgress = (video.currentTime / video.duration) * 100
-    setProgress(currentProgress)
-    props.onProgress?.(video.currentTime)
-  }
+  const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
     updateProgress()
@@ -156,11 +151,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
         </div>
-      </div>
-
-      {/* Progress bar */}
-      <div class="absolute inset-x-0 bottom-0 h-1 bg-surface-container-high">
-        <div class="h-full bg-yellow-400" style={{ width: `${progress()}%` }} />
       </div>
     </div>
   )
