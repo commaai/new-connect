@@ -1,11 +1,13 @@
 import { Accessor, Component, createEffect, createSignal, onMount, onCleanup } from 'solid-js'
+import { render } from 'solid-js/web'
 import L from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+
 import { getTileUrl } from '~/map'
 import { GPSPathPoint } from '~/api/derived'
+
 import IconButton from './material/IconButton'
 import Icon from './material/Icon'
-import { render } from 'solid-js/web'
 
 const findClosestPoint = (lng: number, lat: number, coords: GPSPathPoint[]): number =>
   coords.reduce(
