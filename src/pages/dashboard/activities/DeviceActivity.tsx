@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, Suspense, createSignal, For, Show } from 'solid-js'
+import { createResource, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -131,13 +131,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </div>
           <Show when={isDeviceUser()}>
-            <div class="flex">
-              <div class="flex-auto">
-                <Suspense fallback={<div class="skeleton-loader size-full" />}>
-                  <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-                </Suspense>
-              </div>
-            </div>
+            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
             </Show>
