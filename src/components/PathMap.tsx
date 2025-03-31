@@ -20,13 +20,13 @@ const createCarIcon = () => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex items-center justify-center rounded-full bg-primary-container">
+      <div class="flex size-[30px] items-center justify-center rounded-full bg-primary-container">
         <Icon size="20" name="directions_car" />
       </div>
     ),
     el,
   )
-  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [25, 30], iconAnchor: [12, 10] })
+  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [20, 20], iconAnchor: [15, 15] })
 }
 
 export const PathMap: Component<{
@@ -70,9 +70,8 @@ export const PathMap: Component<{
       scrollWheelZoom: false,
       boxZoom: false,
     })
-
     L.tileLayer(getTileUrl()).addTo(m)
-    m.setView([props.coords[0].lat, props.coords[0].lng], props.coords.length ? 14 : 10)
+    m.setView([props.coords[0].lat, props.coords[0].lng], 12)
     m.zoomControl.setPosition('topright')
     pastPolyline = L.polyline([], { color: props.color || '#6F707F', weight: props.strokeWidth || 4 }).addTo(m)
     futurePolyline = L.polyline([], { color: props.color || '#dfe0ff', weight: props.strokeWidth || 4 }).addTo(m)
@@ -93,12 +92,17 @@ export const PathMap: Component<{
       m.dragging.enable()
       marker?.getElement()?.classList.add('no-transition')
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
+      m.panTo([lat, lng], { animate: true })
       updatePosition(lng, lat)
     }
 
-    marker.on('drag', handleDrag).on('dragend', () => setIsDragging(false))
-    hitboxPolyline?.on('click', handleDrag)
+    marker.on('drag', handleDrag).on('dragend', () => {
+      setIsDragging(false)
+      m.panTo(currentCoord(), { animate: true })
+    })
+    hitboxPolyline?.on('mousedown', handleDrag)
     m.on('mouseup', () => setIsDragging(false))
+
     setMap(m)
     onCleanup(() => m.remove())
   })
@@ -155,8 +159,8 @@ export const PathMap: Component<{
         `}
       </style>
       <IconButton
-        name={isLocked() ? 'lock' : 'lock_open'}
-        class="absolute z-[1000] left-4 top-4 bg-primary-container"
+        name={isLocked() ? 'my_location' : 'location_searching'}
+        class={`absolute z-[1000] left-4 top-4 bg-surface-variant ${isLocked() ? ' text-primary' : 'text-whtite'}`}
         onClick={() => {
           const newLocked = !isLocked()
           setIsLocked(newLocked)
