@@ -53,11 +53,6 @@ export interface DrivingStatistics {
   week: DrivingStatisticsAggregation
 }
 
-export interface DeviceUser {
-  email: string
-  permission: 'read_access' | 'owner'
-}
-
 export interface Route extends ApiResponseBase {
   can?: boolean
   create_time: number
@@ -126,10 +121,6 @@ export interface Files {
 }
 
 export type AthenaOfflineQueueResponse = AthenaOfflineQueueItem<unknown>[]
-
-export interface AthenaOfflineQueueItemParams {
-  files_data: [string, string, Record<string, string>][]
-}
 
 export interface AthenaOfflineQueueItem<T> extends ApiResponseBase, AthenaCallRequest<T> {
   expiry: number
