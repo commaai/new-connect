@@ -3,11 +3,6 @@ import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatist
 import { parseUploadPath } from '~/utils/parse'
 import { fetcher } from '.'
 
-export const DeviceQueryKeys = {
-  offlineQueue: ['devices', 'athena_offline_queue'],
-  offlineQueueForDongle: (dongleId: string) => [...DeviceQueryKeys.offlineQueue, dongleId],
-}
-
 const sortDevices = (devices: Device[]) =>
   devices.sort((a, b) => {
     if (a.is_owner !== b.is_owner) {
