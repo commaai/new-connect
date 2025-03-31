@@ -1,5 +1,9 @@
 import { createSignal, lazy, onCleanup, Show, Suspense, type ParentComponent, type VoidComponent } from 'solid-js'
 import { Router, Route } from '@solidjs/router'
+import { QueryClientProvider } from '@tanstack/solid-query'
+import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
+import { getAppQueryClient } from '~/api/query-client'
+
 import 'leaflet/dist/leaflet.css'
 
 const Login = lazy(() => import('./pages/auth/login'))
@@ -38,10 +42,15 @@ export const AppLayout: ParentComponent = (props) => {
   )
 }
 
+const queryClient = getAppQueryClient()
+
 const App: VoidComponent = () => (
-  <Router root={AppLayout}>
-    <Routes />
-  </Router>
+  <QueryClientProvider client={queryClient}>
+    <SolidQueryDevtools />
+    <Router root={AppLayout}>
+      <Routes />
+    </Router>
+  </QueryClientProvider>
 )
 
 export default App
