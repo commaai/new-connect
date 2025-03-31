@@ -1,4 +1,4 @@
-import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics } from '~/types'
+import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics } from '~/api/types'
 import { fetcher } from '.'
 
 const sortDevices = (devices: Device[]) =>

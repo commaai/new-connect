@@ -1,4 +1,4 @@
-import { RouteInfo, UploadFile, UploadFileMetadata } from '~/types'
+import { RouteInfo, UploadFile, UploadFileMetadata } from '~/api/types'
 import { uploadFilesToUrls } from './athena'
 import { getAlreadyUploadedFiles, requestToUploadFiles } from './file'
 import { parseRouteName } from './route'
