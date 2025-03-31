@@ -1,4 +1,4 @@
-import { type VoidComponent, batch } from 'solid-js'
+import { createEffect, createSignal, on, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
@@ -7,14 +7,14 @@ import Button from './material/Button'
 import { uploadAllSegments, type FileType } from '~/api/upload'
 import type { Route } from '~/types'
 
-type ButtonType = 'road' | 'driver' | 'logs' | 'route'
+const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
+type ButtonType = (typeof BUTTON_TYPES)[number]
 type ButtonState = 'idle' | 'loading' | 'success' | 'error'
 
-const BUTTON_TO_FILE_TYPES: Record<ButtonType, FileType[] | undefined> = {
+const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
   road: ['cameras', 'ecameras'],
   driver: ['dcameras'],
   logs: ['logs'],
-  route: undefined,
 }
 
 interface UploadButtonProps {
@@ -34,7 +34,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
     props.onClick?.()
   }
 
-  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, IconName> = {
+  const stateToIcon: Record<ButtonState, IconName> = {
     idle: icon(),
     loading: 'progress_activity',
     success: 'check',
@@ -67,48 +67,45 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       route: 'idle',
     } as Record<ButtonType, ButtonState>,
   })
+  const [abortController, setAbortController] = createSignal(new AbortController())
 
-  const updateButtonStates = (types: ButtonType[], state: ButtonState) => {
-    batch(() => {
-      for (const type of types) {
-        setUploadStore('states', type, state)
-      }
-    })
-  }
+  createEffect(
+    on(
+      () => props.route,
+      () => {
+        abortController().abort()
+        setAbortController(new AbortController())
+        setUploadStore('states', BUTTON_TYPES, 'idle')
+      },
+    ),
+  )
 
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
+    const { fullname, maxqlog } = props.route
+    const { signal } = abortController()
 
-    if (type === 'route') {
-      const typesNotUploadedYet = Object.entries(uploadStore.states)
-        .filter(([_, state]) => state !== 'loading' && state !== 'success')
-        .map(([type]) => type as ButtonType)
-        .filter((type) => type !== undefined)
-
-      const typesToUpload = typesNotUploadedYet.flatMap((type) => BUTTON_TO_FILE_TYPES[type]).filter((type) => type !== undefined)
-
-      updateButtonStates(typesNotUploadedYet, 'loading')
-
-      try {
-        await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, typesToUpload)
-        updateButtonStates(typesNotUploadedYet, 'success')
-      } catch (err) {
-        console.error('Failed to upload', err)
-        updateButtonStates(typesNotUploadedYet, 'error')
-      }
-      return
+    const updateButtonStates = (types: readonly ButtonType[], state: ButtonState) => {
+      if (signal.aborted) return
+      setUploadStore('states', types, state)
     }
 
-    setUploadStore('states', type, 'loading')
+    const uploadButtonTypes: ButtonType[] = [type]
+    let uploadFileTypes: FileType[] = []
+    for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
+      const state = uploadStore.states[check]
+      if (state === 'loading' || state === 'success') continue
+      uploadButtonTypes.push(check)
+      uploadFileTypes = uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
+    }
 
-    const fileTypesToUpload = BUTTON_TO_FILE_TYPES[type]
-
+    updateButtonStates(uploadButtonTypes, 'loading')
     try {
-      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, fileTypesToUpload)
-      setUploadStore('states', type, 'success')
+      await uploadAllSegments(fullname, maxqlog + 1, uploadFileTypes)
+      updateButtonStates(uploadButtonTypes, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
-      setUploadStore('states', type, 'error')
+      updateButtonStates(uploadButtonTypes, 'error')
     }
   }
 

@@ -1,4 +1,4 @@
-import { BASE_URL } from '../config'
+import { API_URL } from '../config'
 import { getService } from './config'
 
 function stringify(obj: Record<string, string>): string {
@@ -8,7 +8,7 @@ function stringify(obj: Record<string, string>): string {
 const GOOGLE_OAUTH_PARAMS = {
   type: 'web_server',
   client_id: '45471411055-ornt4svd2miog6dnopve7qtmh5mnu6id.apps.googleusercontent.com',
-  redirect_uri: `${BASE_URL}/v2/auth/g/redirect/`,
+  redirect_uri: `${API_URL}/v2/auth/g/redirect/`,
   response_type: 'code',
   scope: 'https://www.googleapis.com/auth/userinfo.email',
   prompt: 'select_account',
@@ -23,7 +23,7 @@ export function getGoogleAuthUrl(): string {
 
 const APPLE_OAUTH_PARAMS = {
   client_id: 'ai.comma.login',
-  redirect_uri: `${BASE_URL}/v2/auth/a/redirect/`,
+  redirect_uri: `${API_URL}/v2/auth/a/redirect/`,
   response_type: 'code',
   response_mode: 'form_post',
   scope: 'name email',
@@ -38,7 +38,7 @@ export function getAppleAuthUrl(): string {
 
 const GITHUB_OAUTH_PARAMS = {
   client_id: '28c4ecb54bb7272cb5a4',
-  redirect_uri: `${BASE_URL}/v2/auth/h/redirect/`,
+  redirect_uri: `${API_URL}/v2/auth/h/redirect/`,
   scope: 'read:user',
 }
 export function getGitHubAuthUrl(): string {

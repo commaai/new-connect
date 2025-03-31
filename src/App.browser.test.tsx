@@ -3,11 +3,11 @@ import { configure, render, waitFor } from '@solidjs/testing-library'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
-import { Routes } from './App'
+import { AppLayout, Routes } from './App'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 
-const renderApp = (location: string) => render(() => <Routes />, { location })
+const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
 
 beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
 beforeEach(() => clearAccessToken())

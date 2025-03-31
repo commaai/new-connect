@@ -1,7 +1,7 @@
 import type { Route, RouteInfo, RouteShareSignature } from '~/types'
 
 import { fetcher } from '.'
-import { BASE_URL } from './config'
+import { API_URL } from './config'
 
 export const parseRouteName = (routeName: string): RouteInfo => {
   const [dongleId, routeId] = routeName.split('|')
@@ -13,7 +13,7 @@ export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/ro
 export const getRouteShareSignature = (routeName: string) => fetcher<RouteShareSignature>(`/v1/route/${routeName}/share_signature`)
 
 export const createQCameraStreamUrl = (routeName: Route['fullname'], signature: RouteShareSignature): string =>
-  `${BASE_URL}/v1/route/${routeName}/qcamera.m3u8?${new URLSearchParams(signature).toString()}`
+  `${API_URL}/v1/route/${routeName}/qcamera.m3u8?${new URLSearchParams(signature).toString()}`
 
 export const getQCameraStreamUrl = (routeName: Route['fullname']) =>
   getRouteShareSignature(routeName)
