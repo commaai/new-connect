@@ -9,23 +9,27 @@ const populateFetchedAt = <T>(item: T): T => {
 }
 
 export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: string = API_URL): Promise<T> {
-  const res = await fetch(`${apiUrl}${endpoint}`, {
+  const req = new Request(`${apiUrl}${endpoint}`, {
     ...init,
     headers: {
       ...init?.headers,
       Authorization: `JWT ${getAccessToken()}`,
     },
   })
+  const res = await fetch(req)
   const text = await res.text()
+  if (!res.ok) {
+    throw new Error(`${req.method} ${req.url} ${res.status}`, { cause: res })
+  }
   // biome-ignore lint/suspicious/noImplicitAnyLet: TODO: validate server response
   let json
   try {
-    json = (await JSON.parse(text)) as T & { error?: string; description?: string }
-  } catch {
-    throw new Error(`Error: ${res.status} ${res.statusText}`, { cause: text })
+    json = await JSON.parse(text)
+  } catch (err) {
+    throw new Error('Failed to parse response from server', { cause: err })
   }
   if (json.error) {
-    throw new Error(json.description, { cause: res })
+    throw new Error(`Server error: ${json.description}`, { cause: json })
   }
   if (Array.isArray(json)) {
     return json.map(populateFetchedAt) as T
