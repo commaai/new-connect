@@ -30,13 +30,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     setProgress(currentProgress)
     props.onProgress?.(video.currentTime)
   }
-
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
     updateProgress()
     requestAnimationFrame(updateProgressContinuously)
   }
-
   const startProgressTracking = () => {
     requestAnimationFrame(updateProgressContinuously)
   }
@@ -48,7 +46,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.pause()
     }
   }
-
   const onClick = (e: Event) => {
     if (e.target !== e.currentTarget) return
     e.preventDefault()
