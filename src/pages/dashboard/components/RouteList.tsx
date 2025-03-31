@@ -7,7 +7,7 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments } from '~/types'
+import type { RouteSegments } from '~/api/types'
 
 interface RouteCardProps {
   route: RouteSegments

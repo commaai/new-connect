@@ -3,7 +3,7 @@ import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { TimelineEvent, getTimelineEvents } from '~/api/derived'
-import type { Route } from '~/types'
+import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
 function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
