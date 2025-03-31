@@ -7,30 +7,26 @@ import IconButton from './material/IconButton'
 import Icon from './material/Icon'
 import { render } from 'solid-js/web'
 
-const findClosestPoint = (lng: number, lat: number, coords: GPSPathPoint[]): number => {
-  let minDist = Infinity
-  let closestIndex = 0
-  coords.forEach((point, i) => {
-    const dist = Math.sqrt((point.lng - lng) ** 2 + (point.lat - lat) ** 2)
-    if (dist < minDist) {
-      minDist = dist
-      closestIndex = i
-    }
-  })
-  return closestIndex
-}
+const findClosestPoint = (lng: number, lat: number, coords: GPSPathPoint[]): number =>
+  coords.reduce(
+    (closest, point, i) => {
+      const dist = Math.sqrt((point.lng - lng) ** 2 + (point.lat - lat) ** 2)
+      return dist < closest.minDist ? { minDist: dist, index: i } : closest
+    },
+    { minDist: Infinity, index: 0 },
+  ).index
 
 const createCarIcon = () => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex size-[40px] items-center justify-center rounded-full bg-primary-container">
-        <Icon name="directions_car" />
+      <div class="flex items-center justify-center rounded-full bg-primary-container">
+        <Icon size="20" name="directions_car" />
       </div>
     ),
     el,
   )
-  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [40, 40], iconAnchor: [20, 20] })
+  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [25, 30], iconAnchor: [12, 10] })
 }
 
 export const PathMap: Component<{
@@ -49,7 +45,6 @@ export const PathMap: Component<{
   const [position, setPosition] = createSignal(0)
   const [isLocked, setIsLocked] = createSignal(true)
   const [isDragging, setIsDragging] = createSignal(false)
-  const [isMapInteractive, setIsMapInteractive] = createSignal(false)
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
@@ -64,19 +59,18 @@ export const PathMap: Component<{
 
   onMount(() => {
     const m = L.map(mapRef, {
-      zoomControl: false,
+      zoomControl: true,
       attributionControl: false,
       dragging: false,
       touchZoom: false,
       doubleClickZoom: false,
       scrollWheelZoom: false,
       boxZoom: false,
-      maxZoom: 17,
     })
 
     L.tileLayer(getTileUrl()).addTo(m)
     m.setView([props.coords[0].lat, props.coords[0].lng], props.coords.length ? 14 : 10)
-
+    m.zoomControl.setPosition('topright')
     pastPolyline = L.polyline([], { color: props.color || '#6F707F', weight: props.strokeWidth || 4 }).addTo(m)
     futurePolyline = L.polyline([], { color: props.color || '#dfe0ff', weight: props.strokeWidth || 4 }).addTo(m)
     hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
@@ -90,21 +84,12 @@ export const PathMap: Component<{
       props.updateTime(props.coords[idx].t)
     }
 
-    const enableMap = () => {
-      setIsMapInteractive(true)
-      m.dragging.enable()
-      m.touchZoom.enable()
-      m.doubleClickZoom.enable()
-      m.scrollWheelZoom.enable()
-      m.boxZoom.enable()
-    }
-
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
       setIsLocked(false)
-      if (!isMapInteractive()) enableMap()
+      m.dragging.enable()
+      marker?.getElement()?.classList.add('no-transition')
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
-      marker?.getElement()?.classList.add('no-transition')
     }
 
     marker
@@ -113,6 +98,7 @@ export const PathMap: Component<{
       .on('dragend', () => setIsDragging(false))
 
     m.on('mousemove', (e) => isDragging() && handleDrag(e)).on('mouseup', () => setIsDragging(false))
+
     hitboxPolyline?.on('mousedown', handleDrag)
     setMap(m)
     onCleanup(() => m.remove())
@@ -149,6 +135,10 @@ export const PathMap: Component<{
     <div ref={mapRef} class="h-full relative" style={{ 'background-color': 'rgb(19 19 24)' }}>
       <style>
         {`
+          .leaflet-bar a {
+            background-color: rgb(83 90 146) !important;
+            color: rgb(255 255 255) !important;
+          }
           .leaflet-marker-pane > * {
             -webkit-transition: transform 1.2s linear;
             -moz-transition: transform 1.2s linear;
@@ -166,19 +156,15 @@ export const PathMap: Component<{
         `}
       </style>
       <IconButton
-        name="my_location"
-        class={`absolute z-[1000] left-4 top-4 bg-primary-container ${isLocked() && 'hidden'}`}
+        name={isLocked() ? 'lock' : 'lock_open'}
+        class="absolute z-[1000] left-4 top-4 bg-primary-container"
         onClick={() => {
-          setIsLocked(true)
-          map()?.setView(currentCoord(), map()?.getZoom())
-          setIsMapInteractive(false)
+          const newLocked = !isLocked()
+          setIsLocked(newLocked)
+          map()?.panTo(currentCoord())
           const m = map()
           if (m) {
-            m.dragging.disable()
-            m.touchZoom.disable()
-            m.doubleClickZoom.disable()
-            m.scrollWheelZoom.disable()
-            m.boxZoom.disable()
+            m.dragging[newLocked ? 'disable' : 'enable']()
           }
         }}
       />
