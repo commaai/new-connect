@@ -47,7 +47,7 @@ describe('Anonymous user', () => {
     expect(await findByText('Sign in with Google')).toBeTruthy()
   })
 
-  test('View public route', async () => {
+  test('View demo route', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     // Videos do not load, yet
@@ -63,20 +63,20 @@ describe('Anonymous user', () => {
   })
 })
 
-describe('Public routes', () => {
-  test('View public route while signed in as another user', async () => {
-    setAccessToken(Demo.ACCESS_TOKEN)
+const USERS = [
+  { name: 'anonymous', token: '' },
+  { name: 'demo user', token: Demo.ACCESS_TOKEN },
+]
+
+describe.each(USERS)('Routing (as $name)', ({ token }) => {
+  beforeEach(() => setAccessToken(token))
+
+  test('View public route', async () => {
     const { findByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
     expect(await findByText(PUBLIC_ROUTE_ID.split('/').at(-1)!)).toBeTruthy()
   })
-})
 
-describe('Private routes', () => {
-  test.each([
-    ['anonymous', ''],
-    ['demo', Demo.ACCESS_TOKEN],
-  ])('Navigate away from private routes (%s)', async ([_, token]) => {
-    setAccessToken(token)
+  test('Navigate away from private route', async () => {
     const { findByText } = renderApp(`/${PRIVATE_ROUTE_ID}`)
     expect(await findByText('Sign in with Google')).toBeTruthy()
   })
