@@ -1,5 +1,5 @@
+import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createMutation, createQuery, queryOptions, useQueryClient } from '@tanstack/solid-query'
-import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
@@ -97,7 +97,7 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const onlineQueue = createQuery(() => queries.getOnline(props.dongleId))
   const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
-  const cancel = queries.cancelUpload(props.dongleId)
+  const cancel = createMemo(() => queries.cancelUpload(props.dongleId))
 
   const [items, setItems] = createStore<UploadQueueItemWithAttributes[]>([])
 
@@ -111,7 +111,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
-    cancel.mutate(ids)
+    cancel().mutate(ids)
   }
 
   return (
@@ -126,7 +126,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         <Switch
           fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow cancel={cancel.mutate} item={item} />}</For>
+              <For each={items}>{(item) => <UploadQueueRow cancel={cancel().mutate} item={item} />}</For>
             </div>
           }
         >
