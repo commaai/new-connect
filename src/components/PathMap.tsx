@@ -45,6 +45,7 @@ export const PathMap: Component<{
   const [position, setPosition] = createSignal(0)
   const [isLocked, setIsLocked] = createSignal(true)
   const [isDragging, setIsDragging] = createSignal(false)
+  const [isMapInteractive, setIsMapInteractive] = createSignal(false)
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
@@ -90,7 +91,7 @@ export const PathMap: Component<{
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
       setIsDragging(true)
       setIsLocked(false)
-      m.dragging.enable()
+      setIsMapInteractive(true)
       marker?.getElement()?.classList.add('no-transition')
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
@@ -101,6 +102,24 @@ export const PathMap: Component<{
     m.on('mouseup', () => setIsDragging(false))
     setMap(m)
     onCleanup(() => m.remove())
+  })
+
+  createEffect(() => {
+    const m = map()
+    if (!m) return
+    if (isMapInteractive()) {
+      m.dragging.enable()
+      m.touchZoom.enable()
+      m.doubleClickZoom.enable()
+      m.scrollWheelZoom.enable()
+      m.boxZoom.enable()
+    } else {
+      m.dragging.disable()
+      m.touchZoom.disable()
+      m.doubleClickZoom.disable()
+      m.scrollWheelZoom.disable()
+      m.boxZoom.disable()
+    }
   })
 
   createEffect(() => {
@@ -162,10 +181,7 @@ export const PathMap: Component<{
           setIsLocked(newLocked)
           map()?.panTo(currentCoord())
           marker?.getElement()?.classList.add('no-transition')
-          const m = map()
-          if (m) {
-            m.dragging[newLocked ? 'disable' : 'enable']()
-          }
+          setIsMapInteractive(!newLocked)
         }}
       />
     </div>
