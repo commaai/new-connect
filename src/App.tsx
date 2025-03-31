@@ -2,7 +2,7 @@ import { createSignal, lazy, onCleanup, Show, Suspense, type ParentComponent, ty
 import { Router, Route } from '@solidjs/router'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
-import { getAppQueryClient } from '~/api/query-client'
+import { getAppQueryClient } from '~/queries/client'
 
 import 'leaflet/dist/leaflet.css'
 
