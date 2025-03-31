@@ -114,6 +114,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
 
+  // a device which the user does not have access to, but are viewing a public route
+  const [isSharedDevice] = createResource(
+    () => ({ devices: devices(), dongleId: dongleId(), profile: profile() }),
+    ({ devices, dongleId, profile }) =>
+      !profile?.superuser && devices && dongleId && !devices.find((device) => device.dongle_id === dongleId),
+  )
+
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
     if (dongleId()) return undefined
@@ -128,6 +135,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
+        </Match>
+        <Match when={isSharedDevice() && !dateStr()}>
+          <Navigate href="/" />
         </Match>
         <Match when={dongleId()} keyed>
           {(id) => (
