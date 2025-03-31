@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -14,7 +14,6 @@ import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import Icon from '~/components/material/Icon'
 
 type RouteActivityProps = {
   dongleId: string
@@ -25,13 +24,11 @@ type RouteActivityProps = {
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
-  const [popupState, setPopupState] = createSignal(1)
-  let intervalId: NodeJS.Timer | null = null
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  function onTimelineChange(newTime: number) {
+  const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
@@ -45,20 +42,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       await setRouteViewed(device.dongle_id, dateStr)
     },
   )
-  createEffect(() => {
-    if (popupState() === 0) {
-      if (intervalId) {
-        clearInterval(intervalId)
-        intervalId = null
-      }
-    } else {
-      if (!intervalId) {
-        intervalId = setInterval(() => {
-          setPopupState((prev) => (prev === 1 ? 2 : 1))
-        }, 4000)
-      }
-    }
-  })
 
   return (
     <>
@@ -76,22 +59,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
               <RouteDynamicMap route={route()} routeName={routeName()} seekTime={seekTime} updateTime={onTimelineChange} />
             </Suspense>
           </div>
-          {popupState() !== 0 && (
-            <div class="flex items-center justify-center gap-2 rounded-md p-2 lg:text-sm text-xs">
-              {popupState() === 1 ? (
-                <>
-                  Tap <Icon size="20" name="lock" class="bg-primary-container rounded-md" /> to lock/unlock the map
-                </>
-              ) : (
-                <>
-                  Drag <Icon size="20" name="directions_car" class="bg-primary-container rounded-md" /> or tap on the path to seek freely
-                </>
-              )}
-              <p class="text-gray-500 underline" onClick={() => setPopupState(0)}>
-                Hide
-              </p>
-            </div>
-          )}
         </div>
 
         <div class="flex flex-col gap-2">

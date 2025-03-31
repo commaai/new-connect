@@ -82,9 +82,9 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
   const urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
   const results = urls.map((url) =>
     fetch(url)
-      .then((res) => res.json() as T)
+      .then((res) => (res.ok ? (res.json() as T) : undefined))
       .catch((err) => {
-        console.error('Error fetching file', url, err)
+        console.error('Error parsing file', url, err)
         return undefined
       }),
   )
