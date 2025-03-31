@@ -44,24 +44,30 @@ const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem
       })),
     )
 
-const extractAttributes = (url: string) => {
-  const parsed = new URL(url)
-  const parts = parsed.pathname.split('/')
-  if (parsed.hostname === 'upload.commadotai.com') {
-    return { route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
-  }
-  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
+interface UploadQueueItemWithAttributes extends UploadQueueItem {
+  route: string
+  segment: number
+  filename: string
+  isFirehose: boolean
 }
 
-const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItem }> = ({ cancel, item }) => {
-  const attrs = extractAttributes(item.url)
+const populateAttributes = (item: UploadQueueItem): UploadQueueItemWithAttributes => {
+  const parsed = new URL(item.url)
+  const parts = parsed.pathname.split('/')
+  if (parsed.hostname === 'upload.commadotai.com') {
+    return { ...item, route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
+  }
+  return { ...item, route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
+}
+
+const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItemWithAttributes }> = ({ cancel, item }) => {
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={attrs.isFirehose ? 'local_fire_department' : 'person'} />
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item.isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[attrs.route, attrs.segment, attrs.filename].join(' ')}</span>
+            <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
@@ -94,12 +100,12 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
   const cancel = queries.cancelUpload(props.dongleId)
 
-  const [items, setItems] = createStore<UploadQueueItem[]>([])
+  const [items, setItems] = createStore<UploadQueueItemWithAttributes[]>([])
 
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data?.result ?? []) : []
     const offline = offlineQueue.isSuccess ? mapOfflineQueueItems(offlineQueue.data ?? []) : []
-    const sorted = [...online, ...offline].sort((a, b) => b.progress - a.progress)
+    const sorted = [...online, ...offline].map(populateAttributes).sort((a, b) => b.progress - a.progress)
     setItems(reconcile(sorted))
   })
 
