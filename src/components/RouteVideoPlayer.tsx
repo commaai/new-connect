@@ -18,6 +18,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
+  let controls!: HTMLDivElement
 
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
@@ -48,6 +49,32 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   }
 
+  const onClick = (e: Event) => {
+    if (e.target !== e.currentTarget) return
+    togglePlayback()
+  }
+
+  const onTimeUpdate = (e: Event) => {
+    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
+    if (video.paused) updateProgress()
+  }
+  const onLoadedMetadata = () => {
+    setDuration(video.duration)
+    // if ('ontouchstart' in window) return
+    // void video.play().catch(() => {})
+  }
+  const onPlay = () => {
+    setIsPlaying(true)
+    startProgressTracking()
+  }
+  const onPause = () => setIsPlaying(false)
+  const onEnded = () => setIsPlaying(false)
+  const onStalled = () => {
+    if (isPlaying()) {
+      void video.play()
+    }
+  }
+
   onMount(() => {
     if (!Number.isNaN(props.startTime)) {
       video.currentTime = props.startTime
@@ -55,27 +82,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
     props.ref?.(video)
 
-    const onTimeUpdate = (e: Event) => {
-      setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
-      if (video.paused) updateProgress()
-    }
-    const onLoadedMetadata = () => {
-      setDuration(video.duration)
-      // if ('ontouchstart' in window) return
-      // void video.play().catch(() => {})
-    }
-    const onPlay = () => {
-      setIsPlaying(true)
-      startProgressTracking()
-    }
-    const onPause = () => setIsPlaying(false)
-    const onEnded = () => setIsPlaying(false)
-    const onStalled = () => {
-      if (isPlaying()) {
-        void video.play()
-      }
-    }
-
+    controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
     video.addEventListener('loadedmetadata', onLoadedMetadata)
     video.addEventListener('play', onPlay)
@@ -84,6 +91,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('stalled', onStalled)
 
     onCleanup(() => {
+      controls.removeEventListener('click', onClick)
       video.removeEventListener('timeupdate', onTimeUpdate)
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
       video.removeEventListener('play', onPlay)
@@ -143,7 +151,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       </div>
 
       {/* Controls overlay */}
-      <div class="absolute inset-0 flex items-end">
+      <div class="absolute inset-0 flex items-end" ref={controls}>
         {/* Controls background gradient */}
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
