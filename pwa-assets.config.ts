@@ -1,10 +1,4 @@
-import {
-  createAppleSplashScreens,
-  defaultAssetName,
-  defaultSplashScreenName,
-  defineConfig,
-  minimal2023Preset,
-} from '@vite-pwa/assets-generator/config'
+import { createAppleSplashScreens, defineConfig, minimal2023Preset } from '@vite-pwa/assets-generator/config'
 
 export default defineConfig({
   headLinkOptions: {
@@ -30,13 +24,7 @@ export default defineConfig({
         basePath: '/',
         xhtml: true,
       },
-      name(landscape, size, dark) {
-        return 'images/pwa-' + defaultSplashScreenName(landscape, size, dark)
-      },
     }),
-    assetName(type, size) {
-      return 'images/pwa-' + defaultAssetName(type, size)
-    },
   },
   images: ['public/favicon.svg'],
 })
