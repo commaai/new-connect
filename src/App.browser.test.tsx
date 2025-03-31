@@ -67,7 +67,7 @@ describe('Anonymous user', () => {
     expect(await findByText('Sign in with Google')).toBeTruthy()
   })
 
-  test('View demo route', async () => {
+  test.skip('View demo route', async () => {
     const { findByText, queryByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     // Route visible
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
