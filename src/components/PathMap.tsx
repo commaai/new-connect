@@ -161,6 +161,7 @@ export const PathMap: Component<{
           const newLocked = !isLocked()
           setIsLocked(newLocked)
           map()?.panTo(currentCoord())
+          marker?.getElement()?.classList.add('no-transition')
           const m = map()
           if (m) {
             m.dragging[newLocked ? 'disable' : 'enable']()
