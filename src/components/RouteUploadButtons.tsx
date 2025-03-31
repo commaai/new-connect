@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
-import { uploadAllSegments, type FileType } from '~/api/upload'
+import { uploadAllSegments, type FileType } from '~/api/file'
 import type { Route } from '~/api/types'
 
 const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
