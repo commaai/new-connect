@@ -129,12 +129,13 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
               }
             >
               <For each={routes()}>
-                {(route, _) => {
+                {route => {
+                  const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
                   return (
                     <>
                       <Show when={dayHeader}>
-                        <Show when={i() !== 0}>
+                        <Show when={!firstHeader}>
                           <div class="6 w-full" />
                         </Show>
                         <h2 class="px-4 text-xl font-bold">{dayHeader}</h2>
