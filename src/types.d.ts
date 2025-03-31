@@ -207,8 +207,4 @@ export interface UploadQueueItem {
   progress: number
   retry_count: number
   url: string
-  route: string
-  segment: number
-  filename: string
-  isFirehose: boolean
 }

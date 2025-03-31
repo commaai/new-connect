@@ -1,19 +1,15 @@
 import { createMutation, queryOptions, useQueryClient } from '@tanstack/solid-query'
 import { fetcher } from '~/api'
 import { makeAthenaCall } from '~/api/athena'
-import { parseUploadPath } from '~/utils/parse'
 import { AthenaCallResponse, AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 
-const mapOnlineQueueItems = (data: AthenaCallResponse<UploadQueueItem[]>) =>
-  data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || []
-
-const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse) =>
+const mapOnlineQueueItems = (data: AthenaCallResponse<UploadQueueItem[]>) => data.result?.sort((a, b) => b.progress - a.progress) || []
+const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem[] =>
   data
     .filter((item) => item.method === 'uploadFilesToUrls')
     .flatMap((item) =>
       (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
         ...file,
-        ...parseUploadPath(file.url),
         path: file.fn,
         created_at: 0,
         current: false,

@@ -9,14 +9,24 @@ import Button from '~/components/material/Button'
 import { uploadQueue } from '~/queries/upload-queue'
 import { UploadQueueItem } from '~/types'
 
+const extractAttributes = (url: string) => {
+  const parsed = new URL(url)
+  const parts = parsed.pathname.split('/')
+  if (parsed.hostname === 'upload.commadotai.com') {
+    return { route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
+  }
+  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
+}
+
 const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItem }> = ({ cancel, item }) => {
+  const attrs = extractAttributes(item.url)
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item.isFirehose ? 'local_fire_department' : 'person'} />
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={attrs.isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
+            <span class="text-body-sm font-mono truncate text-on-surface">{[attrs.route, attrs.segment, attrs.filename].join(' ')}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
@@ -49,7 +59,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const offlineQueue = createQuery(() => uploadQueue.getOffline(props.dongleId))
   const cancel = uploadQueue.cancelUpload(props.dongleId)
 
-  const [items, setItems] = createStore<UploadQueueItem[]>([])
+  const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
 
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
@@ -60,7 +70,6 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
-    console.log('ids', ids)
     cancel.mutate(ids)
   }
 
