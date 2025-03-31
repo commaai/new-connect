@@ -165,7 +165,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   return (
     <div class="flex flex-col">
       <div class="h-1 bg-surface-container-high">
-        <div class="h-full bg-yellow-400" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
+        <div class="h-full bg-white" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
       </div>
       <div
         ref={ref!}
@@ -186,7 +186,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         >
           <div class="absolute inset-x-0 h-full w-px bg-white" />
           <div class="absolute -bottom-1.5 left-1/2 -translate-x-[calc(50%+1px)]">
-            <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-yellow-500" />
+            <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-white" />
           </div>
         </div>
       </div>

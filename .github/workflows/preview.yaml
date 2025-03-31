@@ -12,7 +12,7 @@ permissions:
   checks: write
 
 concurrency:
-  group: ${{ github.head_ref || github.ref }}-${{ github.workflow }}
+  group: ${{ github.event.workflow_run.head_branch }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:

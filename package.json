@@ -23,6 +23,7 @@
   "type": "module",
   "//devDependencies": {
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
+    "@vite-pwa/assets-generator": "generate PWA assets during build",
     "@vitest/browser": "run vitest suite in browser using playwright",
     "autoprefixer": "adds css vendor prefixes automatically",
     "jsdom": "js implementation of the dom (used in testing env which we don't really make use of)",
@@ -44,6 +45,7 @@
     "@types/bun": "^1.2.5",
     "@types/geojson": "^7946.0.16",
     "@types/leaflet": "^1.9.16",
+    "@vite-pwa/assets-generator": "^1.0.0",
     "@vitest/browser": "^3.0.9",
     "autoprefixer": "^10.4.21",
     "jsdom": "^26.0.0",
