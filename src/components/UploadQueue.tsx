@@ -6,7 +6,7 @@ import Icon, { IconName } from './material/Icon'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
-import { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
+import { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/api/types'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
 import { getAthenaOfflineQueue } from '~/api/devices'
 

@@ -1,4 +1,4 @@
-import { Files, Route, UploadFileMetadataResponse } from '~/types'
+import { Files, Route, UploadFileMetadataResponse } from '~/api/types'
 import { fetcher } from '.'
 
 export const getAlreadyUploadedFiles = (routeName: Route['fullname']): Promise<Files> => fetcher<Files>(`/v1/route/${routeName}/files`)

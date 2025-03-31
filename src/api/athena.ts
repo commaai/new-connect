@@ -8,7 +8,7 @@ import {
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
   UploadQueueItem,
-} from '~/types'
+} from '~/api/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
 

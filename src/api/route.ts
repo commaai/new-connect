@@ -1,4 +1,4 @@
-import type { Route, RouteInfo, RouteShareSignature } from '~/types'
+import type { Route, RouteInfo, RouteShareSignature } from '~/api/types'
 
 import { fetcher } from '.'
 import { API_URL } from './config'

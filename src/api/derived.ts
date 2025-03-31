@@ -1,4 +1,4 @@
-import type { Route } from '~/types'
+import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
 export interface GPSPathPoint {
