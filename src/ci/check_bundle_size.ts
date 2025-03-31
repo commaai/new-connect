@@ -7,8 +7,10 @@ if (!OUT_DIR) {
   await $`bun run build`.quiet()
 }
 
+const EXCLUDE_GLOBS = ['*.map', 'pwa-*.png', 'maskable-*.png', 'apple-touch-icon-*.png', 'apple-splash-*.png']
+
 const files = []
-for await (const path of $`find ${OUT_DIR} -type f ! -name '*.map' ! -name 'pwa-*.png' ! -name 'maskable-*.png' ! -name 'apple-touch-icon-*.png' ! -name 'apple-splash-*.png'`.lines()) {
+for await (const path of $`find ${OUT_DIR} -type f ${{ raw: EXCLUDE_GLOBS.map((path) => `! -name '${path}'`).join(' ') }}`.lines()) {
   if (!path) continue
   const size = Number((await $`cat ${path} | wc -c`.quiet()).text().trim())
   const compressedSize = Number((await $`gzip -9c ${path} | wc -c`.quiet()).text().trim())
