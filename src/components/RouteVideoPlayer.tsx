@@ -51,6 +51,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   const onClick = (e: Event) => {
     if (e.target !== e.currentTarget) return
+    e.preventDefault()
     togglePlayback()
   }
 
@@ -58,11 +59,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
   }
-  const onLoadedMetadata = () => {
-    setDuration(video.duration)
-    // if ('ontouchstart' in window) return
-    // void video.play().catch(() => {})
-  }
+  const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
     setIsPlaying(true)
     startProgressTracking()
