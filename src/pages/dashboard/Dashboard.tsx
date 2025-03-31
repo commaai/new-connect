@@ -138,7 +138,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
         </Match>
         <Match when={isSharedDevice()}>
           <Show when={dateStr()} fallback={<Navigate href="/" />}>
-            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+            <div class="mx-auto max-w-[1560px]">
+              <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+            </div>
           </Show>
         </Match>
         <Match when={dongleId()} keyed>
