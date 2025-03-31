@@ -42,7 +42,10 @@ const createSharedDevice = (dongleId: string): Device => ({
 
 export const getDevice = async (dongleId: string) => {
   try {
-    return await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+    // return null
+    let ret = await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+    console.log('ret', ret)
+    return ret
   } catch {
     return createSharedDevice(dongleId)
   }
