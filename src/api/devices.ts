@@ -1,6 +1,4 @@
-import { queryOptions } from '@tanstack/solid-query'
-import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics, UploadFilesToUrlsRequest } from '~/types'
-import { parseUploadPath } from '~/utils/parse'
+import type { Device, DeviceLocation, DrivingStatistics } from '~/types'
 import { fetcher } from '.'
 
 const sortDevices = (devices: Device[]) =>
@@ -48,34 +46,6 @@ export const getDevice = async (dongleId: string) => {
   } catch {
     return createSharedDevice(dongleId)
   }
-}
-
-const transformOfflineQueueToUploadItems = (data: AthenaOfflineQueueResponse) =>
-  data
-    .filter((item) => item.method === 'uploadFilesToUrls')
-    .flatMap((item) =>
-      (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
-        ...file,
-        ...parseUploadPath(file.url),
-        path: file.fn,
-        created_at: 0,
-        current: false,
-        id: '',
-        progress: 0,
-        retry_count: 0,
-      })),
-    )
-
-export const devices = {
-  prefix: ['devices'],
-  offlineQueue: () => [...devices.prefix, 'athena_offline_queue'],
-  offlineQueueForDongle: (dongleId: string) => [...devices.offlineQueue(), dongleId],
-  getOfflineQueue: (dongleId: string) =>
-    queryOptions({
-      queryKey: devices.offlineQueueForDongle(dongleId),
-      queryFn: () => fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`),
-      select: transformOfflineQueueToUploadItems,
-    }),
 }
 
 export const getDeviceLocation = async (dongleId: string) =>

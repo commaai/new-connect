@@ -1,44 +1,19 @@
-import { createMutation, queryOptions, useQueryClient } from '@tanstack/solid-query'
 import {
   AthenaCallResponse,
   BackendAthenaCallResponse,
   BackendAthenaCallResponseError,
-  CancelUploadRequest,
-  CancelUploadResponse,
   UploadFile,
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
-  UploadQueueItem,
 } from '~/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
-import { parseUploadPath } from '~/utils/parse'
 
 // Higher number is lower priority
 export const COMMA_CONNECT_PRIORITY = 1
 
 // Uploads expire after 1 week if device remains offline
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
-
-export const athena = {
-  prefix: ['athena'],
-  uploadQueue: () => [...athena.prefix, 'upload_queue'],
-  uploadQueueForDongle: (dongleId: string) => [...athena.uploadQueue(), dongleId],
-  getUploadQueue: (dongleId: string) =>
-    queryOptions({
-      queryKey: athena.uploadQueueForDongle(dongleId),
-      queryFn: () => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue'),
-      select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })) || [],
-    }),
-  cancelUpload: (dongleId: string) => {
-    const queryClient = useQueryClient()
-    return createMutation(() => ({
-      mutationFn: (ids: string[]) =>
-        makeAthenaCall<CancelUploadRequest, CancelUploadResponse>(dongleId, 'cancelUpload', { upload_id: ids }),
-      onSettled: () => queryClient.invalidateQueries({ queryKey: athena.uploadQueueForDongle(dongleId) }),
-    }))
-  },
-}
 
 export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, boolean>(dongleId, 'getNetworkMetered')
 

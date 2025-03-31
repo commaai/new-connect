@@ -1,13 +1,12 @@
 import { createQuery } from '@tanstack/solid-query'
 import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
-import { athena } from '~/api/athena'
-import { devices } from '~/api/devices'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
+import { uploadQueue } from '~/queries/upload-queue'
 import { UploadQueueItem } from '~/types'
 
 const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItem }> = ({ cancel, item }) => {
@@ -46,9 +45,9 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueue = createQuery(() => athena.getUploadQueue(props.dongleId))
-  const offlineQueue = createQuery(() => devices.getOfflineQueue(props.dongleId))
-  const cancel = athena.cancelUpload(props.dongleId)
+  const onlineQueue = createQuery(() => uploadQueue.getOnline(props.dongleId))
+  const offlineQueue = createQuery(() => uploadQueue.getOffline(props.dongleId))
+  const cancel = uploadQueue.cancelUpload(props.dongleId)
 
   const [items, setItems] = createStore<UploadQueueItem[]>([])
 
