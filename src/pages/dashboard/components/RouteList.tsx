@@ -58,7 +58,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 2
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
@@ -109,7 +109,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   let prevDayHeader: string | null = null
   function getDayHeader(route: RouteSegments): string | null {
     const date = dayjs(route.start_time_utc_millis)
-    const dayHeader = date.format(date.year() === dayjs().year() ? 'ddd, MMM D' : 'ddd, MMM D, YYYY')
+    const dayHeader = date.format(date.year() === dayjs().year() ? 'dddd, MMM D' : 'dddd, MMM D, YYYY')
     if (dayHeader !== prevDayHeader) {
       prevDayHeader = dayHeader
       return dayHeader
