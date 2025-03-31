@@ -5,9 +5,7 @@ import { parseUploadPath } from '~/utils/parse'
 import { AthenaCallResponse, AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 
 const mapOnlineQueueItems = (data: AthenaCallResponse<UploadQueueItem[]>) =>
-  data.result
-    ?.map((item) => ({ ...item, ...parseUploadPath(item.url) }))
-    .sort((a, b) => (a.current === b.current ? 0 : a.current ? -1 : 1)) || []
+  data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || []
 
 const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse) =>
   data
