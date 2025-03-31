@@ -36,10 +36,16 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <CardHeader
         headline={
           <div class="flex gap-2">
-            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
+            {props.route.start_time_utc_millis ? (
+              <>
+                <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
+                <span>
+                  {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+                </span>
+              </>
+            ) : (
+              <span>Timeless Route</span>
+            )}
           </div>
         }
         subhead={location()}
@@ -68,7 +74,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
+    return `${endpoint()}&end=${previousPageData.at(-1)!.create_time - 1}`
   }
   const getPage = (page: number): Promise<RouteSegments[]> => {
     if (pages[page] === undefined) {
