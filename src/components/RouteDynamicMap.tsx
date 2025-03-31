@@ -52,6 +52,7 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
                 coords={coords()!}
                 updateTime={props.updateTime}
                 hidpi={true}
+                strokeWidth={5}
               />
             )}
           </For>
