@@ -13,7 +13,6 @@ const shownDateHeaders = new Set<string>()
 
 interface RouteCardProps {
   route: RouteSegments
-  shouldShowDateHeader: boolean
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
@@ -35,38 +34,35 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 
   return (
-    <>
-      {props.shouldShowDateHeader && <h2 class="text-xl font-bold mt-6 pl-2">{startTime().format('ddd, MMM D, YYYY')}</h2>}
-      <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
-        <CardHeader
-          headline={
-            <div class="flex gap-2">
-              <span>
-                {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-              </span>
-            </div>
-          }
-          subhead={location()}
-          trailing={
-            <Suspense>
-              <Show when={timeline()?.userFlags}>
-                <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
-                  <Icon class="text-yellow-300" size="20" name="flag" filled />
-                </div>
-              </Show>
-            </Suspense>
-          }
-        />
+    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
+      <CardHeader
+        headline={
+          <div class="flex gap-2">
+            <span>
+              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+            </span>
+          </div>
+        }
+        subhead={location()}
+        trailing={
+          <Suspense>
+            <Show when={timeline()?.userFlags}>
+              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
+                <Icon class="text-yellow-300" size="20" name="flag" filled />
+              </div>
+            </Show>
+          </Suspense>
+        }
+      />
 
-        <CardContent>
-          <RouteStatistics route={props.route} />
-        </CardContent>
-      </Card>
-    </>
+      <CardContent>
+        <RouteStatistics route={props.route} />
+      </CardContent>
+    </Card>
   )
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 1
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
@@ -115,6 +111,14 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   })
   onCleanup(() => observer.disconnect())
 
+  const getDateHeader = (route: RouteSegments): string | null => {
+    const dateKey = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
+    if (shownDateHeaders.has(dateKey)) return null
+
+    shownDateHeaders.add(dateKey)
+    return dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
+  }
+
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
@@ -128,10 +132,15 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
             >
               <For each={routes() || []}>
                 {(route) => {
-                  const dateString = dayjs(route.start_time_utc_millis).format('YYYY-MM-DD')
-                  const isUniqueDate = !shownDateHeaders.has(dateString)
-                  if (isUniqueDate) shownDateHeaders.add(dateString)
-                  return <RouteCard route={route} shouldShowDateHeader={isUniqueDate} />
+                  const headerText = getDateHeader(route)
+                  return (
+                    <>
+                      <Show when={headerText}>
+                        <h2 class="text-xl font-bold mt-6 pl-2">{headerText}</h2>
+                      </Show>
+                      <RouteCard route={route} />
+                    </>
+                  )
                 }}
               </For>
             </Suspense>
