@@ -60,29 +60,28 @@ const populateAttributes = (item: UploadQueueItem): UploadQueueItemWithAttribute
   return { ...item, route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
 }
 
-const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItemWithAttributes }> = ({ cancel, item }) => {
+const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItemWithAttributes }> = (props) => {
+  const item = () => props.item
+  const cancel = () => props.cancel([item().id])
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
         <div class="flex items-center min-w-0 flex-1">
-          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item.isFirehose ? 'local_fire_department' : 'person'} />
+          <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item().isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[item.route, item.segment, item.filename].join(' ')}</span>
+            <span class="text-body-sm font-mono truncate text-on-surface">{[item().route, item().segment, item().filename].join(' ')}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
-          <Show
-            when={!item.id || item.progress !== 0}
-            fallback={<IconButton size="20" name="close_small" onClick={() => cancel([item.id])} />}
-          >
+          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={cancel} />}>
             <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
-              {item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}
+              {item().id ? `${Math.round(item().progress * 100)}%` : 'Offline'}
             </span>
           </Show>
         </div>
       </div>
       <div class="h-1.5 w-full overflow-hidden rounded-full bg-surface-container-highest">
-        <LinearProgress progress={item.progress} color={Math.round(item.progress * 100) === 100 ? 'tertiary' : 'primary'} />
+        <LinearProgress progress={item().progress} color={Math.round(item().progress * 100) === 100 ? 'tertiary' : 'primary'} />
       </div>
     </div>
   )
