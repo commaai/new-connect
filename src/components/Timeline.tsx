@@ -163,26 +163,31 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   return (
-    <div
-      ref={ref!}
-      class={clsx(
-        'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
-        'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
-        props.class,
-      )}
-      title="Disengaged"
-    >
-      <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+    <div class="flex flex-col">
+      <div class="h-1 bg-surface-container-high">
+        <div class="h-full bg-yellow-400" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
+      </div>
       <div
-        class="absolute top-0 z-10 h-full"
-        style={{
-          width: `${MARKER_WIDTH}px`,
-          left: `${markerOffsetPct()}%`,
-        }}
+        ref={ref!}
+        class={clsx(
+          'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
+          'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
+          props.class,
+        )}
+        title="Disengaged"
       >
-        <div class="absolute inset-x-0 h-full w-px bg-white" />
-        <div class="absolute -bottom-1.5 left-1/2 -translate-x-[calc(50%+1px)]">
-          <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-yellow-500" />
+        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+        <div
+          class="absolute top-0 z-10 h-full"
+          style={{
+            width: `${MARKER_WIDTH}px`,
+            left: `${markerOffsetPct()}%`,
+          }}
+        >
+          <div class="absolute inset-x-0 h-full w-px bg-white" />
+          <div class="absolute -bottom-1.5 left-1/2 -translate-x-[calc(50%+1px)]">
+            <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-yellow-500" />
+          </div>
         </div>
       </div>
     </div>
