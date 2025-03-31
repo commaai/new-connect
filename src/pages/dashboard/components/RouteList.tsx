@@ -9,20 +9,6 @@ import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/types'
 
-function groupRoutes(all_routes: RouteSegments[] | undefined): { day: string; segments: RouteSegments[] }[] {
-  if (!all_routes) return []
-  const groups = new Map<string, RouteSegments[]>()
-  for (const route of all_routes) {
-    const day = dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
-    if (!groups.has(day)) {
-      console.log("adding day", day)
-      groups.set(day, [])
-    }
-    groups.get(day)!.push(route)
-  }
-  return Array.from(groups, ([day, segments]) => ({ day, segments }))
-}
-
 interface RouteCardProps {
   route: RouteSegments
 }
@@ -120,9 +106,19 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   })
   onCleanup(() => observer.disconnect())
 
+  let prevDayHeader: string | null = null
+  function getDayHeader(route: RouteSegments): string | null {
+    const date = dayjs(route.start_time_utc_millis)
+    const dayHeader = date.format(date.year() === dayjs().year() ? 'ddd, MMM D' : 'ddd, MMM D, YYYY')
+    if (dayHeader !== prevDayHeader) {
+      prevDayHeader = dayHeader
+      return dayHeader
+    }
+    return null
+  }
+
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
-      {/*TODO: this results in duplicate headers*/}
       <For each={pageNumbers()}>
         {(_, i) => {
           const [routes] = createResource(() => i(), getPage)
@@ -132,14 +128,21 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={groupRoutes(routes())}>
-                {(group) => (
-                  <>
-                    <h2 class="px-4 text-xl font-bold">{group.day}</h2>
-                    <For each={group.segments}>{(route) => <RouteCard route={route} />}</For>
-                    <div class="6 w-full" />
-                  </>
-                )}
+              <For each={routes()}>
+                {(route, _) => {
+                  const dayHeader = getDayHeader(route)
+                  return (
+                    <>
+                      <Show when={dayHeader}>
+                        <Show when={i() !== 0}>
+                          <div class="6 w-full" />
+                        </Show>
+                        <h2 class="px-4 text-xl font-bold">{dayHeader}</h2>
+                      </Show>
+                      <RouteCard route={route} />
+                    </>
+                  )
+                }}
               </For>
             </Suspense>
           )
