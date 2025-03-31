@@ -1,7 +1,6 @@
 import { createMutation, queryOptions, useQueryClient } from '@tanstack/solid-query'
-import { fetcher } from '~/api'
-import { makeAthenaCall } from '~/api/athena'
-import { AthenaOfflineQueueResponse, UploadQueueItem } from '~/types'
+import { getUploadQueue, makeAthenaCall } from '~/api/athena'
+import { getAthenaOfflineQueue } from '~/api/devices'
 
 export const uploadQueue = {
   prefix: ['upload_queue'],
@@ -11,7 +10,7 @@ export const uploadQueue = {
   getOnline: (dongleId: string) =>
     queryOptions({
       queryKey: uploadQueue.onlineForDongle(dongleId),
-      queryFn: () => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue'),
+      queryFn: () => getUploadQueue(dongleId),
     }),
 
   offline: () => [...uploadQueue.prefix, 'offline'],
@@ -19,7 +18,7 @@ export const uploadQueue = {
   getOffline: (dongleId: string) =>
     queryOptions({
       queryKey: uploadQueue.offlineForDongle(dongleId),
-      queryFn: () => fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`),
+      queryFn: () => getAthenaOfflineQueue(dongleId),
     }),
 
   cancelUpload: (dongleId: string) => {

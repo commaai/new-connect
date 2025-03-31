@@ -1,4 +1,4 @@
-import type { Device, DeviceLocation, DrivingStatistics } from '~/types'
+import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics } from '~/types'
 import { fetcher } from '.'
 
 const sortDevices = (devices: Device[]) =>
@@ -47,6 +47,9 @@ export const getDevice = async (dongleId: string) => {
     return createSharedDevice(dongleId)
   }
 }
+
+export const getAthenaOfflineQueue = (dongleId: string) =>
+  fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`)
 
 export const getDeviceLocation = async (dongleId: string) =>
   fetcher<DeviceLocation>(`/v1/devices/${dongleId}/location`).catch(() => undefined)

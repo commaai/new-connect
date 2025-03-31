@@ -5,6 +5,7 @@ import {
   UploadFile,
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
+  UploadQueueItem,
 } from '~/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
@@ -16,7 +17,7 @@ export const COMMA_CONNECT_PRIORITY = 1
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
 
 export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, boolean>(dongleId, 'getNetworkMetered')
-
+export const getUploadQueue = (dongleId: string) => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue')
 export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
   makeAthenaCall<UploadFilesToUrlsRequest, UploadFilesToUrlsResponse>(
     dongleId,
