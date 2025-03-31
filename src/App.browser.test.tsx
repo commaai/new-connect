@@ -6,6 +6,9 @@ import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
+const PUBLIC_ROUTE_ID = 'e886087f430e7fe7/00000221--604653e929'
+const PRIVATE_ROUTE_ID = 'e886087f430e7fe7/00000009--84661aeefa'
+
 const UPLOAD_QUEUE = 'Upload Queue'
 
 const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
@@ -31,7 +34,7 @@ describe('Demo mode', () => {
 
 // TODO: write tests/setup second demo for read-only access tests
 
-describe('Public routes', () => {
+describe('Anonymous user', () => {
   beforeEach(() => clearAccessToken())
 
   test('Show login page', async () => {
@@ -44,7 +47,7 @@ describe('Public routes', () => {
     expect(await findByText('Sign in with Google')).toBeTruthy()
   })
 
-  test('View public route without signing in', async () => {
+  test('View public route', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     // Videos do not load, yet
@@ -52,16 +55,29 @@ describe('Public routes', () => {
     // await waitFor(() => expect(video.src).toBeTruthy())
   })
 
-  test('View public route while signed in as another user', async () => {
-    setAccessToken(Demo.ACCESS_TOKEN)
-    const { findByText } = renderApp(`/e886087f430e7fe7/00000221--604653e929`)
-    expect(await findByText('00000221--604653e929')).toBeTruthy()
-  })
-
   test('Viewing public route should not show device details', async () => {
     const { findByTestId, queryByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
     expect(queryByText(UPLOAD_QUEUE)).toBeFalsy()
+  })
+})
+
+describe('Public routes', () => {
+  test('View public route while signed in as another user', async () => {
+    setAccessToken(Demo.ACCESS_TOKEN)
+    const { findByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
+    expect(await findByText(PUBLIC_ROUTE_ID.split('/').at(-1)!)).toBeTruthy()
+  })
+})
+
+describe('Private routes', () => {
+  test.each([
+    ['anonymous', ''],
+    ['demo', Demo.ACCESS_TOKEN],
+  ])('Navigate away from private routes (%s)', async ([_, token]) => {
+    setAccessToken(token)
+    const { findByText } = renderApp(`/${PRIVATE_ROUTE_ID}`)
+    expect(await findByText('Sign in with Google')).toBeTruthy()
   })
 })
