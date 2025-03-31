@@ -39,7 +39,6 @@ export function setAccessToken(token: string): void {
   if (typeof window === 'undefined') {
     return
   }
-  console.trace('setAccessToken', !!token)
   window.localStorage.setItem(AUTH_KEY, token)
 }
 
