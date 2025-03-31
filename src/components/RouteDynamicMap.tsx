@@ -4,7 +4,7 @@ import clsx from 'clsx'
 
 import { getCoords } from '~/api/derived'
 import { getThemeId } from '~/theme'
-import type { Route } from '~/types'
+import type { Route } from '~/api/types'
 
 import Icon from '~/components/material/Icon'
 import { PathMap } from '~/components/PathMap'
