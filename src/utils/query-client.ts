@@ -1,14 +1,14 @@
 import { QueryClient } from '@tanstack/solid-query'
+import { AthenaQueryKeys } from '~/api/athena'
+import { DeviceQueryKeys } from '~/api/devices'
 
-export const ONLINE_QUEUE = 'online_queue'
-export const OFFLINE_QUEUE = 'offline_queue'
+const pollingConfig = { retry: false, refetchInterval: 1000 }
 
 export const getAppQueryClient = () => {
   const queryClient = new QueryClient()
 
-  const pollingConfig = { retry: false, refetchInterval: 1000 }
-  queryClient.setQueryDefaults([ONLINE_QUEUE], pollingConfig)
-  queryClient.setQueryDefaults([OFFLINE_QUEUE], pollingConfig)
+  queryClient.setQueryDefaults(AthenaQueryKeys.uploadQueue, pollingConfig)
+  queryClient.setQueryDefaults(DeviceQueryKeys.offlineQueue, pollingConfig)
 
   return queryClient
 }

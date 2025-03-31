@@ -1,33 +1,15 @@
-import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import { cancelUpload, getUploadQueue } from '~/api/athena'
-import { UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
 import { getAthenaOfflineQueue } from '~/api/devices'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
-import { OFFLINE_QUEUE, ONLINE_QUEUE } from '~/utils/query-client'
+import { DecoratedUploadQueueItem } from '~/types'
 
-interface DecoratedUploadQueueItem extends UploadQueueItem {
-  route: string
-  segment: number
-  filename: string
-  isFirehose: boolean
-}
-
-const parseUploadPath = (url: string) => {
-  const parsed = new URL(url)
-  const parts = parsed.pathname.split('/')
-  if (parsed.hostname === 'upload.commadotai.com') {
-    return { route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
-  }
-  return { route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
-}
-
-const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
+const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
@@ -40,7 +22,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (id: string) => void; item: Decora
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
           <Show
             when={!item.id || item.progress !== 0}
-            fallback={<IconButton size="20" name="close_small" onClick={() => cancel(item.id)} />}
+            fallback={<IconButton size="20" name="close_small" onClick={() => cancel([item.id])} />}
           >
             <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
               {item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}
@@ -63,49 +45,22 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueueKey = () => [ONLINE_QUEUE, props.dongleId]
-  const onlineQueue = createQuery(() => ({
-    queryKey: onlineQueueKey(),
-    queryFn: () => getUploadQueue(props.dongleId),
-    select: (data) => data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })).sort((a, b) => b.progress - a.progress) || [],
-  }))
-
-  const offlineQueue = createQuery(() => ({
-    queryKey: [OFFLINE_QUEUE, props.dongleId],
-    queryFn: () => getAthenaOfflineQueue(props.dongleId),
-    select: (data) =>
-      data
-        ?.filter((item) => item.method === 'uploadFilesToUrls')
-        .flatMap((item) =>
-          (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
-            ...file,
-            ...parseUploadPath(file.url),
-            path: file.fn,
-            created_at: 0,
-            current: false,
-            id: '',
-            progress: 0,
-            retry_count: 0,
-          })),
-        ) || [],
-  }))
+  const onlineQueue = getUploadQueue(props.dongleId)
+  const offlineQueue = getAthenaOfflineQueue(props.dongleId)
+  const cancel = cancelUpload(props.dongleId)
 
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
+
   createEffect(() => {
     const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
     const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
     setItems(reconcile([...online, ...offline]))
   })
 
-  const queryClient = useQueryClient()
-  const cancelMutation = createMutation(() => ({
-    mutationFn: (ids: string[]) => cancelUpload(props.dongleId, ids),
-    onSettled: () => queryClient.invalidateQueries({ queryKey: onlineQueueKey() }),
-  }))
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
-    cancelMutation.mutate(ids)
+    cancel.mutate(ids)
   }
 
   return (
@@ -120,7 +75,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         <Switch
           fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow cancel={(id) => cancelMutation.mutate([id])} item={item} />}</For>
+              <For each={items}>{(item) => <UploadQueueRow cancel={cancel.mutate} item={item} />}</For>
             </div>
           }
         >

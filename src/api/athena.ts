@@ -1,9 +1,11 @@
+import { createMutation, createQuery, useQueryClient } from '@tanstack/solid-query'
 import {
   AthenaCallResponse,
   BackendAthenaCallResponse,
   BackendAthenaCallResponseError,
   CancelUploadRequest,
   CancelUploadResponse,
+  DecoratedUploadQueueItem,
   UploadFile,
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
@@ -11,6 +13,7 @@ import {
 } from '~/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
+import { parseUploadPath } from '~/utils/parse'
 
 // Higher number is lower priority
 export const COMMA_CONNECT_PRIORITY = 1
@@ -18,12 +21,30 @@ export const COMMA_CONNECT_PRIORITY = 1
 // Uploads expire after 1 week if device remains offline
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
 
-export const cancelUpload = (dongleId: string, ids: string[]) =>
-  makeAthenaCall<CancelUploadRequest, CancelUploadResponse>(dongleId, 'cancelUpload', { upload_id: ids })
+export const AthenaQueryKeys = {
+  uploadQueue: ['athena', 'upload_queue'],
+  uploadQueueForDongle: (dongleId: string) => [...AthenaQueryKeys.uploadQueue, dongleId],
+}
+
+export const cancelUpload = (dongleId: string) => {
+  const queryClient = useQueryClient()
+  return createMutation(() => ({
+    mutationFn: (ids: string[]) => makeAthenaCall<CancelUploadRequest, CancelUploadResponse>(dongleId, 'cancelUpload', { upload_id: ids }),
+    onSettled: () => queryClient.invalidateQueries({ queryKey: AthenaQueryKeys.uploadQueueForDongle(dongleId) }),
+  }))
+}
 
 export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, boolean>(dongleId, 'getNetworkMetered')
 
-export const getUploadQueue = (dongleId: string) => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue')
+const transformUploadQueueToDecoratedUploadQueueItems = (data: AthenaCallResponse<UploadQueueItem[]>): DecoratedUploadQueueItem[] =>
+  data.result?.map((item) => ({ ...item, ...parseUploadPath(item.url) })) || []
+
+export const getUploadQueue = (dongleId: string) =>
+  createQuery(() => ({
+    queryKey: AthenaQueryKeys.uploadQueueForDongle(dongleId),
+    queryFn: () => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue'),
+    select: transformUploadQueueToDecoratedUploadQueueItems,
+  }))
 
 export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
   makeAthenaCall<UploadFilesToUrlsRequest, UploadFilesToUrlsResponse>(

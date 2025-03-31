@@ -208,3 +208,10 @@ export interface UploadQueueItem {
   retry_count: number
   url: string
 }
+
+export interface DecoratedUploadQueueItem extends UploadQueueItem {
+  route: string
+  segment: number
+  filename: string
+  isFirehose: boolean
+}
