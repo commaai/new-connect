@@ -60,6 +60,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
+    console.log('ids', ids)
     cancel.mutate(ids)
   }
 
