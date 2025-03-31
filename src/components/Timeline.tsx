@@ -176,13 +176,12 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       <div
         class="absolute top-0 z-10 h-full"
         style={{
-          'background-color': 'rgba(255,255,255,0.7)',
           width: `${MARKER_WIDTH}px`,
           left: `${markerOffsetPct()}%`,
         }}
       >
         <div class="absolute inset-x-0 h-full w-px bg-white" />
-        <div class="absolute -bottom-1.5 left-1/2 -translate-x-1/2">
+        <div class="absolute -bottom-1.5 left-1/2 -translate-x-[calc(50%+1px)]">
           <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-yellow-500" />
         </div>
       </div>
