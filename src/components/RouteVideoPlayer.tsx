@@ -153,7 +153,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
         {/* Controls container */}
-        <div class="relative flex w-full items-center gap-4 pb-4 pl-1">
+        <div class="relative flex w-full items-center gap-4 pb-3 px-1">
           <button
             class="bg-surface-container-highest/80 flex size-8 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-highest"
             onClick={togglePlayback}
