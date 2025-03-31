@@ -1,13 +1,14 @@
+import { createQuery } from '@tanstack/solid-query'
 import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
-import { cancelUpload, getUploadQueue } from '~/api/athena'
+import { athena } from '~/api/athena'
+import { devices } from '~/api/devices'
+import { DecoratedUploadQueueItem } from '~/types'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
-import { getAthenaOfflineQueue } from '~/api/devices'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
-import { DecoratedUploadQueueItem } from '~/types'
 
 const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: DecoratedUploadQueueItem }> = ({ cancel, item }) => {
   return (
@@ -45,9 +46,9 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueue = getUploadQueue(props.dongleId)
-  const offlineQueue = getAthenaOfflineQueue(props.dongleId)
-  const cancel = cancelUpload(props.dongleId)
+  const onlineQueue = createQuery(() => athena.getUploadQueue(props.dongleId))
+  const offlineQueue = createQuery(() => devices.getOfflineQueue(props.dongleId))
+  const cancel = athena.cancelUpload(props.dongleId)
 
   const [items, setItems] = createStore<DecoratedUploadQueueItem[]>([])
 
