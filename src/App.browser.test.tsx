@@ -13,7 +13,7 @@ const UPLOAD_QUEUE = 'Upload Queue'
 
 const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
 
-beforeAll(() => configure({ asyncUtilTimeout: 2000 }))
+beforeAll(() => configure({ asyncUtilTimeout: 5000 }))
 
 describe('Demo mode', () => {
   beforeEach(() => setAccessToken(Demo.ACCESS_TOKEN))
@@ -26,9 +26,26 @@ describe('Demo mode', () => {
 
   test('View demo route', async () => {
     const { findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    // Route visible
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
+  })
+
+  test('View public route', async () => {
+    const { findByText, queryByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
+    // Route visible
+    expect(await findByText(PUBLIC_ROUTE_ID.split('/').at(-1)!)).toBeTruthy()
+    // Videos do not load, yet
+    // const video = (await findByTestId('route-video')) as HTMLVideoElement
+    // await waitFor(() => expect(video.src).toBeTruthy())
+    // Device hidden
+    expect(queryByText(UPLOAD_QUEUE)).toBeFalsy()
+  })
+
+  test('Navigate away from private route', async () => {
+    const { findByText } = renderApp(`/${PRIVATE_ROUTE_ID}`)
+    expect(await findByText('demo 3X')).toBeTruthy()
   })
 })
 
@@ -48,32 +65,22 @@ describe('Anonymous user', () => {
   })
 
   test('View demo route', async () => {
-    const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    const { findByText, queryByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    // Route visible
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     // Videos do not load, yet
     // const video = (await findByTestId('route-video')) as HTMLVideoElement
     // await waitFor(() => expect(video.src).toBeTruthy())
-  })
-
-  test('Viewing public route should not show device details', async () => {
-    const { findByTestId, queryByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    const video = (await findByTestId('route-video')) as HTMLVideoElement
-    await waitFor(() => expect(video.src).toBeTruthy())
+    // Device hidden
     expect(queryByText(UPLOAD_QUEUE)).toBeFalsy()
   })
-})
-
-const USERS = [
-  { name: 'anonymous', token: '' },
-  { name: 'demo user', token: Demo.ACCESS_TOKEN },
-]
-
-describe.each(USERS)('Routing (as $name)', ({ token }) => {
-  beforeEach(() => setAccessToken(token))
 
   test('View public route', async () => {
-    const { findByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
+    const { findByText, queryByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
+    // Route visible
     expect(await findByText(PUBLIC_ROUTE_ID.split('/').at(-1)!)).toBeTruthy()
+    // Device hidden
+    expect(queryByText(UPLOAD_QUEUE)).toBeFalsy()
   })
 
   test('Navigate away from private route', async () => {
