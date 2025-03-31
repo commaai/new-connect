@@ -60,9 +60,9 @@ const populateAttributes = (item: UploadQueueItem): UploadQueueItemWithAttribute
   return { ...item, route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
 }
 
-const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItemWithAttributes }> = (props) => {
+const UploadQueueRow: VoidComponent<{ dongleId: string; item: UploadQueueItemWithAttributes }> = (props) => {
   const item = () => props.item
-  const cancel = () => props.cancel([item().id])
+  const onCancel = () => queries.cancelUpload(props.dongleId).mutate([item().id])
   return (
     <div class="flex flex-col">
       <div class="flex items-center justify-between flex-wrap mb-1 gap-x-4 min-w-0">
@@ -73,7 +73,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
-          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={cancel} />}>
+          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={onCancel} />}>
             <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
               {item().id ? `${Math.round(item().progress * 100)}%` : 'Offline'}
             </span>
@@ -97,7 +97,6 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const onlineQueue = createQuery(() => queries.getOnline(props.dongleId))
   const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
-  const cancel = queries.cancelUpload(props.dongleId)
 
   const [items, setItems] = createStore<UploadQueueItemWithAttributes[]>([])
 
@@ -111,7 +110,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const cancelAll = () => {
     const ids = items.filter((item) => item.id).map((item) => item.id)
     if (ids.length === 0) return
-    cancel.mutate(ids)
+    queries.cancelUpload(props.dongleId).mutate(ids)
   }
 
   return (
@@ -126,7 +125,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
         <Switch
           fallback={
             <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
-              <For each={items}>{(item) => <UploadQueueRow cancel={cancel.mutate} item={item} />}</For>
+              <For each={items}>{(item) => <UploadQueueRow dongleId={props.dongleId} item={item} />}</For>
             </div>
           }
         >
