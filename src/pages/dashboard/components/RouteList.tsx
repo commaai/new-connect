@@ -117,7 +117,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     return dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
   }
 
-  let foundFirstHeader = false
+  let foundFirstDateHeader = false
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
@@ -132,14 +132,14 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
             >
               <For each={routes() || []}>
                 {(route) => {
-                  const headerText = getDateHeader(route)
-                  const isFirstHeader = headerText && !foundFirstHeader
-                  if (isFirstHeader) foundFirstHeader = true
+                  const dateHeaderText = getDateHeader(route)
+                  const isFirstDateHeader = dateHeaderText && !foundFirstDateHeader
+                  if (isFirstDateHeader) foundFirstDateHeader = true
 
                   return (
                     <>
-                      <Show when={headerText}>
-                        <h2 class={`text-xl font-bold pl-2 ${isFirstHeader ? '' : 'mt-6'}`}>{headerText}</h2>
+                      <Show when={dateHeaderText}>
+                        <h2 class={`text-xl font-bold pl-2 ${isFirstDateHeader ? '' : 'mt-6'}`}>{dateHeaderText}</h2>
                       </Show>
                       <RouteCard route={route} />
                     </>
