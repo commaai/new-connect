@@ -45,6 +45,6 @@
   "background_color": "#131318",
   "display": "standalone",
   "scope": "/",
-  "theme_color": "#535a92",
+  "theme_color": "#131318",
   "description": "manage your openpilot experience"
 }
