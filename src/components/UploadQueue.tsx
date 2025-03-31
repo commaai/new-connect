@@ -7,7 +7,22 @@ import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
 import { uploadQueue } from '~/queries/upload-queue'
-import { UploadQueueItem } from '~/types'
+import { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
+
+const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem[] =>
+  data
+    .filter((item) => item.method === 'uploadFilesToUrls')
+    .flatMap((item) =>
+      (item.params as UploadFilesToUrlsRequest).files_data.map((file) => ({
+        ...file,
+        path: file.fn,
+        created_at: 0,
+        current: false,
+        id: '',
+        progress: 0,
+        retry_count: 0,
+      })),
+    )
 
 const extractAttributes = (url: string) => {
   const parsed = new URL(url)
@@ -62,9 +77,10 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
   const [items, setItems] = createStore<UploadQueueItem[]>([])
 
   createEffect(() => {
-    const online = onlineQueue.isSuccess ? (onlineQueue.data ?? []) : []
-    const offline = offlineQueue.isSuccess ? (offlineQueue.data ?? []) : []
-    setItems(reconcile([...online, ...offline]))
+    const online = onlineQueue.isSuccess ? (onlineQueue.data?.result ?? []) : []
+    const offline = offlineQueue.isSuccess ? mapOfflineQueueItems(offlineQueue.data ?? []) : []
+    const sorted = [...online, ...offline].sort((a, b) => b.progress - a.progress)
+    setItems(reconcile(sorted))
   })
 
   const cancelAll = () => {
