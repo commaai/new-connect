@@ -37,11 +37,9 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
-          <div class="flex gap-2">
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
-          </div>
+          <span>
+            {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+          </span>
         }
         subhead={location()}
         trailing={
