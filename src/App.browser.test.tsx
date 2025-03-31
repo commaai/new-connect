@@ -1,4 +1,4 @@
-import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
+import { beforeAll, describe, expect, test } from 'vitest'
 import { configure, render, waitFor } from '@solidjs/testing-library'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
@@ -13,10 +13,10 @@ const UPLOAD_QUEUE = 'Upload Queue'
 
 const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
 
-beforeAll(() => configure({ asyncUtilTimeout: 5000 }))
+beforeAll(() => configure({ asyncUtilTimeout: import.meta.env.CI ? 10000 : 5000 }))
 
 describe('Demo mode', () => {
-  beforeEach(() => setAccessToken(Demo.ACCESS_TOKEN))
+  beforeAll(() => setAccessToken(Demo.ACCESS_TOKEN))
 
   test('View dashboard', async () => {
     const { findByText } = renderApp('/')
@@ -52,7 +52,7 @@ describe('Demo mode', () => {
 // TODO: write tests/setup second demo for read-only access tests
 
 describe('Anonymous user', () => {
-  beforeEach(() => clearAccessToken())
+  beforeAll(() => clearAccessToken())
 
   test('Show login page', async () => {
     const { findByText } = renderApp('/')
