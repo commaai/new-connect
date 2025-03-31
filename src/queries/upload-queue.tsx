@@ -8,19 +8,11 @@ export const uploadQueue = {
   online: () => [...uploadQueue.prefix, 'online'],
   onlineForDongle: (dongleId: string) => [...uploadQueue.online(), dongleId],
   getOnline: (dongleId: string) =>
-    queryOptions({
-      queryKey: uploadQueue.onlineForDongle(dongleId),
-      queryFn: () => getUploadQueue(dongleId),
-    }),
-
+    queryOptions({ queryKey: uploadQueue.onlineForDongle(dongleId), queryFn: () => getUploadQueue(dongleId) }),
   offline: () => [...uploadQueue.prefix, 'offline'],
   offlineForDongle: (dongleId: string) => [...uploadQueue.offline(), dongleId],
   getOffline: (dongleId: string) =>
-    queryOptions({
-      queryKey: uploadQueue.offlineForDongle(dongleId),
-      queryFn: () => getAthenaOfflineQueue(dongleId),
-    }),
-
+    queryOptions({ queryKey: uploadQueue.offlineForDongle(dongleId), queryFn: () => getAthenaOfflineQueue(dongleId) }),
   cancelUpload: (dongleId: string) => {
     const queryClient = useQueryClient()
     return createMutation(() => ({
