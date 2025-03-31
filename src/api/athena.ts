@@ -2,6 +2,8 @@ import {
   AthenaCallResponse,
   BackendAthenaCallResponse,
   BackendAthenaCallResponseError,
+  CancelUploadRequest,
+  CancelUploadResponse,
   UploadFile,
   UploadFilesToUrlsRequest,
   UploadFilesToUrlsResponse,
@@ -16,8 +18,13 @@ export const COMMA_CONNECT_PRIORITY = 1
 // Uploads expire after 1 week if device remains offline
 const EXPIRES_IN_SECONDS = 60 * 60 * 24 * 7
 
+export const cancelUpload = (dongleId: string, ids: string[]) =>
+  makeAthenaCall<CancelUploadRequest, CancelUploadResponse>(dongleId, 'cancelUpload', { upload_id: ids })
+
 export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, boolean>(dongleId, 'getNetworkMetered')
+
 export const getUploadQueue = (dongleId: string) => makeAthenaCall<void, UploadQueueItem[]>(dongleId, 'listUploadQueue')
+
 export const uploadFilesToUrls = (dongleId: string, files: UploadFile[]) =>
   makeAthenaCall<UploadFilesToUrlsRequest, UploadFilesToUrlsResponse>(
     dongleId,

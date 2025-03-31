@@ -1,4 +1,4 @@
-import { createQuery } from '@tanstack/solid-query'
+import { createMutation, createQuery, queryOptions, useQueryClient } from '@tanstack/solid-query'
 import { createEffect, For, Match, Show, Switch, VoidComponent } from 'solid-js'
 import { createStore, reconcile } from 'solid-js/store'
 import LinearProgress from './material/LinearProgress'
@@ -6,8 +6,28 @@ import Icon, { IconName } from './material/Icon'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
-import { uploadQueue } from '~/queries/upload-queue'
 import { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/types'
+import { cancelUpload, getUploadQueue } from '~/api/athena'
+import { getAthenaOfflineQueue } from '~/api/devices'
+
+export const queries = {
+  prefix: ['upload_queue'],
+
+  online: () => [...queries.prefix, 'online'],
+  onlineForDongle: (dongleId: string) => [...queries.online(), dongleId],
+  getOnline: (dongleId: string) => queryOptions({ queryKey: queries.onlineForDongle(dongleId), queryFn: () => getUploadQueue(dongleId) }),
+  offline: () => [...queries.prefix, 'offline'],
+  offlineForDongle: (dongleId: string) => [...queries.offline(), dongleId],
+  getOffline: (dongleId: string) =>
+    queryOptions({ queryKey: queries.offlineForDongle(dongleId), queryFn: () => getAthenaOfflineQueue(dongleId) }),
+  cancelUpload: (dongleId: string) => {
+    const queryClient = useQueryClient()
+    return createMutation(() => ({
+      mutationFn: (ids: string[]) => cancelUpload(dongleId, ids),
+      onSettled: () => queryClient.invalidateQueries({ queryKey: queries.onlineForDongle(dongleId) }),
+    }))
+  },
+}
 
 const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem[] =>
   data
@@ -70,9 +90,9 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueue = createQuery(() => uploadQueue.getOnline(props.dongleId))
-  const offlineQueue = createQuery(() => uploadQueue.getOffline(props.dongleId))
-  const cancel = uploadQueue.cancelUpload(props.dongleId)
+  const onlineQueue = createQuery(() => queries.getOnline(props.dongleId))
+  const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
+  const cancel = queries.cancelUpload(props.dongleId)
 
   const [items, setItems] = createStore<UploadQueueItem[]>([])
 
