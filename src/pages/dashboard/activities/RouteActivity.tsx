@@ -49,12 +49,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <Suspense fallback={<div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />}>
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-        </Suspense>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm">Timeline</h3>
+        <div class="flex flex-col">
+          <Suspense fallback={<div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />}>
+            <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          </Suspense>
           <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} />
         </div>
 
