@@ -64,9 +64,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onPause = () => setIsPlaying(false)
   const onEnded = () => setIsPlaying(false)
   const onStalled = () => {
-    if (isPlaying()) {
-      void video.play()
-    }
+    if (!isPlaying()) return
+    void video.play()
   }
 
   onMount(() => {
