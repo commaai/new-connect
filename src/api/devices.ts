@@ -1,7 +1,7 @@
-import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics, UploadFilesToUrlsRequest } from '~/types'
-import { fetcher } from '.'
 import { createQuery } from '@tanstack/solid-query'
+import type { AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics, UploadFilesToUrlsRequest } from '~/types'
 import { parseUploadPath } from '~/utils/parse'
+import { fetcher } from '.'
 
 export const DeviceQueryKeys = {
   offlineQueue: ['devices', 'athena_offline_queue'],
