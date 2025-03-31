@@ -77,7 +77,8 @@ export interface TimelineStatistics {
 }
 
 const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
-  return []
+  console.log('getDerived123', route.fullname, fn)
+  // return []
   if (!route) return []
   const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
   const urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
