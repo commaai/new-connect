@@ -26,6 +26,8 @@ export default defineConfig({
         description: 'manage your openpilot experience',
         background_color: '#131318',
         theme_color: '#131318',
+        start_url: '/',
+        id: '/',
       },
       pwaAssets: {
         config: true,
