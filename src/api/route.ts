@@ -8,7 +8,7 @@ export const parseRouteName = (routeName: string): RouteInfo => {
   return { dongleId, routeId }
 }
 
-export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`).catch(() => undefined)
+export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`)
 
 export const getRouteShareSignature = (routeName: string) => fetcher<RouteShareSignature>(`/v1/route/${routeName}/share_signature`)
 
