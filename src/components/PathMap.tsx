@@ -20,13 +20,13 @@ const createCarIcon = () => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex items-center justify-center rounded-full bg-primary-container">
+      <div class="flex size-[30px] items-center justify-center rounded-full bg-primary-container">
         <Icon size="20" name="directions_car" />
       </div>
     ),
     el,
   )
-  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [25, 30], iconAnchor: [12, 10] })
+  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [20, 20], iconAnchor: [15, 15] })
 }
 
 export const PathMap: Component<{
