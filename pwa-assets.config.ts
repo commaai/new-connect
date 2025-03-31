@@ -16,6 +16,10 @@ export default defineConfig({
       ...minimal2023Preset.maskable,
       resizeOptions: { background: '#131318' },
     },
+    apple: {
+      ...minimal2023Preset.apple,
+      resizeOptions: { background: '#131318' },
+    },
     appleSplashScreens: createAppleSplashScreens({
       padding: 0.3,
       resizeOptions: { fit: 'contain', background: '#131318' },
