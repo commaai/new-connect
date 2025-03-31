@@ -93,10 +93,20 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   })
 
   const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
+  let loading = false
+
   const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        setSize((prev) => prev + 1)
+    async (entries) => {
+      const entry = entries[0]
+      if (entry.isIntersecting && !loading) {
+        loading = true
+        observer.unobserve(entry.target)
+
+        setSize(prev => prev + 1)
+        await pages[size()]?.catch(() => {})
+
+        loading = false
+        observer.observe(entry.target)
       }
     },
     { threshold: 0.1 },
