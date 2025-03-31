@@ -20,9 +20,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   let video!: HTMLVideoElement
 
   const [isPlaying, setIsPlaying] = createSignal(true)
-  const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+  const [progress, setProgress] = createSignal(0)
 
   const updateProgress = () => {
     const currentProgress = (video.currentTime / video.duration) * 100
@@ -58,7 +58,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const onTimeUpdate = (e: Event) => {
       setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
       if (video.paused) updateProgress()
-      props.onProgress?.(video.currentTime)
     }
     const onLoadedMetadata = () => {
       setDuration(video.duration)

@@ -29,7 +29,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  function onTimelineChange(newTime: number) {
+  const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
