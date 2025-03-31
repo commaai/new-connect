@@ -161,7 +161,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
             class="bg-surface-container-highest/80 flex size-8 items-center justify-center rounded-full text-on-surface hover:bg-surface-container-highest"
             onClick={togglePlayback}
           >
-            <Icon name={isPlaying() ? 'pause' : 'play_arrow'} />
+            <Icon name={isPlaying() ? 'pause' : 'play_arrow'} filled />
           </button>
 
           <div class="font-mono text-sm text-on-surface">
