@@ -9,6 +9,7 @@
         "@sentry/vite-plugin": "^3.2.2",
         "@solid-primitives/state-machine": "^0.1.0",
         "@solidjs/router": "^0.15.3",
+        "@tanstack/solid-query": "^5.70.0",
         "clsx": "^2.1.1",
         "dayjs": "^1.11.13",
         "hls.js": "^1.5.20",
@@ -19,6 +20,7 @@
       "devDependencies": {
         "@biomejs/biome": "1.9.4",
         "@solidjs/testing-library": "^0.8.10",
+        "@tanstack/solid-query-devtools": "^5.70.0",
         "@types/bun": "^1.2.5",
         "@types/geojson": "^7946.0.16",
         "@types/leaflet": "^1.9.16",
@@ -560,6 +562,14 @@
     "@solidjs/testing-library": ["@solidjs/testing-library@0.8.10", "", { "dependencies": { "@testing-library/dom": "^10.4.0" }, "peerDependencies": { "@solidjs/router": ">=0.9.0", "solid-js": ">=1.0.0" }, "optionalPeers": ["@solidjs/router"] }, "sha512-qdeuIerwyq7oQTIrrKvV0aL9aFeuwTd86VYD3afdq5HYEwoox1OBTJy4y8A3TFZr8oAR0nujYgCzY/8wgHGfeQ=="],
 
     "@surma/rollup-plugin-off-main-thread": ["@surma/rollup-plugin-off-main-thread@2.2.3", "", { "dependencies": { "ejs": "^3.1.6", "json5": "^2.2.0", "magic-string": "^0.25.0", "string.prototype.matchall": "^4.0.6" } }, "sha512-lR8q/9W7hZpMWweNiAKU7NQerBnzQQLvi8qnTDU/fxItPhtZVMbPV3lbCwjhIlNBe9Bbr5V+KHshvWmVSG9cxQ=="],
+
+    "@tanstack/query-core": ["@tanstack/query-core@5.70.0", "", {}, "sha512-ZkkjQAZjI6nS5OyAmaSQafQXK180Xvp0lZYk4BzrnskkTV8On3zSJUxOIXnh0h/8EgqRkCA9i879DiJovA1kGw=="],
+
+    "@tanstack/query-devtools": ["@tanstack/query-devtools@5.67.2", "", {}, "sha512-O4QXFFd7xqp6EX7sdvc9tsVO8nm4lpWBqwpgjpVLW5g7IeOY6VnS/xvs/YzbRhBVkKTMaJMOUGU7NhSX+YGoNg=="],
+
+    "@tanstack/solid-query": ["@tanstack/solid-query@5.70.0", "", { "dependencies": { "@tanstack/query-core": "5.70.0" }, "peerDependencies": { "solid-js": "^1.6.0" } }, "sha512-PXWrLxNeS7rZXQ3WHEaTpDJQmuJhkbH3cbZojmp2ueQIxS9PReVUde/Yn/EgAmDl19dNuF3VT5yEQOqKJovbYA=="],
+
+    "@tanstack/solid-query-devtools": ["@tanstack/solid-query-devtools@5.70.0", "", { "dependencies": { "@tanstack/query-devtools": "5.67.2" }, "peerDependencies": { "@tanstack/solid-query": "^5.70.0", "solid-js": "^1.6.0" } }, "sha512-unFcNHpazEwo71MrrlMb6EXedc+mUyzvaNzgOWyCzUr8YR6LH741JYlvY55XC6e5cDHNWsrd9g9i8BOTAcljLA=="],
 
     "@testing-library/dom": ["@testing-library/dom@10.4.0", "", { "dependencies": { "@babel/code-frame": "^7.10.4", "@babel/runtime": "^7.12.5", "@types/aria-query": "^5.0.1", "aria-query": "5.3.0", "chalk": "^4.1.0", "dom-accessibility-api": "^0.5.9", "lz-string": "^1.5.0", "pretty-format": "^27.0.2" } }, "sha512-pemlzrSESWbdAloYml3bAJMEfNh1Z7EduzqPKprCH5S341frlpYnUEW0H72dLxa6IsYr+mPno20GiSm+h9dEdQ=="],
 
