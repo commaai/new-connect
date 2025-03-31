@@ -8,6 +8,7 @@ import clsx from 'clsx'
 import { getAthenaOfflineQueue } from '~/api/devices'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
+import Button from '~/components/material/Button'
 
 interface DecoratedUploadQueueItem extends UploadQueueItem {
   route: string
@@ -45,7 +46,7 @@ const UploadQueueRow: VoidComponent<{ dongleId: string; item: DecoratedUploadQue
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
           <Show
             when={!item.id || item.progress !== 0}
-            fallback={<IconButton class="text-red-300" size="20" name="close_small" onClick={() => cancel(dongleId, [item.id])} />}
+            fallback={<IconButton size="20" name="close_small" onClick={() => cancel(dongleId, [item.id])} />}
           >
             <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
               {item.id ? `${Math.round(item.progress * 100)}%` : 'Offline'}
@@ -134,7 +135,9 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
         <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
-        <IconButton name="close" onClick={cancelAll} />
+        <Button onClick={cancelAll} class="px-2 md:px-3" leading={<Icon name="close" size="20" />} color="primary">
+          <span class="flex items-center gap-1 font-mono">Cancel All</span>
+        </Button>
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch

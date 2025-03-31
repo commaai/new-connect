@@ -1,5 +1,5 @@
 import { getAccessToken } from './auth/client'
-import { BASE_URL } from './config'
+import { API_URL } from './config'
 
 const populateFetchedAt = <T>(item: T): T => {
   return {
@@ -8,7 +8,7 @@ const populateFetchedAt = <T>(item: T): T => {
   }
 }
 
-export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: string = BASE_URL): Promise<T> {
+export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: string = API_URL): Promise<T> {
   const res = await fetch(`${apiUrl}${endpoint}`, {
     ...init,
     headers: {

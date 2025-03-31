@@ -1,14 +1,24 @@
-import { type VoidComponent, batch } from 'solid-js'
+import { createEffect, createSignal, on, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
-import { FileTypes, uploadAllSegments } from '~/api/upload'
+import { uploadAllSegments, type FileType } from '~/api/upload'
 import type { Route } from '~/types'
 
+const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
+type ButtonType = (typeof BUTTON_TYPES)[number]
+type ButtonState = 'idle' | 'loading' | 'success' | 'error'
+
+const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
+  road: ['cameras', 'ecameras'],
+  driver: ['dcameras'],
+  logs: ['logs'],
+}
+
 interface UploadButtonProps {
-  state: 'idle' | 'loading' | 'success' | 'error'
+  state: ButtonState
   onClick?: () => void
   icon: IconName
   text: string
@@ -21,13 +31,10 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 
   const handleUpload = () => {
     if (disabled()) return
-
-    if (props.onClick) {
-      props.onClick()
-    }
+    props.onClick?.()
   }
 
-  const stateToIcon: Record<Exclude<UploadButtonProps['state'], null | undefined>, IconName> = {
+  const stateToIcon: Record<ButtonState, IconName> = {
     idle: icon(),
     loading: 'progress_activity',
     success: 'check',
@@ -47,8 +54,6 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   )
 }
 
-type ButtonType = 'cameras' | 'driver' | 'logs' | 'route'
-
 interface RouteUploadButtonsProps {
   route?: Route
 }
@@ -56,68 +61,58 @@ interface RouteUploadButtonsProps {
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   const [uploadStore, setUploadStore] = createStore({
     states: {
-      cameras: 'idle',
+      road: 'idle',
       driver: 'idle',
       logs: 'idle',
       route: 'idle',
-    } as Record<ButtonType, 'idle' | 'loading' | 'success' | 'error'>,
+    } as Record<ButtonType, ButtonState>,
   })
+  const [abortController, setAbortController] = createSignal(new AbortController())
 
-  const updateButtonStates = (types: ButtonType[], state: 'loading' | 'success' | 'error') => {
-    batch(() => {
-      for (const type of types) {
-        setUploadStore('states', type, state)
-      }
-    })
-  }
-
-  const buttonToFileTypeMap: Record<ButtonType, (keyof typeof FileTypes)[] | undefined> = {
-    cameras: ['cameras', 'ecameras'],
-    driver: ['dcameras'],
-    logs: ['logs'],
-    route: undefined,
-  }
+  createEffect(
+    on(
+      () => props.route,
+      () => {
+        abortController().abort()
+        setAbortController(new AbortController())
+        setUploadStore('states', BUTTON_TYPES, 'idle')
+      },
+    ),
+  )
 
   const handleUpload = async (type: ButtonType) => {
     if (!props.route) return
+    const { fullname, maxqlog } = props.route
+    const { signal } = abortController()
 
-    if (type === 'route') {
-      const typesNotUploadedYet = Object.entries(uploadStore.states)
-        .filter(([_, state]) => state !== 'loading' && state !== 'success')
-        .map(([type]) => type as ButtonType)
-        .filter((type) => type !== undefined)
-
-      const typesToUpload = typesNotUploadedYet.flatMap((type) => buttonToFileTypeMap[type]).filter((type) => type !== undefined)
-
-      updateButtonStates(typesNotUploadedYet, 'loading')
-
-      try {
-        await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, typesToUpload)
-        updateButtonStates(typesNotUploadedYet, 'success')
-      } catch (err) {
-        console.error('Failed to upload', err)
-        updateButtonStates(typesNotUploadedYet, 'error')
-      }
-      return
+    const updateButtonStates = (types: readonly ButtonType[], state: ButtonState) => {
+      if (signal.aborted) return
+      setUploadStore('states', types, state)
     }
 
-    setUploadStore('states', type, 'loading')
+    const uploadButtonTypes: ButtonType[] = [type]
+    let uploadFileTypes: FileType[] = []
+    for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
+      const state = uploadStore.states[check]
+      if (state === 'loading' || state === 'success') continue
+      uploadButtonTypes.push(check)
+      uploadFileTypes = uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
+    }
 
-    const fileTypesToUpload = buttonToFileTypeMap[type]
-
+    updateButtonStates(uploadButtonTypes, 'loading')
     try {
-      await uploadAllSegments(props.route.fullname, props.route.maxqlog + 1, fileTypesToUpload)
-      setUploadStore('states', type, 'success')
+      await uploadAllSegments(fullname, maxqlog + 1, uploadFileTypes)
+      updateButtonStates(uploadButtonTypes, 'success')
     } catch (err) {
       console.error('Failed to upload', err)
-      setUploadStore('states', type, 'error')
+      updateButtonStates(uploadButtonTypes, 'error')
     }
   }
 
   return (
     <div class="flex flex-col rounded-b-md m-5">
       <div class="grid grid-cols-2 gap-3 w-full lg:grid-cols-4">
-        <UploadButton text="Road" icon="videocam" state={uploadStore.states.cameras} onClick={() => handleUpload('cameras')} />
+        <UploadButton text="Road" icon="videocam" state={uploadStore.states.road} onClick={() => handleUpload('road')} />
         <UploadButton text="Driver" icon="person" state={uploadStore.states.driver} onClick={() => handleUpload('driver')} />
         <UploadButton text="Logs" icon="description" state={uploadStore.states.logs} onClick={() => handleUpload('logs')} />
         <UploadButton text="All" icon="upload" state={uploadStore.states.route} onClick={() => handleUpload('route')} />

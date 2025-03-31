@@ -12,7 +12,7 @@ permissions:
   checks: write
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ${{ github.head_ref || github.ref }}-${{ github.workflow }}
   cancel-in-progress: true
 
 jobs:
@@ -89,6 +89,22 @@ jobs:
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
           command: pages deploy dist --project-name=connect --branch=${{ needs.pr.outputs.number }} --commit-dirty=true
 
+      - name: Comment URL on PR
+        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
+        with:
+          message: |
+            <!-- _(run_id **${{ github.run_id }}**)_ -->
+
+            # deployed preview: https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev
+
+            Welcome to connect! Make sure to:
+            * read the [contributing guidelines](https://github.com/commaai/connect?tab=readme-ov-file#contributing)
+            * mark your PR as a draft until it's ready to review
+            * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
+          comment-tag: run_id
+          pr-number: ${{ needs.pr.outputs.number }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
       - name: Checkout ci-artifacts
         uses: actions/checkout@v4
         with:
@@ -110,7 +126,7 @@ jobs:
           git commit -m "screenshots for PR #${{ needs.pr.outputs.number }}"
           git push origin connect/pr-${{ needs.pr.outputs.number }} --force
 
-      - name: Comment URL on PR
+      - name: Add screenshots to comment on PR
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
         with:
           message: |

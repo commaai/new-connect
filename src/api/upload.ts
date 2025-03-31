@@ -10,7 +10,7 @@ export const FileTypes = {
   ecameras: ['ecamera.hevc'],
 }
 
-type FileType = keyof typeof FileTypes
+export type FileType = keyof typeof FileTypes
 
 const getFiles = async (routeName: string, types?: FileType[]) => {
   const files = await getAlreadyUploadedFiles(routeName)
