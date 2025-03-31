@@ -95,13 +95,11 @@ export const PathMap: Component<{
       setIsMapInteractive(true)
       marker?.getElement()?.classList.add('no-transition')
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
-      m.panTo([lat, lng], { animate: true })
       updatePosition(lng, lat)
     }
 
     marker.on('drag', handleDrag).on('dragend', () => {
       setIsDragging(false)
-      m.panTo(currentCoord(), { animate: true })
     })
     hitboxPolyline?.on('mousedown', handleDrag)
     m.on('mouseup', () => setIsDragging(false))
