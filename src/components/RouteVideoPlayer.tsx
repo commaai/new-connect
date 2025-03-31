@@ -23,11 +23,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [progress, setProgress] = createSignal(0)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
-  // const progress = () => {
-  //   const total = duration()
-  //   if (!total) return 0
-  //   return (currentTime() / total) * 100
-  // }
 
   const updateProgress = () => {
     const currentProgress = (video.currentTime / video.duration) * 100
