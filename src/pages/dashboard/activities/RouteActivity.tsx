@@ -33,8 +33,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
-    () => route() && events() && ([route(), events()] as const),
-    ([r, e]) => generateTimelineStatistics(r, e),
+    () => [route(), events()] as const,
+    ([r, e]) => generateTimelineStatistics(r, e)
   )
 
   const onTimelineChange = (newTime: number) => {

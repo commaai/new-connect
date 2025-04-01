@@ -190,7 +190,7 @@ const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEve
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-export const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
+export const generateTimelineStatistics = (route: Route | undefined, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0
   let userFlags = 0
   timeline.forEach((ev) => {
