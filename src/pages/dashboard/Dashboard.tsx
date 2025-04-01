@@ -1,4 +1,4 @@
-import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -6,6 +6,7 @@ import clsx from 'clsx'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
+import { Device } from '~/api/types'
 import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
@@ -114,65 +115,74 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices] = createResource(getDevices)
   const [profile] = createResource(getProfile)
 
-  // a device which the user does not have access to, but are viewing a public route
-  const [isSharedDevice] = createResource(
-    () => ({ devices: devices(), dongleId: dongleId(), profile: profile() }),
-    ({ devices, dongleId, profile }) =>
-      !profile?.superuser && devices && dongleId && !devices.find((device) => device.dongle_id === dongleId),
-  )
-
-  const getDefaultDongleId = () => {
-    // Do not redirect if dongle ID already selected
-    if (dongleId()) return undefined
-
+  const getDefaultDongleId = (devices: Device[]) => {
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
-    if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
-    return devices()?.[0]?.dongle_id
+    if (lastSelectedDongleId && devices.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
+    return devices[0].dongle_id
   }
+
+  const state = createMemo<'loading' | 'pair' | 'unauthorized' | 'forbidden' | 'error' | 'no-device' | string | 'route-only' | 'full'>(
+    () => {
+      const [dongleId, dateStr] = pathParts()
+      if (devices.latest === undefined || profile.latest === undefined) return 'loading'
+      if (profile.latest === null) return dongleId && dateStr ? 'route-only' : 'unauthorized'
+      if (dongleId === 'pair' || pairToken()) return 'pair'
+      if (devices.latest === null) return 'error'
+      if (!dongleId) return devices.latest.length ? getDefaultDongleId(devices.latest) : 'no-device'
+      const device = devices()?.find((device) => device.dongle_id === dongleId)
+      if (!device) return dateStr ? 'route-only' : 'forbidden'
+      return 'full'
+    },
+  )
 
   return (
     <Drawer drawer={<DashboardDrawer />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={dongleId() === 'pair' || pairToken()}>
+      <Switch fallback={<Navigate href={`/${state()}`} />}>
+        <Match when={state() === 'loading'}>
+          <div />
+        </Match>
+        <Match when={state() === 'pair'}>
           <PairActivity />
         </Match>
-        <Match when={isSharedDevice()}>
-          <Show when={dateStr()} fallback={<Navigate href="/" />}>
-            <div class="mx-auto max-w-[1560px]">
-              <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
-            </div>
-          </Show>
-        </Match>
-        <Match when={dongleId()} keyed>
-          {(id) => (
-            <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} />}
-              paneTwo={
-                <Switch
-                  fallback={
-                    <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                      <Icon name="search" size="48" />
-                      <span class="text-title-md">Select a route to view</span>
-                    </div>
-                  }
-                >
-                  <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                    <SettingsActivity dongleId={id} />
-                  </Match>
-                  <Match when={dateStr()}>
-                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
-                  </Match>
-                </Switch>
-              }
-              paneTwoContent={!!dateStr()}
-            />
-          )}
-        </Match>
-        <Match when={!profile.loading && !profile.latest}>
+        <Match when={state() === 'unauthorized'}>
           <Navigate href="/login" />
         </Match>
-        <Match when={getDefaultDongleId()} keyed>
-          {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+        <Match when={state() === 'forbidden'}>
+          <Navigate href="/" />
+        </Match>
+        <Match when={state() === 'error'}>
+          <TopAppBar leading={<DrawerToggleButton />}>Something went wrong</TopAppBar>
+        </Match>
+        <Match when={state() === 'no-device'}>
+          <TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>
+        </Match>
+        <Match when={state() === 'route-only'}>
+          <div class="mx-auto max-w-[1280px]">
+            <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+          </div>
+        </Match>
+        <Match when={state() === 'full'}>
+          <DashboardLayout
+            paneOne={<DeviceActivity dongleId={dongleId()} />}
+            paneTwo={
+              <Switch
+                fallback={
+                  <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                    <Icon name="search" size="48" />
+                    <span class="text-title-md">Select a route to view</span>
+                  </div>
+                }
+              >
+                <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                  <SettingsActivity dongleId={dongleId()} />
+                </Match>
+                <Match when={dateStr()}>
+                  <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+                </Match>
+              </Switch>
+            }
+            paneTwoContent={!!dateStr()}
+          />
         </Match>
       </Switch>
     </Drawer>

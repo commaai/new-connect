@@ -60,7 +60,7 @@ export const getDeviceStats = async (dongleId: string) =>
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
-    .catch(() => [])
+    .catch(() => null)
 
 export const unpairDevice = async (dongleId: string) =>
   fetcher<{ success: number }>(`/v1/devices/${dongleId}/unpair`, {

@@ -9,6 +9,7 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 const PUBLIC_ROUTE_ID = 'e886087f430e7fe7/00000221--604653e929'
 const PRIVATE_ROUTE_ID = 'e886087f430e7fe7/00000009--84661aeefa'
 
+const repeats = import.meta.env.CI ? 5 : 2
 // until errors are properly handled
 const SKIP_PRIVATE = true
 
@@ -18,7 +19,7 @@ const renderApp = (location: string) => render(() => <Routes />, { location, wra
 
 beforeAll(() => configure({ asyncUtilTimeout: import.meta.env.CI ? 10000 : 5000 }))
 
-describe('Demo mode', () => {
+describe('Demo mode', { repeats }, () => {
   beforeAll(() => setAccessToken(Demo.ACCESS_TOKEN))
 
   test('View dashboard', async () => {
@@ -54,7 +55,7 @@ describe('Demo mode', () => {
 
 // TODO: write tests/setup second demo for read-only access tests
 
-describe('Anonymous user', () => {
+describe('Anonymous user', { repeats }, () => {
   beforeAll(() => clearAccessToken())
 
   test('Show login page', async () => {
@@ -67,7 +68,7 @@ describe('Anonymous user', () => {
     expect(await findByText('Sign in with Google')).toBeTruthy()
   })
 
-  test.skip('View demo route', async () => {
+  test('View demo route', async () => {
     const { findByText, queryByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     // Route visible
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
@@ -78,7 +79,7 @@ describe('Anonymous user', () => {
     expect(queryByText(UPLOAD_QUEUE)).toBeFalsy()
   })
 
-  test.skip('View public route', async () => {
+  test('View public route', async () => {
     const { findByText, queryByText } = renderApp(`/${PUBLIC_ROUTE_ID}`)
     // Route visible
     expect(await findByText(PUBLIC_ROUTE_ID.split('/').at(-1)!)).toBeTruthy()
