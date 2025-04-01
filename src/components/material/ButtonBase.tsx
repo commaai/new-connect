@@ -27,7 +27,13 @@ const ButtonBase: Component<ButtonBaseProps> = (props) => {
       keyed
     >
       {(href) => (
-        <A class={clsx('relative isolate overflow-hidden', props.class)} onClick={onClick} href={href} activeClass={props.activeClass}>
+        <A
+          noScroll
+          class={clsx('relative isolate overflow-hidden', props.class)}
+          onClick={onClick}
+          href={href}
+          activeClass={props.activeClass}
+        >
           {props.children}
         </A>
       )}

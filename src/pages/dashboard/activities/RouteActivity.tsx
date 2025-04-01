@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Match, Suspense, Switch, type VoidComponent } from 'solid-js'
+import { createEffect, createSignal, Match, Suspense, Switch, type VoidComponent } from 'solid-js'
 import { Navigate } from '@solidjs/router'
 import { createQuery } from '@tanstack/solid-query'
 
@@ -27,69 +27,67 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
-  const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const route = createQuery(() => ({
-    queryKey: ['route', routeName()],
-    queryFn: () => getRoute(routeName()),
-    retry: false,
-  }))
-  const [startTime] = createResource(route, (route) => dayjs(route.data?.start_time)?.format('ddd, MMM D, YYYY'))
-
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
+  const routeName = () => `${props.dongleId}|${props.dateStr}`
+  const route = createQuery(() => ({ queryKey: ['route', routeName()], queryFn: () => getRoute(routeName()) }))
+  const device = createQuery(() => ({ queryKey: ['device', props.dongleId], queryFn: () => getDevice(props.dongleId) }))
+  const profile = createQuery(() => ({ queryKey: ['profile'], queryFn: getProfile }))
+
   createEffect(() => {
-    if (!device() || !profile() || (!device()?.is_owner && !profile()?.superuser)) return
-    setRouteViewed(device()!.dongle_id, props.dateStr).catch(console.error)
+    if (!device.isSuccess || !profile.isSuccess || (!device.data?.is_owner && !profile.data?.superuser)) return
+    setRouteViewed(device.data!.dongle_id, props.dateStr).catch(console.error)
   })
 
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
+        {dayjs(route.data?.start_time)?.format('ddd, MMM D, YYYY')}
+      </TopAppBar>
 
       <Switch>
         <Match when={route.isError}>
           <Navigate href="/" />
         </Match>
-        <Match when={route.isSuccess}>
+        <Match when={true}>
           <div class="flex flex-col gap-6 px-4 pb-4">
-            <div class="flex flex-col">
-              <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-              <Timeline class="mb-1" route={route.data} seekTime={seekTime()} updateTime={onTimelineChange} />
-            </div>
+            <Suspense fallback={<div class="skeleton-loader h-[292px]" />}>
+              <div class="flex flex-col">
+                <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+                <Timeline class="mb-1" route={route.data} seekTime={seekTime()} updateTime={onTimelineChange} />
+              </div>
+            </Suspense>
 
-            <div class="flex flex-col gap-2">
-              <h3 class="text-label-sm uppercase">Route Info</h3>
-              <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-                <RouteStatistics class="p-5" route={route.data} />
-
-                <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-label-sm uppercase">Route Info</h3>
+                <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
+                  <RouteStatistics class="p-5" route={route.data} />
                   <RouteActions routeName={routeName()} route={route.data} />
-                </Suspense>
+                </div>
               </div>
-            </div>
+            </Suspense>
 
-            <div class="flex flex-col gap-2">
-              <h3 class="text-label-sm uppercase">Upload Files</h3>
-              <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-                <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-label-sm uppercase">Upload Files</h3>
+                <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
                   <RouteUploadButtons route={route.data} />
-                </Suspense>
+                </div>
               </div>
-            </div>
+            </Suspense>
 
-            <div class="flex flex-col gap-2">
-              <h3 class="text-label-sm uppercase">Route Map</h3>
-              <div class="aspect-square overflow-hidden rounded-lg">
-                <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
+            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
+              <div class="flex flex-col gap-2">
+                <h3 class="text-label-sm uppercase">Route Map</h3>
+                <div class="aspect-square overflow-hidden rounded-lg">
                   <RouteStaticMap route={route.data} />
-                </Suspense>
+                </div>
               </div>
-            </div>
+            </Suspense>
           </div>
         </Match>
       </Switch>
