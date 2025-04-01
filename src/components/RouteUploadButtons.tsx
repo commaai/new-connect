@@ -19,7 +19,7 @@ const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
 
 interface UploadButtonProps {
   state: ButtonState
-  onClick?: () => void
+  onClick: () => void
   icon: IconName
   text: string
 }
