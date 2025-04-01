@@ -98,9 +98,12 @@ const RoutePathMap: Component<{
       updatePosition(lng, lat)
     }
 
-    marker.on('drag', handleDrag).on('dragend', () => {
-      setIsDragging(false)
+    marker.on('click', () => {
+      setIsLocked(!isLocked()) // toggle lock state when marker clicked
+      setShowTransition(false)
+      map()?.panTo(currentCoord()) // center map on marker when clicked
     })
+    marker.on('drag', handleDrag).on('dragend', () => setIsDragging(false))
     hitboxPolyline?.on('mousedown', handleDrag)
     m.on('mouseup', () => setIsDragging(false))
 
