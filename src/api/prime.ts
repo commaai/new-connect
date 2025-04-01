@@ -41,12 +41,6 @@ export const getSubscribeInfo = async (dongleId: string) => {
   return fetcher<SubscribeInfo>(`/v1/prime/subscribe_info?${params.toString()}`, undefined, BILLING_URL)
 }
 
-interface ActivateSubscriptionRequest {
-  dongle_id: string
-  sim_id: string | null
-  stripe_token: string
-}
-
 const getBilling = <T>(endpoint: string, init?: RequestInit): Promise<T> => fetcher<T>(endpoint, init, BILLING_URL)
 
 const postBilling = <T>(endpoint: string, body: unknown, init?: RequestInit): Promise<T> => {
@@ -65,23 +59,7 @@ const postBilling = <T>(endpoint: string, body: unknown, init?: RequestInit): Pr
   )
 }
 
-export const activateSubscription = async (body: ActivateSubscriptionRequest) => postBilling<{ success: 1 }>('/v1/prime/pay', body)
-
 export const cancelSubscription = async (dongleId: string) => postBilling<{ success: 1 }>('/v1/prime/cancel', { dongle_id: dongleId })
-
-interface PaymentSource {
-  brand: string
-  country: string
-  exp_month: number
-  exp_year: number
-  last4: string
-  tokenization_method: string | null
-}
-
-export const getPaymentSource = async () => getBilling<PaymentSource>('/v1/prime/payment_source')
-
-export const setPaymentSource = async (stripeToken: string) =>
-  postBilling<PaymentSource>('/v1/prime/payment_source', { stripe_token: stripeToken })
 
 export const getStripeCheckout = async (dongleId: string, simId: string, plan: string) =>
   postBilling<{ url: string }>('/v1/prime/stripe_checkout', {
