@@ -28,7 +28,7 @@ const createCarIcon = () => {
     ),
     el,
   )
-  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [20, 20], iconAnchor: [15, 15] })
+  return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [30, 30], iconAnchor: [15, 15] })
 }
 
 const RoutePathMap: Component<{
