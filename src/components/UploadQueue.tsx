@@ -125,7 +125,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
           fallback={
-            <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto hide-scrollbar">
+            <div class="absolute inset-0 bottom-4 flex flex-col gap-2 px-4 overflow-y-auto">
               <For each={items}>{(item) => <UploadQueueRow cancel={cancel().mutate} item={item} />}</For>
             </div>
           }
