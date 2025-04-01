@@ -46,7 +46,7 @@ const RoutePathMap: Component<{
   const [position, setPosition] = createSignal(0) // current position in the route
   const [isLocked, setIsLocked] = createSignal(true) // auto track and center with map interaction disabled
   const [isDragging, setIsDragging] = createSignal(false) // marker is being dragged
-  const [showTransition, setShowTransition] = createSignal(false) // smooth panning and marker animation while playing
+  const [showTransition, setShowTransition] = createSignal(false) // smooth marker transition
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
@@ -58,6 +58,10 @@ const RoutePathMap: Component<{
   let pastPolyline: L.Polyline | null = null
   let futurePolyline: L.Polyline | null = null
   let hitboxPolyline: L.Polyline | null = null
+
+  const centerMarker: (animateDuration?: number) => void = (animateDuration = 0.25) => {
+    map()?.panTo(currentCoord(), { animate: animateDuration > 0, duration: animateDuration })
+  }
 
   onMount(() => {
     setTimeout(() => {
@@ -100,16 +104,19 @@ const RoutePathMap: Component<{
 
     const handleDragEnd = () => {
       setIsDragging(false)
-      map()?.panTo(currentCoord()) // Center marker on map when dragging ends
+      centerMarker() // Center marker on map when dragging ends
     }
 
     marker.on('click', () => {
       setIsLocked(!isLocked()) // Toggle lock state when marker clicked
-      setShowTransition(false)
-      map()?.panTo(currentCoord()) // Center map on marker when clicked
+      centerMarker() // Center marker when it's clicked
     })
     marker.on('drag', handleDrag).on('dragend', handleDragEnd)
-    hitboxPolyline?.on('mousedown', handleDrag)
+    hitboxPolyline?.on('mousedown', (e) => {
+      handleDrag(e)
+      centerMarker() // Center marker when just selecting route point without dragging
+    })
+    hitboxPolyline?.on('mouseup', handleDragEnd)
 
     setMap(m)
     onCleanup(() => m.remove())
@@ -157,7 +164,7 @@ const RoutePathMap: Component<{
     futurePolyline?.setLatLngs(futureCoords())
     marker?.setLatLng(currentCoord())
 
-    if (isLocked() && !isDragging()) map()?.panTo(currentCoord(), { animate: showTransition(), duration: 2 })
+    if (isLocked() && !isDragging()) centerMarker(showTransition() ? 2 : 0)
   })
 
   // Update marker animation class
@@ -197,10 +204,7 @@ const RoutePathMap: Component<{
         onClick={() => {
           const newLocked = !isLocked()
           setIsLocked(newLocked)
-          if (newLocked) {
-            setShowTransition(false)
-            map()?.panTo(currentCoord())
-          }
+          if (newLocked) centerMarker()
         }}
       />
     </div>
