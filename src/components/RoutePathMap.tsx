@@ -47,6 +47,7 @@ const RoutePathMap: Component<{
   const [isLocked, setIsLocked] = createSignal(true)
   const [isDragging, setIsDragging] = createSignal(false)
   const [isMapInteractive, setIsMapInteractive] = createSignal(false)
+  const [showTransition, setShowTransition] = createSignal(false)
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
@@ -93,7 +94,7 @@ const RoutePathMap: Component<{
       setIsDragging(true)
       setIsLocked(false)
       setIsMapInteractive(true)
-      marker?.getElement()?.classList.add('no-transition')
+      setShowTransition(false)
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
     }
@@ -128,11 +129,7 @@ const RoutePathMap: Component<{
 
   createEffect(() => {
     const t = props.seekTime()
-    if (t - lastSeekTime > 0.3 || t - lastSeekTime < 0) {
-      marker?.getElement()?.classList.add('no-transition')
-    } else {
-      marker?.getElement()?.classList.remove('no-transition')
-    }
+    setShowTransition(t - lastSeekTime >= 0 && t - lastSeekTime <= 0.3)
     lastSeekTime = t
     if (!props.coords.length) return
     if (t < props.coords[0].t) {
@@ -151,6 +148,12 @@ const RoutePathMap: Component<{
     marker?.setLatLng(currentCoord())
 
     if (isLocked() && !isDragging()) map()?.panTo(currentCoord(), { animate: true, duration: 2 })
+  })
+
+  createEffect(() => {
+    const markerClassList = marker?.getElement()?.classList
+    if (showTransition()) markerClassList?.remove('no-transition')
+    else markerClassList?.add('no-transition')
   })
 
   return (
@@ -184,8 +187,8 @@ const RoutePathMap: Component<{
           const newLocked = !isLocked()
           setIsLocked(newLocked)
           if (newLocked) {
+            setShowTransition(false)
             map()?.panTo(currentCoord())
-            marker?.getElement()?.classList.add('no-transition')
           }
           setIsMapInteractive(!newLocked)
         }}
