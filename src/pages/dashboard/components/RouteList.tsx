@@ -16,20 +16,17 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const startPosition = () => [props.route.start_lng || 0, props.route.start_lat || 0] as number[]
-  const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
-  const [startPlace] = createResource(startPosition, getPlaceName)
-  const [endPlace] = createResource(endPosition, getPlaceName)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
-  const [location] = createResource(
-    () => [startPlace(), endPlace()],
-    ([startPlace, endPlace]) => {
-      if (!startPlace && !endPlace) return ''
-      if (!endPlace || startPlace === endPlace) return startPlace
-      if (!startPlace) return endPlace
-      return `${startPlace} to ${endPlace}`
-    },
-  )
+  const [location] = createResource(async () => {
+    const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
+    const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
+    const startPlace = await getPlaceName(startPos)
+    const endPlace = await getPlaceName(endPos)
+    if (!startPlace && !endPlace) return ''
+    if (!endPlace || startPlace === endPlace) return startPlace
+    if (!startPlace) return endPlace
+    return `${startPlace} to ${endPlace}`
+  })
 
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
@@ -42,7 +39,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             </span>
           </div>
         }
-        subhead={location()}
+        subhead={<Suspense>{location()}</Suspense>}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
@@ -59,6 +56,20 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       </CardContent>
     </Card>
   )
+}
+
+const Sentinel = (props: { onTrigger: () => void }) => {
+  let sentinel!: HTMLDivElement
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0].isIntersecting) return
+      props.onTrigger()
+    },
+    { threshold: 0.1 },
+  )
+  onMount(() => observer.observe(sentinel))
+  onCleanup(() => observer.disconnect())
+  return <div ref={sentinel} class="h-10 w-full" />
 }
 
 const PAGE_SIZE = 10
@@ -92,23 +103,6 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     }
   })
 
-  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        setSize((prev) => prev + 1)
-      }
-    },
-    { threshold: 0.1 },
-  )
-  onMount(() => {
-    const sentinelEl = sentinel()
-    if (sentinelEl) {
-      observer.observe(sentinelEl)
-    }
-  })
-  onCleanup(() => observer.disconnect())
-
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
@@ -125,7 +119,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
           )
         }}
       </For>
-      <div ref={setSentinel} class="h-10 w-full" />
+      <Sentinel onTrigger={() => setSize((size) => size + 1)} />
     </div>
   )
 }
