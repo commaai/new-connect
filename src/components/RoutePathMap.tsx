@@ -119,6 +119,7 @@ const RoutePathMap: Component<{
       centerMarker() // Center marker when just selecting route point without dragging
     })
     hitboxPolyline?.on('mouseup', handleDragEnd)
+    m?.on('mouseup', () => setIsDragging(false)) // this is needed for some cases, but we don't want to center the marker
 
     setMap(m)
     onCleanup(() => m.remove())
