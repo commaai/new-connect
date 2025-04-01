@@ -184,8 +184,10 @@ const RoutePathMap: Component<{
         onClick={() => {
           const newLocked = !isLocked()
           setIsLocked(newLocked)
-          map()?.panTo(currentCoord())
-          marker?.getElement()?.classList.add('no-transition')
+          if (newLocked) {
+            map()?.panTo(currentCoord())
+            marker?.getElement()?.classList.add('no-transition')
+          }
           setIsMapInteractive(!newLocked)
         }}
       />
