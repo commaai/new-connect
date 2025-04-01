@@ -94,7 +94,7 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
   getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat())
 
-export const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
+const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
 
 const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEvent[] => {
@@ -190,7 +190,7 @@ const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEve
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
+export const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0
   let userFlags = 0
   timeline.forEach((ev) => {

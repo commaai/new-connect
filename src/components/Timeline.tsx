@@ -2,7 +2,7 @@ import { For, createResource, createSignal, createEffect, onMount, onCleanup, Su
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { TimelineEvent, getTimelineEvents } from '~/api/derived'
+import { TimelineEvent } from '~/api/derived'
 import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
@@ -94,11 +94,11 @@ interface TimelineProps {
   route?: Route
   seekTime: number
   updateTime: (time: number) => void
+  events: TimelineEvent[]
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   const route = () => props.route
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
@@ -176,7 +176,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events)}</Suspense>
         <div
           class="absolute top-0 z-10 h-full"
           style={{
