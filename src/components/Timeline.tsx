@@ -91,7 +91,7 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  route?: Route
+  route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
 }

@@ -10,8 +10,8 @@ type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   startTime: number
-  onProgress?: (seekTime: number) => void
-  ref?: (el?: HTMLVideoElement) => void
+  onProgress: (seekTime: number) => void
+  ref: (el?: HTMLVideoElement) => void
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
