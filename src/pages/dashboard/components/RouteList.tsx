@@ -83,17 +83,15 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     getNextPageParam: (lastPage) => lastPage.at(-1)!.end_time_utc_millis - 1,
   }))
 
+  const routeList = () => routes.data?.pages.flat()
+
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <Show when={routes.isError}>
         <div>Error: {routes.error?.message}</div>
       </Show>
-      <Show when={routes.isLoading}>
-        <div>Loading...</div>
-      </Show>
       <Show when={routes.isSuccess}>
-        <div>Routes:</div>
-        <For each={routes.data?.pages}>{(page) => <For each={page}>{(route) => <RouteCard route={route} />}</For>}</For>
+        <For each={routeList()}>{(route) => <RouteCard route={route} />}</For>
       </Show>
       <Show when={routes.isFetchingNextPage}>
         <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
