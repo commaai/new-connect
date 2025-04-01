@@ -55,7 +55,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 }
 
 interface RouteUploadButtonsProps {
-  route?: Route
+  route: Route | undefined
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
