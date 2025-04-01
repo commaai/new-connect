@@ -5,6 +5,7 @@ import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
+import { getTimelineEvents, getTimelineStatistics, generateTimelineStatistics } from '~/api/derived'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -26,6 +27,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
+  // TODO: get route from parent
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
@@ -36,6 +38,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
+  // TODO: we already fetch the timeline in RouteList, don't do this again
+  // const [timeline] = createResource(() => route(), getTimelineStatistics)
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+
   createResource(
     () => [device(), profile(), props.dateStr] as const,
     async ([device, profile, dateStr]) => {
@@ -51,13 +57,17 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} />
+          {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
+            <Timeline class="mb-1" route={route.latest} events={events()} seekTime={seekTime()} updateTime={onTimelineChange} />
+          {/*</Suspense>*/}
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} />
+            {/*<RouteStatistics class="p-5" route={route()} timeline={timeline()} />*/}
+            {/*<RouteStatistics class="p-5" route={route()} timeline={events().then((timeline) => generateTimelineStatistics(route, timeline))} />*/}
+            <RouteStatistics class="p-5" route={route()} timeline={generateTimelineStatistics(route()!, events())} />
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
               <RouteActions routeName={routeName()} route={route()} />

@@ -1,4 +1,4 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -92,13 +92,15 @@ const MARKER_WIDTH = 3
 interface TimelineProps {
   class?: string
   route?: Route
+  events?: TimelineEvent[]
   seekTime: number
   updateTime: (time: number) => void
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   const route = () => props.route
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  // const [events] = createResource(null, () => null, { initialValue: [] })  // TODO: pass in
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
@@ -119,6 +121,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     const onStart = () => {
       const onMouseMove = (ev: MouseEvent) => {
         updateMarker(ev.clientX)
+        console.log("props.events", props.events)
       }
       const onTouchMove = (ev: TouchEvent) => {
         if (ev.touches.length !== 1) return
@@ -176,7 +179,9 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+        {/*<Show when={props.events}>*/}
+        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events!)}</Suspense>
+        {/*</Show>*/}
         <div
           class="absolute top-0 z-10 h-full"
           style={{
