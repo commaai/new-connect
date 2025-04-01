@@ -16,20 +16,17 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const startPosition = () => [props.route.start_lng || 0, props.route.start_lat || 0] as number[]
-  const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
-  const [startPlace] = createResource(startPosition, getPlaceName)
-  const [endPlace] = createResource(endPosition, getPlaceName)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
-  const [location] = createResource(
-    () => [startPlace(), endPlace()],
-    ([startPlace, endPlace]) => {
-      if (!startPlace && !endPlace) return ''
-      if (!endPlace || startPlace === endPlace) return startPlace
-      if (!startPlace) return endPlace
-      return `${startPlace} to ${endPlace}`
-    },
-  )
+  const [location] = createResource(async () => {
+    const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
+    const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
+    const startPlace = await getPlaceName(startPos)
+    const endPlace = await getPlaceName(endPos)
+    if (!startPlace && !endPlace) return ''
+    if (!endPlace || startPlace === endPlace) return startPlace
+    if (!startPlace) return endPlace
+    return `${startPlace} to ${endPlace}`
+  })
 
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
