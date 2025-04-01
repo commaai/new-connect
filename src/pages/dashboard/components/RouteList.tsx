@@ -73,7 +73,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   return <div ref={sentinel} class="h-10 w-full" />
 }
 
-const PAGE_SIZE = 100
+const PAGE_SIZE = 20
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const routes = createInfiniteQuery(() => ({
