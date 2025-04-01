@@ -43,11 +43,11 @@ const RoutePathMap: Component<{
 }> = (props) => {
   let mapRef!: HTMLDivElement
   const [map, setMap] = createSignal<L.Map | null>(null)
-  const [position, setPosition] = createSignal(0)
-  const [isLocked, setIsLocked] = createSignal(true)
-  const [isDragging, setIsDragging] = createSignal(false)
-  const [isMapInteractive, setIsMapInteractive] = createSignal(false)
-  const [showTransition, setShowTransition] = createSignal(false)
+  const [position, setPosition] = createSignal(0) // current position in the route
+  const [isLocked, setIsLocked] = createSignal(true) // auto track and center
+  const [isDragging, setIsDragging] = createSignal(false) // marker is being dragged
+  const [isMapInteractive, setIsMapInteractive] = createSignal(false) // map is interactive (zoom, pan, etc.)
+  const [showTransition, setShowTransition] = createSignal(false) // smooth panning and marker animation while playing
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
@@ -62,8 +62,10 @@ const RoutePathMap: Component<{
 
   onMount(() => {
     setTimeout(() => {
-      window.dispatchEvent(new Event('resize'))
+      window.dispatchEvent(new Event('resize')) // The map size is updated after the first load, so redraw it after a delay
     }, 1000)
+
+    // Create the Leaflet map
     const m = L.map(mapRef, {
       zoomControl: true,
       attributionControl: false,
@@ -74,13 +76,12 @@ const RoutePathMap: Component<{
       boxZoom: false,
     })
     L.tileLayer(getTileUrl()).addTo(m)
-    m.setView([props.coords[0].lat, props.coords[0].lng], 12) // initialize with default zoom (fit to bounds later)
     m.zoomControl.setPosition('topright')
     pastPolyline = L.polyline([], { color: '#6F707F', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
     futurePolyline = L.polyline([], { color: '#DFE0FF', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
     hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
-    marker = L.marker([props.coords[0].lat, props.coords[0].lng], { icon: createCarIcon(), draggable: true }).addTo(m)
-    m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // set zoom so route is fully visible
+    marker = L.marker(currentCoord(), { icon: createCarIcon(), draggable: true }).addTo(m)
+    m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // Set initial view so route is fully visible
 
     const updatePosition = (lng: number, lat: number) => {
       const idx = findClosestPoint(lng, lat, props.coords)
@@ -109,6 +110,7 @@ const RoutePathMap: Component<{
     onCleanup(() => m.remove())
   })
 
+  // Update map interactivity
   createEffect(() => {
     const m = map()
     if (!m) return
@@ -127,9 +129,11 @@ const RoutePathMap: Component<{
     }
   })
 
+  // Update marker position based on seek time
   createEffect(() => {
     const t = props.seekTime()
-    setShowTransition(t - lastSeekTime >= 0 && t - lastSeekTime <= 0.3)
+    const delta = t - lastSeekTime
+    setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 0.3) // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position) or
     lastSeekTime = t
     if (!props.coords.length) return
     if (t < props.coords[0].t) {
@@ -140,6 +144,7 @@ const RoutePathMap: Component<{
     setPosition(newPos === -1 ? props.coords.length - 1 : newPos)
   })
 
+  // Update polyline and marker position based on coordinates, and auto center if locked
   createEffect(() => {
     if (!map() || !props.coords.length) return
 
@@ -147,9 +152,10 @@ const RoutePathMap: Component<{
     futurePolyline?.setLatLngs(futureCoords())
     marker?.setLatLng(currentCoord())
 
-    if (isLocked() && !isDragging()) map()?.panTo(currentCoord(), { animate: true, duration: 2 })
+    if (isLocked() && !isDragging()) map()?.panTo(currentCoord(), { animate: showTransition(), duration: 2 })
   })
 
+  // Update marker animation class
   createEffect(() => {
     const markerClassList = marker?.getElement()?.classList
     if (showTransition()) markerClassList?.remove('no-transition')
