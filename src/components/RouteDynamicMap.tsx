@@ -45,11 +45,12 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
           <RoutePathMap
             themeId={themeId}
             seekTime={props.seekTime}
+            updateTime={props.updateTime}
             duration={duration}
             coords={coords()!}
-            updateTime={props.updateTime}
             hidpi={true}
             strokeWidth={5}
+            opacity={0.8}
           />
         </Match>
       </Switch>
