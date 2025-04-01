@@ -7,7 +7,7 @@ import { getThemeId } from '~/theme'
 import type { Route } from '~/api/types'
 
 import Icon from '~/components/material/Icon'
-import { PathMap } from '~/components/PathMap'
+import RoutePathMap from '~/components/RoutePathMap'
 import { getRouteDuration } from '~/utils/format'
 
 const State = (props: {
@@ -45,7 +45,7 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
         <Match when={(coords()?.length ?? 0) > 0} keyed>
           <For each={[props.routeName]}>
             {() => (
-              <PathMap
+              <RoutePathMap
                 themeId={themeId}
                 seekTime={props.seekTime}
                 duration={duration}

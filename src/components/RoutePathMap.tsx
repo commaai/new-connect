@@ -31,7 +31,7 @@ const createCarIcon = () => {
   return L.divIcon({ className: 'car-icon', html: el.innerHTML, iconSize: [20, 20], iconAnchor: [15, 15] })
 }
 
-export const PathMap: Component<{
+const RoutePathMap: Component<{
   themeId: string
   duration: Accessor<number>
   seekTime: Accessor<number>
@@ -192,3 +192,5 @@ export const PathMap: Component<{
     </div>
   )
 }
+
+export default RoutePathMap
