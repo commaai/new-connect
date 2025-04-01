@@ -72,7 +72,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   return <div ref={sentinel} class="h-10 w-full" />
 }
 
-const PAGE_SIZE = 1
+const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
