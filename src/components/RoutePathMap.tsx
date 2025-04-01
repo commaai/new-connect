@@ -143,9 +143,10 @@ const RoutePathMap: Component<{
 
   // Update marker position based on seek time
   createEffect(() => {
-    const t = props.seekTime()
+    const t = Math.round(props.seekTime())
     const delta = t - lastSeekTime
-    setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 0.3) // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position) or
+    setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 1) // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
+    if (t === lastSeekTime) return // Skip if seek time hasn't changed, since it will just get the same position
     lastSeekTime = t
     if (!props.coords.length) return
     if (t < props.coords[0].t) {
