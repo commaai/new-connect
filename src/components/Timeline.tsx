@@ -2,7 +2,7 @@ import { For, createResource, createSignal, createEffect, onMount, onCleanup, Su
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { TimelineEvent } from '~/api/derived'
+import type { TimelineEvent } from '~/api/derived'
 import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
