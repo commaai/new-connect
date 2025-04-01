@@ -114,7 +114,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (shownDateHeaders.has(dateKey)) return null
 
     shownDateHeaders.add(dateKey)
-    return dayjs(route.start_time_utc_millis).format('ddd, MMM D, YYYY')
+
+    const date = dayjs(route.start_time_utc_millis)
+    return date.format(date.year() === dayjs().year() ? 'dddd, MMM D' : 'dddd, MMM D, YYYY')
   }
 
   let foundFirstDateHeader = false
