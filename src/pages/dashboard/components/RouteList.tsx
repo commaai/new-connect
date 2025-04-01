@@ -90,8 +90,8 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
       <Show when={routes.isError}>
         <div>Error: {routes.error?.message}</div>
       </Show>
-      <Show when={routes.isSuccess}>
-        <For each={routeList()}>
+      <Show when={routes.isFetched}>
+        <For each={routeList()} fallback="No routes found">
           {(route) => (
             <Suspense fallback={<div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}>
               <RouteCard route={route} />
