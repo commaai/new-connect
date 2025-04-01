@@ -35,14 +35,14 @@ const createCarIcon = (locked: boolean) => {
 
 const RoutePathMap: Component<{
   themeId: string
-  duration: Accessor<number>
   seekTime: Accessor<number>
   updateTime: (newTime: number) => void
   coords: GPSPathPoint[]
-  hidpi: boolean
   strokeWidth?: number
   opacity?: number
 }> = (props) => {
+  const { coords, strokeWidth = 4, opacity, seekTime, updateTime } = props
+
   let mapRef!: HTMLDivElement
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [position, setPosition] = createSignal(0) // current position in the route
@@ -50,7 +50,7 @@ const RoutePathMap: Component<{
   const [isDragging, setIsDragging] = createSignal(false) // marker is being dragged
   const [showTransition, setShowTransition] = createSignal(false) // smooth marker transition
 
-  const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
+  const mapCoords = () => coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
   const futureCoords = () => mapCoords().slice(position())
   const currentCoord = () => mapCoords()[position()]
@@ -82,18 +82,18 @@ const RoutePathMap: Component<{
     })
     L.tileLayer(getTileUrl()).addTo(m)
     m.zoomControl.setPosition('topright')
-    pastPolyline = L.polyline([], { color: '#6F707F', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
-    futurePolyline = L.polyline([], { color: '#DFE0FF', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
-    hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
+    pastPolyline = L.polyline([], { color: '#6F707F', weight: strokeWidth, opacity }).addTo(m)
+    futurePolyline = L.polyline([], { color: '#DFE0FF', weight: strokeWidth, opacity }).addTo(m)
+    hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: strokeWidth + 16, opacity: 0 }).addTo(m)
     marker = L.marker(currentCoord(), { icon: createCarIcon(isLocked()), draggable: true }).addTo(m)
     m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // Set initial view so route is fully visible
 
     const updatePosition = (lng: number, lat: number) => {
-      const idx = findClosestPoint(lng, lat, props.coords)
+      const idx = findClosestPoint(lng, lat, coords)
       const point = mapCoords()[idx]
       marker?.setLatLng(point)
       setPosition(idx)
-      props.updateTime(props.coords[idx].t)
+      updateTime(coords[idx].t)
     }
 
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
@@ -145,23 +145,25 @@ const RoutePathMap: Component<{
 
   // Update marker position based on seek time
   createEffect(() => {
-    const t = Math.round(props.seekTime())
+    const t = Math.round(seekTime())
     const delta = t - lastSeekTime
-    setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 1) // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
-    if (t === lastSeekTime) return // Skip if seek time hasn't changed, since it will just get the same position
+    setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 1)
+    if (t === lastSeekTime)
+      // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
+      return // Skip if seek time hasn't changed, since it will just get the same position
     lastSeekTime = t
-    if (!props.coords.length) return
-    if (t < props.coords[0].t) {
+    if (!coords.length) return
+    if (t < coords[0].t) {
       setPosition(0)
       return
     }
-    const newPos = props.coords.findIndex((p, i) => i === props.coords.length - 1 || (t >= p.t && t < props.coords[i + 1].t))
-    setPosition(newPos === -1 ? props.coords.length - 1 : newPos)
+    const newPos = coords.findIndex((p, i) => i === coords.length - 1 || (t >= p.t && t < coords[i + 1].t))
+    setPosition(newPos === -1 ? coords.length - 1 : newPos)
   })
 
   // Update polyline and marker position based on coordinates, and auto center if locked
   createEffect(() => {
-    if (!map() || !props.coords.length) return
+    if (!map() || !coords.length) return
 
     pastPolyline?.setLatLngs(pastCoords())
     futurePolyline?.setLatLngs(futureCoords())
@@ -208,7 +210,7 @@ const RoutePathMap: Component<{
       </style>
       <IconButton
         name={isLocked() ? 'my_location' : 'location_searching'}
-        class={`absolute z-[1000] left-4 top-4 bg-surface-variant ${isLocked() ? ' text-primary' : 'text-white'}`}
+        class={`absolute z-[1000] left-4 top-4 bg-surface-variant ${isLocked() ? 'text-primary' : 'text-white'}`}
         onClick={() => {
           const newLocked = !isLocked()
           setIsLocked(newLocked)

@@ -1,4 +1,4 @@
-import { createMemo, createResource, Match, Switch } from 'solid-js'
+import { createResource, Match, Switch } from 'solid-js'
 import type { Accessor, JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -8,7 +8,6 @@ import type { Route } from '~/api/types'
 
 import Icon from '~/components/material/Icon'
 import RoutePathMap from '~/components/RoutePathMap'
-import { getRouteDuration } from '~/utils/format'
 
 const State = (props: {
   children: JSXElement
@@ -32,7 +31,6 @@ type RouteDynamicMapProps = {
 
 const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
   const [coords] = createResource(() => props.route, getCoords)
-  const duration = createMemo(() => (props.route ? (getRouteDuration(props.route!)?.asSeconds() ?? 0) : 0))
   const themeId = getThemeId()
 
   return (
@@ -46,9 +44,7 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
             themeId={themeId}
             seekTime={props.seekTime}
             updateTime={props.updateTime}
-            duration={duration}
             coords={coords()!}
-            hidpi={true}
             strokeWidth={5}
             opacity={0.8}
           />
