@@ -1,4 +1,4 @@
-import { createMemo, createResource, For, Match, Switch } from 'solid-js'
+import { createMemo, createResource, Match, Switch } from 'solid-js'
 import type { Accessor, JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -26,7 +26,6 @@ const State = (props: {
 type RouteDynamicMapProps = {
   class?: string
   route: Route | undefined
-  routeName: string
   seekTime: Accessor<number>
   updateTime: (newTime: number) => void
 }
@@ -43,19 +42,15 @@ const RouteDynamicMap: VoidComponent<RouteDynamicMapProps> = (props) => {
           <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
         </Match>
         <Match when={(coords()?.length ?? 0) > 0} keyed>
-          <For each={[props.routeName]}>
-            {() => (
-              <RoutePathMap
-                themeId={themeId}
-                seekTime={props.seekTime}
-                duration={duration}
-                coords={coords()!}
-                updateTime={props.updateTime}
-                hidpi={true}
-                strokeWidth={5}
-              />
-            )}
-          </For>
+          <RoutePathMap
+            themeId={themeId}
+            seekTime={props.seekTime}
+            duration={duration}
+            coords={coords()!}
+            updateTime={props.updateTime}
+            hidpi={true}
+            strokeWidth={5}
+          />
         </Match>
       </Switch>
     </div>
