@@ -58,6 +58,20 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
+const Sentinel = (props: { onTrigger: () => void }) => {
+  let sentinel!: HTMLDivElement
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0].isIntersecting) return
+      props.onTrigger()
+    },
+    { threshold: 0.1 },
+  )
+  onMount(() => observer.observe(sentinel))
+  onCleanup(() => observer.disconnect())
+  return <div ref={sentinel} class="h-10 w-full" />
+}
+
 const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
@@ -89,23 +103,6 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     }
   })
 
-  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        setSize((prev) => prev + 1)
-      }
-    },
-    { threshold: 0.1 },
-  )
-  onMount(() => {
-    const sentinelEl = sentinel()
-    if (sentinelEl) {
-      observer.observe(sentinelEl)
-    }
-  })
-  onCleanup(() => observer.disconnect())
-
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
@@ -122,7 +119,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
           )
         }}
       </For>
-      <div ref={setSentinel} class="h-10 w-full" />
+      <Sentinel onTrigger={() => setSize((size) => size + 1)} />
     </div>
   )
 }
