@@ -65,7 +65,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
       if (!entries[0].isIntersecting) return
       props.onTrigger()
     },
-    { rootMargin: '50px', threshold: 0.1 },
+    { threshold: 0.1 },
   )
   onMount(() => observer.observe(sentinel))
   onCleanup(() => observer.disconnect())
