@@ -52,7 +52,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatistics route={props.route} />
+        <RouteStatistics route={props.route} timeline={timeline()} />
       </CardContent>
     </Card>
   )
@@ -72,7 +72,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   return <div ref={sentinel} class="h-10 w-full" />
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 1
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
