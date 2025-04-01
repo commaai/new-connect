@@ -98,7 +98,6 @@ const RoutePathMap: Component<{
 
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
       setIsDragging(true)
-      setIsLocked(false)
       setShowTransition(false)
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
