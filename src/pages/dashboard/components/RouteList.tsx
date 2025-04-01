@@ -1,13 +1,14 @@
-import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import { batch, createEffect, createResource, For, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createStore } from 'solid-js/store'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
 import { getTimelineStatistics } from '~/api/derived'
+import type { RouteSegments } from '~/api/types'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments } from '~/api/types'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -39,7 +40,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             </span>
           </div>
         }
-        subhead={<Suspense>{location()}</Suspense>}
+        subhead={location()}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
@@ -58,71 +59,62 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 20
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
-  const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData) return endpoint()
-    if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
-  }
-  const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (pages[page] === undefined) {
-      pages[page] = (async () => {
-        const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        return key ? fetcher<RouteSegments[]>(key) : []
-      })()
-    }
-    return pages[page]
-  }
-
-  const pages: Promise<RouteSegments[]>[] = []
-  const [size, setSize] = createSignal(1)
-  const pageNumbers = () => Array.from({ length: size() })
+  const [store, setStore] = createStore<{ routes: Promise<RouteSegments>[]; length: number }>({
+    routes: [],
+    length: 0,
+  })
 
   createEffect(() => {
-    if (props.dongleId) {
-      pages.length = 0
-      setSize(1)
-    }
+    if (!props.dongleId) return
+    setStore({ routes: [], length: 0 })
   })
 
-  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
+  createEffect(async () => {
+    const { length } = store.routes
+    const limit = store.length - length
+    if (limit <= 0) return
+    let key = `/v1/devices/${props.dongleId}/routes_segments?limit=${limit}`
+    const lastRoute = await store.routes.at(-1)
+    if (lastRoute) key += `&end=${lastRoute.start_time_utc_millis - 1}`
+    const results = fetcher<RouteSegments[]>(key)
+    batch(() => {
+      for (let i = 0; i < limit; i++) {
+        const routeAsync = results.then((routes) => routes[i])
+        setStore('routes', length + i, routeAsync)
+      }
+    })
+  })
+
+  let sentinel!: HTMLDivElement
   const observer = new IntersectionObserver(
     (entries) => {
-      if (entries[0].isIntersecting) {
-        setSize((prev) => prev + 1)
-      }
+      if (!entries[0].isIntersecting) return
+      setStore('length', (length) => length + PAGE_SIZE)
     },
-    { threshold: 0.1 },
+    { rootMargin: '30px', threshold: 0.1 },
   )
-  onMount(() => {
-    const sentinelEl = sentinel()
-    if (sentinelEl) {
-      observer.observe(sentinelEl)
-    }
-  })
+  onMount(() => observer.observe(sentinel))
   onCleanup(() => observer.disconnect())
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
-      <For each={pageNumbers()}>
-        {(_, i) => {
-          const [routes] = createResource(() => i(), getPage)
+      <For each={store.routes}>
+        {(routeAsync) => {
+          // This feels suboptimal
+          const [route] = createResource(() => routeAsync)
           return (
-            <Suspense
-              fallback={
-                <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
-              }
-            >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
+            <Suspense fallback={<div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}>
+              <Show when={route()} keyed fallback={<div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}>
+                {(route) => <RouteCard route={route} />}
+              </Show>
             </Suspense>
           )
         }}
       </For>
-      <div ref={setSentinel} class="h-10 w-full" />
+      <div ref={sentinel} class="h-10 w-full" />
     </div>
   )
 }
