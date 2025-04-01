@@ -4,6 +4,7 @@ import { configure, render, waitFor } from '@solidjs/testing-library'
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 const PUBLIC_ROUTE_ID = 'e886087f430e7fe7/00000221--604653e929'
@@ -14,7 +15,16 @@ const SKIP_PRIVATE = true
 
 const UPLOAD_QUEUE = 'Upload Queue'
 
-const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
+const testWrapper = () => {
+  const queryClient = new QueryClient()
+  return (
+    <QueryClientProvider client={queryClient}>
+      <AppLayout />
+    </QueryClientProvider>
+  )
+}
+
+const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: testWrapper })
 
 beforeAll(() => configure({ asyncUtilTimeout: import.meta.env.CI ? 10000 : 5000 }))
 
