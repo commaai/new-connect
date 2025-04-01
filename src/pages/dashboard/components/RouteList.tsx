@@ -40,7 +40,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             </span>
           </div>
         }
-        subhead={<Suspense>{location()}</Suspense>}
+        subhead={location()}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
