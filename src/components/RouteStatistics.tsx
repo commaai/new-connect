@@ -11,7 +11,7 @@ const formatEngagement = (timeline?: TimelineStatistics): string | undefined => 
   return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
 }
 
-const RouteStatistics: VoidComponent<{ class?: string; route?: Route; timeline?: TimelineStatistics }> = (props) => {
+const RouteStatistics: VoidComponent<{ class?: string; route: Route | undefined; timeline: TimelineStatistics | undefined }> = (props) => {
   return (
     <StatisticBar
       class={props.class}
