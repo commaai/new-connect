@@ -19,6 +19,7 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import {getRoute} from "~/api/route";
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -116,6 +117,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
     pathParts()[2] ? Number(pathParts()[2]) : 0
   );
 
+  const routeName = createMemo(() => `${dongleId()}|${dateStr()}`)
+  // // TODO: get route from parent
+  const [route] = createResource(routeName, getRoute)
 
   const pairToken = () => !!location.query.pair
 
@@ -154,7 +158,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     <SettingsActivity dongleId={id} />
                   </Match>
                   <Match when={dateStr()}>
-                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
+                    <Suspense>
+                      <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} route={null} />
+                    </Suspense>
                   </Match>
                 </Switch>
               }

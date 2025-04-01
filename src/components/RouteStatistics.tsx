@@ -1,4 +1,4 @@
-import { createResource } from 'solid-js'
+import { createResource, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { TimelineStatistics, getTimelineStatistics } from '~/api/derived'
@@ -14,6 +14,9 @@ const formatEngagement = (timeline?: TimelineStatistics): string | undefined => 
 
 const RouteStatistics: VoidComponent<{ class?: string; route?: Route, timeline?: TimelineStatistics}> = (props) => {
   return (
+    <>
+    {/* Sus Needed? */}
+    <Suspense>
     <StatisticBar
       class={props.class}
       statistics={[
@@ -22,6 +25,8 @@ const RouteStatistics: VoidComponent<{ class?: string; route?: Route, timeline?:
         { label: 'Engaged', value: () => formatEngagement(props.timeline) },
       ]}
     />
+    </Suspense>
+    </>
   )
 }
 

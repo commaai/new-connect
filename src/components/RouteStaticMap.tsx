@@ -1,4 +1,4 @@
-import { createResource, Match, Switch } from 'solid-js'
+import { createResource, Match, Switch, Suspense, createSignal, createEffect } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -52,23 +52,52 @@ type RouteStaticMapProps = {
 }
 
 const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
-  const [coords] = createResource(() => props.route, getCoords)
-  const [url] = createResource(coords, getStaticMapUrl)
-  const [loadedUrl] = createResource(url, loadImage)
+  // const [coords] = createResource(() => props.route, getCoords)
+  const [coords, setCoords] = createSignal<GPSPathPoint[] | undefined>()
+  // const [url] = createResource(coords, getStaticMapUrl)
+  const [url, setUrl] = createSignal<string | undefined>()
+  // const [loadedUrl] = createResource(url, loadImage)
+  const [loadedUrl, setLoadedUrl] = createSignal<HTMLImageElement | undefined>()
+
+  createEffect(() => {
+    const route = props.route
+    if (!route) return
+
+    getCoords(route).then(setCoords)
+  })
+
+  // Step 3: Generate map URL when coords are ready
+  createEffect(() => {
+    const c = coords()
+    if (!c) return
+
+    const generatedUrl = getStaticMapUrl(c)
+    setUrl(generatedUrl)
+  })
+
+  // Step 4: Load image when URL is ready
+  createEffect(() => {
+    const u = url()
+    if (!u) return
+
+    loadImage(u).then(setLoadedUrl)
+  })
 
   return (
     <div class={clsx('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>
-      <Switch>
-        <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
-          <State trailing={<Icon name="error" filled />}>Problem loading map</State>
-        </Match>
-        <Match when={coords()?.length === 0} keyed>
-          <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
-        </Match>
-        <Match when={url() && loadedUrl()} keyed>
-          <img class="pointer-events-none size-full object-cover" src={loadedUrl()} alt="" />
-        </Match>
-      </Switch>
+      <Suspense>
+        <Switch>
+          <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
+            <State trailing={<Icon name="error" filled />}>Problem loading map</State>
+          </Match>
+          <Match when={coords()?.length === 0} keyed>
+            <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
+          </Match>
+          <Match when={url() && loadedUrl()} keyed>
+            <img class="pointer-events-none size-full object-cover" src={loadedUrl()} alt="" />
+          </Match>
+        </Switch>
+      </Suspense>
     </div>
   )
 }
