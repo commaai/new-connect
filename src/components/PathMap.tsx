@@ -74,12 +74,13 @@ export const PathMap: Component<{
       boxZoom: false,
     })
     L.tileLayer(getTileUrl()).addTo(m)
-    m.setView([props.coords[0].lat, props.coords[0].lng], 12)
+    m.setView([props.coords[0].lat, props.coords[0].lng], 12) // initialize with default zoom (fit to bounds later)
     m.zoomControl.setPosition('topright')
     pastPolyline = L.polyline([], { color: props.color || '#6F707F', weight: props.strokeWidth || 4 }).addTo(m)
     futurePolyline = L.polyline([], { color: props.color || '#dfe0ff', weight: props.strokeWidth || 4 }).addTo(m)
     hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
     marker = L.marker([props.coords[0].lat, props.coords[0].lng], { icon: createCarIcon(), draggable: true }).addTo(m)
+    m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // set zoom so route is fully visible
 
     const updatePosition = (lng: number, lat: number) => {
       const idx = findClosestPoint(lng, lat, props.coords)
