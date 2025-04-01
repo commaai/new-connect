@@ -1,13 +1,14 @@
-import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createInfiniteQuery } from '@tanstack/solid-query'
 import dayjs from 'dayjs'
 
-import { fetcher } from '~/api'
 import { getTimelineStatistics } from '~/api/derived'
+import { getRoutesSegments } from '~/api/route'
+import type { RouteSegments } from '~/api/types'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments } from '~/api/types'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -72,54 +73,32 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   return <div ref={sentinel} class="h-10 w-full" />
 }
 
-const PAGE_SIZE = 10
+const PAGE_SIZE = 100
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
-  const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
-    if (!previousPageData) return endpoint()
-    if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
-  }
-  const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (pages[page] === undefined) {
-      pages[page] = (async () => {
-        const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        return key ? fetcher<RouteSegments[]>(key) : []
-      })()
-    }
-    return pages[page]
-  }
-
-  const pages: Promise<RouteSegments[]>[] = []
-  const [size, setSize] = createSignal(1)
-  const pageNumbers = () => Array.from({ length: size() })
-
-  createEffect(() => {
-    if (props.dongleId) {
-      pages.length = 0
-      setSize(1)
-    }
-  })
+  const routes = createInfiniteQuery(() => ({
+    queryKey: ['routes_segments', props.dongleId],
+    queryFn: ({ pageParam }) => getRoutesSegments(props.dongleId, PAGE_SIZE, pageParam),
+    initialPageParam: 0,
+    getNextPageParam: (lastPage) => lastPage.at(-1)!.end_time_utc_millis - 1,
+  }))
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
-      <For each={pageNumbers()}>
-        {(_, i) => {
-          const [routes] = createResource(() => i(), getPage)
-          return (
-            <Suspense
-              fallback={
-                <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
-              }
-            >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
-            </Suspense>
-          )
-        }}
-      </For>
-      <Sentinel onTrigger={() => setSize((size) => size + 1)} />
+      <Show when={routes.isError}>
+        <div>Error: {routes.error?.message}</div>
+      </Show>
+      <Show when={routes.isLoading}>
+        <div>Loading...</div>
+      </Show>
+      <Show when={routes.isSuccess}>
+        <div>Routes:</div>
+        <For each={routes.data?.pages}>{(page) => <For each={page}>{(route) => <RouteCard route={route} />}</For>}</For>
+      </Show>
+      <Show when={routes.isFetchingNextPage}>
+        <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+      </Show>
+      <Sentinel onTrigger={() => routes.fetchNextPage({ cancelRefetch: false })} />
     </div>
   )
 }

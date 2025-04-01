@@ -1,4 +1,4 @@
-import type { Route, RouteInfo, RouteShareSignature } from '~/api/types'
+import type { Route, RouteInfo, RouteSegments, RouteShareSignature } from '~/api/types'
 
 import { fetcher } from '.'
 import { API_URL } from './config'
@@ -34,3 +34,10 @@ export const getPreservedRoutes = (dongleId: string): Promise<Route[]> =>
 
 export const setRoutePreserved = (routeName: string, preserved: boolean): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/preserve`, { method: preserved ? 'POST' : 'DELETE' })
+
+export const getRoutesSegments = (dongleId: string, limit: number | undefined, end: number | undefined) => {
+  const params = new URLSearchParams()
+  if (limit) params.append('limit', limit.toString())
+  if (end) params.append('end', end.toString())
+  return fetcher<RouteSegments[]>(`/v1/devices/${dongleId}/routes_segments?${params}`)
+}
