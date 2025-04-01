@@ -99,6 +99,7 @@ const RoutePathMap: Component<{
     }
 
     const handleDragEnd = () => {
+      setIsDragging(false)
       map()?.panTo(currentCoord()) // Center marker on map when dragging ends
     }
 
