@@ -44,9 +44,8 @@ const RoutePathMap: Component<{
   let mapRef!: HTMLDivElement
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [position, setPosition] = createSignal(0) // current position in the route
-  const [isLocked, setIsLocked] = createSignal(true) // auto track and center
+  const [isLocked, setIsLocked] = createSignal(true) // auto track and center with map interaction disabled
   const [isDragging, setIsDragging] = createSignal(false) // marker is being dragged
-  const [isMapInteractive, setIsMapInteractive] = createSignal(false) // map is interactive (zoom, pan, etc.)
   const [showTransition, setShowTransition] = createSignal(false) // smooth panning and marker animation while playing
 
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
@@ -94,7 +93,6 @@ const RoutePathMap: Component<{
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
       setIsDragging(true)
       setIsLocked(false)
-      setIsMapInteractive(true)
       setShowTransition(false)
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
@@ -114,18 +112,18 @@ const RoutePathMap: Component<{
   createEffect(() => {
     const m = map()
     if (!m) return
-    if (isMapInteractive()) {
-      m.dragging.enable()
-      m.touchZoom.enable()
-      m.doubleClickZoom.enable()
-      m.scrollWheelZoom.enable()
-      m.boxZoom.enable()
-    } else {
+    if (isLocked()) {
       m.dragging.disable()
       m.touchZoom.disable()
       m.doubleClickZoom.disable()
       m.scrollWheelZoom.disable()
       m.boxZoom.disable()
+    } else {
+      m.dragging.enable()
+      m.touchZoom.enable()
+      m.doubleClickZoom.enable()
+      m.scrollWheelZoom.enable()
+      m.boxZoom.enable()
     }
   })
 
@@ -196,7 +194,6 @@ const RoutePathMap: Component<{
             setShowTransition(false)
             map()?.panTo(currentCoord())
           }
-          setIsMapInteractive(!newLocked)
         }}
       />
     </div>
