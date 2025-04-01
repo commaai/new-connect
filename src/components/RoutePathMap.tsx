@@ -18,11 +18,13 @@ const findClosestPoint = (lng: number, lat: number, coords: GPSPathPoint[]): num
     { minDist: Infinity, index: 0 },
   ).index
 
-const createCarIcon = () => {
+const createCarIcon = (locked: boolean) => {
   const el = document.createElement('div')
   render(
     () => (
-      <div class="flex size-[30px] items-center justify-center rounded-full bg-primary-container">
+      <div
+        class={`flex size-[30px] items-center justify-center rounded-full bg-primary-container ${locked ? 'text-on-primary-container' : 'text-on-surface-variant'}`}
+      >
         <Icon size="20" name="directions_car" />
       </div>
     ),
@@ -83,7 +85,7 @@ const RoutePathMap: Component<{
     pastPolyline = L.polyline([], { color: '#6F707F', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
     futurePolyline = L.polyline([], { color: '#DFE0FF', weight: props.strokeWidth || 4, opacity: props.opacity }).addTo(m)
     hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: 20, opacity: 0 }).addTo(m)
-    marker = L.marker(currentCoord(), { icon: createCarIcon(), draggable: true }).addTo(m)
+    marker = L.marker(currentCoord(), { icon: createCarIcon(isLocked()), draggable: true }).addTo(m)
     m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // Set initial view so route is fully visible
 
     const updatePosition = (lng: number, lat: number) => {
@@ -173,6 +175,11 @@ const RoutePathMap: Component<{
     const markerClassList = marker?.getElement()?.classList
     if (showTransition()) markerClassList?.remove('no-transition')
     else markerClassList?.add('no-transition')
+  })
+
+  // Update marker icon
+  createEffect(() => {
+    marker?.setIcon(createCarIcon(isLocked()))
   })
 
   return (
