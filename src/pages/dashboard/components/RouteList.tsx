@@ -60,7 +60,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   )
 }
 
-const PAGE_SIZE = 1
+const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
