@@ -179,7 +179,7 @@ export const PathMap: Component<{
       </style>
       <IconButton
         name={isLocked() ? 'my_location' : 'location_searching'}
-        class={`absolute z-[1000] left-4 top-4 bg-surface-variant ${isLocked() ? ' text-primary' : 'text-whtite'}`}
+        class={`absolute z-[1000] left-4 top-4 bg-surface-variant ${isLocked() ? ' text-primary' : 'text-white'}`}
         onClick={() => {
           const newLocked = !isLocked()
           setIsLocked(newLocked)
