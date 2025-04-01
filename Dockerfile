@@ -1,3 +1,6 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv;error=true
+
 # *** build app ***
 FROM oven/bun:1.2.5-alpine AS build
 WORKDIR /app
