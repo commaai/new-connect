@@ -28,6 +28,7 @@ type DeviceLocationProps = {
 }
 
 const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
+  // TODO: something in here blocks the DeviceActivity from switching before it completes without Suspense
   let mapRef!: HTMLDivElement
 
   const [map, setMap] = createSignal<L.Map | null>(null)

@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import {createMemo, createResource, createSignal, For, Show, Suspense} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -29,10 +29,13 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+  // const [device] = createResource(() => props.dongleId, getDevice)
+  const [device] = createResource(props.dongleId, getDevice)
+  // const [deviceName] = createResource(device, getDeviceName)  // TODO: why does this block device switching? even if not used?!
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
+  // const [isDeviceUser] = createResource(device, (_device) => _device.is_owner || _device.alias !== SHARED_DEVICE)  // blocks UI from switching devices until getDevice is done (or something else taking 500ms)
+  // const isDeviceUser = createMemo(() => device()?.is_owner || device()?.alias !== SHARED_DEVICE)  // TODO: even memo blocks UI
+  const isDeviceUser = () => (device()?.is_owner || device()?.alias !== SHARED_DEVICE)  // but function doesn't :thinking:
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -120,32 +123,40 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+          <Suspense fallback={<div class="skeleton-loader size-full bg-surface min-h-[240px]"></div>}>
+            <DeviceLocation dongleId={props.dongleId} deviceName={getDeviceName(device()!)} />
+          </Suspense>
+          {/*<Suspense>*/}
+          {/*  <span>{getDeviceName(device()!)}</span>*/}
+          {/*</Suspense>*/}
           <div class="flex items-center justify-between p-4">
-            <Suspense>
-              <div class="text-xl font-bold">{deviceName()}</div>
+            <Suspense fallback={<div class="skeleton-loader size-full"></div>}>
+              <div class="text-xl font-bold">{getDeviceName(device()!)}</div>
             </Suspense>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={isDeviceUser()}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-            <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
+          <Suspense>
+            {/*TODO: We should always display this since we won't list routes for shared devices soon*/}
+            <Show when={isDeviceUser()}>
+              <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+              <Show when={queueVisible()}>
+                <UploadQueue dongleId={props.dongleId} />
+              </Show>
+              <button
+                class={clsx(
+                  'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                  queueVisible() && 'border-t-2 border-t-surface-container-low',
+                )}
+                onClick={() => setQueueVisible(!queueVisible())}
+              >
+                <p class="mr-2">Upload Queue</p>
+                <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+              </button>
             </Show>
-            <button
-              class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-                queueVisible() && 'border-t-2 border-t-surface-container-low',
-              )}
-              onClick={() => setQueueVisible(!queueVisible())}
-            >
-              <p class="mr-2">Upload Queue</p>
-              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-            </button>
-          </Show>
+          </Suspense>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>

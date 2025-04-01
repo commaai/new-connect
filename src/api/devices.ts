@@ -51,6 +51,13 @@ export const getDevice = async (dongleId: string) => {
   }
 }
 
+// export const getDevice = async (dongleId: string) => {
+//   // return null
+//   let ret = fetcher<Device>(`/v1.1/devices/${dongleId}/`)
+//   console.log('ret', ret)
+//   return ret
+// }
+
 export const getAthenaOfflineQueue = async (dongleId: string) =>
   fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`).catch(() => undefined)
 
@@ -59,6 +66,10 @@ export const getDeviceLocation = async (dongleId: string) =>
 
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`).catch(() => undefined)
+
+// export const getDeviceStats = async (dongleId: string) => {
+//   return null
+// }
 
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')
