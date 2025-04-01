@@ -91,7 +91,13 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
         <div>Error: {routes.error?.message}</div>
       </Show>
       <Show when={routes.isSuccess}>
-        <For each={routeList()}>{(route) => <RouteCard route={route} />}</For>
+        <For each={routeList()}>
+          {(route) => (
+            <Suspense fallback={<div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}>
+              <RouteCard route={route} />
+            </Suspense>
+          )}
+        </For>
       </Show>
       <Show when={routes.isFetchingNextPage}>
         <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
