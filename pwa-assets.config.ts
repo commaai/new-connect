@@ -25,6 +25,10 @@ export default defineConfig({
         basePath: '/',
         xhtml: true,
       },
+      name: (landscape, size) => {
+        // make sure to update when generating light/dark variants
+        return `apple-splash-${landscape ? 'landscape' : 'portrait'}-${size.width}x${size.height}.png`
+      },
     }),
   },
   images: ['public/favicon.svg'],
