@@ -13,11 +13,11 @@ import Icon from './material/Icon'
 
 type RouteVideoPlayerProps = {
   class?: string
+  onError?: () => void
+  onLoad?: () => void
+  onProgress: (seekTime: number) => void
   routeName: string
   startTime: number
-  onProgress: (seekTime: number) => void
-  onLoad?: () => void
-  onError?: () => void
   ref: (el?: HTMLVideoElement) => void
 }
 
