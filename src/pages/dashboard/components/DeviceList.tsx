@@ -1,8 +1,7 @@
-import { createResource, For, Suspense, type VoidComponent } from 'solid-js'
+import { For, Suspense, type VoidComponent } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevices } from '~/api/devices'
 import { useDrawerContext } from '~/components/material/Drawer'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/api/types'

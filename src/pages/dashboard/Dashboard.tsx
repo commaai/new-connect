@@ -23,7 +23,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent<{devices: Device[]}> = (props) => {
+const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
