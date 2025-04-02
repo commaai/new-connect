@@ -152,8 +152,6 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     }
 
     createEffect(() => {
-      setMarkerOffsetPct((props.seekTime / duration()) * 100)
-
       if (props.interactive) {
         ref.addEventListener('mousedown', onMouseDown)
         ref.addEventListener('touchstart', onTouchStart)
@@ -165,6 +163,8 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       })
     })
   })
+
+  createEffect(() => setMarkerOffsetPct((props.seekTime / duration()) * 100))
 
   return (
     <div class="flex flex-col">
