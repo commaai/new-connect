@@ -116,7 +116,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [profile] = createResource(getProfile)
 
   const currentDevice = () => devices()?.find((device) => device.dongle_id === dongleId())
-  const isSharedDevice = () => !currentDevice() && devices()?.length > 0
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -136,7 +135,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId()} keyed>
           {(id) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} shared={isSharedDevice()} />}
+              paneOne={<DeviceActivity dongleId={id} shared={!currentDevice()} />}
               paneTwo={
                 <Switch
                   fallback={
@@ -147,7 +146,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   }
                 >
                   <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                    <SettingsActivity dongleId={id} shared={isSharedDevice()} />
+                    <SettingsActivity dongleId={id} shared={!currentDevice()} />
                   </Match>
                   <Match when={dateStr()}>
                     <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
