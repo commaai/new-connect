@@ -1,8 +1,4 @@
-<<<<<<< HEAD
-import { Show, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
-=======
 import { createEffect, createResource, createSignal, onCleanup, onMount, Show, type VoidComponent } from 'solid-js'
->>>>>>> 02b6b08 (refactor)
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -27,14 +23,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
 
+  const [isErrored, setErrored] = createSignal(false)
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
-<<<<<<< HEAD
   const [videoLoading, setVideoLoading] = createSignal(true)
-=======
-  const [isErrored, setErrored] = createSignal(false)
->>>>>>> 02b6b08 (refactor)
 
   createEffect(() => {
     props.routeName // track changes
