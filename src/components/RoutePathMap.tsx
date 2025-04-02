@@ -98,7 +98,6 @@ const RoutePathMap: Component<{
 
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
       setIsDragging(true)
-      setShowTransition(false)
       const { lng, lat } = 'latlng' in e ? e.latlng : e.target.getLatLng()
       updatePosition(lng, lat)
     }
@@ -147,10 +146,9 @@ const RoutePathMap: Component<{
   createEffect(() => {
     const t = Math.round(seekTime())
     const delta = t - lastSeekTime
+    // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
     setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 1)
-    if (t === lastSeekTime)
-      // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
-      return // Skip if seek time hasn't changed, since it will just get the same position
+    if (t === lastSeekTime) return // Skip if seek time hasn't changed, since it will just get the same position
     lastSeekTime = t
     if (!coords.length) return
     if (t < coords[0].t) {
@@ -175,7 +173,7 @@ const RoutePathMap: Component<{
   // Update marker animation class
   createEffect(() => {
     const markerClassList = marker?.getElement()?.classList
-    if (showTransition()) markerClassList?.remove('no-transition')
+    if (showTransition() && !isDragging()) markerClassList?.remove('no-transition')
     else markerClassList?.add('no-transition')
   })
 
