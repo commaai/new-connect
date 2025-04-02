@@ -138,11 +138,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          {/*<Show when={deviceName()} fallback={<div class="h-[240px] skeleton-loader size-full" />}>*/}
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
-          {/*</Show>*/}
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
               {/* TODO: we should not need to fetch the device name when switching as we already know it in DeviceList */}
