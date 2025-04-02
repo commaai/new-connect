@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createSignal, For, Show, Suspense } from 'solid-js'
+import {createMemo, createSignal, For, Show, Suspense} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { SHARED_DEVICE } from '~/api/devices'
@@ -31,8 +31,8 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const deviceName = () => (props.device ? getDeviceName(props.device) : '')
-  const isDeviceUser = () => props.device?.is_owner || props.device?.alias !== SHARED_DEVICE
+  const deviceName = createMemo(() => (props.device ? getDeviceName(props.device) : ''))
+  const isDeviceUser = createMemo(() => props.device?.is_owner || props.device?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
