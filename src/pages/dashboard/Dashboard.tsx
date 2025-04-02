@@ -1,4 +1,4 @@
-import {createEffect, createResource, createSignal, lazy, Match, Show, Suspense, SuspenseList, Switch} from 'solid-js'
+import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -123,46 +123,36 @@ const Dashboard: Component<RouteSectionProps> = () => {
     return devices()?.[0]?.dongle_id
   }
 
-  const [currentDongleId, setCurrentDongleId] = createSignal<string | null>(null)
-
-  createEffect(() => {
-    const id = dongleId()
-    if (id && id !== 'pair') {
-      console.log('Setting current dongle ID', id)
-      setCurrentDongleId(id)
-    }
-  })
-
   return (
     <Drawer drawer={<DashboardDrawer />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={dongleId()}>
-        <DashboardLayout
-          paneOne={
-              <DeviceActivity dongleId={currentDongleId()} />
-          }
-          paneTwo={
-            <Switch
-              fallback={
-                <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                  <Icon name="search" size="48" />
-                  <span class="text-title-md">Select a route to view</span>
-                </div>
+        <Match when={dongleId()} keyed>
+          {(id) => (
+            <DashboardLayout
+              paneOne={<DeviceActivity dongleId={id} />}
+              paneTwo={
+                <Switch
+                  fallback={
+                    <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                      <Icon name="search" size="48" />
+                      <span class="text-title-md">Select a route to view</span>
+                    </div>
+                  }
+                >
+                  <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                    <SettingsActivity dongleId={id} />
+                  </Match>
+                  <Match when={dateStr()}>
+                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
+                  </Match>
+                </Switch>
               }
-            >
-              <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                <SettingsActivity dongleId={dongleId()} />
-              </Match>
-              <Match when={dateStr()}>
-                <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
-              </Match>
-            </Switch>
-          }
-          paneTwoContent={!!dateStr()}
-        />
+              paneTwoContent={!!dateStr()}
+            />
+          )}
         </Match>
         <Match when={!profile.loading && !profile.latest}>
           <Navigate href="/login" />
