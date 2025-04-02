@@ -3,26 +3,25 @@ import { createAppleSplashScreens, defineConfig, minimal2023Preset } from '@vite
 export default defineConfig({
   headLinkOptions: {
     preset: '2023',
+    xhtml: true,
   },
   preset: {
     ...minimal2023Preset,
     maskable: {
       ...minimal2023Preset.maskable,
-      padding: 0.5,
+      padding: 0.2,
       resizeOptions: { background: '#131318' },
     },
     apple: {
       ...minimal2023Preset.apple,
-      padding: 0.5,
+      padding: 0.2,
       resizeOptions: { background: '#131318' },
     },
     appleSplashScreens: createAppleSplashScreens({
-      padding: 0.7,
+      padding: 0.5,
       resizeOptions: { fit: 'contain', background: '#131318' },
       linkMediaOptions: {
-        log: true,
         addMediaScreen: true,
-        basePath: '/',
         xhtml: true,
       },
       name: (landscape, size) => {

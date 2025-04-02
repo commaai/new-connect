@@ -1,4 +1,4 @@
-import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -104,22 +104,23 @@ const DashboardLayout: Component<{
 
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
-
-  const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
-  const dongleId = () => pathParts()[0]
-  const dateStr = () => pathParts()[1]
-  const startTime = () => (pathParts()[2] ? Number(pathParts()[2]) : 0)
-
-  const pairToken = () => !!location.query.pair
+  const urlState = createMemo(() => {
+    const parts = location.pathname.split('/').slice(1).filter(Boolean)
+    return {
+      dongleId: parts[0] as string | undefined,
+      dateStr: parts[1] as string | undefined,
+      startTime: parts[2] ? Number(parts[2]) : 0,
+    }
+  })
 
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
-  const currentDevice = () => devices()?.find((device) => device.dongle_id === dongleId())
+  const currentDevice = () => devices()?.find((device) => device.dongle_id === urlState().dongleId)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
-    if (dongleId()) return undefined
+    if (urlState().dongleId) return undefined
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
     if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
@@ -129,13 +130,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={dongleId() === 'pair' || pairToken()}>
+        <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
           <PairActivity />
         </Match>
-        <Match when={dongleId()} keyed>
-          {(id) => (
+        <Match when={urlState().dongleId} keyed>
+          {(dongleId) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} device={currentDevice()} />}
+              paneOne={<DeviceActivity dongleId={dongleId} device={currentDevice()} />}
               paneTwo={
                 <Switch
                   fallback={
@@ -145,15 +146,15 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     </div>
                   }
                 >
-                  <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                    <SettingsActivity dongleId={id} />
+                  <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
+                    <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  <Match when={dateStr()}>
-                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
+                  <Match when={urlState().dateStr}>
+                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
                   </Match>
                 </Switch>
               }
-              paneTwoContent={!!dateStr()}
+              paneTwoContent={!!urlState().dateStr}
             />
           )}
         </Match>
