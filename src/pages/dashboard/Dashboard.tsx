@@ -135,7 +135,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId()} keyed>
           {(id) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} device={currentDevice()} shared={!currentDevice()} />}
+              paneOne={<DeviceActivity dongleId={id} device={currentDevice()} />}
               paneTwo={
                 <Switch
                   fallback={

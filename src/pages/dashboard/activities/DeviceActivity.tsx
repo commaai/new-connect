@@ -20,7 +20,6 @@ import UploadQueue from '~/components/UploadQueue'
 type DeviceActivityProps = {
   dongleId: string
   device: Device | undefined
-  shared: boolean
 }
 
 interface SnapshotResponse {
@@ -31,7 +30,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const deviceName = createMemo(() => getDeviceName(props.device, props.shared))
+  const deviceName = createMemo(() => getDeviceName(props.device))
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -132,7 +131,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={!props.shared}>
+          <Show when={props.device}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
