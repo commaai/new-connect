@@ -136,7 +136,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Suspense>
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
-              {/* TODO: we should not need to fetch the device name when switching as we already know it in DeviceList */}
               {<div class="text-xl font-bold">{deviceName()}</div>}
             </Suspense>
             <div class="flex gap-4">
