@@ -61,9 +61,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
   }
-  const onError = () => props.onError?.() && setErrored(true)
-  const onLoad = () => props.onLoad?.() && setErrored(false)
-
+  const onError = () => setErrored(true) && props.onError?.()
+  const onLoad = () => setErrored(false) && props.onLoad?.()
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
     setIsPlaying(true)
