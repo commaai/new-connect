@@ -61,6 +61,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
   }
+  const onError = () => {
+    props.onError?.()
+    setErrored(true)
+  }
+  const onLoad = () => {
+    props.onLoad?.()
+    setErrored(false)
+  }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
     setIsPlaying(true)
@@ -113,10 +121,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         const { Events, ErrorTypes } = Hls.default
         player.on(Events.ERROR, (_, data) => {
           if (!data.fatal) return
-          if (data.type === ErrorTypes.NETWORK_ERROR) {
-            setErrored(true)
-            props.onError?.()
-          }
+          if (data.type === ErrorTypes.NETWORK_ERROR) onError()
         })
         player.attachMedia(video)
         setHls(player)
@@ -134,8 +139,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const url = streamUrl()
     const player = hls()
     if (!url || player === undefined) {
-      props.onError?.()
-      setErrored(true)
+      onError()
       return
     }
 
@@ -145,8 +149,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.src = url
     }
 
-    props.onLoad?.()
-    setErrored(false)
+    onLoad()
   })
 
   return (
