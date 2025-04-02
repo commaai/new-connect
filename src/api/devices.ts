@@ -57,12 +57,10 @@ export const getDeviceLocation = async (dongleId: string) =>
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`).catch(() => undefined)
 
-export const getDevices = async () => {
-  console.log("getDevices!")
-  return fetcher<Device[]>('/v1/me/devices/')
+export const getDevices = async () =>
+  fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
     .catch(() => [])
-}
 
 export const unpairDevice = async (dongleId: string) =>
   fetcher<{ success: number }>(`/v1/devices/${dongleId}/unpair`, {

@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import {createEffect, createResource, createSignal, For, Show, Suspense} from 'solid-js'
+import {createSignal, For, Show, Suspense} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 import type {Device} from "~/api/types";
@@ -20,7 +20,6 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
-  // devices: Device[]
   device: Device | undefined
 }
 
@@ -48,16 +47,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     fetching: false,
     images: [],
   })
-
-  // createEffect(() => {
-  //   console.log('DeviceActivity', props.devices)
-  //   for (const device of props.devices) {
-  //     if (device.dongle_id === props.dongleId) {
-  //       console.log(device)
-  //       setDevice(device)
-  //     }
-  //   }
-  // })
 
   const takeSnapshot = async () => {
     setSnapshot({ error: null, fetching: true, images: [] })
