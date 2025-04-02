@@ -5,16 +5,20 @@ import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
+import Timeline from './Timeline'
+import { Route } from '~/api/types'
+import { TimelineEvent } from '~/api/derived'
 
 type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   startTime: number
-  onProgress: (seekTime: number) => void
-  ref: (el?: HTMLVideoElement) => void
+  route: Route | undefined
+  events: TimelineEvent[]
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
+  const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
@@ -24,10 +28,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
 
-  const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
-    updateProgress()
+    setSeekTime(video.currentTime)
     requestAnimationFrame(updateProgressContinuously)
   }
   const startProgressTracking = () => {
@@ -46,9 +49,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     togglePlayback()
   }
 
+  const onTimelineUpdate = (time: number) => {
+    setSeekTime(time)
+    video.currentTime = time
+  }
+
   const onTimeUpdate = (e: Event) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
-    if (video.paused) updateProgress()
+    if (video.paused) setSeekTime(video.currentTime)
   }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
@@ -67,8 +75,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.currentTime = props.startTime
     }
 
-    props.ref?.(video)
-
     controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
     video.addEventListener('loadedmetadata', onLoadedMetadata)
@@ -85,7 +91,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.removeEventListener('pause', onPause)
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('stalled', onStalled)
-      props.ref?.(video)
     })
 
     if ('MediaSource' in window) {
@@ -116,41 +121,44 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   })
 
   return (
-    <div
-      class={clsx(
-        'relative flex aspect-[241/151] items-center justify-center self-stretch overflow-hidden rounded-t-md bg-surface-container-low isolate',
-        props.class,
-      )}
-    >
-      {/* Video as background */}
-      <div class="absolute inset-0 -z-10">
-        <video
-          ref={video}
-          class="size-full object-cover"
-          data-testid="route-video"
-          autoplay
-          muted
-          controls={false}
-          playsinline
-          loop
-          disablepictureinpicture
-        />
-      </div>
+    <div class="flex flex-col">
+      <div
+        class={clsx(
+          'relative flex aspect-[241/151] items-center justify-center self-stretch overflow-hidden rounded-t-md bg-surface-container-low isolate',
+          props.class,
+        )}
+      >
+        {/* Video as background */}
+        <div class="absolute inset-0 -z-10">
+          <video
+            ref={video}
+            class="size-full object-cover"
+            data-testid="route-video"
+            autoplay
+            muted
+            controls={false}
+            playsinline
+            loop
+            disablepictureinpicture
+          />
+        </div>
 
-      {/* Controls overlay */}
-      <div class="absolute inset-0 flex items-end" ref={controls}>
-        {/* Controls background gradient */}
-        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+        {/* Controls overlay */}
+        <div class="absolute inset-0 flex items-end" ref={controls}>
+          {/* Controls background gradient */}
+          <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
-        {/* Controls container */}
-        <div class="relative flex w-full items-center gap-3 pb-3 px-2">
-          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          {/* Controls container */}
+          <div class="relative flex w-full items-center gap-3 pb-3 px-2">
+            <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
-          <div class="font-mono text-sm text-on-surface">
-            {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
+            <div class="font-mono text-sm text-on-surface">
+              {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
+            </div>
           </div>
         </div>
       </div>
+      <Timeline class="mb-1" route={props.route} seekTime={seekTime()} updateTime={onTimelineUpdate} events={props.events} />
     </div>
   )
 }
