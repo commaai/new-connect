@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createMemo, createResource, createSignal, For, Show } from 'solid-js'
+import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -30,6 +30,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
+  // TODO: device should be passed in from DeviceList
   const [device] = createResource(() => props.dongleId, getDevice)
   const deviceName = createMemo(() => getDeviceName(device(), props.shared))
   const [queueVisible, setQueueVisible] = createSignal(false)
@@ -120,11 +121,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
+          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
-          </Show>
+          </Suspense>
           <div class="flex items-center justify-between p-4">
-            <div class="text-xl font-bold">{deviceName()}</div>
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
+              {<div class="text-xl font-bold">{deviceName()}</div>}
+            </Suspense>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
