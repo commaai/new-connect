@@ -50,7 +50,7 @@ export const formatVideoTime = (seconds: number): string => {
   return `${minutes}:${remainingSeconds.padStart(2, '0')}`
 }
 
-export const getRouteDuration = (route: Route): Duration | undefined => {
+export const getRouteDuration = (route: Route | undefined): Duration | undefined => {
   if (!route || !route.end_time) return undefined
   const startTime = dayjs(route.start_time)
   const endTime = dayjs(route.end_time)

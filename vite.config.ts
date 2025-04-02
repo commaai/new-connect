@@ -13,11 +13,6 @@ export default defineConfig({
     solid({
       ssr: false,
     }),
-    sentryVitePlugin({
-      org: 'commaai',
-      project: 'new-connect',
-      telemetry: false,
-    }),
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
@@ -78,13 +73,19 @@ export default defineConfig({
         }
       },
     },
+    // put the Sentry plugin after all other plugins
+    sentryVitePlugin({
+      org: 'commaai',
+      project: 'new-connect',
+      telemetry: false,
+    }),
   ],
   server: {
     port: 3000,
   },
   build: {
     target: 'esnext',
-    sourcemap: true,
+    sourcemap: true, // must be turned on for Sentry
   },
   resolve: {
     alias: {

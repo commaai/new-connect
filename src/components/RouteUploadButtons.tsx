@@ -19,7 +19,7 @@ const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
 
 interface UploadButtonProps {
   state: ButtonState
-  onClick?: () => void
+  onClick: () => void
   icon: IconName
   text: string
 }
@@ -55,7 +55,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
 }
 
 interface RouteUploadButtonsProps {
-  route?: Route
+  route: Route | undefined
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
