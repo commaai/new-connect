@@ -31,6 +31,7 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
 
+  // Resource as source of another resource blocks component rendering
   const [deviceName, setDeviceName] = createSignal('')
   // TODO: if we're listing the routes for a user you should always be a user, this is for viewing public routes which are being removed
   const [isDeviceUser, setDeviceUser] = createSignal(true)
@@ -42,15 +43,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     }
   })
 
-  // const [deviceName] = createResource(device, getDeviceName)
-  // const deviceName = () => {
-  //   const d = device();
-  //   return d ? getDeviceName(d) : 'Loading...';
-  // }
   const [queueVisible, setQueueVisible] = createSignal(false)
-  // const [isDeviceUser] = createResource(() => device, (device) => device()?.is_owner || device()?.alias !== SHARED_DEVICE)
-  // const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
-  // const isDeviceUser = () => true
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
