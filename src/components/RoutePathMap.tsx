@@ -51,7 +51,7 @@ const RoutePathMap: Component<{
   const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
   const futureCoords = () => mapCoords().slice(position())
-  const currentCoord = () => mapCoords()[position()]
+  const currentCoord = () => mapCoords()[position()] ?? [0, 0]
 
   let lastSeekTime = 0
   let marker: L.Marker | null = null
