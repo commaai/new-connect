@@ -16,9 +16,9 @@ type RouteVideoPlayerProps = {
   onError?: () => void
   onLoad?: () => void
   onProgress: (seekTime: number) => void
+  ref: (el?: HTMLVideoElement) => void
   routeName: string
   startTime: number
-  ref: (el?: HTMLVideoElement) => void
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
