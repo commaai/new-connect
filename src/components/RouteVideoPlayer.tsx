@@ -61,14 +61,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
   }
-  const onError = () => {
-    props.onError?.()
-    setErrored(true)
-  }
-  const onLoad = () => {
-    props.onLoad?.()
-    setErrored(false)
-  }
+  const onError = () => props.onError?.() && setErrored(true)
+  const onLoad = () => props.onLoad?.() && setErrored(false)
+
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
     setIsPlaying(true)
@@ -140,16 +135,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const player = hls()
     if (!url || player === undefined) {
       onError()
-      return
-    }
-
-    if (player) {
-      player.loadSource(url)
     } else {
-      video.src = url
+      if (player) {
+        player.loadSource(url)
+      } else {
+        video.src = url
+      }
+      onLoad()
     }
-
-    onLoad()
   })
 
   return (
