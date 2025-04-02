@@ -1,16 +1,23 @@
+<<<<<<< HEAD
 import { Show, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
+=======
+import { createEffect, createResource, createSignal, onCleanup, onMount, Show, type VoidComponent } from 'solid-js'
+>>>>>>> 02b6b08 (refactor)
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
+import Icon from './material/Icon'
 
 type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   startTime: number
   onProgress: (seekTime: number) => void
+  onLoad?: () => void
+  onError?: () => void
   ref: (el?: HTMLVideoElement) => void
 }
 
@@ -23,7 +30,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+<<<<<<< HEAD
   const [videoLoading, setVideoLoading] = createSignal(true)
+=======
+  const [isErrored, setErrored] = createSignal(false)
+>>>>>>> 02b6b08 (refactor)
 
   createEffect(() => {
     props.routeName // track changes
@@ -76,7 +87,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
     props.ref?.(video)
 
-    controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
     video.addEventListener('loadedmetadata', onLoadedMetadata)
     video.addEventListener('play', onPlay)
@@ -86,7 +96,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('loadeddata', onLoadedData)
 
     onCleanup(() => {
-      controls.removeEventListener('click', onClick)
       video.removeEventListener('timeupdate', onTimeUpdate)
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
       video.removeEventListener('play', onPlay)
@@ -97,9 +106,25 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       props.ref?.(video)
     })
 
+    createEffect(() => {
+      console.log(isErrored())
+      if (isErrored()) return
+      controls.addEventListener('click', onClick)
+      onCleanup(() => controls.removeEventListener('click', onClick))
+    })
+
     if ('MediaSource' in window) {
-      import('~/utils/hls').then(({ createHls }) => {
-        const player = createHls()
+      import('~/utils/hls').then((Hls) => {
+        const player = Hls.createHls()
+
+        const { Events, ErrorTypes } = Hls.default
+        player.on(Events.ERROR, (_, data) => {
+          if (!data.fatal) return
+          if (data.type === ErrorTypes.NETWORK_ERROR) {
+            setErrored(true)
+            props.onError?.()
+          }
+        })
         player.attachMedia(video)
         setHls(player)
       })
@@ -115,13 +140,20 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   createEffect(() => {
     const url = streamUrl()
     const player = hls()
-    if (!url || player === undefined) return
+    if (!url || player === undefined) {
+      props.onError?.()
+      setErrored(true)
+      return
+    }
 
     if (player) {
       player.loadSource(url)
     } else {
       video.src = url
     }
+
+    props.onLoad?.()
+    setErrored(false)
   })
 
   return (
@@ -152,19 +184,29 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       </Show>
 
       {/* Controls overlay */}
-      <div class="absolute inset-0 flex items-end" ref={controls}>
-        {/* Controls background gradient */}
-        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+      <Show
+        when={!isErrored()}
+        fallback={
+          <div class="flex flex-col items-center gap-2">
+            <Icon name="satellite_alt" />
+            <span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
+          </div>
+        }
+      >
+        <div class="absolute inset-0 flex items-end" ref={controls}>
+          {/* Controls background gradient */}
+          <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
-        {/* Controls container */}
-        <div class="relative flex w-full items-center gap-3 pb-3 px-2">
-          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          {/* Controls container */}
+          <div class="relative flex w-full items-center gap-3 pb-3 px-2">
+            <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
-          <div class="font-mono text-sm text-on-surface">
-            {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
+            <div class="font-mono text-sm text-on-surface">
+              {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
+            </div>
           </div>
         </div>
-      </div>
+      </Show>
     </div>
   )
 }

@@ -24,6 +24,7 @@ type RouteActivityProps = {
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
+  const [timelineIsInteractive, setTimelineIsInteractive] = createSignal(true)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
@@ -42,6 +43,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     if (video) video.currentTime = newTime
   }
 
+  const onVideoLoad = () => setTimelineIsInteractive(true)
+  const onVideoError = () => setTimelineIsInteractive(false)
+
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
   createResource(
@@ -58,8 +62,22 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <RouteVideoPlayer
+            ref={setVideoRef}
+            onError={onVideoError}
+            onLoad={onVideoLoad}
+            onProgress={setSeekTime}
+            routeName={routeName()}
+            startTime={seekTime()}
+          />
+          <Timeline
+            class="mb-1"
+            interactive={timelineIsInteractive()}
+            route={route.latest}
+            seekTime={seekTime()}
+            updateTime={onTimelineChange}
+            events={events()}
+          />
         </div>
 
         <div class="flex flex-col gap-2">

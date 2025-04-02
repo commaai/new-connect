@@ -91,6 +91,7 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
+  interactive: boolean
   route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
@@ -150,27 +151,31 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       onStart()
     }
 
-    ref.addEventListener('mousedown', onMouseDown)
-    ref.addEventListener('touchstart', onTouchStart)
-    onCleanup(() => {
-      ref.removeEventListener('mousedown', onMouseDown)
-      ref.removeEventListener('touchstart', onTouchStart)
-    })
-  })
+    createEffect(() => {
+      setMarkerOffsetPct((props.seekTime / duration()) * 100)
 
-  createEffect(() => {
-    setMarkerOffsetPct((props.seekTime / duration()) * 100)
+      if (props.interactive) {
+        ref.addEventListener('mousedown', onMouseDown)
+        ref.addEventListener('touchstart', onTouchStart)
+      }
+
+      onCleanup(() => {
+        ref.removeEventListener('mousedown', onMouseDown)
+        ref.removeEventListener('touchstart', onTouchStart)
+      })
+    })
   })
 
   return (
     <div class="flex flex-col">
       <div class="h-1 bg-surface-container-high">
-        <div class="h-full bg-white" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
+        <div class={clsx('h-full bg-white', !props.interactive && 'hidden')} style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
       </div>
       <div
         ref={ref!}
         class={clsx(
-          'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
+          'relative isolate flex h-8 touch-none self-stretch rounded-b-md bg-blue-900',
+          props.interactive && 'cursor-pointer',
           'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
           props.class,
         )}
@@ -178,7 +183,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       >
         {renderTimelineEvents(props.route, props.events)}
         <div
-          class="absolute top-0 z-10 h-full"
+          class={clsx('absolute top-0 z-10 h-full', !props.interactive && 'hidden')}
           style={{
             width: `${MARKER_WIDTH}px`,
             left: `${markerOffsetPct()}%`,
