@@ -32,6 +32,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
 
   const [deviceName, setDeviceName] = createSignal('')
+  // TODO: if we're listing the routes for a user you should always be a user, this is for viewing public routes which are being removed
   const [isDeviceUser, setDeviceUser] = createSignal(true)
   createEffect(() => {
     const d = device()
