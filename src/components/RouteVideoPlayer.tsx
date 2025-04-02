@@ -5,7 +5,6 @@ import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
-import Icon from './material/Icon'
 
 type RouteVideoPlayerProps = {
   class?: string
@@ -173,12 +172,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       {/* Controls overlay */}
       <Show
         when={!isErrored()}
-        fallback={
-          <div class="flex flex-col items-center gap-2">
-            <Icon name="satellite_alt" />
-            <span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
-          </div>
-        }
+        fallback={<span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>}
       >
         <div class="absolute inset-0 flex items-end" ref={controls}>
           {/* Controls background gradient */}
