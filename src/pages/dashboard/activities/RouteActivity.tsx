@@ -124,7 +124,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*  <RouteStatistics class="p-5" route={route()} timeline={undefined} />*/}
             {/*<Show when={route()}>*/}
             {/*TODO: add skeleton animation to each StatisticBar*/}
-            <RouteStatistics class="p-5" route={route.latest} timeline={undefined} />
+            <RouteStatistics class="p-5" route={route.loading ? route() : route.latest} timeline={undefined} />
             {/*</Show>*/}
             {/*</Suspense>*/}
             {/*</Show>*/}
@@ -137,10 +137,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*  </Show>*/}
             {/*</Suspense>*/}
 
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
               {/*{route.latest?.fullname}*/}
-              <RouteActions routeName={routeName()} route={route()} />
-            </Suspense>
+              <RouteActions routeName={routeName()} route={route.latest} />
+            {/*</Suspense>*/}
           </div>
         </div>
 
