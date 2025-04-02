@@ -29,16 +29,16 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
+  // TODO: device should be passed in from DeviceList
   const [device] = createResource(() => props.dongleId, getDevice)
 
   // Resource as source of another resource blocks component rendering
-  const [deviceName, setDeviceName] = createSignal('')
+  const deviceName = () => getDeviceName(device.latest)
   // TODO: if we're listing the routes for a user you should always be a user, this is for viewing public routes which are being removed
   const [isDeviceUser, setDeviceUser] = createSignal(true)
   createEffect(() => {
     const d = device()
     if (!d) return
-    setDeviceName(getDeviceName(d))
     setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
   })
 
