@@ -1,8 +1,20 @@
-import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import {
+  createEffect,
+  createMemo,
+  createResource,
+  createSignal,
+  For,
+  Index,
+  onCleanup,
+  onMount,
+  Show,
+  Suspense,
+  type VoidComponent
+} from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import { getTimelineStatistics } from '~/api/derived'
+import {generateTimelineStatistics, getTimelineEvents, getTimelineStatistics, type TimelineEvent} from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
@@ -11,12 +23,16 @@ import type { RouteSegments } from '~/api/types'
 
 interface RouteCardProps {
   route: RouteSegments
+  setEvents: (events: TimelineEvent[]) => void
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  // const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  const [events] = createResource(() => props.route, getTimelineEvents)
+  const timeline = createMemo(() => generateTimelineStatistics(events()))
+  createEffect(() => props.setEvents(events() || []))
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
@@ -73,8 +89,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
 }
 
 const PAGE_SIZE = 10
-
-const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
+const RouteList: VoidComponent<{ dongleId: string; setEvents: (events: TimelineEvent[]) => void }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -114,7 +129,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
+              <For each={routes()}>{(route) => <RouteCard route={route} setEvents={props.setEvents}/>}</For>
             </Suspense>
           )
         }}

@@ -98,10 +98,10 @@ interface TimelineProps {
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const route = () => props.route
+  // const route = () => props.route
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
+  // const [duration] = createResource(props.route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
 
   let ref!: HTMLDivElement
 
@@ -112,7 +112,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       const fraction = x / rect.width
       // Update marker immediately without waiting for video
       setMarkerOffsetPct(fraction * 100)
-      const newTime = duration() * fraction
+      const newTime = 1 * fraction
       props.updateTime(newTime)
     }
 

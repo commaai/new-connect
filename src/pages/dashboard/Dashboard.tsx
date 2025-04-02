@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import {createMemo, createResource, createSignal, lazy, Match, Show, Suspense, SuspenseList, Switch} from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -116,6 +116,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
+  const [events, setEvents] = createSignal([])
+
   const currentDevice = () => devices()?.find((device) => device.dongle_id === urlState().dongleId)
 
   const getDefaultDongleId = () => {
@@ -136,7 +138,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={dongleId} device={currentDevice()} />}
+              paneOne={<DeviceActivity dongleId={dongleId} device={currentDevice()} setEvents={setEvents} />}
               paneTwo={
                 <Switch
                   fallback={
@@ -150,7 +152,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
                   <Match when={urlState().dateStr}>
-                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
+                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} urlStartTime={urlState().startTime} events={events()} />}
                   </Match>
                 </Switch>
               }

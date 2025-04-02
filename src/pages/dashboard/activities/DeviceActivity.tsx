@@ -16,10 +16,12 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
+import type {TimelineEvent} from "~/api/derived";
 
 type DeviceActivityProps = {
   dongleId: string
   device: Device | undefined
+  setEvents: (events: TimelineEvent[]) => void
 }
 
 interface SnapshotResponse {
@@ -176,7 +178,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           )}
         </div>
-        <RouteList dongleId={props.dongleId} />
+        <RouteList dongleId={props.dongleId} setEvents={props.setEvents} />
       </div>
     </>
   )
