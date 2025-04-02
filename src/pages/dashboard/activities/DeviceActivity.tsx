@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show } from 'solid-js'
+import {createResource, createSignal, createEffect, For, Show, Suspense} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -30,9 +30,23 @@ interface SnapshotResponse {
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+
+  const [deviceName, setDeviceName] = createSignal('')
+  createEffect(() => {
+    const d = device()
+    if (d) {
+      setDeviceName(getDeviceName(d))
+    }
+  })
+
+  // const [deviceName] = createResource(device, getDeviceName)
+  // const deviceName = () => {
+  //   const d = device();
+  //   return d ? getDeviceName(d) : 'Loading...';
+  // }
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
+  // const [isDeviceUser] = createResource(() => device, (device) => device()?.is_owner || device()?.alias !== SHARED_DEVICE)
+  const isDeviceUser = () => true
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -120,18 +134,21 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          {/*<Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>*/}
-          {/*  <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />*/}
-          {/*</Show>*/}
-          <Suspense fallback={<div class="h-[64px] skeleton-loader size-full"/>}>
-            <div class="flex items-center justify-between p-4">
-              {device() && <div class="text-xl font-bold">{deviceName()}</div>}
-              <div class="flex gap-4">
-                <IconButton name="camera" onClick={() => void takeSnapshot()}/>
-                <IconButton name="settings" href={`/${props.dongleId}/settings`}/>
-              </div>
-            </div>
+          {/*<Show when={deviceName()} fallback={<div class="h-[240px] skeleton-loader size-full" />}>*/}
+          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full"/>}>
+            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!}/>
           </Suspense>
+          {/*</Show>*/}
+          <div class="flex items-center justify-between p-4">
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full"/>}>
+              {/* TODO: we should not need to fetch the device name when switching as we already know it in DeviceList */}
+              {<div class="text-xl font-bold">{deviceName()}</div>}
+            </Suspense>
+            <div class="flex gap-4">
+              <IconButton name="camera" onClick={() => void takeSnapshot()}/>
+              <IconButton name="settings" href={`/${props.dongleId}/settings`}/>
+            </div>
+          </div>
           <Show when={isDeviceUser()}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
