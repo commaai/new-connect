@@ -147,7 +147,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   }
                 >
                   <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                    <SettingsActivity dongleId={id} />
+                    <SettingsActivity dongleId={id} shared={isSharedDevice()} />
                   </Match>
                   <Match when={dateStr()}>
                     <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />

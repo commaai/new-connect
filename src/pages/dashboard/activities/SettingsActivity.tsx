@@ -34,6 +34,7 @@ const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 1
 
 type PrimeActivityProps = {
   dongleId: string
+  shared: boolean
 }
 
 type PrimePlan = 'nodata' | 'data'
@@ -402,7 +403,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
