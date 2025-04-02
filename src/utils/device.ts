@@ -1,6 +1,10 @@
 import type { Device } from '~/api/types'
 
-export function getDeviceName(device: Device) {
+const SHARED_DEVICE = 'Shared Device'
+
+export function getDeviceName(device: Device | undefined, shared: boolean) {
+  if (shared) return SHARED_DEVICE
+  if (!device) return ''
   if (device.alias) return device.alias
   return `comma ${device.device_type}`
 }
