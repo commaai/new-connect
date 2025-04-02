@@ -132,30 +132,28 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={dongleId()} keyed>
-          {(id) => (
-            <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} shared={!currentDevice()} />}
-              paneTwo={
-                <Switch
-                  fallback={
-                    <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-                      <Icon name="search" size="48" />
-                      <span class="text-title-md">Select a route to view</span>
-                    </div>
-                  }
-                >
-                  <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
-                    <SettingsActivity dongleId={id} shared={!currentDevice()} />
-                  </Match>
-                  <Match when={dateStr()}>
-                    <RouteActivity dongleId={id} dateStr={dateStr()} startTime={startTime()} />
-                  </Match>
-                </Switch>
-              }
-              paneTwoContent={!!dateStr()}
-            />
-          )}
+        <Match when={dongleId()}>
+          <DashboardLayout
+            paneOne={<DeviceActivity dongleId={dongleId()} shared={!currentDevice()} />}
+            paneTwo={
+              <Switch
+                fallback={
+                  <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                    <Icon name="search" size="48" />
+                    <span class="text-title-md">Select a route to view</span>
+                  </div>
+                }
+              >
+                <Match when={dateStr() === 'settings' || dateStr() === 'prime'}>
+                  <SettingsActivity dongleId={dongleId()} shared={!currentDevice()} />
+                </Match>
+                <Match when={dateStr()}>
+                  <RouteActivity dongleId={dongleId()} dateStr={dateStr()} startTime={startTime()} />
+                </Match>
+              </Switch>
+            }
+            paneTwoContent={!!dateStr()}
+          />
         </Match>
         <Match when={!profile.loading && !profile.latest}>
           <Navigate href="/login" />

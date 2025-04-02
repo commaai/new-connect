@@ -1,4 +1,16 @@
-import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
+import {
+  createEffect,
+  createResource,
+  createSignal,
+  For,
+  Index,
+  on,
+  onCleanup,
+  onMount,
+  Show,
+  Suspense,
+  type VoidComponent,
+} from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
@@ -8,6 +20,7 @@ import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/api/types'
+import { createStore } from 'solid-js/store'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -81,33 +94,42 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     if (previousPageData.length === 0) return undefined
     return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
   }
+
+  const [pages, setPages] = createStore<{ [key: string]: Promise<RouteSegments[]>[] }>({})
   const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (pages[page] === undefined) {
-      pages[page] = (async () => {
-        const previousPageData = page > 0 ? await getPage(page - 1) : undefined
-        const key = getKey(previousPageData)
-        return key ? fetcher<RouteSegments[]>(key) : []
-      })()
+    if (!pages[props.dongleId]) setPages(props.dongleId, [])
+    if (!pages[props.dongleId][page]) {
+      setPages(
+        props.dongleId,
+        page,
+        (async () => {
+          const previousPageData = page > 0 ? await getPage(page - 1) : undefined
+          const key = getKey(previousPageData)
+          return key ? fetcher<RouteSegments[]>(key) : []
+        })(),
+      )
     }
-    return pages[page]
+    return pages[props.dongleId][page]
   }
 
-  const pages: Promise<RouteSegments[]>[] = []
   const [size, setSize] = createSignal(1)
   const pageNumbers = () => Array.from({ length: size() })
 
-  createEffect(() => {
-    if (props.dongleId) {
-      pages.length = 0
-      setSize(1)
-    }
-  })
+  createEffect(
+    on(
+      () => props.dongleId,
+      () => setSize(1),
+    ),
+  )
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
         {(_, i) => {
-          const [routes] = createResource(() => i(), getPage)
+          const [routes] = createResource(
+            () => [props.dongleId, i()],
+            () => getPage(i()),
+          )
           return (
             <Suspense
               fallback={
