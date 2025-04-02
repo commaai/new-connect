@@ -130,6 +130,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       if (!video.canPlayType('application/vnd.apple.mpegurl')) {
         console.error('Browser does not support Media Source Extensions API')
       }
+      video.onerror = onError
     }
   })
 
