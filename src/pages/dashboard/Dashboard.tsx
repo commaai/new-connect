@@ -116,7 +116,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [profile] = createResource(getProfile)
 
   const currentDevice = () => devices()?.find((device) => device.dongle_id === dongleId())
-  const isSharedDevice = () => !currentDevice() && devices()?.length > 0
+  const isSharedDevice = () => !currentDevice()
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected

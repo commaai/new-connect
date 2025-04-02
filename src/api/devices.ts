@@ -14,9 +14,7 @@ const sortDevices = (devices: Device[]) =>
     }
   })
 
-export const getDevice = async (dongleId: string) => {
-  return await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
-}
+export const getDevice = async (dongleId: string) => fetcher<Device>(`/v1.1/devices/${dongleId}/`).catch(() => undefined)
 
 export const getAthenaOfflineQueue = (dongleId: string) =>
   fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`)
