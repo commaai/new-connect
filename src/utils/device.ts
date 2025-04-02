@@ -1,6 +1,7 @@
 import type { Device } from '~/api/types'
 
-export function getDeviceName(device: Device) {
+export function getDeviceName(device: Device | undefined) {
+  if (!device) return undefined
   if (device.alias) return device.alias
   return `comma ${device.device_type}`
 }
