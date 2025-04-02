@@ -15,18 +15,6 @@ export default defineConfig({
     }),
     VitePWA({
       registerType: 'autoUpdate',
-      manifest: {
-        name: 'comma connect',
-        short_name: 'connect',
-        description: 'manage your openpilot experience',
-        background_color: '#131318',
-        theme_color: '#131318',
-        start_url: '/',
-        id: '/',
-      },
-      pwaAssets: {
-        config: true,
-      },
       workbox: {
         globPatterns: ['**/*.{js,css,html,ico,png,svg,webp}'],
         runtimeCaching: [
