@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createMemo, createResource, createSignal, createEffect, For, Show, Suspense } from 'solid-js'
+import { createResource, createSignal, createEffect, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -32,19 +32,16 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
 
   // Resource as source of another resource blocks component rendering
-  // const [deviceName, setDeviceName] = createSignal('')
-  const deviceName = () => getDeviceName(device.latest)
-  // const isDeviceUser = () => !device.latest ? (device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE) : true
-  const isDeviceUser = createMemo(() => device.latest ? (device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE) : true)
+  const [deviceName, setDeviceName] = createSignal('')
   // TODO: if we're listing the routes for a user you should always be a user, this is for viewing public routes which are being removed
-  // const [isDeviceUser, setDeviceUser] = createSignal(true)
-  // createEffect(() => {
-  //   const d = device()
-  //   if (d) {
-  //     // setDeviceName(getDeviceName(d))
-  //     setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
-  //   }
-  // })
+  const [isDeviceUser, setDeviceUser] = createSignal(true)
+  createEffect(() => {
+    const d = device()
+    if (d) {
+      setDeviceName(getDeviceName(d))
+      setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
+    }
+  })
 
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
@@ -146,22 +143,22 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-            <Show when={isDeviceUser()}>
-              <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-              <Show when={queueVisible()}>
-                <UploadQueue dongleId={props.dongleId} />
-              </Show>
-              <button
-                class={clsx(
-                  'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-                  queueVisible() && 'border-t-2 border-t-surface-container-low',
-                )}
-                onClick={() => setQueueVisible(!queueVisible())}
-              >
-                <p class="mr-2">Upload Queue</p>
-                <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-              </button>
+          <Show when={isDeviceUser()}>
+            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+            <Show when={queueVisible()}>
+              <UploadQueue dongleId={props.dongleId} />
             </Show>
+            <button
+              class={clsx(
+                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                queueVisible() && 'border-t-2 border-t-surface-container-low',
+              )}
+              onClick={() => setQueueVisible(!queueVisible())}
+            >
+              <p class="mr-2">Upload Queue</p>
+              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+            </button>
+          </Show>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
