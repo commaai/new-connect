@@ -123,7 +123,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*<Suspense>*/}
             {/*  <RouteStatistics class="p-5" route={route()} timeline={undefined} />*/}
             {/*<Show when={route()}>*/}
-            <RouteStatistics class="p-5" route={route.loading ? undefined : route.latest} timeline={undefined} />
+            {/*TODO: add skeleton animation to each StatisticBar*/}
+            <RouteStatistics class="p-5" route={route.latest} timeline={undefined} />
             {/*</Show>*/}
             {/*</Suspense>*/}
             {/*</Show>*/}
