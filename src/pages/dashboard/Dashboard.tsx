@@ -4,7 +4,7 @@ import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
-import { getDevices } from '~/api/devices'
+import {getDevice, getDevices} from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 import type { Device } from '~/api/types'
@@ -116,7 +116,28 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
-  const currentDevice = () => devices()?.find((device) => device.dongle_id === urlState().dongleId)
+  // const currentDevice = () => devices()?.find((device) => device.dongle_id === urlState().dongleId)
+  // const currentDevice = createMemo(async () => {
+  //   let device = devices()?.find((device) => device.dongle_id === urlState().dongleId)
+  //   const dongleId = urlState().dongleId
+  //   if (!device && dongleId) {
+  //     device = await getDevice(dongleId)
+  //     console.log('got device from api call instead', device)
+  //   } else {
+  //     console.log('got device from me/devices list query')
+  //   }
+  //   return device
+  // })
+
+const [currentDevice] = createResource(
+  () => urlState().dongleId,
+  async (id) => {
+    const deviceInList = devices()?.find((d) => d.dongle_id === id)
+    if (deviceInList) return deviceInList
+    return await getDevice(id)
+  },
+  { initialValue: undefined }
+)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected

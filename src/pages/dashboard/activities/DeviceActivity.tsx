@@ -130,7 +130,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </div>
           <Show when={props.device}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+            <Suspense>
+              <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+            </Suspense>
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
             </Show>
