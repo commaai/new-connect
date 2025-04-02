@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
-import { configure, render, waitFor } from '@solidjs/testing-library'
+import { configure, render, waitFor, screen } from '@solidjs/testing-library'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
@@ -21,8 +21,8 @@ describe('Demo mode', () => {
   beforeEach(() => setAccessToken(Demo.ACCESS_TOKEN))
 
   test('View dashboard', async () => {
-    const { findByText } = renderApp('/')
-    expect(await findByText('demo 3X')).not.toBeFalsy()
+    const { findAllByText } = renderApp('/')
+    expect(await findAllByText('demo 3X')).toHaveLength(2)
   })
 
   test('View demo route', async () => {
