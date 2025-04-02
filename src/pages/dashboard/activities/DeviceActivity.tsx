@@ -37,10 +37,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [isDeviceUser, setDeviceUser] = createSignal(true)
   createEffect(() => {
     const d = device()
-    if (d) {
-      setDeviceName(getDeviceName(d))
-      setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
-    }
+    if (!d) return
+    setDeviceName(getDeviceName(d))
+    setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
   })
 
   const [queueVisible, setQueueVisible] = createSignal(false)
