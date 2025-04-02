@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import { createMemo, createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
@@ -19,6 +19,7 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
+  shared: boolean
 }
 
 interface SnapshotResponse {
@@ -31,10 +32,7 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   // TODO: device should be passed in from DeviceList
   const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
-  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
-  // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
-  const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
+  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -135,7 +133,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={isDeviceUser()}>
+          <Show when={!props.shared}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
