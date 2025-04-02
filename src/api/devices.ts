@@ -14,38 +14,8 @@ const sortDevices = (devices: Device[]) =>
     }
   })
 
-// export const SHARED_DEVICE = 'Shared Device'
-
-// const createSharedDevice = (dongleId: string): Device => ({
-//   dongle_id: dongleId,
-//   alias: SHARED_DEVICE,
-//   serial: '',
-//   last_athena_ping: 0,
-//   ignore_uploads: null,
-//   is_paired: true,
-//   is_owner: false,
-//   public_key: '',
-//   prime: false,
-//   prime_type: 0,
-//   trial_claimed: false,
-//   device_type: '',
-//   openpilot_version: '',
-//   sim_id: '',
-//   sim_type: 0,
-//   eligible_features: {
-//     prime: false,
-//     prime_data: false,
-//     nav: false,
-//   },
-//   fetched_at: Math.floor(Date.now() / 1000),
-// })
-
 export const getDevice = async (dongleId: string) => {
-  // try {
   return await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
-  // } catch {
-  //   return createSharedDevice(dongleId)
-  // }
 }
 
 export const getAthenaOfflineQueue = (dongleId: string) =>
