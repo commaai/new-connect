@@ -1,10 +1,9 @@
 import clsx from 'clsx'
-import { createMemo, createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import { createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice } from '~/api/devices'
-import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
+import { ATHENA_URL } from '~/api/config'
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -12,15 +11,9 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import { getDeviceName } from '~/utils/device'
-
-import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
 
-type DeviceActivityProps = {
-  dongleId: string
-  shared: boolean
-}
+import RouteList from '../components/RouteList'
 
 interface SnapshotResponse {
   result?: {
@@ -29,10 +22,12 @@ interface SnapshotResponse {
   }
 }
 
+interface DeviceActivityProps {
+  dongleId: string
+  deviceName: string
+}
+
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -122,33 +117,29 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+            <DeviceLocation dongleId={props.dongleId} deviceName={props.deviceName} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
-              {<div class="text-xl font-bold">{deviceName()}</div>}
-            </Suspense>
+            <div class="text-xl font-bold">{props.deviceName}</div>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={!props.shared}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-            <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
-            </Show>
-            <button
-              class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-                queueVisible() && 'border-t-2 border-t-surface-container-low',
-              )}
-              onClick={() => setQueueVisible(!queueVisible())}
-            >
-              <p class="mr-2">Upload Queue</p>
-              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-            </button>
+          <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+          <Show when={queueVisible()}>
+            <UploadQueue dongleId={props.dongleId} />
           </Show>
+          <button
+            class={clsx(
+              'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+              queueVisible() && 'border-t-2 border-t-surface-container-low',
+            )}
+            onClick={() => setQueueVisible(!queueVisible())}
+          >
+            <p class="mr-2">Upload Queue</p>
+            <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
+          </button>
         </div>
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>

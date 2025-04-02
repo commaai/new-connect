@@ -4,6 +4,7 @@ import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice, unpairDevice } from '~/api/devices'
+import type { Device } from '~/api/types'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -21,7 +22,6 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
-import { getDeviceName } from '~/utils/device'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -31,11 +31,6 @@ const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
 }
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 === 0 ? 0 : 2)}`
-
-type PrimeActivityProps = {
-  dongleId: string
-  shared: boolean
-}
 
 type PrimePlan = 'nodata' | 'data'
 
@@ -401,10 +396,13 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   )
 }
 
-const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
+type SettingsActivityProps = {
+  dongleId: string
+  device: Device
+  deviceName: string
+}
 
+const SettingsActivity: VoidComponent<SettingsActivityProps> = (props) => {
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
@@ -413,7 +411,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <h2 class="text-headline-sm">{deviceName()}</h2>
+        <h2 class="text-headline-sm">{props.deviceName}</h2>
         <Show when={unpairData.error}>
           <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
             <Icon class="text-error" name="error" size="20" />
@@ -427,11 +425,11 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         <h2 class="text-headline-sm">comma prime</h2>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
-            <Match when={device()?.prime === false}>
+            <Match when={props.device.prime === false}>
               <PrimeCheckout dongleId={props.dongleId} />
             </Match>
 
-            <Match when={device()?.prime === true}>
+            <Match when={props.device.prime === true}>
               <PrimeManage dongleId={props.dongleId} />
             </Match>
           </Switch>
