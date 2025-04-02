@@ -21,7 +21,6 @@ export default defineConfig({
       resizeOptions: { fit: 'contain', background: '#131318' },
       linkMediaOptions: {
         addMediaScreen: true,
-        xhtml: true,
       },
       name: (landscape, size) => {
         // make sure to update when generating light/dark variants
@@ -29,5 +28,5 @@ export default defineConfig({
       },
     }),
   },
-  images: ['public/favicon.svg'],
+  images: ['public/favicon-dark.svg'],
 })
