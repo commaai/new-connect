@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Match, Suspense, Switch, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, Match, on, Suspense, Switch, type VoidComponent } from 'solid-js'
 import { Navigate } from '@solidjs/router'
 
 import { setRouteViewed } from '~/api/athena'
@@ -53,16 +53,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   )
 
   // Reset seek time when route changes
-  let lastRouteName = ''
-  createEffect(() => {
-    if (lastRouteName === routeName()) return // Skip if route hasn't changed
-    if (lastRouteName) {
-      // Reset seek and timeline to 0 if this isn't the first route loaded (if it is, we want it to use the start time from the URL if provided)
-      setSeekTime(0)
-      onTimelineChange(0)
-    }
-    lastRouteName = routeName()
-  })
+  createEffect(
+    on(routeName, (_, prevName) => {
+      if (prevName) {
+        // Reset seek and timeline to 0 if this isn't the first route loaded (if it is, we want to use the start time from the URL if provided)
+        setSeekTime(0)
+        onTimelineChange(0)
+      }
+    }),
+  )
 
   return (
     <>
