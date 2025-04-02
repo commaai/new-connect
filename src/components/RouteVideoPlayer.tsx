@@ -136,7 +136,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   createEffect(() => {
     const url = streamUrl()
     const player = hls()
-    if (!url || player === undefined) return
+    if (!url || !player) return
     if (player) {
       player.loadSource(url)
     } else {
