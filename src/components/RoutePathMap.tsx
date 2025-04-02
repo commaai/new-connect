@@ -41,8 +41,6 @@ const RoutePathMap: Component<{
   strokeWidth?: number
   opacity?: number
 }> = (props) => {
-  const { coords, strokeWidth = 4, opacity, seekTime, updateTime } = props
-
   let mapRef!: HTMLDivElement
   const [map, setMap] = createSignal<L.Map | null>(null)
   const [position, setPosition] = createSignal(0) // current position in the route
@@ -50,7 +48,7 @@ const RoutePathMap: Component<{
   const [isDragging, setIsDragging] = createSignal(false) // marker is being dragged
   const [showTransition, setShowTransition] = createSignal(false) // smooth marker transition
 
-  const mapCoords = () => coords.map((p) => [p.lat, p.lng] as [number, number])
+  const mapCoords = () => props.coords.map((p) => [p.lat, p.lng] as [number, number])
   const pastCoords = () => mapCoords().slice(0, position() + 1)
   const futureCoords = () => mapCoords().slice(position())
   const currentCoord = () => mapCoords()[position()]
@@ -81,19 +79,20 @@ const RoutePathMap: Component<{
       boxZoom: false,
     })
     L.tileLayer(getTileUrl()).addTo(m)
+    m.setView(currentCoord(), 12) // initialize with default zoom (fit to bounds later)
     m.zoomControl.setPosition('topright')
+    const { strokeWidth = 4, opacity } = props
     pastPolyline = L.polyline([], { color: '#6F707F', weight: strokeWidth, opacity }).addTo(m)
     futurePolyline = L.polyline([], { color: '#DFE0FF', weight: strokeWidth, opacity }).addTo(m)
-    hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: strokeWidth + 16, opacity: 0 }).addTo(m)
+    hitboxPolyline = L.polyline(mapCoords(), { color: 'red', weight: (strokeWidth || 4) + 16, opacity: 0.2 }).addTo(m)
     marker = L.marker(currentCoord(), { icon: createCarIcon(isLocked()), draggable: true }).addTo(m)
-    m.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // Set initial view so route is fully visible
 
     const updatePosition = (lng: number, lat: number) => {
-      const idx = findClosestPoint(lng, lat, coords)
+      const idx = findClosestPoint(lng, lat, props.coords)
       const point = mapCoords()[idx]
       marker?.setLatLng(point)
       setPosition(idx)
-      updateTime(coords[idx].t)
+      props.updateTime(props.coords[idx].t)
     }
 
     const handleDrag = (e: L.LeafletMouseEvent | L.LeafletEvent) => {
@@ -123,6 +122,13 @@ const RoutePathMap: Component<{
     onCleanup(() => m.remove())
   })
 
+  // Update hitbox polyline when route changes and fit to bounds
+  createEffect(() => {
+    if (!hitboxPolyline) return
+    hitboxPolyline.setLatLngs(mapCoords())
+    map()?.fitBounds(hitboxPolyline.getBounds(), { padding: [20, 20] }) // Set initial view so route is fully visible
+  })
+
   // Update map interactivity
   createEffect(() => {
     const m = map()
@@ -144,30 +150,30 @@ const RoutePathMap: Component<{
 
   // Update marker position based on seek time
   createEffect(() => {
-    const t = Math.round(seekTime())
+    const t = Math.round(props.seekTime())
     const delta = t - lastSeekTime
     // Don't animate if not smoothly seeking forward or for the first pan (to fix initial load position)
     setShowTransition(lastSeekTime > 0 && delta >= 0 && delta <= 1)
     if (t === lastSeekTime) return // Skip if seek time hasn't changed, since it will just get the same position
     lastSeekTime = t
-    if (!coords.length) return
-    if (t < coords[0].t) {
+    if (!props.coords.length) return
+    if (t < props.coords[0].t) {
       setPosition(0)
       return
     }
-    const newPos = coords.findIndex((p, i) => i === coords.length - 1 || (t >= p.t && t < coords[i + 1].t))
-    setPosition(newPos === -1 ? coords.length - 1 : newPos)
+    const newPos = props.coords.findIndex((p, i) => i === props.coords.length - 1 || (t >= p.t && t < props.coords[i + 1].t))
+    setPosition(newPos === -1 ? props.coords.length - 1 : newPos)
   })
 
   // Update polyline and marker position based on coordinates, and auto center if locked
   createEffect(() => {
-    if (!map() || !coords.length) return
+    if (!map() || !props.coords.length) return
 
     pastPolyline?.setLatLngs(pastCoords())
     futurePolyline?.setLatLngs(futureCoords())
     marker?.setLatLng(currentCoord())
 
-    if (isLocked() && !isDragging()) centerMarker(showTransition() ? 2 : 0)
+    if (isLocked() && !isDragging()) centerMarker(showTransition() ? 2 : 0.25)
   })
 
   // Update marker animation class
