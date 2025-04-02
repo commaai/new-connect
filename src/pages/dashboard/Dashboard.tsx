@@ -131,10 +131,10 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={currentDevice()} keyed>
+        <Match when={dongleId()} keyed>
           {(id) => (
             <DashboardLayout
-              paneOne={<DeviceActivity device={currentDevice()} />}
+              paneOne={<DeviceActivity dongleId={id} device={currentDevice()} />}
               paneTwo={
                 <Switch
                   fallback={
