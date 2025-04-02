@@ -1,11 +1,11 @@
 import clsx from 'clsx'
-import {createSignal, For, Show, Suspense} from 'solid-js'
+import { createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
-import type {Device} from "~/api/types";
+import type { Device } from '~/api/types'
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -33,11 +33,11 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   // const [device] = createResource(() => props.dongleId, getDevice)
   // const [device, setDevice] = createSignal<Device | null>(null)
-  const deviceName = () => props.device ? getDeviceName(props.device) : ''
+  const deviceName = () => (props.device ? getDeviceName(props.device) : '')
   const [queueVisible, setQueueVisible] = createSignal(false)
   // const [isDeviceUser] = createResource(() => props.device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
-  console.log("props.device", props.device)
-  const isDeviceUser = () => (props.device?.is_owner || props.device?.alias !== SHARED_DEVICE)
+  console.log('props.device', props.device)
+  const isDeviceUser = () => props.device?.is_owner || props.device?.alias !== SHARED_DEVICE
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -129,9 +129,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            {/*<Suspense fallback={<div class="h-[48px] skeleton-loader size-2 rounded-full" />}>*/}
-              <div class="text-xl font-bold">{deviceName()}</div>
-            {/*</Suspense>*/}
+            <div class="text-xl font-bold">{deviceName()}</div>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
