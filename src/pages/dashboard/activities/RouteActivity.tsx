@@ -1,4 +1,4 @@
-import {createEffect, createMemo, createResource, createSignal, Suspense, type VoidComponent} from 'solid-js'
+import {createEffect, createMemo, createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -108,20 +108,38 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          {/*<RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />*/}
-          <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-            <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={props.events} />
-          </Suspense>
+          {/*<Suspense>*/}
+            <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          {/*</Suspense>*/}
+          {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
+          {/*  <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={props.events} />*/}
+          {/*</Suspense>*/}
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            {/*<RouteStatistics class="p-5" route={route()} timeline={timeline()} />*/}
-
-            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-            {/*  <RouteActions routeName={routeName()} route={route()} />*/}
+            {/*<Show when={!route.loading} fallback={<div class="skeleton-loader h-[76px]" />}>*/}
+            {/*<Suspense>*/}
+            {/*  <RouteStatistics class="p-5" route={route()} timeline={undefined} />*/}
+            {/*<Show when={route()}>*/}
+            <RouteStatistics class="p-5" route={route.loading ? undefined : route.latest} timeline={undefined} />
+            {/*</Show>*/}
             {/*</Suspense>*/}
+            {/*</Show>*/}
+            {/*<Show when={route()} fallback={<div class="skeleton-loader w-12 h-5" />}>*/}
+            {/*  {(r) => <div>Distance: {r.length}</div>}*/}
+            {/*</Show>*/}
+            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
+            {/*  <Show when={!route.loading} fallback={<div class="skeleton-loader min-h-48" />}>*/}
+            {/*  <div>Distance: {route.latest?.length}</div>*/}
+            {/*  </Show>*/}
+            {/*</Suspense>*/}
+
+            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+              {/*{route.latest?.fullname}*/}
+              <RouteActions routeName={routeName()} route={route()} />
+            </Suspense>
           </div>
         </div>
 
