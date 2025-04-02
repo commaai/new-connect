@@ -102,7 +102,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     })
 
     createEffect(() => {
-      console.log(isErrored())
       if (isErrored()) return
       controls.addEventListener('click', onClick)
       onCleanup(() => controls.removeEventListener('click', onClick))
