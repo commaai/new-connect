@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, createSignal, createEffect, For, Show, Suspense } from 'solid-js'
+import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -32,9 +32,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   // TODO: device should be passed in from DeviceList
   const [device] = createResource(() => props.dongleId, getDevice)
   // Resource as source of another resource blocks component initialization
-  const deviceName = () => device.latest ? getDeviceName(device.latest) : ''
+  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
   // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
-  const isDeviceUser = () => device.loading ? true : (device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
+  const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
