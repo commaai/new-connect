@@ -11,10 +11,10 @@ import { TimelineEvent } from '~/api/derived'
 
 type RouteVideoPlayerProps = {
   class?: string
+  events: TimelineEvent[]
+  route: Route | undefined
   routeName: string
   startTime: number
-  route: Route | undefined
-  events: TimelineEvent[]
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
@@ -158,7 +158,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           </div>
         </div>
       </div>
-      <Timeline class="mb-1" route={props.route} seekTime={seekTime()} updateTime={onTimelineUpdate} events={props.events} />
+      <Timeline class="mb-1" events={props.events} route={props.route} seekTime={seekTime()} updateTime={onTimelineUpdate} />
     </div>
   )
 }

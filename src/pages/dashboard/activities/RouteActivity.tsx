@@ -47,7 +47,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <RouteVideoPlayer route={route.latest} routeName={routeName()} startTime={props.startTime} events={events.latest} />
+        <RouteVideoPlayer events={events.latest} route={route.latest} routeName={routeName()} startTime={props.startTime} />
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
