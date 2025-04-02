@@ -11,6 +11,7 @@ import storage from '~/utils/storage'
 
 type DeviceListProps = {
   class?: string
+  devices: Device[]
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
@@ -23,11 +24,11 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
     storage.setItem('lastSelectedDongleId', device.dongle_id)
   }
 
-  const [devices] = createResource(getDevices)
+  // const [devices] = createResource(getDevices)
   return (
     <List variant="nav" class={props.class}>
       <Suspense fallback={<div class="h-14 skeleton-loader rounded-xl" />}>
-        <For each={devices()}>
+        <For each={props.devices}>
           {(device) => (
             <ListItem
               variant="nav"
