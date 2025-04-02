@@ -63,8 +63,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   let sentinel!: HTMLDivElement
   const observer = new IntersectionObserver(
     (entries) => {
-      if (!entries[0].isIntersecting) return
-      props.onTrigger()
+      if (entries.some((entry) => entry.isIntersecting)) props.onTrigger()
     },
     { threshold: 0.1 },
   )
@@ -105,7 +104,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
       <Show when={routes.isFetchingNextPage}>
         <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
       </Show>
-      <Sentinel onTrigger={() => routes.fetchNextPage({ cancelRefetch: false })} />
+      <Show when={!routes.isFetchingNextPage && routes.isFetchedAfterMount}>
+        <Sentinel onTrigger={() => routes.fetchNextPage({ cancelRefetch: true })} />
+      </Show>
     </div>
   )
 }
