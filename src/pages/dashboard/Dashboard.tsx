@@ -7,6 +7,7 @@ import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
+import type { Device } from '~/api/types'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
@@ -22,7 +23,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent = () => {
+const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
@@ -40,7 +41,7 @@ const DashboardDrawer: VoidComponent = () => {
       >
         Devices
       </TopAppBar>
-      <DeviceList class="overflow-y-auto p-2" />
+      <DeviceList class="overflow-y-auto p-2" devices={props.devices} />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
@@ -111,7 +112,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query.pair
 
-  const [devices] = createResource(getDevices)
+  const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
@@ -124,7 +125,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <Drawer drawer={<DashboardDrawer />}>
+    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
