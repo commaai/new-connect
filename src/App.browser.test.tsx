@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
-import { configure, render, waitFor, screen } from '@solidjs/testing-library'
+import { configure, render, waitFor } from '@solidjs/testing-library'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
