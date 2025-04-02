@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import { createMemo, createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
