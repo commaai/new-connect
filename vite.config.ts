@@ -9,9 +9,7 @@ import { Icons } from './src/components/material/Icon'
 
 export default defineConfig({
   plugins: [
-    devtools({
-      autoname: true,
-    }),
+    devtools(),
     solid({
       ssr: false,
     }),
