@@ -116,9 +116,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [profile] = createResource(getProfile)
   const currentDevice = () => devices()?.filter((device) => device.dongle_id === dongleId())[0]
 
+  const dongleIdExists = () => devices()?.some((device) => device.dongle_id === dongleId())
+
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
-    if (dongleId()) return undefined
+    // if (dongleId()) return undefined
+    // Do not redirect if dongle ID is in devices
+    // if (dongleIdExists()) return undefined
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
     if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
@@ -131,7 +135,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId() === 'pair' || pairToken()}>
           <PairActivity />
         </Match>
-        <Match when={dongleId()} keyed>
+        <Match when={dongleIdExists() ? dongleId() : null} keyed>
           {(id) => (
             <DashboardLayout
               paneOne={<DeviceActivity dongleId={id} device={currentDevice()} />}
@@ -159,7 +163,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={!profile.loading && !profile.latest}>
           <Navigate href="/login" />
         </Match>
-        <Match when={getDefaultDongleId()} keyed>
+        <Match when={!dongleIdExists() ? getDefaultDongleId() : null} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
         </Match>
       </Switch>
