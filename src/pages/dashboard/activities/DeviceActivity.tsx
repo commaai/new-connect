@@ -1,10 +1,11 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show } from 'solid-js'
+import {createEffect, createResource, createSignal, For, Show, Suspense} from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
+import type {Device} from "~/api/types";
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -19,6 +20,8 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
+  // devices: Device[]
+  device: Device | undefined
 }
 
 interface SnapshotResponse {
@@ -29,10 +32,13 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+  // const [device] = createResource(() => props.dongleId, getDevice)
+  // const [device, setDevice] = createSignal<Device | null>(null)
+  const deviceName = () => props.device ? getDeviceName(props.device) : ''
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
+  // const [isDeviceUser] = createResource(() => props.device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
+  console.log("props.device", props.device)
+  const isDeviceUser = () => (props.device?.is_owner || props.device?.alias !== SHARED_DEVICE)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -42,6 +48,16 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     fetching: false,
     images: [],
   })
+
+  // createEffect(() => {
+  //   console.log('DeviceActivity', props.devices)
+  //   for (const device of props.devices) {
+  //     if (device.dongle_id === props.dongleId) {
+  //       console.log(device)
+  //       setDevice(device)
+  //     }
+  //   }
+  // })
 
   const takeSnapshot = async () => {
     setSnapshot({ error: null, fetching: true, images: [] })
@@ -120,11 +136,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <Show when={deviceName()} fallback={<div class="skeleton-loader size-full" />}>
+          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
-          </Show>
+          </Suspense>
           <div class="flex items-center justify-between p-4">
-            <div class="text-xl font-bold">{deviceName()}</div>
+            {/*<Suspense fallback={<div class="h-[48px] skeleton-loader size-2 rounded-full" />}>*/}
+              <div class="text-xl font-bold">{deviceName()}</div>
+            {/*</Suspense>*/}
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
