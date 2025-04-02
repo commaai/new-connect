@@ -31,13 +31,9 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // const [device] = createResource(() => props.dongleId, getDevice)
-  // const [device, setDevice] = createSignal<Device | null>(null)
   const deviceName = () => (props.device ? getDeviceName(props.device) : '')
-  const [queueVisible, setQueueVisible] = createSignal(false)
-  // const [isDeviceUser] = createResource(() => props.device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
-  console.log('props.device', props.device)
   const isDeviceUser = () => props.device?.is_owner || props.device?.alias !== SHARED_DEVICE
+  const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
