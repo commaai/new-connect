@@ -5,6 +5,7 @@ import type { ReverseGeocodingResponse, ReverseGeocodingFeature } from '~/map/ap
 import { MAPBOX_TOKEN } from '~/map/config'
 
 export async function reverseGeocode(position: Position): Promise<ReverseGeocodingFeature | null> {
+  return null
   if (Math.abs(position[0]) < 0.001 && Math.abs(position[1]) < 0.001) {
     return null
   }
