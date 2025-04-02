@@ -19,7 +19,6 @@ import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
-  dongleId: string
   // devices: Device[]
   device: Device | undefined
 }
@@ -69,7 +68,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         id: 0,
       }
 
-      const response = await fetch(`${ATHENA_URL}/${props.dongleId}`, {
+      const response = await fetch(`${ATHENA_URL}/${props.device?.dongle_id}`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -137,7 +136,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+            <DeviceLocation dongleId={props.device?.dongle_id} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
             {/*<Suspense fallback={<div class="h-[48px] skeleton-loader size-2 rounded-full" />}>*/}
@@ -145,13 +144,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             {/*</Suspense>*/}
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+              <IconButton name="settings" href={`/${props.device?.dongle_id}/settings`} />
             </div>
           </div>
           <Show when={isDeviceUser()}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+            <DeviceStatistics dongleId={props.device?.dongle_id} class="p-4" />
             <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
+              <UploadQueue dongleId={props.device?.dongle_id} />
             </Show>
             <button
               class={clsx(
@@ -195,7 +194,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           )}
         </div>
-        <RouteList dongleId={props.dongleId} />
+        <RouteList dongleId={props.device?.dongle_id} />
       </div>
     </>
   )
