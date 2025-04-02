@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import {createResource, createSignal, createEffect, For, Show, Suspense} from 'solid-js'
+import { createResource, createSignal, createEffect, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
@@ -139,18 +139,18 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           {/*<Show when={deviceName()} fallback={<div class="h-[240px] skeleton-loader size-full" />}>*/}
-          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full"/>}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!}/>
+          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
+            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           {/*</Show>*/}
           <div class="flex items-center justify-between p-4">
-            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full"/>}>
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
               {/* TODO: we should not need to fetch the device name when switching as we already know it in DeviceList */}
               {<div class="text-xl font-bold">{deviceName()}</div>}
             </Suspense>
             <div class="flex gap-4">
-              <IconButton name="camera" onClick={() => void takeSnapshot()}/>
-              <IconButton name="settings" href={`/${props.dongleId}/settings`}/>
+              <IconButton name="camera" onClick={() => void takeSnapshot()} />
+              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
           <Show when={isDeviceUser()}>
