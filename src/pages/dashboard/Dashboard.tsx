@@ -115,6 +115,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
+  const currentDevice = () => devices()?.find((device) => device.dongle_id === dongleId())
+  const isSharedDevice = () => !currentDevice() && devices()?.length > 0
+
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
     if (dongleId()) return undefined
@@ -133,7 +136,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={dongleId()} keyed>
           {(id) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={id} />}
+              paneOne={<DeviceActivity dongleId={id} shared={isSharedDevice()} />}
               paneTwo={
                 <Switch
                   fallback={

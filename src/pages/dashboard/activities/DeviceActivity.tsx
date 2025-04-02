@@ -1,8 +1,8 @@
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show } from 'solid-js'
+import { createMemo, createResource, createSignal, For, Show } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
 
@@ -19,6 +19,7 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
+  shared: boolean
 }
 
 interface SnapshotResponse {
@@ -30,9 +31,8 @@ interface SnapshotResponse {
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
@@ -130,7 +130,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={isDeviceUser()}>
+          <Show when={!props.shared}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
