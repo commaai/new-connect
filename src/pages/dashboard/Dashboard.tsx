@@ -112,7 +112,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   const pairToken = () => !!location.query.pair
 
-  const [devices] = createResource(getDevices)
+  const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
