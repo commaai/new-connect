@@ -3,6 +3,7 @@ import './index.css'
 
 import * as Sentry from '@sentry/solid'
 import { render } from 'solid-js/web'
+import 'solid-devtools'
 import App from './App'
 import './pwa.ts'
 
