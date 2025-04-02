@@ -20,7 +20,7 @@ export default defineConfig({
       padding: 0.7,
       resizeOptions: { fit: 'contain', background: '#131318' },
       linkMediaOptions: {
-        addMediaScreen: false,
+        addMediaScreen: true,
         xhtml: true,
       },
       name: (landscape, size) => {
