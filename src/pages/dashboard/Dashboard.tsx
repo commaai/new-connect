@@ -1,4 +1,4 @@
-import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -104,14 +104,14 @@ const DashboardLayout: Component<{
 
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
-  const urlState = () => {
+  const urlState = createMemo(() => {
     const parts = location.pathname.split('/').slice(1).filter(Boolean)
     return {
       dongleId: parts[0] as string | undefined,
       dateStr: parts[1] as string | undefined,
       startTime: parts[2] ? Number(parts[2]) : 0,
     }
-  }
+  })
 
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
