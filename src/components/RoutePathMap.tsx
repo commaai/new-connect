@@ -84,7 +84,7 @@ const RoutePathMap: Component<{
     const { strokeWidth = 4, opacity } = props
     pastPolyline = L.polyline([], { color: '#6F707F', weight: strokeWidth, opacity }).addTo(m)
     futurePolyline = L.polyline([], { color: '#DFE0FF', weight: strokeWidth, opacity }).addTo(m)
-    hitboxPolyline = L.polyline(mapCoords(), { color: 'red', weight: (strokeWidth || 4) + 16, opacity: 0.2 }).addTo(m)
+    hitboxPolyline = L.polyline(mapCoords(), { color: 'transparent', weight: (strokeWidth || 4) + 16, opacity: 0 }).addTo(m)
     marker = L.marker(currentCoord(), { icon: createCarIcon(isLocked()), draggable: true }).addTo(m)
 
     const updatePosition = (lng: number, lat: number) => {
