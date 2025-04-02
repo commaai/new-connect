@@ -80,7 +80,10 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     queryKey: ['routes_segments', props.dongleId],
     queryFn: ({ pageParam }) => getRoutesSegments(props.dongleId, PAGE_SIZE, pageParam),
     initialPageParam: 0,
-    getNextPageParam: (lastPage) => lastPage.at(-1)!.start_time_utc_millis - 1,
+    getNextPageParam: (lastPage) => {
+      if (lastPage.length < PAGE_SIZE) return undefined
+      return lastPage.at(-1)!.start_time_utc_millis - 1
+    },
   }))
 
   const routeList = () => routes.data?.pages.flat()
