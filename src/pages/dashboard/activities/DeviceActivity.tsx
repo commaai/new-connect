@@ -1,10 +1,10 @@
 import clsx from 'clsx'
-import { createMemo, createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import { createMemo, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
-import { getDevice } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
+import type { Device } from '~/api/types'
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -19,7 +19,7 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
-  shared: boolean
+  device: Device | undefined
 }
 
 interface SnapshotResponse {
@@ -30,9 +30,7 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const deviceName = createMemo(() => getDeviceName(device(), props.shared))
+  const deviceName = createMemo(() => getDeviceName(props.device))
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -125,15 +123,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
-              {<div class="text-xl font-bold">{deviceName()}</div>}
-            </Suspense>
+            {<div class="text-xl font-bold">{deviceName()}</div>}
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={!props.shared}>
+          <Show when={props.device}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
