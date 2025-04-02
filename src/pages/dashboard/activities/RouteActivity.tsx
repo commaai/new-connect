@@ -32,8 +32,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateTimelineStatistics(r, e),
+    () => [route.latest, events.latest] as const,
+    ([route, events]) => generateTimelineStatistics(route, events),
   )
 
   const onTimelineChange = (newTime: number) => {
@@ -64,7 +64,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
+            <RouteStatistics class="p-5" route={route()} timeline={timeline.latest} />
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
               <RouteActions routeName={routeName()} route={route()} />
