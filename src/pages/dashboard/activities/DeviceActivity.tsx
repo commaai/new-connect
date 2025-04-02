@@ -32,10 +32,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
 
   const [deviceName, setDeviceName] = createSignal('')
+  const [isDeviceUser, setDeviceUser] = createSignal(true)
   createEffect(() => {
     const d = device()
     if (d) {
       setDeviceName(getDeviceName(d))
+      setDeviceUser(d.is_owner || d.alias !== SHARED_DEVICE)
     }
   })
 
@@ -46,7 +48,8 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   // }
   const [queueVisible, setQueueVisible] = createSignal(false)
   // const [isDeviceUser] = createResource(() => device, (device) => device()?.is_owner || device()?.alias !== SHARED_DEVICE)
-  const isDeviceUser = () => true
+  // const [isDeviceUser] = createResource(device, (device) => device.is_owner || device.alias !== SHARED_DEVICE)
+  // const isDeviceUser = () => true
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
     fetching: boolean
