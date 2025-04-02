@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { createMemo, createResource, createSignal, For, Show, Suspense } from 'solid-js'
+import { createEffect, createMemo, createResource, createSignal, For, on, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice } from '~/api/devices'
@@ -107,8 +107,19 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
 
   const { modal } = useDrawerContext()
 
+  let listRef!: HTMLDivElement
+
+  createEffect(
+    on(
+      () => props.dongleId,
+      () => {
+        listRef.parentElement?.scrollTo(0, 0)
+      },
+    ),
+  )
+
   return (
-    <>
+    <div ref={listRef}>
       <TopAppBar
         class="font-bold"
         leading={
@@ -182,7 +193,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         </div>
         <RouteList dongleId={props.dongleId} />
       </div>
-    </>
+    </div>
   )
 }
 

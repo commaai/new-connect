@@ -96,14 +96,15 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   }
 
   const [pages, setPages] = createStore<{ [key: string]: Promise<RouteSegments[]>[] }>({})
-  const getPage = (page: number): Promise<RouteSegments[]> => {
-    if (!pages[props.dongleId]) setPages(props.dongleId, [])
-    if (!pages[props.dongleId][page]) {
+  const getPage = (dongleId: string, page: number): Promise<RouteSegments[]> => {
+    console.log('getPage', dongleId, page)
+    if (!pages[dongleId]) setPages(dongleId, [])
+    if (!pages[dongleId][page]) {
       setPages(
-        props.dongleId,
+        dongleId,
         page,
         (async () => {
-          const previousPageData = page > 0 ? await getPage(page - 1) : undefined
+          const previousPageData = page > 0 ? await getPage(dongleId, page - 1) : undefined
           const key = getKey(previousPageData)
           return key ? fetcher<RouteSegments[]>(key) : []
         })(),
@@ -113,22 +114,25 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   }
 
   const [size, setSize] = createSignal(1)
-  const pageNumbers = () => Array.from({ length: size() })
-
   createEffect(
     on(
       () => props.dongleId,
-      () => setSize(1),
+      () => {
+        setSize(1)
+      },
     ),
   )
+
+  const pageNumbers = () => Array.from({ length: size() }, () => props.dongleId)
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
         {(_, i) => {
+          console.log('i', i())
           const [routes] = createResource(
             () => [props.dongleId, i()],
-            () => getPage(i()),
+            () => getPage(props.dongleId, i()),
           )
           return (
             <Suspense

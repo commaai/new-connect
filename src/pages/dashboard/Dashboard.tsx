@@ -1,4 +1,4 @@
-import { createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -106,7 +106,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
 
   const pathParts = () => location.pathname.split('/').slice(1).filter(Boolean)
-  const dongleId = () => pathParts()[0]
+  const dongleId = createMemo(() => pathParts()[0])
   const dateStr = () => pathParts()[1]
   const startTime = () => (pathParts()[2] ? Number(pathParts()[2]) : 0)
 
