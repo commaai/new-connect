@@ -31,40 +31,37 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   createEffect(() => {
     console.log("route", route()?.fullname)
   })
-  // const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
-  //
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
     () => [route(), events()] as const,
     ([r, e]) => generateTimelineStatistics(r, e),
   )
-  //
-  // const onTimelineChange = (newTime: number) => {
-  //   const video = videoRef()
-  //   if (video) video.currentTime = newTime
-  // }
-  //
-  // const [device] = createResource(() => props.dongleId, getDevice)
-  // const [profile] = createResource(getProfile)
-  // createResource(
-  //   () => [device(), profile(), props.dateStr] as const,
-  //   async ([device, profile, dateStr]) => {
-  //     if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-  //     await setRouteViewed(device.dongle_id, dateStr)
-  //   },
-  // )
+
+  const onTimelineChange = (newTime: number) => {
+    const video = videoRef()
+    if (video) video.currentTime = newTime
+  }
+
+  const [device] = createResource(() => props.dongleId, getDevice)
+  const [profile] = createResource(getProfile)
+  createResource(
+    () => [device(), profile(), props.dateStr] as const,
+    async ([device, profile, dateStr]) => {
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+      await setRouteViewed(device.dongle_id, dateStr)
+    },
+  )
 
   return (
     <>
-      {/*<TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>*/}
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          {/*<Show when={!route.loading} fallback={<div class="skeleton-loader flex h-[297px] w-full"></div>}>*/}
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          {/*</Show>*/}
-        {/*  /!*TIMELINE NEEDS ANIMATION*!/*/}
-        {/*  <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />*/}
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
