@@ -50,11 +50,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
+        <Show when={startTime()} fallback={<div class="skeleton-loader min-h-16" />}>
+          {startTime()}
+        </Show>
+      </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <Show when={route.isSuccess && events.isSuccess} fallback={<div></div>}>
+          <Show when={route.isSuccess && events.isSuccess} fallback={<div class="skeleton-loader h-[335px]" />}>
             <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
             <Timeline class="mb-1" route={route.data} seekTime={seekTime()} updateTime={onTimelineChange} events={events.data!} />
           </Show>
