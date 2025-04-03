@@ -8,7 +8,7 @@ import type Hls from '~/utils/hls'
 
 type RouteVideoPlayerProps = {
   class?: string
-  onError?: () => void
+  onEvent?: (event: 'load' | 'error') => void
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
   routeName: string
@@ -62,7 +62,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onError = () => {
     setErrored(true)
     setVideoLoading(false)
-    props.onError?.()
+    props.onEvent?.('error')
   }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
@@ -142,6 +142,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     } else {
       video.src = url
     }
+
+    props.onEvent?.('load')
   })
 
   return (

@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, on, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -23,8 +23,8 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, seek] = createSignal(props.startTime)
-  const [interactive, setTimelineInteractive] = createSignal(true)
+  const [seekTime, setSeekTime] = createSignal(props.startTime)
+  const [interactive, setTimelineInteractive] = createSignal(false)
   const [videoRef, setRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
@@ -38,8 +38,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     ([r, e]) => generateTimelineStatistics(r, e),
   )
 
-  createEffect(on(routeName, () => setTimelineInteractive(true)))
-  const onError = () => setTimelineInteractive(false)
+  const updateSeekTime = (newTime: number) => {
+    setTimelineInteractive(true)
+    setSeekTime(newTime)
+  }
+  const onEvent = (event: 'load' | 'error') => {
+    if (event === 'load') setTimelineInteractive(true)
+    else setTimelineInteractive(false)
+  }
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -61,8 +67,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <div class="flex flex-col gap-1">
-          <RouteVideoPlayer ref={setRef} onError={onError} onProgress={seek} routeName={routeName()} startTime={seekTime()} />
+        <div class="flex flex-col">
+          <RouteVideoPlayer ref={setRef} onEvent={onEvent} onProgress={updateSeekTime} routeName={routeName()} startTime={seekTime()} />
           <Timeline interactive={interactive()} route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
