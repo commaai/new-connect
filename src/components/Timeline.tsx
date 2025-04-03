@@ -1,4 +1,4 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import { Show, For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -6,8 +6,8 @@ import type { TimelineEvent } from '~/api/derived'
 import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
-function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
-  if (!route) return
+function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[] | undefined) {
+  if (!route || !events) return
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
     <For each={events}>
@@ -94,7 +94,7 @@ interface TimelineProps {
   route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
-  events: TimelineEvent[]
+  events: TimelineEvent[] | undefined
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
@@ -176,7 +176,9 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events)}</Suspense>
+        {/*<Show when={props.events} fallback={<div class="skeleton-loader size-full"></div>}>*/}
+          {renderTimelineEvents(props.route, props.events)}
+        {/*</Show>*/}
         <div
           class="absolute top-0 z-10 h-full"
           style={{

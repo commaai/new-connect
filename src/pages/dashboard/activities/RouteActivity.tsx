@@ -14,7 +14,7 @@ import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import { generateTimelineStatistics, getTimelineEvents, type TimelineEvent } from '~/api/derived'
+import {generateTimelineStatistics, getTimelineEvents, type TimelineEvent, type TimelineStatistics} from '~/api/derived'
 
 type RouteActivityProps = {
   dongleId: string
@@ -36,6 +36,36 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   // createEffect(() => {
   //   console.log('routeName', routeName())
   // })
+
+  const [events, setEvents] = createSignal<TimelineEvent[] | undefined>(undefined);
+  const [timeline, setTimeline] = createSignal<TimelineStatistics | undefined>(undefined);
+  // const [startTime, setStartTime] = createSignal<TimelineStatistics | undefined>(undefined);
+  createEffect(() => {
+    // if (route.loading) {
+    //   setEvents(undefined);
+    //   setTimeline(undefined);
+    //   return
+    // }
+
+    const r = route.latest;
+    if (r && !route.loading) { // TODO: check route.latest?
+      // Only fetch events when route is available
+      // getTimelineEvents(r).then(setEvents);
+      getTimelineEvents(r).then((events) => {
+        setEvents(events)
+        console.log('Events loaded:', events)
+        setTimeline(generateTimelineStatistics(r, events))
+      })
+      // getTimelineStatistics(r).then(setTimeline);
+      // setStartTime(dayjs(r.start_time)?.format('ddd, MMM D, YYYY'));
+    }
+  });
+
+  // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  // const [timeline] = createResource(
+  //   () => [route(), events()] as const,
+  //   ([r, e]) => generateTimelineStatistics(r, e),
+  // )
 
   //
   // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
@@ -112,7 +142,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
           {/*</Suspense>*/}
           {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-          {/*  <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={props.events} />*/}
+          {/*<Show when={events()} fallback={<div> dummy!</div>}>*/}
+            <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          {/*</Show>*/}
           {/*</Suspense>*/}
         </div>
 
@@ -124,7 +156,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*  <RouteStatistics class="p-5" route={route()} timeline={undefined} />*/}
             {/*<Show when={route()}>*/}
             {/*TODO: add skeleton animation to each StatisticBar (https://github.com/solidjs/solid/issues/2437)*/}
-            <RouteStatistics class="p-5" route={route.latest} timeline={undefined} />
+            <RouteStatistics class="p-5" route={route.latest} timeline={timeline()} />
             {/*</Show>*/}
             {/*</Suspense>*/}
             {/*</Show>*/}
