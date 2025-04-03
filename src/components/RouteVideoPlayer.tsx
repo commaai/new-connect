@@ -145,6 +145,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           disablepictureinpicture
         />
       </div>
+
       {/* Loading animation */}
       <Show when={videoLoading()}>
         <div class="absolute inset-0 z-0 skeleton-loader" />
