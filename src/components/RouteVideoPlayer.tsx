@@ -25,11 +25,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
 
-  createEffect(() => {
-    props.routeName // track changes
-    setVideoLoading(true)
-  })
-
   const onLoadedData = () => setVideoLoading(false)
   const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
@@ -122,6 +117,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     } else {
       video.src = url
     }
+  })
+
+  createEffect(() => {
+    props.routeName // track changes
+    setVideoLoading(true)
   })
 
   return (
