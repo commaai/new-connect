@@ -12,7 +12,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import {deviceIsOnline, getDeviceName} from '~/utils/device'
+import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
@@ -127,14 +127,20 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-             <div class="flex items-center gap-2">
-            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full"/>}>
             {/*<Show when={true}>*/}
-            {/*  <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400')} />*/}
             {/*</Show>*/}
-              {<div class="text-xl font-bold">{deviceName()}</div>}
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full inline-block" />}>
+              <div class="inline-flex items-center gap-2">
+                <div
+                  class={clsx(
+                    'm-2 size-2 shrink-0 rounded-full',
+                    device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400',
+                  )}
+                />
+
+                {<div class="text-xl font-bold">{deviceName()}</div>}
+              </div>
             </Suspense>
-             </div>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
