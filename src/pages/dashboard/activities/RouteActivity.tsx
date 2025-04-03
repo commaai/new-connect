@@ -39,20 +39,20 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     ([r, e]) => generateTimelineStatistics(r, e),
   )
   //
-  // const onTimelineChange = (newTime: number) => {
-  //   const video = videoRef()
-  //   if (video) video.currentTime = newTime
-  // }
-  //
-  // const [device] = createResource(() => props.dongleId, getDevice)
-  // const [profile] = createResource(getProfile)
-  // createResource(
-  //   () => [device(), profile(), props.dateStr] as const,
-  //   async ([device, profile, dateStr]) => {
-  //     if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-  //     await setRouteViewed(device.dongle_id, dateStr)
-  //   },
-  // )
+  const onTimelineChange = (newTime: number) => {
+    const video = videoRef()
+    if (video) video.currentTime = newTime
+  }
+
+  const [device] = createResource(() => props.dongleId, getDevice)
+  const [profile] = createResource(getProfile)
+  createResource(
+    () => [device(), profile(), props.dateStr] as const,
+    async ([device, profile, dateStr]) => {
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+      await setRouteViewed(device.dongle_id, dateStr)
+    },
+  )
 
   return (
     <>
@@ -64,7 +64,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
           {/*</Show>*/}
         {/*  /!*TIMELINE NEEDS ANIMATION*!/*/}
-        {/*  <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />*/}
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime.latest} updateTime={onTimelineChange} events={events.latest} />
         </div>
 
         <div class="flex flex-col gap-2">
