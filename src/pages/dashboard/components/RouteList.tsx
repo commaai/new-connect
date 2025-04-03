@@ -56,9 +56,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-      {/*<Suspense>*/}
         <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
-      {/*</Suspense>*/}
       </CardContent>
     </Card>
   )
