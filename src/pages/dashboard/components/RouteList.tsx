@@ -18,7 +18,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endTime = () => dayjs(props.route.end_time_utc_millis)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 1 second
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
     const startPlace = await getPlaceName(startPos)
@@ -37,7 +36,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
           </span>
         }
-        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs"/>}>{location()}</Suspense>}
+        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
@@ -50,7 +49,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatistics route={props.route} timeline={timeline()} />
+        <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
       </CardContent>
     </Card>
   )

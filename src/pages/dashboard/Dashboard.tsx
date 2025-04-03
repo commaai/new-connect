@@ -93,10 +93,10 @@ const DashboardLayout: Component<{
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
-        {/*<SuspenseList revealOrder="forwards">*/}
+        <SuspenseList revealOrder="forwards">
           <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
           <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
-        {/*</SuspenseList>*/}
+        </SuspenseList>
       </div>
     </div>
   )
