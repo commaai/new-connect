@@ -37,11 +37,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     () => [route(), events()] as const,
     ([r, e]) => generateTimelineStatistics(r, e),
   )
-
-  const updateSeekTime = (newTime: number) => {
-    setTimelineInteractive(true)
-    setSeekTime(newTime)
-  }
   const onEvent = (event: 'load' | 'error') => {
     if (event === 'load') setTimelineInteractive(true)
     else setTimelineInteractive(false)
@@ -68,7 +63,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setRef} onEvent={onEvent} onProgress={updateSeekTime} routeName={routeName()} startTime={seekTime()} />
+          <RouteVideoPlayer ref={setRef} onEvent={onEvent} onProgress={setSeekTime} routeName={routeName()} startTime={seekTime()} />
           <Timeline interactive={interactive()} route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
