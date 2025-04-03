@@ -29,10 +29,10 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  // const [timeline] = createResource(() => props.route, getTimelineStatistics)
-  const [events] = createResource(() => props.route, getTimelineEvents)
-  const timeline = createMemo(() => generateTimelineStatistics(events()))
-  createEffect(() => props.setEvents(events() || []))
+  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  // const [events] = createResource(() => props.route, getTimelineEvents)
+  // const timeline = createMemo(() => generateTimelineStatistics(events()))
+  // createEffect(() => props.setEvents(events() || []))
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
