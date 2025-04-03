@@ -1,4 +1,4 @@
-import { createSignal, lazy, onCleanup, Show, Suspense, type ParentComponent, type VoidComponent } from 'solid-js'
+import { createSignal, lazy, onCleanup, Show, type ParentComponent, type VoidComponent } from 'solid-js'
 import { Router, Route } from '@solidjs/router'
 import { QueryClientProvider } from '@tanstack/solid-query'
 import { SolidQueryDevtools } from '@tanstack/solid-query-devtools'
@@ -37,7 +37,7 @@ export const AppLayout: ParentComponent = (props) => {
 
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
-      <Suspense>{props.children}</Suspense>
+      {props.children}
     </Show>
   )
 }
