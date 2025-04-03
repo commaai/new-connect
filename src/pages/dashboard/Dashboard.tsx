@@ -136,7 +136,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={dongleId} device={currentDevice()} />}
+              paneOne={<DeviceActivity dongleId={dongleId} shared={!currentDevice()} />}
               paneTwo={
                 <Switch
                   fallback={
@@ -147,7 +147,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   }
                 >
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
-                    <SettingsActivity dongleId={dongleId} />
+                    <SettingsActivity dongleId={dongleId} shared={!currentDevice()} />
                   </Match>
                   <Match when={urlState().dateStr}>
                     {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
