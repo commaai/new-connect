@@ -163,7 +163,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   return (
-    <div class="flex flex-col">
+    <div class="flex flex-col h-10">
       <div class="h-1 bg-surface-container-high">
         <div class="h-full bg-white" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
       </div>

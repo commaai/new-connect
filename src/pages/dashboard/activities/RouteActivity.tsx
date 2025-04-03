@@ -51,18 +51,24 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     setRouteViewed(device.data!.dongle_id, props.dateStr)
   })
 
-  const startTime = () => dayjs(route.data?.start_time)?.format('ddd, MMM D, YYYY')
+  const startTime = () => {
+    if (!route.data) return undefined
+    return dayjs(route.data.start_time).format('ddd, MMM D, YYYY')
+  }
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
-        <Show when={startTime()} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+        <Show when={startTime()} fallback={<div class="skeleton-loader bg-surface-container rounded-xs h-[28px] w-[40%]" />}>
           {startTime()}
         </Show>
       </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <div class="flex flex-col">
-          <Show when={route.isSuccess} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+        <div class="flex flex-col aspect-[241/151] h-full">
+          <Show
+            when={route.isSuccess && events.isSuccess}
+            fallback={<div class="skeleton-loader bg-surface-container rounded-md h-full" />}
+          >
             <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
             <Timeline class="mb-1" route={route.data} seekTime={seekTime()} updateTime={onTimelineChange} events={events.data!} />
           </Show>
@@ -71,7 +77,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <Show when={route.isSuccess} fallback={<div class="skeleton-loader min-h-48" />}>
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader bg-surface-container h-[268px] w-full" />}>
               <RouteStatistics class="p-5" route={route.data} timeline={timeline()} />
               <RouteActions routeName={routeName()} route={route.data} />
             </Show>
@@ -80,8 +86,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
-          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <Show when={route.isSuccess} fallback={<div class="skeleton-loader min-h-48" />}>
+          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container h-[80px]">
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader bg-surface-container h-full" />}>
               <RouteUploadButtons route={route.data} />
             </Show>
           </div>
@@ -89,8 +95,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Map</h3>
-          <div class="aspect-square overflow-hidden rounded-lg">
-            <Show when={route.isSuccess} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+          <div class="aspect-square overflow-hidden rounded-md bg-surface-container">
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader bg-surface-container size-full" />}>
               <RouteStaticMap route={route.data} />
             </Show>
           </div>
