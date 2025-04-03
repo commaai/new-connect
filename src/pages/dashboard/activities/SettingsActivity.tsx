@@ -402,7 +402,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
-  const deviceName = createMemo(() => getDeviceName(device()))
+  const [deviceName] = createResource(device, getDeviceName)
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)

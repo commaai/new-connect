@@ -1,10 +1,10 @@
 import clsx from 'clsx'
-import { createMemo, createSignal, For, Show, Suspense } from 'solid-js'
+import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
+import { getDevice, SHARED_DEVICE } from '~/api/devices'
 import { ATHENA_URL } from '~/api/config'
 import { getAccessToken } from '~/api/auth/client'
-import type { Device } from '~/api/types'
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -19,7 +19,6 @@ import UploadQueue from '~/components/UploadQueue'
 
 type DeviceActivityProps = {
   dongleId: string
-  device: Device | undefined
 }
 
 interface SnapshotResponse {
@@ -30,7 +29,12 @@ interface SnapshotResponse {
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const deviceName = createMemo(() => getDeviceName(props.device))
+  // TODO: device should be passed in from DeviceList
+  const [device] = createResource(() => props.dongleId, getDevice)
+  // Resource as source of another resource blocks component initialization
+  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
+  // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
+  const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -123,13 +127,15 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            {<div class="text-xl font-bold">{deviceName()}</div>}
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
+              {<div class="text-xl font-bold">{deviceName()}</div>}
+            </Suspense>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
-          <Show when={props.device}>
+          <Show when={isDeviceUser()}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
