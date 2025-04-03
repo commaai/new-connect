@@ -1,20 +1,8 @@
-import {
-  createEffect,
-  createMemo,
-  createResource,
-  createSignal,
-  For,
-  Index,
-  onCleanup,
-  onMount,
-  Show,
-  Suspense,
-  type VoidComponent
-} from 'solid-js'
+import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import {generateTimelineStatistics, getTimelineEvents, getTimelineStatistics, type TimelineEvent} from '~/api/derived'
+import { getTimelineStatistics, type TimelineEvent } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
@@ -129,7 +117,7 @@ const RouteList: VoidComponent<{ dongleId: string; setEvents: (events: TimelineE
                 <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={routes()}>{(route) => <RouteCard route={route} setEvents={props.setEvents}/>}</For>
+              <For each={routes()}>{(route) => <RouteCard route={route} setEvents={props.setEvents} />}</For>
             </Suspense>
           )
         }}

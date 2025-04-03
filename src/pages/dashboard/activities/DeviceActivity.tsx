@@ -16,7 +16,7 @@ import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
-import type {TimelineEvent} from "~/api/derived";
+import type { TimelineEvent } from '~/api/derived'
 
 type DeviceActivityProps = {
   dongleId: string

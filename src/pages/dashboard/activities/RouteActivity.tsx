@@ -1,20 +1,12 @@
-import {createEffect, createMemo, createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
-
-import { setRouteViewed } from '~/api/athena'
-import { getDevice } from '~/api/devices'
-import { getProfile } from '~/api/profile'
+import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 import { getRoute } from '~/api/route'
-import { dayjs } from '~/utils/format'
-
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 import RouteActions from '~/components/RouteActions'
 import RouteStaticMap from '~/components/RouteStaticMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import {generateTimelineStatistics, getTimelineEvents, type TimelineEvent, type TimelineStatistics} from '~/api/derived'
+import { generateTimelineStatistics, getTimelineEvents, type TimelineEvent, type TimelineStatistics } from '~/api/derived'
 
 type RouteActivityProps = {
   dongleId: string
@@ -37,18 +29,19 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   //   console.log('routeName', routeName())
   // })
 
-  const [events, setEvents] = createSignal<TimelineEvent[] | undefined>(undefined);
-  const [timeline, setTimeline] = createSignal<TimelineStatistics | undefined>(undefined);
+  const [events, setEvents] = createSignal<TimelineEvent[] | undefined>(undefined)
+  const [timeline, setTimeline] = createSignal<TimelineStatistics | undefined>(undefined)
   // const [startTime, setStartTime] = createSignal<TimelineStatistics | undefined>(undefined);
   createEffect(() => {
     if (route.loading) {
-      setEvents(undefined);
-      setTimeline(undefined);
+      setEvents(undefined)
+      setTimeline(undefined)
       return
     }
 
-    const r = route.latest;
-    if (r && !route.loading) { // TODO: check route.latest?
+    const r = route.latest
+    if (r && !route.loading) {
+      // TODO: check route.latest?
       // Only fetch events when route is available
       // getTimelineEvents(r).then(setEvents);
       getTimelineEvents(r).then((events) => {
@@ -59,7 +52,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       // getTimelineStatistics(r).then(setTimeline);
       // setStartTime(dayjs(r.start_time)?.format('ddd, MMM D, YYYY'));
     }
-  });
+  })
 
   // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   // const [timeline] = createResource(
@@ -76,32 +69,32 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   //   getTimelineEvents,
   //   { initialValue: [] }
   // )
-//   const [events] = createResource(
-//   () => props.dateStr || null,  // only change when needed
-//   async (key) => {
-//     if (!key) return []
-//     return await getTimelineEvents(key)
-//   },
-//   {
-//     initialValue: [],            // gives you something immediately
-//     deferStream: true            // Solid starts using new value once ready
-//   }
-// )
+  //   const [events] = createResource(
+  //   () => props.dateStr || null,  // only change when needed
+  //   async (key) => {
+  //     if (!key) return []
+  //     return await getTimelineEvents(key)
+  //   },
+  //   {
+  //     initialValue: [],            // gives you something immediately
+  //     deferStream: true            // Solid starts using new value once ready
+  //   }
+  // )
 
   // const events = () => (route.loading ? [] : getTimelineEvents(route.latest!))
-// const [events] = createResource(
-//   () => routeName(),
-//   async (routeId) => {
-//     if (!routeId) return []
-//
-//     const route = await getRoute(routeId) // ✅ wait for this first
-//     if (!route) return []
-//     return await getTimelineEvents(route) // ✅ only call if route is ready
-//   },
-//   {
-//     initialValue: [], // prevents render blocking
-//   }
-// )
+  // const [events] = createResource(
+  //   () => routeName(),
+  //   async (routeId) => {
+  //     if (!routeId) return []
+  //
+  //     const route = await getRoute(routeId) // ✅ wait for this first
+  //     if (!route) return []
+  //     return await getTimelineEvents(route) // ✅ only call if route is ready
+  //   },
+  //   {
+  //     initialValue: [], // prevents render blocking
+  //   }
+  // )
 
   // const [events, setEvents] = createSignal([])
 
@@ -139,11 +132,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           {/*<Suspense>*/}
-            <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
           {/*</Suspense>*/}
           {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
           {/*<Show when={events()} fallback={<div class="skeleton-loader min-h-12" />}>*/}
-            <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
           {/*</Show>*/}
           {/*</Suspense>*/}
         </div>
@@ -180,7 +173,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-              <RouteUploadButtons route={route()} />
+            <RouteUploadButtons route={route()} />
             {/*</Suspense>*/}
           </div>
         </div>
@@ -189,7 +182,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
             {/*<Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>*/}
-              <RouteStaticMap route={route()} />
+            <RouteStaticMap route={route()} />
             {/*</Suspense>*/}
           </div>
         </div>

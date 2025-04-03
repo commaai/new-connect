@@ -1,4 +1,4 @@
-import { Show, For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import { Show, For, createResource, createSignal, createEffect, onMount, onCleanup } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 

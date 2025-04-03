@@ -1,4 +1,4 @@
-import {Suspense, VoidComponent, Show, createEffect} from 'solid-js'
+import { VoidComponent } from 'solid-js'
 
 import type { TimelineStatistics } from '~/api/derived'
 import type { Route } from '~/api/types'
@@ -44,6 +44,5 @@ const RouteStatistics: VoidComponent<{ class?: string; route: Route | undefined;
     />
   )
 }
-
 
 export default RouteStatistics

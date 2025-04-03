@@ -1,4 +1,4 @@
-import {Show, createEffect, createResource, ErrorBoundary, Match, Switch} from 'solid-js'
+import { createEffect, createResource, Match, Switch } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
