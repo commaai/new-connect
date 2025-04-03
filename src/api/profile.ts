@@ -1,4 +1,4 @@
-import type { Profile } from '~/types'
+import type { Profile } from '~/api/types'
 
 import { fetcher } from '.'
 

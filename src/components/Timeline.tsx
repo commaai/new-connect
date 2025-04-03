@@ -1,9 +1,9 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import { For, createResource, createSignal, createEffect, onMount, onCleanup } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { TimelineEvent, getTimelineEvents } from '~/api/derived'
-import type { Route } from '~/types'
+import type { TimelineEvent } from '~/api/derived'
+import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
 function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
@@ -61,7 +61,7 @@ function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[])
             break
           case 'user_flag':
             title = 'User flag'
-            classes = 'bg-yellow-500  min-w-[2px]'
+            classes = 'bg-yellow-500 min-w-[2px]'
         }
 
         const zIndex = {
@@ -91,14 +91,14 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  route?: Route
+  route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
+  events: TimelineEvent[]
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   const route = () => props.route
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
@@ -124,14 +124,18 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         if (ev.touches.length !== 1) return
         updateMarker(ev.touches[0].clientX)
       }
-      const onMouseUp = () => {
+      const onStop = () => {
         window.removeEventListener('mousemove', onMouseMove)
         window.removeEventListener('touchmove', onTouchMove)
-        window.removeEventListener('mouseup', onMouseUp)
+        window.removeEventListener('mouseup', onStop)
+        window.removeEventListener('touchend', onStop)
+        window.removeEventListener('touchcancel', onStop)
       }
       window.addEventListener('mousemove', onMouseMove)
       window.addEventListener('touchmove', onTouchMove)
-      window.addEventListener('mouseup', onMouseUp)
+      window.addEventListener('mouseup', onStop)
+      window.addEventListener('touchend', onStop)
+      window.addEventListener('touchcancel', onStop)
     }
 
     const onMouseDown = (ev: MouseEvent) => {
@@ -159,24 +163,33 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   return (
-    <div
-      ref={ref!}
-      class={clsx(
-        'relative isolate flex h-6 cursor-pointer touch-none self-stretch overflow-hidden rounded-sm bg-blue-900',
-        'after:absolute after:inset-0 after:bg-gradient-to-b after:from-[rgba(0,0,0,0)] after:via-[rgba(0,0,0,0.1)] after:to-[rgba(0,0,0,0.2)]',
-        props.class,
-      )}
-      title="Disengaged"
-    >
-      <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, events())}</Suspense>
+    <div class="flex flex-col">
+      <div class="h-1 bg-surface-container-high">
+        <div class="h-full bg-white" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
+      </div>
       <div
-        class="absolute top-0 z-10 h-full"
-        style={{
-          'background-color': 'rgba(255,255,255,0.7)',
-          width: `${MARKER_WIDTH}px`,
-          left: `${markerOffsetPct()}%`,
-        }}
-      />
+        ref={ref!}
+        class={clsx(
+          'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
+          'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
+          props.class,
+        )}
+        title="Disengaged"
+      >
+        {renderTimelineEvents(props.route, props.events)}
+        <div
+          class="absolute top-0 z-10 h-full"
+          style={{
+            width: `${MARKER_WIDTH}px`,
+            left: `${markerOffsetPct()}%`,
+          }}
+        >
+          <div class="absolute inset-x-0 h-full w-px bg-white" />
+          <div class="absolute -bottom-1.5 left-1/2 -translate-x-[calc(50%+1px)]">
+            <div class="size-0 border-x-8 border-b-[12px] border-x-transparent border-b-white" />
+          </div>
+        </div>
+      </div>
     </div>
   )
 }

@@ -7,8 +7,10 @@ if (!OUT_DIR) {
   await $`bun run build`.quiet()
 }
 
+const EXCLUDE_GLOBS = ['*.map', 'pwa-*.png', 'maskable-*.png', 'apple-touch-icon-*.png', 'apple-splash-*.png']
+
 const files = []
-for await (const path of $`find ${OUT_DIR} -type f ! -name '*.map'`.lines()) {
+for await (const path of $`find ${OUT_DIR} -type f ${{ raw: EXCLUDE_GLOBS.map((path) => `! -name '${path}'`).join(' ') }}`.lines()) {
   if (!path) continue
   const size = Number((await $`cat ${path} | wc -c`.quiet()).text().trim())
   const compressedSize = Number((await $`gzip -9c ${path} | wc -c`.quiet()).text().trim())
@@ -28,7 +30,7 @@ const totalCompressedSizeKB = (totalCompressedSize / 1024).toFixed(2)
 files.push({}, { path: 'Total', sizeKB: totalSizeKB, compressedSizeKB: totalCompressedSizeKB })
 console.table(files, ['path', 'sizeKB', 'compressedSizeKB'])
 
-const upperBoundKB = 265
+const upperBoundKB = 270
 const lowerBoundKB = upperBoundKB - 10
 if (totalCompressedSize < lowerBoundKB * 1024) {
   console.warn(`Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`)

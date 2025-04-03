@@ -1,4 +1,4 @@
-import type { Route } from '~/types'
+import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
 export interface GPSPathPoint {
@@ -78,13 +78,12 @@ export interface TimelineStatistics {
 
 const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
   if (!route) return []
-  const segmentNumbers = Array.from({ length: route.maxqlog }, (_, i) => i)
-  const urls = segmentNumbers.map((i) => `${route.url}/${i}/${fn}`)
+  const urls = Array.from({ length: route.maxqlog + 1 }, (_, i) => `${route.url}/${i}/${fn}`)
   const results = urls.map((url) =>
     fetch(url)
-      .then((res) => res.json() as T)
+      .then((res) => (res.ok ? (res.json() as T) : undefined))
       .catch((err) => {
-        console.error('Error fetching file', url, err)
+        console.error('Error parsing file', url, err)
         return undefined
       }),
   )
@@ -94,7 +93,7 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
   getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat())
 
-export const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
+const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
 
 const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEvent[] => {
@@ -190,7 +189,7 @@ const generateTimelineEvents = (route: Route, events: DriveEvent[]): TimelineEve
 export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
-const generateTimelineStatistics = (route: Route, timeline: TimelineEvent[]): TimelineStatistics => {
+export const generateTimelineStatistics = (route: Route | undefined, timeline: TimelineEvent[]): TimelineStatistics => {
   let engagedDuration = 0
   let userFlags = 0
   timeline.forEach((ev) => {

@@ -1,4 +1,4 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -14,6 +14,7 @@ import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
+import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
 
 type RouteActivityProps = {
   dongleId: string
@@ -29,7 +30,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  function onTimelineChange(newTime: number) {
+  // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  const [timeline] = createResource(
+    () => [route(), events()] as const,
+    ([r, e]) => generateTimelineStatistics(r, e),
+  )
+
+  const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
@@ -49,41 +57,31 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <Suspense fallback={<div class="skeleton-loader aspect-[241/151] rounded-lg bg-surface-container-low" />}>
+        <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-        </Suspense>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm">Timeline</h3>
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} />
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} />
+            <RouteStatistics class="p-5" route={route.latest} timeline={timeline.latest} />
 
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteActions routeName={routeName()} route={route()} />
-            </Suspense>
+            <RouteActions routeName={routeName()} route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteUploadButtons route={route()} />
-            </Suspense>
+            <RouteUploadButtons route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
-            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-              <RouteStaticMap route={route()} />
-            </Suspense>
+            <RouteStaticMap route={route()} />
           </div>
         </div>
       </div>

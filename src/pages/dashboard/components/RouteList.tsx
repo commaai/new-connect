@@ -7,7 +7,7 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments } from '~/types'
+import type { RouteSegments } from '~/api/types'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -16,20 +16,17 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const startPosition = () => [props.route.start_lng || 0, props.route.start_lat || 0] as number[]
-  const endPosition = () => [props.route.end_lng || 0, props.route.end_lat || 0] as number[]
-  const [startPlace] = createResource(startPosition, getPlaceName)
-  const [endPlace] = createResource(endPosition, getPlaceName)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
-  const [location] = createResource(
-    () => [startPlace(), endPlace()],
-    ([startPlace, endPlace]) => {
-      if (!startPlace && !endPlace) return ''
-      if (!endPlace || startPlace === endPlace) return startPlace
-      if (!startPlace) return endPlace
-      return `${startPlace} to ${endPlace}`
-    },
-  )
+  const [location] = createResource(async () => {
+    const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
+    const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
+    const startPlace = await getPlaceName(startPos)
+    const endPlace = await getPlaceName(endPos)
+    if (!startPlace && !endPlace) return ''
+    if (!endPlace || startPlace === endPlace) return startPlace
+    if (!startPlace) return endPlace
+    return `${startPlace} to ${endPlace}`
+  })
 
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
@@ -39,12 +36,12 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
           </span>
         }
-        subhead={location()}
+        subhead={<Suspense>{location()}</Suspense>}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
-              <div class="flex items-center justify-center rounded-full bg-gradient-to-br from-amber-500 to-amber-900 p-2 border border-amber-300 shadow-inner shadow-black/20">
-                <Icon class="text-yellow-300" size="20" name="flag" filled />
+              <div class="flex items-center justify-center rounded-full p-1 border-amber-300 border-2">
+                <Icon class="text-yellow-300" size="24" name="flag" filled />
               </div>
             </Show>
           </Suspense>
@@ -52,10 +49,24 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatistics route={props.route} />
+        <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
       </CardContent>
     </Card>
   )
+}
+
+const Sentinel = (props: { onTrigger: () => void }) => {
+  let sentinel!: HTMLDivElement
+  const observer = new IntersectionObserver(
+    (entries) => {
+      if (!entries[0].isIntersecting) return
+      props.onTrigger()
+    },
+    { threshold: 0.1 },
+  )
+  onMount(() => observer.observe(sentinel))
+  onCleanup(() => observer.disconnect())
+  return <div ref={sentinel} class="h-10 w-full" />
 }
 
 const PAGE_SIZE = 10
@@ -88,23 +99,6 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
       setSize(1)
     }
   })
-
-  const [sentinel, setSentinel] = createSignal<HTMLDivElement>()
-  const observer = new IntersectionObserver(
-    (entries) => {
-      if (entries[0].isIntersecting) {
-        setSize((prev) => prev + 1)
-      }
-    },
-    { threshold: 0.1 },
-  )
-  onMount(() => {
-    const sentinelEl = sentinel()
-    if (sentinelEl) {
-      observer.observe(sentinelEl)
-    }
-  })
-  onCleanup(() => observer.disconnect())
 
   let prevDayHeader: string | null = null
   function getDayHeader(route: RouteSegments): string | null {
@@ -149,7 +143,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
           )
         }}
       </For>
-      <div ref={setSentinel} class="h-10 w-full" />
+      <Sentinel onTrigger={() => setSize((size) => size + 1)} />
     </div>
   )
 }

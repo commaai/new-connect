@@ -1,16 +1,16 @@
-import { createResource, For, Suspense, type VoidComponent } from 'solid-js'
+import { For, Suspense, type VoidComponent } from 'solid-js'
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevices } from '~/api/devices'
 import { useDrawerContext } from '~/components/material/Drawer'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
-import type { Device } from '~/types'
+import type { Device } from '~/api/types'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
 import storage from '~/utils/storage'
 
 type DeviceListProps = {
   class?: string
+  devices: Device[] | undefined
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
@@ -23,11 +23,10 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
     storage.setItem('lastSelectedDongleId', device.dongle_id)
   }
 
-  const [devices] = createResource(getDevices)
   return (
     <List variant="nav" class={props.class}>
       <Suspense fallback={<div class="h-14 skeleton-loader rounded-xl" />}>
-        <For each={devices()}>
+        <For each={props.devices}>
           {(device) => (
             <ListItem
               variant="nav"

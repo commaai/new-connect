@@ -1,9 +1,11 @@
+# syntax=docker/dockerfile:1
+# check=skip=SecretsUsedInArgOrEnv;error=true
+
 # *** build app ***
 FROM oven/bun:1.2.5-alpine AS build
 WORKDIR /app
 ADD . ./
 RUN bun install --frozen-lockfile
-RUN bun run build
 
 # env
 ARG VITE_APP_GIT_SHA=unknown
@@ -14,6 +16,8 @@ ENV VITE_APP_GIT_SHA=$VITE_APP_GIT_SHA
 ENV VITE_APP_GIT_TIMESTAMP=$VITE_APP_GIT_TIMESTAMP
 ENV SENTRY_AUTH_TOKEN=$SENTRY_AUTH_TOKEN
 ENV SENTRY_RELEASE=$SENTRY_RELEASE
+
+RUN bun run build
 
 # *** final image ***
 FROM nginx:1.24

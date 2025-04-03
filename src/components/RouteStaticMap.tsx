@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import { GPSPathPoint, getCoords } from '~/api/derived'
 import { Coords, getPathStaticMapUrl } from '~/map'
 import { getThemeId } from '~/theme'
-import type { Route } from '~/types'
+import type { Route } from '~/api/types'
 
 import Icon from '~/components/material/Icon'
 
@@ -48,7 +48,7 @@ const State = (props: {
 
 type RouteStaticMapProps = {
   class?: string
-  route?: Route
+  route: Route | undefined
 }
 
 const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
