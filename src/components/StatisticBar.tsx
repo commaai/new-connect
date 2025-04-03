@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { For, VoidComponent } from 'solid-js'
+import { Suspense, For, VoidComponent } from 'solid-js'
 
 const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string; value: () => unknown }[] }> = (props) => {
   return (
@@ -9,7 +9,9 @@ const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string;
           {(statistic) => (
             <div class="flex basis-0 grow flex-col justify-between">
               <span class="text-body-sm text-on-surface-variant">{statistic.label}</span>
-              <span class="font-mono text-label-lg uppercase">{statistic.value()?.toString() ?? '—'}</span>
+              <Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>
+                <span class="font-mono text-label-lg uppercase">{statistic.value()?.toString() ?? '—'}</span>
+              </Suspense>
             </div>
           )}
         </For>
