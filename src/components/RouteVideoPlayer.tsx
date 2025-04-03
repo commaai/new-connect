@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -23,7 +23,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+  const [videoLoading, setVideoLoading] = createSignal(true)
 
+  createEffect(() => {
+    props.routeName // track changes
+    setVideoLoading(true)
+  })
+
+  const onLoadedData = () => setVideoLoading(false)
   const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
@@ -76,6 +83,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('pause', onPause)
     video.addEventListener('ended', onEnded)
     video.addEventListener('stalled', onStalled)
+    video.addEventListener('loadeddata', onLoadedData)
 
     onCleanup(() => {
       controls.removeEventListener('click', onClick)
@@ -85,6 +93,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.removeEventListener('pause', onPause)
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('stalled', onStalled)
+      video.removeEventListener('loadeddata', onLoadedData)
       props.ref?.(video)
     })
 
@@ -136,6 +145,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           disablepictureinpicture
         />
       </div>
+
+      {/* Loading animation */}
+      <Show when={videoLoading()}>
+        <div class="absolute inset-0 z-0 skeleton-loader" />
+      </Show>
 
       {/* Controls overlay */}
       <div class="absolute inset-0 flex items-end" ref={controls}>
