@@ -127,9 +127,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
+             <div class="flex items-center gap-2">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full"/>}>
+            {/*<Show when={true}>*/}
+            {/*  <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400')} />*/}
+            {/*</Show>*/}
               {<div class="text-xl font-bold">{deviceName()}</div>}
             </Suspense>
+             </div>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
