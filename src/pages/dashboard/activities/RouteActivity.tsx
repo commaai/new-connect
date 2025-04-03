@@ -1,4 +1,4 @@
-import {createEffect, createResource, createSignal, Suspense, type VoidComponent} from 'solid-js'
+import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -15,7 +15,6 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
-import { routeEvents } from '~/pages/dashboard/Dashboard'
 
 type RouteActivityProps = {
   dongleId: string
@@ -31,15 +30,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  createEffect(() => {
-    console.log("got routeEvents", routeEvents())
-  })
-
-  // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  // const [timeline] = createResource(
-  //   () => [route(), events()] as const,
-  //   ([r, e]) => generateTimelineStatistics(r, e),
-  // )
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  const [timeline] = createResource(
+    () => [route(), events()] as const,
+    ([r, e]) => generateTimelineStatistics(r, e),
+  )
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -48,13 +43,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
-  // createResource(
-  //   () => [device(), profile(), props.dateStr] as const,
-  //   async ([device, profile, dateStr]) => {
-  //     if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-  //     await setRouteViewed(device.dongle_id, dateStr)
-  //   },
-  // )
+  createResource(
+    () => [device(), profile(), props.dateStr] as const,
+    async ([device, profile, dateStr]) => {
+      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
+      await setRouteViewed(device.dongle_id, dateStr)
+    },
+  )
 
   return (
     <>
@@ -63,13 +58,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={routeEvents()} />
+          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            {/*<RouteStatistics class="p-5" route={route()} timeline={timeline()} />*/}
+            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
 
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
               <RouteActions routeName={routeName()} route={route()} />

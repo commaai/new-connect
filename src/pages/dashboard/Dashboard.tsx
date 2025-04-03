@@ -1,4 +1,4 @@
-import {createMemo, createResource, createSignal, lazy, Match, Show, Suspense, SuspenseList, Switch} from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -20,12 +20,8 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
-import {TimelineEvent} from "~/api/derived";
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
-
-// TODO: move to common file
-export const [routeEvents, setRouteEvents] = createSignal<TimelineEvent[]>([])
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
@@ -141,24 +137,24 @@ const Dashboard: Component<RouteSectionProps> = () => {
           {(dongleId) => (
             <DashboardLayout
               paneOne={<DeviceActivity dongleId={dongleId} device={currentDevice()} />}
-              // paneTwo={
-              //   <Switch
-              //     fallback={
-              //       <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
-              //         <Icon name="search" size="48" />
-              //         <span class="text-title-md">Select a route to view</span>
-              //       </div>
-              //     }
-              //   >
-              //     <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
-              //       <SettingsActivity dongleId={dongleId} />
-              //     </Match>
-              //     <Match when={urlState().dateStr}>
-              //       {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
-              //     </Match>
-              //   </Switch>
-              // }
-              paneTwoContent={null}
+              paneTwo={
+                <Switch
+                  fallback={
+                    <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
+                      <Icon name="search" size="48" />
+                      <span class="text-title-md">Select a route to view</span>
+                    </div>
+                  }
+                >
+                  <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
+                    <SettingsActivity dongleId={dongleId} />
+                  </Match>
+                  <Match when={urlState().dateStr}>
+                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
+                  </Match>
+                </Switch>
+              }
+              paneTwoContent={!!urlState().dateStr}
             />
           )}
         </Match>
