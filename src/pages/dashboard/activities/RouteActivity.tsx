@@ -86,7 +86,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
-          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container h-[80px]">
+          <div class="flex flex-col rounded-md overflow-hidden bg-surface-container lg:h-[5rem] h-[8.25rem]">
             <Show when={route.isSuccess} fallback={<div class="skeleton-loader bg-surface-container h-full" />}>
               <RouteUploadButtons route={route.data} />
             </Show>
