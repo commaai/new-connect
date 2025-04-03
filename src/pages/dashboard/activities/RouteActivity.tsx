@@ -1,4 +1,4 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createMemo, createSignal, Show, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -15,6 +15,7 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { createQuery } from '@tanstack/solid-query'
 
 type RouteActivityProps = {
   dongleId: string
@@ -25,68 +26,73 @@ type RouteActivityProps = {
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
-
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [timeline] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateTimelineStatistics(r, e),
-  )
+  const route = createQuery(() => ({ queryKey: ['route', routeName()], queryFn: () => getRoute(routeName()) }))
+  const events = createQuery(() => ({
+    queryKey: ['events', routeName()],
+    queryFn: () => getTimelineEvents(route.data!),
+    enabled: route.isSuccess,
+  }))
+  const timeline = createMemo(() => {
+    if (!route.data || !events.data) return undefined
+    return generateTimelineStatistics(route.data, events.data)
+  })
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
-  createResource(
-    () => [device(), profile(), props.dateStr] as const,
-    async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
-    },
-  )
+  const profile = createQuery(() => ({ queryKey: ['profile'], queryFn: getProfile }))
+  const device = createQuery(() => ({ queryKey: ['device', props.dongleId], queryFn: () => getDevice(props.dongleId) }))
+  createEffect(() => {
+    if (!device.data || !profile.data || (!device.data!.is_owner && !profile.data!.superuser)) return
+    setRouteViewed(device.data!.dongle_id, props.dateStr)
+  })
 
+  const startTime = () => dayjs(route.data?.start_time)?.format('ddd, MMM D, YYYY')
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
+        <Show when={startTime()} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+          {startTime()}
+        </Show>
+      </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Show when={route.isSuccess} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+            <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+            <Timeline class="mb-1" route={route.data} seekTime={seekTime()} updateTime={onTimelineChange} events={events.data!} />
+          </Show>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
-
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteActions routeName={routeName()} route={route()} />
-            </Suspense>
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader min-h-48" />}>
+              <RouteStatistics class="p-5" route={route.data} timeline={timeline()} />
+              <RouteActions routeName={routeName()} route={route.data} />
+            </Show>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
-              <RouteUploadButtons route={route()} />
-            </Suspense>
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader min-h-48" />}>
+              <RouteUploadButtons route={route.data} />
+            </Show>
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
-            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-              <RouteStaticMap route={route()} />
-            </Suspense>
+            <Show when={route.isSuccess} fallback={<div class="skeleton-loader size-full bg-surface" />}>
+              <RouteStaticMap route={route.data} />
+            </Show>
           </div>
         </div>
       </div>
