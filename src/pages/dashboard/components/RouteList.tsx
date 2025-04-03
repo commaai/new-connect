@@ -106,9 +106,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     const date = dayjs(route.start_time_utc_millis)
     let dayHeader = null
     if (date.isSame(dayjs(), 'day')) {
-      dayHeader = 'Today'
+      dayHeader = `Today – ${date.format('dddd, MMM D')}`
     } else if (date.isSame(dayjs().subtract(1, 'day'), 'day')) {
-      dayHeader = 'Yesterday'
+      dayHeader = `Yesterday – ${date.format('dddd, MMM D')}`
     } else if (date.year() === dayjs().year()) {
       dayHeader = date.format('dddd, MMM D')
     } else {
