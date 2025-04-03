@@ -37,8 +37,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     () => [route(), events()] as const,
     ([r, e]) => generateTimelineStatistics(r, e),
   )
-  const onEvent = (event: 'load' | 'error') => setTimelineInteractive(event === 'load')
 
+  const onEvent = (event: 'load' | 'error') => setTimelineInteractive(event === 'load')
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
