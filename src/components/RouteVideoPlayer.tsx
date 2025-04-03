@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, onCleanup, onMount, Show, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -8,11 +8,11 @@ import type Hls from '~/utils/hls'
 
 type RouteVideoPlayerProps = {
   class?: string
+  routeName: string
+  startTime: number
   onEvent?: (event: 'load' | 'error') => void
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
-  routeName: string
-  startTime: number
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
@@ -136,13 +136,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     if (!url || player === undefined) return
     setErrored(false)
     setVideoLoading(true)
-
     if (player) {
       player.loadSource(url)
     } else {
       video.src = url
     }
-
     props.onEvent?.('load')
   })
 
