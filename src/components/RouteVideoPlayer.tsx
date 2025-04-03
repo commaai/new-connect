@@ -134,13 +134,16 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const url = streamUrl()
     const player = hls()
     if (!url || player === undefined) return
+
     setErrored(false)
     setVideoLoading(true)
+
     if (player) {
       player.loadSource(url)
     } else {
       video.src = url
     }
+
     props.onEvent?.('load')
   })
 
