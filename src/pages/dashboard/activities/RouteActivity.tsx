@@ -1,4 +1,4 @@
-import {createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
+import {createEffect, createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -28,13 +28,16 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
+  createEffect(() => {
+    console.log("route", route()?.fullname)
+  })
   // const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
   //
-  // const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  // const [timeline] = createResource(
-  //   () => [route(), events()] as const,
-  //   ([r, e]) => generateTimelineStatistics(r, e),
-  // )
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  const [timeline] = createResource(
+    () => [route(), events()] as const,
+    ([r, e]) => generateTimelineStatistics(r, e),
+  )
   //
   // const onTimelineChange = (newTime: number) => {
   //   const video = videoRef()
@@ -68,29 +71,23 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             {/*THIS BLOCKS*/}
-            {/*<RouteStatistics class="p-5" route={route()} timeline={timeline()} />*/}
+            <RouteStatistics class="p-5" route={route.latest} timeline={timeline.latest} />
 
-            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
             <RouteActions routeName={routeName()} route={route()} />
-            {/*</Suspense>*/}
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-            {/*  <RouteUploadButtons route={route()} />*/}
-            {/*</Suspense>*/}
+            <RouteUploadButtons route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
-            {/*<Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>*/}
-            {/*  <RouteStaticMap route={route()} />*/}
-            {/*</Suspense>*/}
+            <RouteStaticMap route={route()} />
           </div>
         </div>
       </div>
