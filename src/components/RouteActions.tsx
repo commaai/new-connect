@@ -1,4 +1,4 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
+import { Suspense, createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
@@ -35,27 +35,46 @@ const ToggleButton: VoidComponent<{
 interface RouteActionsProps {
   routeName: string
   route: Route | undefined
+  test: string
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
-  const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
+  // const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
+  const [isPreserved] = createResource(() => props.route, (route) => route?.is_public || false)
 
   const useradminUrl = () => `${USERADMIN_URL}/?onebox=${currentRouteId()}`
 
   createEffect(() => {
-    const preservedRoutes = preservedRoutesResource()
-    if (!props.route) return
-    setIsPublic(props.route.is_public)
-    if (props.route.is_preserved) {
-      setIsPreserved(true)
+    console.log("isPreserved", isPreserved())
+    console.log('ROUTEACTIONS', props.routeName, props.route(), preservedRoutesResource.loading, props.test)
+  })
+
+  // createEffect(() => {
+  //
+  // })
+
+  createEffect(() => {
+    // console.log("cREATEEFFECT", props.routeName, props.route, preservedRoutesResource.loading)
+    if (!props.route() || preservedRoutesResource.loading) {
+      setIsPublic(undefined)
+      // setIsPreserved(undefined)
+      return
+    }
+    if (props.routeName) {
+
+    }
+    setIsPublic(props.route().is_public)
+    const preservedRoutes = preservedRoutesResource.latest
+    if (props.route().is_preserved) {
+      // setIsPreserved(true)
     } else if (preservedRoutes) {
-      const { fullname } = props.route
-      setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
+      const { fullname } = props.route()
+      // setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
     } else {
-      setIsPreserved(undefined)
+      // setIsPreserved(undefined)
     }
   })
 
@@ -126,8 +145,14 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <div class="flex flex-col gap-2">
-        <ToggleButton label="Preserve Route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
-        <ToggleButton label="Public Access" active={isPublic()} onToggle={() => void toggleRoute('public')} />
+        {/*<Show when={!preservedRoutesResource.loading} fallback={<div>LOADING!</div>}>*/}
+        {/*<Show when={!props.route.loading} fallback={<div class="skeleton-loader h-[88px] rounded-md" />}>*/}
+        <Show when={!isPreserved.loading} fallback={<div class="skeleton-loader h-[88px] rounded-md" />}>
+        {/*<Suspense fallback={<div>LOADING!</div>}>*/}
+          <ToggleButton label="Preserve Route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
+          <ToggleButton label="Public Access" active={isPublic()} onToggle={() => void toggleRoute('public')} />
+        {/*</Suspense>*/}
+        </Show>
       </div>
 
       <Show when={error()}>
