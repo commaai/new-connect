@@ -126,11 +126,8 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <div class="flex flex-col gap-2">
-        {/*<Show when={isPreserved() !== undefined} fallback={<div>LOADING!</div>}>*/}
-        {/*<Show when={isPreserved() !== undefined} fallback={<div>LOADING!</div>}>*/}
         <ToggleButton label="Preserve Route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
         <ToggleButton label="Public Access" active={isPublic()} onToggle={() => void toggleRoute('public')} />
-        {/*</Show>*/}
       </div>
 
       <Show when={error()}>

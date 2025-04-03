@@ -1,4 +1,4 @@
-import {createEffect, createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
+import { createResource, createSignal, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -28,11 +28,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  createEffect(() => {
-    console.log("route", route()?.fullname)
-  })
+  // createEffect(() => {
+  //   console.log("route", route()?.fullname)
+  // })
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
+  // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
     () => [route(), events()] as const,
@@ -67,9 +68,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            {/*THIS BLOCKS*/}
             <RouteStatistics class="p-5" route={route.latest} timeline={timeline.latest} />
-
             <RouteActions routeName={routeName()} route={route()} />
           </div>
         </div>
