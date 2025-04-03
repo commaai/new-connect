@@ -9,7 +9,7 @@ import { dayjs } from '~/utils/format'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteActions from '~/components/RouteActions'
-import RouteStaticMap from '~/components/RouteStaticMap'
+import RouteDynamicMap from '~/components/RouteDynamicMap'
 import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
@@ -62,6 +62,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
+          <h3 class="text-label-sm uppercase">Route Map</h3>
+          <div class="aspect-square max-h-64 overflow-hidden rounded-lg">
+            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
+              <RouteDynamicMap route={route()} seekTime={seekTime} updateTime={onTimelineChange} />
+            </Suspense>
+          </div>
+        </div>
+
+        <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
@@ -77,15 +86,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
               <RouteUploadButtons route={route()} />
-            </Suspense>
-          </div>
-        </div>
-
-        <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm uppercase">Route Map</h3>
-          <div class="aspect-square overflow-hidden rounded-lg">
-            <Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>
-              <RouteStaticMap route={route()} />
             </Suspense>
           </div>
         </div>
