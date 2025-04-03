@@ -103,10 +103,6 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
 
-  createEffect(() => {
-    console.log("events len, route", props.events.length, route()?.fullname, duration.latest, duration.loading)
-  })
-
   let ref!: HTMLDivElement
 
   onMount(() => {
@@ -180,12 +176,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        {/*<Suspense fallback={<div class="skeleton-loader size-full"></div>}>*/}
-        <Show when={!duration.loading && duration() !== undefined}  fallback={<div class="skeleton-loader size-auto w-full"></div>}>
-
-          {renderTimelineEvents(props.route, props.events)}
-        </Show>
-        {/*</Suspense>*/}
+        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events)}</Suspense>
         <div
           class="absolute top-0 z-10 h-full"
           style={{
