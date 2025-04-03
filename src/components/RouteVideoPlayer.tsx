@@ -9,7 +9,6 @@ import type Hls from '~/utils/hls'
 type RouteVideoPlayerProps = {
   class?: string
   onError?: () => void
-  onLoad?: () => void
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
   routeName: string
@@ -62,11 +61,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
   const onError = () => {
     setErrored(true)
+    setVideoLoading(false)
     props.onError?.()
-  }
-  const onLoad = () => {
-    setErrored(false)
-    props.onLoad?.()
   }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
@@ -127,10 +123,10 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       onCleanup(() => hls()?.destroy())
     } else {
       setHls(null)
+      video.onerror = onError
       if (!video.canPlayType('application/vnd.apple.mpegurl')) {
         console.error('Browser does not support Media Source Extensions API')
       }
-      video.onerror = onError
     }
   })
 
@@ -138,13 +134,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const url = streamUrl()
     const player = hls()
     if (!url || player === undefined) return
+    setErrored(false)
+    setVideoLoading(true)
 
     if (player) {
       player.loadSource(url)
     } else {
       video.src = url
     }
-    onLoad()
   })
 
   return (
@@ -173,26 +170,24 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       <Show when={videoLoading()}>
         <div class="absolute inset-0 z-0 skeleton-loader" />
       </Show>
+      <Show when={isErrored()}>
+        <span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
+      </Show>
 
       {/* Controls overlay */}
-      <Show
-        when={!isErrored()}
-        fallback={<span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>}
-      >
-        <div class="absolute inset-0 flex items-end" ref={controls}>
-          {/* Controls background gradient */}
-          <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
+      <div class="absolute inset-0 flex items-end" ref={controls}>
+        {/* Controls background gradient */}
+        <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
-          {/* Controls container */}
-          <div class="relative flex w-full items-center gap-3 pb-3 px-2">
-            <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+        {/* Controls container */}
+        <div class="relative flex w-full items-center gap-3 pb-3 px-2">
+          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
-            <div class="font-mono text-sm text-on-surface">
-              {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
-            </div>
+          <div class="font-mono text-sm text-on-surface">
+            {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
         </div>
-      </Show>
+      </div>
     </div>
   )
 }

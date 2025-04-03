@@ -1,4 +1,4 @@
-import { createResource, createSignal, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, on, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -23,9 +23,9 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(props.startTime)
-  const [timelineIsInteractive, setTimelineIsInteractive] = createSignal(true)
-  const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
+  const [seekTime, seek] = createSignal(props.startTime)
+  const [interactive, setTimelineInteractive] = createSignal(true)
+  const [videoRef, setRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
@@ -38,13 +38,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     ([r, e]) => generateTimelineStatistics(r, e),
   )
 
+  createEffect(on(routeName, () => setTimelineInteractive(true)))
+  const onError = () => setTimelineInteractive(false)
+
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
-
-  const onVideoLoad = () => setTimelineIsInteractive(true)
-  const onVideoError = () => setTimelineIsInteractive(false)
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
@@ -61,23 +61,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        <div class="flex flex-col">
-          <RouteVideoPlayer
-            ref={setVideoRef}
-            onError={onVideoError}
-            onLoad={onVideoLoad}
-            onProgress={setSeekTime}
-            routeName={routeName()}
-            startTime={seekTime()}
-          />
-          <Timeline
-            class="mb-1"
-            interactive={timelineIsInteractive()}
-            route={route.latest}
-            seekTime={seekTime()}
-            updateTime={onTimelineChange}
-            events={events()}
-          />
+        <div class="flex flex-col gap-1">
+          <RouteVideoPlayer ref={setRef} onError={onError} onProgress={seek} routeName={routeName()} startTime={seekTime()} />
+          <Timeline interactive={interactive()} route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
