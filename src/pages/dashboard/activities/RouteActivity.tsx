@@ -179,9 +179,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <Suspense fallback={<div class="skeleton-loader min-h-48" />}>
+            {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
               <RouteUploadButtons route={route()} />
-            </Suspense>
+            {/*</Suspense>*/}
           </div>
         </div>
 
@@ -189,7 +189,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <h3 class="text-label-sm uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
             {/*<Suspense fallback={<div class="skeleton-loader size-full bg-surface" />}>*/}
-            {/*  <RouteStaticMap route={route()} />*/}
+              <RouteStaticMap route={route()} />
             {/*</Suspense>*/}
           </div>
         </div>

@@ -90,6 +90,12 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
   return (await Promise.all(results)).filter((it) => it !== undefined)
 }
 
+// export const getCoords = (route: Route): Promise<GPSPathPoint[]> => {
+//   //empty promise to avoid error
+//   return new Promise((resolve) => {
+//     resolve([])
+//   })
+// }
 export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
   getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat())
 

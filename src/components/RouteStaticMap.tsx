@@ -1,4 +1,4 @@
-import { createResource, Match, Switch } from 'solid-js'
+import {Show, createEffect, createResource, ErrorBoundary, Match, Switch} from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -22,6 +22,7 @@ const loadImage = (url: string | undefined): Promise<string | undefined> => {
 }
 
 const getStaticMapUrl = (gpsPoints: GPSPathPoint[]): string | undefined => {
+  // throw new Error('getStaticMapUrl is not implemented')
   if (gpsPoints.length === 0) {
     return undefined
   }
@@ -53,11 +54,23 @@ type RouteStaticMapProps = {
 
 const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
   const [coords] = createResource(() => props.route, getCoords)
+  // const [coords] = createResource(() => props.route, (route) => {
+  //   throw new Error("Debug test error")
+  // })
   const [url] = createResource(coords, getStaticMapUrl)
   const [loadedUrl] = createResource(url, loadImage)
+  createEffect(() => {
+    console.log('coords.latest', coords.latest)
+    console.log('coords.error', coords.error, url.error, loadedUrl.error)
+  })
 
   return (
     <div class={clsx('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>
+      {/*<span>{coords.error && "ERROR!"}</span>*/}
+      {/*<Show when={coords.error}>*/}
+      {/*  <State trailing={<Icon name="error" filled />}>Problem loading map</State>*/}
+      {/*</Show>*/}
+      {/*<ErrorBoundary fallback={<State>Problem loading map</State>}>*/}
       <Switch>
         <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon name="error" filled />}>Problem loading map</State>
@@ -69,6 +82,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
           <img class="pointer-events-none size-full object-cover" src={loadedUrl()} alt="" />
         </Match>
       </Switch>
+      {/*</ErrorBoundary>*/}
     </div>
   )
 }

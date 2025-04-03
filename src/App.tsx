@@ -37,7 +37,9 @@ export const AppLayout: ParentComponent = (props) => {
 
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
-      <Suspense>{props.children}</Suspense>
+      {/*<Suspense>*/}
+        {props.children}
+      {/*</Suspense>*/}
     </Show>
   )
 }
