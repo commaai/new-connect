@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import {createEffect, createMemo, createResource, createSignal, lazy, Match, Show, Suspense, SuspenseList, Switch} from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -7,7 +7,7 @@ import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
-import type { Device } from '~/api/types'
+import type {Device, Route} from '~/api/types'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
@@ -20,8 +20,14 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import {TimelineEvent} from "~/api/derived";
+import {getRoute} from "~/api/route";
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
+
+// TODO: move to common file
+// export const [routeEvents, setRouteEvents] = createSignal<TimelineEvent[]>([])
+export const [currentRoute, setCurrentRoute] = createSignal<Route | undefined>(undefined)
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
@@ -112,6 +118,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
       startTime: parts[2] ? Number(parts[2]) : 0,
     }
   })
+
+  const routeName = () => `${urlState().dongleId}|${urlState().dateStr}`
+  createEffect(() => {
+    getRoute(routeName()).then(setCurrentRoute)
+  })
+
+  // const [route] = createResource(routeName, getRoute)
 
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
