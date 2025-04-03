@@ -127,16 +127,16 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            {/*<Show when={true}>*/}
-            {/*</Show>*/}
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full inline-block" />}>
               <div class="inline-flex items-center gap-2">
-                <div
-                  class={clsx(
-                    'm-2 size-2 shrink-0 rounded-full',
-                    device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400',
-                  )}
-                />
+                <Show when={modal()}>
+                  <div
+                    class={clsx(
+                      'm-2 size-2 shrink-0 rounded-full',
+                      device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400',
+                    )}
+                  />
+                </Show>
 
                 {<div class="text-xl font-bold">{deviceName()}</div>}
               </div>
