@@ -20,13 +20,13 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
-import {TimelineEvent} from "~/api/derived";
+import {getTimelineEvents, TimelineEvent} from "~/api/derived";
 import {getRoute} from "~/api/route";
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 // TODO: move to common file
-// export const [routeEvents, setRouteEvents] = createSignal<TimelineEvent[]>([])
+export const [routeEvents, setRouteEvents] = createSignal<TimelineEvent[]>([])
 export const [currentRoute, setCurrentRoute] = createSignal<Route | undefined>(undefined)
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
@@ -121,7 +121,14 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   const routeName = () => `${urlState().dongleId}|${urlState().dateStr}`
   createEffect(() => {
-    getRoute(routeName()).then(setCurrentRoute)
+    getRoute(routeName()).then((route) => {
+      setCurrentRoute(route)
+      console.log('got route!', route)
+      getTimelineEvents(route!).then((events) => {
+        console.log('got events!', events)
+        setRouteEvents(events)
+      })
+    })
   })
 
   // const [route] = createResource(routeName, getRoute)

@@ -2,12 +2,13 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import { getTimelineStatistics } from '~/api/derived'
+import {generateTimelineStatistics, getTimelineStatistics} from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/api/types'
+import {routeEvents} from '~/pages/dashboard/Dashboard'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -16,7 +17,14 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  // const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  const [timeline, setTimeline] = createSignal()
+  createEffect(() => {
+    const events = routeEvents()
+    if (events) {
+      setTimeline(generateTimelineStatistics(props.route, events))
+    }
+  })
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
