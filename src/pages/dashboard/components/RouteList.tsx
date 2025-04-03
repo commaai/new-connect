@@ -105,10 +105,10 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   function getDayHeader(route: RouteSegments): string | null {
     const date = dayjs(route.start_time_utc_millis)
     let dayHeader = null
-    if (date.isSame(dayjs(), 'day') || true) {
-      dayHeader = `Today – ${date.format('dddd, MMM D')}`
+    if (date.isSame(dayjs(), 'day')) {
+      dayHeader = 'Today'
     } else if (date.isSame(dayjs().subtract(1, 'day'), 'day')) {
-      dayHeader = `Yesterday – ${date.format('dddd, MMM D')}`
+      dayHeader = 'Yesterday'
     } else if (date.year() === dayjs().year()) {
       dayHeader = date.format('dddd, MMM D')
     } else {
