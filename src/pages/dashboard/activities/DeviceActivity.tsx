@@ -12,7 +12,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import { getDeviceName } from '~/utils/device'
+import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
@@ -128,7 +128,16 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Suspense>
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
-              {<div class="text-xl font-bold">{deviceName()}</div>}
+              <div class="inline-flex items-center gap-2">
+                <div
+                  class={clsx(
+                    'm-2 size-2 shrink-0 rounded-full',
+                    device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400',
+                  )}
+                />
+
+                {<div class="text-xl font-bold">{deviceName()}</div>}
+              </div>
             </Suspense>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
