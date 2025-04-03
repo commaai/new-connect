@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { Show, Suspend, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -23,7 +23,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+  const [videoLoading, setVideoLoading] = createSignal(true)
 
+  createEffect(() => {
+    props.routeName  // track changes
+    setVideoLoading(true)
+  })
+
+  const onLoadedData = () => setVideoLoading(false)
   const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
@@ -66,8 +73,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     if (!Number.isNaN(props.startTime)) {
       video.currentTime = props.startTime
     }
+    console.log("hi")
 
     props.ref?.(video)
+
+
 
     controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
@@ -76,6 +86,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('pause', onPause)
     video.addEventListener('ended', onEnded)
     video.addEventListener('stalled', onStalled)
+    video.addEventListener('loadeddata', onLoadedData)
 
     onCleanup(() => {
       controls.removeEventListener('click', onClick)
@@ -85,6 +96,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.removeEventListener('pause', onPause)
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('stalled', onStalled)
+      video.removeEventListener('loadeddata', onLoadedData)
       props.ref?.(video)
     })
 
@@ -123,6 +135,10 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       )}
     >
       {/* Video as background */}
+      <Show when={videoLoading()}>
+        <div class="absolute inset-0 z-0 skeleton-loader" />
+      </Show>
+      {/*<Show when={!videoLoading()} fallback={<div class="skeleton-loader size-full"/>}>*/}
       <div class="absolute inset-0 -z-10">
         <video
           ref={video}
@@ -136,6 +152,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           disablepictureinpicture
         />
       </div>
+      {/*</Show>*/}
 
       {/* Controls overlay */}
       <div class="absolute inset-0 flex items-end" ref={controls}>

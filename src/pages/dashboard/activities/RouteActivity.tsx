@@ -1,4 +1,4 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import {createResource, createSignal, Show, Suspense, type VoidComponent} from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -56,11 +56,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       {/*<TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>*/}
 
       <div class="flex flex-col gap-6 px-4 pb-4">
-        {/*<div class="flex flex-col">*/}
-        {/*  <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />*/}
+        <div class="flex flex-col">
+          {/*<Show when={!route.loading} fallback={<div class="skeleton-loader flex h-[297px] w-full"></div>}>*/}
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          {/*</Show>*/}
         {/*  /!*TIMELINE NEEDS ANIMATION*!/*/}
         {/*  <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />*/}
-        {/*</div>*/}
+        </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-sm uppercase">Route Info</h3>
@@ -69,7 +71,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*<RouteStatistics class="p-5" route={route()} timeline={timeline()} />*/}
 
             {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-              <RouteActions routeName={routeName()} route={route} test={props.dateStr} />
+            <RouteActions routeName={routeName()} route={route()} />
             {/*</Suspense>*/}
           </div>
         </div>
