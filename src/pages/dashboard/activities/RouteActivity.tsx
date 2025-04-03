@@ -30,6 +30,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
+  // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
     () => [route(), events()] as const,
