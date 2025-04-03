@@ -123,7 +123,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             {/*<Suspense>*/}
             {/*  <RouteStatistics class="p-5" route={route()} timeline={undefined} />*/}
             {/*<Show when={route()}>*/}
-            {/*TODO: add skeleton animation to each StatisticBar*/}
+            {/*TODO: add skeleton animation to each StatisticBar (https://github.com/solidjs/solid/issues/2437)*/}
             <RouteStatistics class="p-5" route={route.latest} timeline={undefined} />
             {/*</Show>*/}
             {/*</Suspense>*/}
