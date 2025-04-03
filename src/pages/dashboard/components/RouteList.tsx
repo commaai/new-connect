@@ -123,7 +123,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
               }
             >
               <For each={routes()}>
-                {route => {
+                {(route) => {
                   const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
                   return (
