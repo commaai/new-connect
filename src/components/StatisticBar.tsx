@@ -9,7 +9,7 @@ const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string;
           {(statistic) => (
             <div class="flex basis-0 grow flex-col justify-between">
               <span class="text-body-sm text-on-surface-variant">{statistic.label}</span>
-                <span class="font-mono text-label-lg uppercase">{statistic.value()?.toString() ?? '—'}</span>
+              <span class="font-mono text-label-lg uppercase">{statistic.value()?.toString() ?? '—'}</span>
             </div>
           )}
         </For>
