@@ -18,7 +18,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const endTime = () => dayjs(props.route.end_time_utc_millis)
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
-    await new Promise(resolve => setTimeout(resolve, 2000))
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
     const startPlace = await getPlaceName(startPos)
@@ -27,11 +26,6 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     if (!endPlace || startPlace === endPlace) return startPlace
     if (!startPlace) return endPlace
     return `${startPlace} to ${endPlace}`
-  })
-  const [fastResource] = createResource(async () => {
-    console.log('props.route', props.route)
-    await new Promise(resolve => setTimeout(resolve, 10))
-    return 'Fast resource'
   })
 
   return (
@@ -42,27 +36,21 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
           </span>
         }
-        // subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs"/>}>{location()}</Suspense>}
-        // subhead={location()}
-        subhead={location.latest}
-        // trailing={
-        //   <Suspense>
-        //     <Show when={timeline()?.userFlags}>
-        //       <div class="flex items-center justify-center rounded-full p-1 border-amber-300 border-2">
-        //         <Icon class="text-yellow-300" size="24" name="flag" filled />
-        //       </div>
-        //     </Show>
-        //   </Suspense>
-        // }
+        subhead={<Suspense fallback={<div className="h-[20px] w-auto skeleton-loader rounded-xs"/>}>{location()}</Suspense>}
+        trailing={
+          <Suspense>
+            <Show when={timeline()?.userFlags}>
+              <div class="flex items-center justify-center rounded-full p-1 border-amber-300 border-2">
+                <Icon class="text-yellow-300" size="24" name="flag" filled />
+              </div>
+            </Show>
+          </Suspense>
+        }
       />
 
-      <Suspense fallback={<span>Loading...</span>}>
-        <span>Done loading!</span>
-        <span>{fastResource()}</span>
-        {/*<CardContent>*/}
-        {/*  <RouteStatistics route={props.route} timeline={timeline()} />*/}
-        {/*</CardContent>*/}
-      </Suspense>
+      <CardContent>
+        <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
+      </CardContent>
     </Card>
   )
 }
