@@ -48,6 +48,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
         }
       />
 
+      {/* FIXME: the location resource blocks this from rendering */}
       <CardContent>
         <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
       </CardContent>
