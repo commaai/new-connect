@@ -73,11 +73,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     if (!Number.isNaN(props.startTime)) {
       video.currentTime = props.startTime
     }
-    console.log("hi")
 
     props.ref?.(video)
-
-
 
     controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
@@ -135,10 +132,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       )}
     >
       {/* Video as background */}
-      <Show when={videoLoading()}>
-        <div class="absolute inset-0 z-0 skeleton-loader" />
-      </Show>
-      {/*<Show when={!videoLoading()} fallback={<div class="skeleton-loader size-full"/>}>*/}
       <div class="absolute inset-0 -z-10">
         <video
           ref={video}
@@ -152,7 +145,10 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           disablepictureinpicture
         />
       </div>
-      {/*</Show>*/}
+      {/* Loading animation */}
+      <Show when={videoLoading()}>
+        <div class="absolute inset-0 z-0 skeleton-loader" />
+      </Show>
 
       {/* Controls overlay */}
       <div class="absolute inset-0 flex items-end" ref={controls}>
