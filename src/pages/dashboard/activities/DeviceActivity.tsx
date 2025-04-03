@@ -118,64 +118,64 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
-        <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
-          <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
-          </Suspense>
-          <div class="flex items-center justify-between p-4">
-            {<div class="text-xl font-bold">{deviceName()}</div>}
-            <div class="flex gap-4">
-              <IconButton name="camera" onClick={() => void takeSnapshot()} />
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
-            </div>
-          </div>
-          <Show when={props.device}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
-            <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
-            </Show>
-            <button
-              class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
-                queueVisible() && 'border-t-2 border-t-surface-container-low',
-              )}
-              onClick={() => setQueueVisible(!queueVisible())}
-            >
-              <p class="mr-2">Upload Queue</p>
-              <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
-            </button>
-          </Show>
-        </div>
-        <div class="flex flex-col gap-2">
-          <For each={snapshot().images}>
-            {(image, index) => (
-              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-                <div class="relative p-4">
-                  <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
-                  <div class="absolute right-4 top-4 p-4">
-                    <IconButton class="text-white" name="download" onClick={() => downloadSnapshot(image, index())} />
-                    <IconButton class="text-white" name="clear" onClick={() => clearImage(index())} />
-                  </div>
-                </div>
-              </div>
-            )}
-          </For>
-          {snapshot().fetching && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <div>Loading snapshots...</div>
-              </div>
-            </div>
-          )}
-          {snapshot().error && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="flex items-center p-4">
-                <IconButton class="text-white" name="clear" onClick={clearError} />
-                <span>Error: {snapshot().error}</span>
-              </div>
-            </div>
-          )}
-        </div>
+      {/*  <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">*/}
+      {/*    <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>*/}
+      {/*      <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />*/}
+      {/*    </Suspense>*/}
+      {/*    <div class="flex items-center justify-between p-4">*/}
+      {/*      {<div class="text-xl font-bold">{deviceName()}</div>}*/}
+      {/*      <div class="flex gap-4">*/}
+      {/*        <IconButton name="camera" onClick={() => void takeSnapshot()} />*/}
+      {/*        <IconButton name="settings" href={`/${props.dongleId}/settings`} />*/}
+      {/*      </div>*/}
+      {/*    </div>*/}
+      {/*    <Show when={props.device}>*/}
+      {/*      <DeviceStatistics dongleId={props.dongleId} class="p-4" />*/}
+      {/*      <Show when={queueVisible()}>*/}
+      {/*        <UploadQueue dongleId={props.dongleId} />*/}
+      {/*      </Show>*/}
+      {/*      <button*/}
+      {/*        class={clsx(*/}
+      {/*          'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',*/}
+      {/*          queueVisible() && 'border-t-2 border-t-surface-container-low',*/}
+      {/*        )}*/}
+      {/*        onClick={() => setQueueVisible(!queueVisible())}*/}
+      {/*      >*/}
+      {/*        <p class="mr-2">Upload Queue</p>*/}
+      {/*        <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />*/}
+      {/*      </button>*/}
+      {/*    </Show>*/}
+      {/*  </div>*/}
+        {/*<div class="flex flex-col gap-2">*/}
+        {/*  <For each={snapshot().images}>*/}
+        {/*    {(image, index) => (*/}
+        {/*      <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">*/}
+        {/*        <div class="relative p-4">*/}
+        {/*          <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />*/}
+        {/*          <div class="absolute right-4 top-4 p-4">*/}
+        {/*            <IconButton class="text-white" name="download" onClick={() => downloadSnapshot(image, index())} />*/}
+        {/*            <IconButton class="text-white" name="clear" onClick={() => clearImage(index())} />*/}
+        {/*          </div>*/}
+        {/*        </div>*/}
+        {/*      </div>*/}
+        {/*    )}*/}
+        {/*  </For>*/}
+        {/*  {snapshot().fetching && (*/}
+        {/*    <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">*/}
+        {/*      <div class="p-4">*/}
+        {/*        <div>Loading snapshots...</div>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*  {snapshot().error && (*/}
+        {/*    <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">*/}
+        {/*      <div class="flex items-center p-4">*/}
+        {/*        <IconButton class="text-white" name="clear" onClick={clearError} />*/}
+        {/*        <span>Error: {snapshot().error}</span>*/}
+        {/*      </div>*/}
+        {/*    </div>*/}
+        {/*  )}*/}
+        {/*</div>*/}
         <RouteList dongleId={props.dongleId} />
       </div>
     </>
