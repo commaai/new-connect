@@ -14,6 +14,7 @@ import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
+import PullDownReload from '../components/PullDownReload'
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
 
@@ -122,6 +123,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
+        <PullDownReload />
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
