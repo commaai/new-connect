@@ -176,9 +176,9 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        {/*<Show when={props.events} fallback={<div class="skeleton-loader size-full"></div>}>*/}
+        <Show when={props.events} fallback={<div class="skeleton-loader size-full"></div>}>
           {renderTimelineEvents(props.route, props.events)}
-        {/*</Show>*/}
+        </Show>
         <div
           class="absolute top-0 z-10 h-full"
           style={{

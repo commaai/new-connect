@@ -41,11 +41,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [timeline, setTimeline] = createSignal<TimelineStatistics | undefined>(undefined);
   // const [startTime, setStartTime] = createSignal<TimelineStatistics | undefined>(undefined);
   createEffect(() => {
-    // if (route.loading) {
-    //   setEvents(undefined);
-    //   setTimeline(undefined);
-    //   return
-    // }
+    if (route.loading) {
+      setEvents(undefined);
+      setTimeline(undefined);
+      return
+    }
 
     const r = route.latest;
     if (r && !route.loading) { // TODO: check route.latest?
@@ -142,7 +142,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
             <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
           {/*</Suspense>*/}
           {/*<Suspense fallback={<div class="skeleton-loader min-h-48" />}>*/}
-          {/*<Show when={events()} fallback={<div> dummy!</div>}>*/}
+          {/*<Show when={events()} fallback={<div class="skeleton-loader min-h-12" />}>*/}
             <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
           {/*</Show>*/}
           {/*</Suspense>*/}
