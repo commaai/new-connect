@@ -120,7 +120,7 @@
      * fill visible viewport
      * https://developers.google.com/web/updates/2016/12/url-bar-resizing
      */
-    @apply h-full overflow-hidden;
+    @apply h-full;
   }
 
   ::-webkit-scrollbar {
