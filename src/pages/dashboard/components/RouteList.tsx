@@ -32,12 +32,9 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
         headline={
-          <div class="flex gap-2">
-            <span>{startTime().format('ddd, MMM D, YYYY')}</span>&middot;
-            <span>
-              {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-            </span>
-          </div>
+          <span>
+            {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
+          </span>
         }
         subhead={<Suspense>{location()}</Suspense>}
         trailing={
@@ -103,6 +100,28 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
     }
   })
 
+  // Group and display headers for each day
+  let prevDayHeader: string | null = null
+  function getDayHeader(route: RouteSegments): string | null {
+    const date = dayjs(route.start_time_utc_millis)
+    let dayHeader = null
+    if (date.isSame(dayjs(), 'day')) {
+      dayHeader = `Today – ${date.format('dddd, MMM D')}`
+    } else if (date.isSame(dayjs().subtract(1, 'day'), 'day')) {
+      dayHeader = `Yesterday – ${date.format('dddd, MMM D')}`
+    } else if (date.year() === dayjs().year()) {
+      dayHeader = date.format('dddd, MMM D')
+    } else {
+      dayHeader = date.format('dddd, MMM D, YYYY')
+    }
+
+    if (dayHeader !== prevDayHeader) {
+      prevDayHeader = dayHeader
+      return dayHeader
+    }
+    return null
+  }
+
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <For each={pageNumbers()}>
@@ -114,7 +133,23 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
               }
             >
-              <For each={routes()}>{(route) => <RouteCard route={route} />}</For>
+              <For each={routes()}>
+                {(route) => {
+                  const firstHeader = prevDayHeader === null
+                  const dayHeader = getDayHeader(route)
+                  return (
+                    <>
+                      <Show when={dayHeader}>
+                        <Show when={!firstHeader}>
+                          <div class="6 w-full" />
+                        </Show>
+                        <h2 class="px-4 text-xl font-bold">{dayHeader}</h2>
+                      </Show>
+                      <RouteCard route={route} />
+                    </>
+                  )
+                }}
+              </For>
             </Suspense>
           )
         }}
