@@ -1,4 +1,4 @@
-import { createEffect, createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -110,10 +110,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
       startTime: parts[2] ? Number(parts[2]) : 0,
       endTime: parts[3] ? Number(parts[3]) : undefined,
     }
-  })
-
-  createEffect(() => {
-    console.log("URL State:", urlState())
   })
 
   const [devices] = createResource(getDevices, { initialValue: [] })
