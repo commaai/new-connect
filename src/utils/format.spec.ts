@@ -60,4 +60,9 @@ describe('dateToGradient', () => {
     expect(dateToGradient(new Date('2025-02-01T12:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
     expect(dateToGradient(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
   })
+
+  it('should fail to generate gradients', () => {
+    expect(() => dateToGradient(new Date('2025-02-01T00:00:00.000Z'), '#fcd', '#38f')).toThrow()
+    expect(() => dateToGradient(new Date('2025-02-01T00:00:00.000Z'), '#fcd', '#38f')).toThrow()
+  })
 })
