@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createMemo, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -39,7 +39,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     { initialValue: state.currentRoute },
   )
 
-  const startTime = () => dayjs(route()?.start_time)?.format('ddd, MMM D, YYYY')
+  const startTime = createMemo(() => {
+    if (!route.latest) return ''
+    return dayjs(route.latest.start_time)?.format('ddd, MMM D, YYYY')
+  })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(
