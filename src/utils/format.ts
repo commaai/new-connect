@@ -89,7 +89,7 @@ const rgbToHex = (rgb: [number, number, number]): string => '#' + rgb.map((v) =>
 
 const blend = (a: number, b: number, mix: number): number => Math.round(a * mix + b * (1 - mix))
 
-export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 9): string => {
+export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 9, power = 6): string => {
   const [r1, g1, b1] = hexToRgb(colorA)
   const [r2, g2, b2] = hexToRgb(colorB)
 
@@ -100,7 +100,9 @@ export const dateToGradient = (date: Date, colorA: string, colorB: string, cente
 
   // cosine smooths transition between colorA and colorB
   const theta = t * 2 * Math.PI
-  const mix = (1 + Math.cos(theta)) / 2
+  const baseMix = (1 + Math.cos(theta)) / 2
+  // raise to power to make transition more pronounced
+  const mix = baseMix ** power / (baseMix ** power + (1 - baseMix) ** power)
 
   return rgbToHex([blend(r1, r2, mix), blend(g1, g2, mix), blend(b1, b2, mix)])
 }
