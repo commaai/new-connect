@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, on, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -27,6 +27,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
+  const initialSeekTime = () => props.startTime
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
@@ -42,12 +43,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     if (video) video.currentTime = newTime
   }
 
-  createEffect(
-    on(routeName, () => {
-      setSeekTime(props.startTime)
-      onTimelineChange(props.startTime)
-    }),
-  )
+  createEffect(() => {
+    routeName() // track changes
+    setSeekTime(initialSeekTime())
+    onTimelineChange(initialSeekTime())
+  })
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
