@@ -1,4 +1,4 @@
-import { createResource, Match, Switch } from 'solid-js'
+import { createEffect, createResource, Match, Switch } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -55,6 +55,10 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
   const [coords] = createResource(() => props.route, getCoords)
   const [url] = createResource(coords, getStaticMapUrl)
   const [loadedUrl] = createResource(url, loadImage)
+
+  createEffect(() => {
+    console.log('coords', coords(), url(), loadedUrl())
+  })
 
   return (
     <div class={clsx('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>

@@ -39,6 +39,11 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     { initialValue: state.currentRoute },
   )
 
+  createEffect(() => {
+    console.log('routeName', routeName())
+    console.log('route', route.latest, route())
+  })
+
   const startTime = createMemo(() => {
     if (!route.latest) return ''
     return dayjs(route.latest.start_time)?.format('ddd, MMM D, YYYY')
@@ -80,6 +85,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   createEffect(() => {
     if (!device() || !profile() || (!device()!.is_owner && !profile()!.superuser)) return
     setRouteViewed(device()!.dongle_id, props.dateStr)
+  })
+
+  createEffect(() => {
+    console.log('route', route.latest, route())
   })
 
   return (
