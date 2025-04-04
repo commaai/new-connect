@@ -145,6 +145,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </div>
           <Show when={isDeviceUser()}>
+            <div class="flex items-center justify-between p-4 pb-0">
+              <span class="text-label-md uppercase">All Time</span>
+            </div>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
