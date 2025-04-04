@@ -148,8 +148,12 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  <Match when={currentRoute !== undefined && urlState().dateStr !== undefined}>
-                    <RouteActivity dongleId={dongleId} dateStr={urlState().dateStr!} startTime={urlState().startTime} />
+                  <Match when={currentRoute || urlState().dateStr}>
+                    <RouteActivity
+                      dongleId={dongleId}
+                      dateStr={urlState().dateStr ?? currentRoute!.fullname.split('|')[1]}
+                      startTime={urlState().startTime}
+                    />
                   </Match>
                 </Switch>
               }
