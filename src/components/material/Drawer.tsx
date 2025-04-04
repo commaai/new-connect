@@ -52,7 +52,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
           width: `${drawerWidth()}px`,
         }}
       >
-        <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
+        <div class="flex size-full flex-col rounded-r-lg bg-surface-container text-on-surface-variant sm:rounded-r-none">
           {props.drawer}
         </div>
       </nav>

@@ -165,14 +165,14 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
   return (
     <div class="relative">
-      <div ref={mapRef} class="h-[240px] w-full !bg-surface-container-low" />
+      <div ref={mapRef} class="h-[240px] w-full !bg-surface-container" />
 
       <Show when={!userPosition() && !showSelectedLocation()}>
         <div class="absolute bottom-2 right-2 z-[9999]">
           <Button
             title="Show your current location"
             color="secondary"
-            class="bg-surface-container-low text-on-surface-variant"
+            class="bg-surface-container text-on-surface-variant"
             onClick={() => void requestUserLocation()}
             trailing={<span class="pr-2 text-sm">Show my location</span>}
           >

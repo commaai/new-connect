@@ -122,7 +122,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
-        <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
+        <div class="h-min overflow-hidden rounded-lg bg-surface-container">
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
@@ -164,7 +164,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <For each={snapshot().images}>
             {(image, index) => (
-              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container">
                 <div class="relative p-4">
                   <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
                   <div class="absolute right-4 top-4 p-4">
@@ -176,14 +176,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             )}
           </For>
           {snapshot().fetching && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container">
               <div class="p-4">
                 <div>Loading snapshots...</div>
               </div>
             </div>
           )}
           {snapshot().error && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container">
               <div class="flex items-center p-4">
                 <IconButton class="text-white" name="clear" onClick={clearError} />
                 <span>Error: {snapshot().error}</span>
