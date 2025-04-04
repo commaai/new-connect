@@ -166,10 +166,12 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       <Show when={videoLoading()}>
         <div class="absolute inset-0 z-0 skeleton-loader" />
       </Show>
+
+      {/* Error message */}
       <Show when={isErrored()}>
-        <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-2">
-        <IconButton name="error" />
-        <span class="w-[66%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
+        <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1">
+          <IconButton name="error" />
+          <span class="w-[90%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
         </div>
       </Show>
 
