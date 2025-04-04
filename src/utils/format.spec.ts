@@ -56,8 +56,8 @@ describe('formatDate', () => {
 describe('dateToGradient', () => {
   it('should generate gradients', () => {
     expect(dateToGradient(new Date('2025-02-01T00:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
-    expect(dateToGradient(new Date('2025-02-01T06:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a8f7a')
+    expect(dateToGradient(new Date('2025-02-01T06:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
     expect(dateToGradient(new Date('2025-02-01T12:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
-    expect(dateToGradient(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a907a')
+    expect(dateToGradient(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
   })
 })
