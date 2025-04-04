@@ -83,6 +83,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
     props.ref?.(video)
 
+    controls.addEventListener('click', onClick)
     video.addEventListener('timeupdate', onTimeUpdate)
     video.addEventListener('loadedmetadata', onLoadedMetadata)
     video.addEventListener('play', onPlay)
@@ -92,6 +93,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('loadeddata', onLoadedData)
 
     onCleanup(() => {
+      controls.removeEventListener('click', onClick)
       video.removeEventListener('timeupdate', onTimeUpdate)
       video.removeEventListener('loadedmetadata', onLoadedMetadata)
       video.removeEventListener('play', onPlay)
@@ -102,11 +104,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       props.ref?.(video)
     })
 
-    createEffect(() => {
-      if (isErrored()) return
-      controls.addEventListener('click', onClick)
-      onCleanup(() => controls.removeEventListener('click', onClick))
-    })
+    // createEffect(() => {
+    //   if (isErrored()) return
+    //   controls.addEventListener('click', onClick)
+    //   onCleanup(() => controls.removeEventListener('click', onClick))
+    // })
 
     if ('MediaSource' in window) {
       import('~/utils/hls').then((Hls) => {

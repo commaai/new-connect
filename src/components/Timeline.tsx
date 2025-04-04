@@ -91,7 +91,6 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  interactive: boolean
   route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
@@ -151,20 +150,17 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       onStart()
     }
 
-    createEffect(() => {
-      if (props.interactive) {
-        ref.addEventListener('mousedown', onMouseDown)
-        ref.addEventListener('touchstart', onTouchStart)
-      }
-
-      onCleanup(() => {
-        ref.removeEventListener('mousedown', onMouseDown)
-        ref.removeEventListener('touchstart', onTouchStart)
-      })
+    ref.addEventListener('mousedown', onMouseDown)
+    ref.addEventListener('touchstart', onTouchStart)
+    onCleanup(() => {
+      ref.removeEventListener('mousedown', onMouseDown)
+      ref.removeEventListener('touchstart', onTouchStart)
     })
   })
 
-  createEffect(() => setMarkerOffsetPct((props.seekTime / duration()) * 100))
+  createEffect(() => {
+    setMarkerOffsetPct((props.seekTime / duration()) * 100)
+  })
 
   return (
     <div class="flex flex-col">
@@ -174,8 +170,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       <div
         ref={ref!}
         class={clsx(
-          'relative isolate flex h-8 touch-none self-stretch rounded-b-md bg-blue-900',
-          props.interactive && 'cursor-pointer',
+          'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
           'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
           props.class,
         )}
