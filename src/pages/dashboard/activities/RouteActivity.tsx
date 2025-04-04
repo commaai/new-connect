@@ -1,4 +1,4 @@
-import {createResource, createSignal, Suspense, type VoidComponent} from 'solid-js'
+import { createResource, createSignal, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
