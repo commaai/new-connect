@@ -27,9 +27,9 @@ export const formatDistance = (miles: number | undefined): string | undefined =>
 
 const _formatDuration = (duration: Duration): string => {
   if (duration.hours() > 0) {
-    return duration.format('H[h] m[m]')
+    return duration.format('H [hr], m [min]')
   } else {
-    return duration.format('m[m]')
+    return duration.format('m [min]')
   }
 }
 
@@ -55,12 +55,6 @@ export const getRouteDuration = (route: Route | undefined): Duration | undefined
   const startTime = dayjs(route.start_time)
   const endTime = dayjs(route.end_time)
   return dayjs.duration(endTime.diff(startTime))
-}
-
-export const formatRouteDuration = (route: Route | undefined): string => {
-  if (!route) return ''
-  const duration = getRouteDuration(route)
-  return duration ? _formatDuration(duration) : ''
 }
 
 const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
