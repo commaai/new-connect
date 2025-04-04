@@ -20,18 +20,25 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
 
-  const [isErrored, setErrored] = createSignal(false)
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
+  const [isErrored, setErrored] = createSignal(false)
 
   createEffect(() => {
     props.routeName // track changes
     setVideoLoading(true)
   })
 
-  const onLoadedData = () => setVideoLoading(false)
+  const onLoadedData = () => {
+    setVideoLoading(false)
+    setErrored(false)
+  }
+  const onError = () => {
+    setErrored(true)
+    setVideoLoading(false)
+  }
   const updateProgress = () => props.onProgress?.(video.currentTime)
   const updateProgressContinuously = () => {
     if (!video || video.paused) return
@@ -57,10 +64,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onTimeUpdate = (e: Event) => {
     setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
-  }
-  const onError = () => {
-    setErrored(true)
-    setVideoLoading(false)
   }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
@@ -89,6 +92,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('ended', onEnded)
     video.addEventListener('stalled', onStalled)
     video.addEventListener('loadeddata', onLoadedData)
+    video.addEventListener('error', onError)
 
     onCleanup(() => {
       controls.removeEventListener('click', onClick)
@@ -99,25 +103,25 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.removeEventListener('ended', onEnded)
       video.removeEventListener('stalled', onStalled)
       video.removeEventListener('loadeddata', onLoadedData)
+      video.removeEventListener('error', onError)
       props.ref?.(video)
     })
 
     if ('MediaSource' in window) {
       import('~/utils/hls').then((Hls) => {
         const player = Hls.createHls()
-
-        const { Events, ErrorTypes } = Hls.default
-        player.on(Events.ERROR, (_, data) => {
-          if (!data.fatal) return
-          if (data.type === ErrorTypes.NETWORK_ERROR) onError()
-        })
         player.attachMedia(video)
         setHls(player)
+
+        // Hls error handler
+        const { Events, ErrorTypes } = Hls.default
+        player.on(Events.ERROR, (_, data) => {
+          if (data.fatal && data.type === ErrorTypes.NETWORK_ERROR) onError()
+        })
       })
       onCleanup(() => hls()?.destroy())
     } else {
       setHls(null)
-      video.onerror = onError
       if (!video.canPlayType('application/vnd.apple.mpegurl')) {
         console.error('Browser does not support Media Source Extensions API')
       }
@@ -125,10 +129,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   })
 
   createEffect(() => {
-    setDuration(0)
-    setErrored(false)
-    setVideoLoading(true)
-
     const url = streamUrl()
     const player = hls()
     if (!url || player === undefined) return

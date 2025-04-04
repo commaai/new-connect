@@ -42,12 +42,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     if (video) video.currentTime = newTime
   }
 
-  createEffect(() => {
-    routeName() // track changes
-    setSeekTime(props.startTime)
-    onTimelineChange(props.startTime)
-  })
-
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
   createResource(
