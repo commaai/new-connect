@@ -40,7 +40,7 @@ const State = (props: {
 }) => {
   return (
     <div class={clsx('absolute flex size-full items-center justify-center gap-2', props.opaque && 'bg-surface text-on-surface')}>
-      <span class="text-label-sm">{props.children}</span>
+      <span class="text-label-md">{props.children}</span>
       {props.trailing}
     </div>
   )
@@ -62,7 +62,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
         <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon name="error" filled />}>Problem loading map</State>
         </Match>
-        <Match when={coords()?.length === 0} keyed>
+        <Match when={coords()?.length === 0 || true} keyed>
           <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
         </Match>
         <Match when={url() && loadedUrl()} keyed>
