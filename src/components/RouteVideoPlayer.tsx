@@ -10,7 +10,6 @@ type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   startTime: number
-  onEvent?: (event: 'load' | 'error') => void
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
 }
@@ -62,7 +61,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onError = () => {
     setErrored(true)
     setVideoLoading(false)
-    props.onEvent?.('error')
   }
   const onLoadedMetadata = () => setDuration(video.duration)
   const onPlay = () => {
@@ -104,12 +102,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       props.ref?.(video)
     })
 
-    // createEffect(() => {
-    //   if (isErrored()) return
-    //   controls.addEventListener('click', onClick)
-    //   onCleanup(() => controls.removeEventListener('click', onClick))
-    // })
-
     if ('MediaSource' in window) {
       import('~/utils/hls').then((Hls) => {
         const player = Hls.createHls()
@@ -145,8 +137,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     } else {
       video.src = url
     }
-
-    props.onEvent?.('load')
   })
 
   return (
