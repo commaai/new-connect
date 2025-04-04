@@ -9,7 +9,6 @@ import type Hls from '~/utils/hls'
 type RouteVideoPlayerProps = {
   class?: string
   routeName: string
-  startTime: number
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
   selection: { startTime: number; endTime: number | undefined }
@@ -61,12 +60,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     const current = (e.currentTarget as HTMLVideoElement).currentTime
     setCurrentTime(current)
     if (current < props.selection.startTime) {
-      // video.pause()
       video.currentTime = props.selection.startTime
     }
     if (props.selection.endTime !== undefined) {
-      if (current >= props.selection.endTime) {
-        // video.pause()
+      if (current > props.selection.endTime) {
+        // video.currentTime = Math.min(props.selection.startTime, duration())
         video.currentTime = props.selection.startTime
       }
     }
@@ -94,12 +92,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   onMount(() => {
-    // if (!Number.isNaN(props.startTime)) {
-    //   video.currentTime = props.startTime
-    // }
-
-    if (!Number.isNaN(props.selection.startTime)) {  // TODO: it should always be a number
-      video.currentTime = props.startTime
+    if (props.selection.startTime > 0) {
+      video.currentTime = props.selection.startTime
     }
 
     props.ref?.(video)
