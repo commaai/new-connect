@@ -27,7 +27,7 @@ export const formatDistance = (miles: number | undefined): string | undefined =>
 
 const _formatDuration = (duration: Duration): string => {
   if (duration.hours() > 0) {
-    return duration.format('H [hr], m [min]')
+    return duration.format('H [hr] m [min]')
   } else {
     return duration.format('m [min]')
   }
