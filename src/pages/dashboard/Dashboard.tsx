@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, SuspenseList, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -93,10 +93,8 @@ const DashboardLayout: Component<{
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
-        <SuspenseList revealOrder="forwards">
-          <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
-          <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
-        </SuspenseList>
+        <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
+        <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
       </div>
     </div>
   )

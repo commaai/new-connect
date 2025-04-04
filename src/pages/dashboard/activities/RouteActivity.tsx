@@ -69,23 +69,23 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm uppercase">Route Info</h3>
+          <h3 class="text-label-md uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route.latest} timeline={timeline.latest} />
+            <RouteStatistics class="p-5" route={route.latest} timeline={timeline()} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm uppercase">Upload Files</h3>
+          <h3 class="text-label-md uppercase">Upload Files</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteUploadButtons route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <h3 class="text-label-sm uppercase">Route Map</h3>
+          <h3 class="text-label-md uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
             <RouteStaticMap route={route()} />
           </div>
