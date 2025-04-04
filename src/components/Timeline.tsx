@@ -167,16 +167,16 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       <div class="h-1 bg-surface-container-high">
         <div class="h-full bg-white" style={{ width: `calc(${markerOffsetPct()}% + 1px)` }} />
       </div>
-      <div
-        ref={ref!}
-        class={clsx(
-          'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
-          'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
-          props.class,
-        )}
-        title="Disengaged"
-      >
-        <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">
+      <div class="relative">
+        <div
+          ref={ref!}
+          class={clsx(
+            'overflow-hidden relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
+            'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
+            props.class,
+          )}
+          title="Disengaged"
+        >
           <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.route, props.events)}</Suspense>
         </div>
         <div
