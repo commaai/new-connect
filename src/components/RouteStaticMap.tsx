@@ -62,7 +62,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
         <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon name="error" filled />}>Problem loading map</State>
         </Match>
-        <Match when={coords()?.length === 0 || true} keyed>
+        <Match when={coords()?.length === 0} keyed>
           <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
         </Match>
         <Match when={url() && loadedUrl()} keyed>
