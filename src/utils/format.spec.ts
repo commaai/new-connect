@@ -14,11 +14,11 @@ describe('formatDistance', () => {
 
 describe('formatDuration', () => {
   it('should format duration', () => {
-    expect(formatDuration(0)).toBe('0m')
-    expect(formatDuration(12)).toBe('12m')
-    expect(formatDuration(12.34)).toBe('12m')
-    expect(formatDuration(90)).toBe('1h 30m')
-    expect(formatDuration(120)).toBe('2h 0m')
+    expect(formatDuration(0)).toBe('0 min')
+    expect(formatDuration(12)).toBe('12 min')
+    expect(formatDuration(12.34)).toBe('12 min')
+    expect(formatDuration(90)).toBe('1 hr 30 min')
+    expect(formatDuration(120)).toBe('2 hr 0 min')
   })
   it('should be undefined for undefined duration', () => {
     expect(formatDuration(undefined)).toBe(undefined)
