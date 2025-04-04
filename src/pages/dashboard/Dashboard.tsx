@@ -20,6 +20,7 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import { useAppContext } from '~/AppContext'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -111,6 +112,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
+  const [{ currentRoute }] = useAppContext()
+
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
@@ -145,8 +148,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  <Match when={urlState().dateStr} keyed>
-                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} />}
+                  <Match when={currentRoute !== undefined && urlState().dateStr !== undefined}>
+                    <RouteActivity dongleId={dongleId} dateStr={urlState().dateStr!} startTime={urlState().startTime} />
                   </Match>
                 </Switch>
               }

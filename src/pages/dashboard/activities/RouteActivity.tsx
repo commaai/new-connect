@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createMemo, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -15,6 +15,7 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { useAppContext } from '~/AppContext'
 
 type RouteActivityProps = {
   dongleId: string
@@ -23,19 +24,34 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
+  const [{ currentRoute, currentEvents, currentTimelineStatistics, currentDevice }] = useAppContext()
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
+  const [route] = createResource(routeName, () => {
+    if (currentRoute) return currentRoute
+    return getRoute(props.dateStr)
+  })
+
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [timeline] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateTimelineStatistics(r, e),
+  const [events] = createResource(
+    route,
+    () => {
+      if (currentEvents) return currentEvents
+      if (!route()) return []
+      return getTimelineEvents(route()!)
+    },
+    { initialValue: [] },
   )
+
+  const timeline = createMemo(() => {
+    if (currentTimelineStatistics) return currentTimelineStatistics
+    if (!route() || !events()) return undefined
+    return generateTimelineStatistics(route(), events())
+  })
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -48,15 +64,19 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     onTimelineChange(props.startTime)
   })
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
-  createResource(
-    () => [device(), profile(), props.dateStr] as const,
-    async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
+  const [device] = createResource(
+    () => props.dongleId,
+    () => {
+      if (currentDevice) return currentDevice
+      return getDevice(props.dongleId)
     },
   )
+
+  const [profile] = createResource(getProfile)
+  createEffect(() => {
+    if (!device() || !profile() || (!device()!.is_owner && !profile()!.superuser)) return
+    setRouteViewed(device()!.dongle_id, props.dateStr)
+  })
 
   return (
     <>
