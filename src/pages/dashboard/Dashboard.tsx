@@ -149,7 +149,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
                   <Match when={urlState().dateStr} keyed>
-                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />}
+                    {(dateStr) => (
+                      <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />
+                    )}
                   </Match>
                 </Switch>
               }

@@ -77,10 +77,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           {/*{props.endTime !== undefined && (*/}
           <Show when={selection().endTime !== undefined}>
             <div class="flex items-center justify-center text-center text-sm text-gray-600 mt-2">
-              <A class="relative isolate overflow-hidden" href={`/${props.dongleId}/${props.dateStr}`}>
+              <A href={`/${props.dongleId}/${props.dateStr}`}>
                 <IconButton name="close_small" />
               </A>
-                You're viewing a section of the route.
+              You're viewing a section of the route.
             </div>
           </Show>
           {/*// )}*/}
