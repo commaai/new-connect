@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createEffect, createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -112,10 +112,15 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [{ currentRoute }] = useAppContext()
+  const [state, { setCurrentProfile, setCurrentDevice }] = useAppContext()
 
   const [devices] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
+
+  createEffect(() => {
+    if (profile.latest) setCurrentProfile(profile.latest)
+    if (devices.latest && urlState().dongleId) setCurrentDevice(devices.latest.find((device) => device.dongle_id === urlState().dongleId)!)
+  })
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -148,10 +153,10 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  <Match when={currentRoute || urlState().dateStr}>
+                  <Match when={state.currentRoute || urlState().dateStr}>
                     <RouteActivity
                       dongleId={dongleId}
-                      dateStr={urlState().dateStr ?? currentRoute!.fullname.split('|')[1]}
+                      dateStr={urlState().dateStr ?? state.currentRoute!.fullname.split('|')[1]}
                       startTime={urlState().startTime}
                     />
                   </Match>

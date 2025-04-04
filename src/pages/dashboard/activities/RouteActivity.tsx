@@ -24,25 +24,34 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [{ currentRoute }] = useAppContext()
+  const [state] = useAppContext()
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  createEffect(() => {
-    if (currentRoute) {
-      console.log('currentRoute', currentRoute)
-    }
-  })
-  const [route] = createResource(routeName, getRoute, { initialValue: currentRoute })
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+
+  const [route] = createResource(
+    routeName,
+    () => {
+      if (state.currentRoute) return state.currentRoute
+      return getRoute(routeName())
+    },
+    { initialValue: state.currentRoute },
+  )
+
+  const startTime = () => dayjs(route()?.start_time)?.format('ddd, MMM D, YYYY')
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [timeline] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateTimelineStatistics(r, e),
+  const [events] = createResource(
+    route,
+    (route) => {
+      if (state.currentEvents) return state.currentEvents
+      return getTimelineEvents(route)
+    },
+    { initialValue: state.currentEvents ?? [] },
   )
+
+  const timeline = () => generateTimelineStatistics(route(), events() ?? [])
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -55,15 +64,20 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     onTimelineChange(props.startTime)
   })
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
-  createResource(
-    () => [device(), profile(), props.dateStr] as const,
-    async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
+  const [device] = createResource(
+    () => props.dongleId,
+    (dongleId) => {
+      if (state.currentDevice) return state.currentDevice
+      return getDevice(dongleId)
     },
+    { initialValue: state.currentDevice },
   )
+
+  const [profile] = createResource(getProfile, { initialValue: state.currentProfile })
+  createEffect(() => {
+    if (!device() || !profile() || (!device()!.is_owner && !profile()!.superuser)) return
+    setRouteViewed(device()!.dongle_id, props.dateStr)
+  })
 
   return (
     <>

@@ -48,10 +48,13 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   })
 
   const setRoute = () => {
-    console.log('setting route', props.route)
-    setCurrentRoute(props.route)
-    setCurrentEvents(events() ?? [])
-    setCurrentTimelineStatistics(timeline() ?? undefined)
+    const route = props.route
+    const e = events() ?? []
+    const t = timeline() ?? undefined
+    console.log('setting route', route, e, t)
+    setCurrentRoute(route)
+    setCurrentEvents(e)
+    setCurrentTimelineStatistics(t)
   }
 
   return (
@@ -60,6 +63,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
       activeClass="md:before:bg-primary"
       onHover={setRoute}
+      onClick={setRoute} // probably not needed
     >
       <CardHeader
         headline={

@@ -1,19 +1,21 @@
 import { createContext, JSX, useContext } from 'solid-js'
 import { createStore } from 'solid-js/store'
-import { Device, Route } from './api/types'
+import { Device, Profile, Route } from './api/types'
 import { TimelineEvent, TimelineStatistics } from './api/derived'
 
 interface AppState {
   currentDevice: Device | undefined
-  currentRoute: Route | undefined
   currentEvents: TimelineEvent[] | undefined
+  currentProfile: Profile | undefined
+  currentRoute: Route | undefined
   currentTimelineStatistics: TimelineStatistics | undefined
 }
 
 const INITIAL_STATE: AppState = {
   currentDevice: undefined,
-  currentRoute: undefined,
   currentEvents: undefined,
+  currentProfile: undefined,
+  currentRoute: undefined,
   currentTimelineStatistics: undefined,
 }
 
@@ -23,6 +25,7 @@ export const AppContext = createContext([
     setCurrentDevice: (_device: Device) => {},
     setCurrentRoute: (_route: Route) => {},
     setCurrentEvents: (_events: TimelineEvent[]) => {},
+    setCurrentProfile: (_profile: Profile) => {},
     setCurrentTimelineStatistics: (_timelineStatistics: TimelineStatistics | undefined) => {},
   },
 ] as const)
@@ -36,6 +39,7 @@ export const AppContextProvider = (props: { children: JSX.Element }) => {
       setCurrentDevice: (device: Device) => setState('currentDevice', device),
       setCurrentRoute: (route: Route) => setState('currentRoute', route),
       setCurrentEvents: (events: TimelineEvent[]) => setState('currentEvents', events),
+      setCurrentProfile: (profile: Profile) => setState('currentProfile', profile),
       setCurrentTimelineStatistics: (timelineStatistics: TimelineStatistics | undefined) =>
         setState('currentTimelineStatistics', timelineStatistics),
     },
