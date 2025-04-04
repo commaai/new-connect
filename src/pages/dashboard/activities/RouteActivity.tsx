@@ -1,4 +1,4 @@
-import { createResource, createSignal, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -81,7 +81,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-md uppercase">Route Map</h3>
           <div class="aspect-square overflow-hidden rounded-lg">
-            <RouteStaticMap route={route()} />
+            <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
+              <RouteStaticMap route={route()} />
+            </Suspense>
           </div>
         </div>
       </div>
