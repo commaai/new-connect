@@ -28,7 +28,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer hover:elevation-1 hover:opacity-80 inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
+        'state-layer hover:elevation-1 inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
         colorClasses(),
         disabled() && 'cursor-not-allowed opacity-50',
         !disabled() && 'hover:opacity-80',
