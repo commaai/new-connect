@@ -77,3 +77,32 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
 }
+
+const hexToRgb = (hex: string): [number, number, number] => {
+  hex = hex.replace('#', '')
+  if (hex.length !== 6) throw new Error('Invalid hex color')
+  const [r, g, b] = [parseInt(hex.slice(0, 2), 16), parseInt(hex.slice(2, 4), 16), parseInt(hex.slice(4, 6), 16)]
+  return [r, g, b]
+}
+
+const rgbToHex = (rgb: [number, number, number]): string => '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('')
+
+const blendChannel = (a: number, b: number, mix: number): number => Math.round(a * mix + b * (1 - mix))
+
+export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 9): string => {
+  const [r1, g1, b1] = hexToRgb(colorA)
+  const [r2, g2, b2] = hexToRgb(colorB)
+
+  const hours = date.getHours() + date.getMinutes() / 60
+
+  // normalize time so that centerHour is 0 and wraps around 24 hours
+  const t = ((hours - centerHour + 24) % 24) / 24
+
+  // cosine smooths transition between colorA and colorB
+  const theta = t * 2 * Math.PI
+  const mix = (1 + Math.cos(theta)) / 2
+
+  const rgb: [number, number, number] = [blendChannel(r1, r2, mix), blendChannel(g1, g2, mix), blendChannel(b1, b2, mix)]
+
+  return rgbToHex(rgb)
+}
