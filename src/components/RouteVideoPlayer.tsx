@@ -26,11 +26,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [isErrored, setErrored] = createSignal(false)
 
-  createEffect(() => {
-    props.routeName // track changes
-    setVideoLoading(true)
-  })
-
   const onLoadedData = () => {
     setVideoLoading(false)
     setErrored(false)
@@ -126,6 +121,13 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         console.error('Browser does not support Media Source Extensions API')
       }
     }
+  })
+
+  // State reset on route change
+  createEffect(() => {
+    props.routeName // track changes
+    setVideoLoading(true)
+    setErrored(false)
   })
 
   createEffect(() => {
