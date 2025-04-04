@@ -23,8 +23,7 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const initialSeekTime = () => props.startTime
-  const [seekTime, setSeekTime] = createSignal(initialSeekTime())
+  const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
@@ -45,8 +44,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   createEffect(() => {
     routeName() // track changes
-    setSeekTime(initialSeekTime())
-    onTimelineChange(initialSeekTime())
+    setSeekTime(props.startTime)
+    onTimelineChange(props.startTime)
   })
 
   const [device] = createResource(() => props.dongleId, getDevice)
