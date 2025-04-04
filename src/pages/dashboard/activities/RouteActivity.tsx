@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { Show, createMemo, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -15,6 +15,7 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
   dongleId: string
@@ -31,7 +32,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  const selection = { startTime: props.startTime, endTime: props.endTime }
+  const selection = createMemo(() => ({ startTime: props.startTime, endTime: props.endTime }))
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
@@ -67,8 +68,22 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          {/*{props.endTime !== undefined && (*/}
+          {/*<div class="text-center text-sm text-gray-600 mt-2">You're viewing a route section. <A href={`/${props.dongleId}/${props.dateStr}/${props.startTime}`} class="ml-1">X</A></div>*/}
+          {/*)}*/}
+
+          {/*{props.endTime !== undefined && (*/}
+          <Show when={selection().endTime !== undefined} fallback={<span>Click and drag to select a section</span>}>
+            <div class="flex items-center justify-center text-center text-sm text-gray-600 mt-2">
+              <A class="relative isolate overflow-hidden" href={`/${props.dongleId}/${props.dateStr}`}>
+                <IconButton name="close_small" />
+              </A>
+                You're viewing a section of the route.
+            </div>
+          </Show>
+          {/*// )}*/}
         </div>
 
         <div class="flex flex-col gap-2">
