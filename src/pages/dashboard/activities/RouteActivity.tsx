@@ -35,7 +35,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents)
+  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
     () => [route(), events()] as const,
     ([r, e]) => generateTimelineStatistics(r, e),

@@ -1,8 +1,8 @@
-import { VoidComponent, createEffect } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 
 import type { TimelineStatistics } from '~/api/derived'
 import type { Route } from '~/api/types'
-import { formatDistance, formatRouteDuration, formatDuration, getRouteDuration } from '~/utils/format'
+import { formatDistance, formatRouteDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
 
 const formatEngagement = (timeline: TimelineStatistics | undefined): string | undefined => {
@@ -12,9 +12,6 @@ const formatEngagement = (timeline: TimelineStatistics | undefined): string | un
 }
 
 const RouteStatistics: VoidComponent<{ class?: string; route: Route | undefined; timeline: TimelineStatistics | undefined }> = (props) => {
-  createEffect(() => {
-    console.log("timeline", props.timeline)
-  })
   return (
     <StatisticBar
       class={props.class}
