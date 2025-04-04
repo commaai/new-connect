@@ -49,7 +49,7 @@ export async function getPlaceName(position: Position): Promise<string | null> {
   } = feature
   return (
     [
-      context.street?.name,
+      // context.street?.name,
       context.neighborhood?.name,
       context.place?.name,
       context.locality?.name,
