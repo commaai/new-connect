@@ -57,6 +57,12 @@ export const getRouteDuration = (route: Route | undefined): Duration | undefined
   return dayjs.duration(endTime.diff(startTime))
 }
 
+export const formatRouteDuration = (route: Route | undefined): string => {
+  if (!route) return ''
+  const duration = getRouteDuration(route)
+  return duration ? _formatDuration(duration) : ''
+}
+
 const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
   if (typeof input === 'number') {
     // Assume number is unix timestamp, convert to seconds
