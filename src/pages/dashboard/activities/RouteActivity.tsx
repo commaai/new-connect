@@ -65,7 +65,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <h3 class="text-label-md uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route.latest} timeline={timeline()} />
+            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>
