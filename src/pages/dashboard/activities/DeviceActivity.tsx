@@ -127,7 +127,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full" />}>
+            <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
                 <div
                   class={clsx(
