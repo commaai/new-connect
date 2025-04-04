@@ -15,6 +15,7 @@ type RouteVideoPlayerProps = {
 }
 
 const ERROR_MISSING_SEGMENT = 'This video segment has not uploaded yet or has been deleted.'
+const ERROR_UNSUPPORTED_BROWSER = 'This browser does not support Media Source Extensions API.'
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const routeName = () => props.routeName
@@ -132,6 +133,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       setHls(null)
       if (!video.canPlayType('application/vnd.apple.mpegurl')) {
         console.error('Browser does not support Media Source Extensions API')
+        setErrorMessage(ERROR_UNSUPPORTED_BROWSER)
       }
     }
   })
