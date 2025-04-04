@@ -72,12 +72,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
 
           <Show when={selection().endTime !== undefined}>
-            <div class="flex items-center justify-center text-center text-sm text-gray-600 mt-2">
-              <A href={`/${props.dongleId}/${props.dateStr}`}>
+              <A class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-2" href={`/${props.dongleId}/${props.dateStr}`}>
+                You're viewing a section of the route.
                 <IconButton name="close_small" />
               </A>
-              You're viewing a section of the route.
-            </div>
           </Show>
         </div>
 
