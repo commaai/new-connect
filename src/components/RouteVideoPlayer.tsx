@@ -57,15 +57,13 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   const onTimeUpdate = (e: Event) => {
-    const current = (e.currentTarget as HTMLVideoElement).currentTime
-    setCurrentTime(current)
+    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
 
     // If there is a selection, loop within it
-    if (current < props.selection.startTime) {
+    if (currentTime() < props.selection.startTime) {
       video.currentTime = props.selection.startTime
-    }
-    if (props.selection.endTime !== undefined) {
-      if (current > props.selection.endTime) {
+    } else if (props.selection.endTime !== undefined) {
+      if (currentTime() > props.selection.endTime) {
         video.currentTime = props.selection.startTime
       }
     }
