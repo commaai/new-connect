@@ -62,8 +62,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       class="max-w-none"
       href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
       activeClass="md:before:bg-primary"
-      onHover={setRoute}
-      onClick={setRoute} // probably not needed
+      onClick={setRoute}
     >
       <CardHeader
         headline={

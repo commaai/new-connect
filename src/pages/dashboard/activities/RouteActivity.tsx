@@ -33,7 +33,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(
     routeName,
     () => {
-      if (state.currentRoute) return state.currentRoute
+      if (state.currentRoute !== undefined) return state.currentRoute
       return getRoute(routeName())
     },
     { initialValue: state.currentRoute },
@@ -48,7 +48,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [events] = createResource(
     route,
     (route) => {
-      if (state.currentEvents) return state.currentEvents
+      if (state.currentEvents !== undefined) return state.currentEvents
       return getTimelineEvents(route)
     },
     { initialValue: state.currentEvents ?? [] },
@@ -70,7 +70,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [device] = createResource(
     () => props.dongleId,
     (dongleId) => {
-      if (state.currentDevice) return state.currentDevice
+      if (state.currentDevice !== undefined) return state.currentDevice
       return getDevice(dongleId)
     },
     { initialValue: state.currentDevice },
