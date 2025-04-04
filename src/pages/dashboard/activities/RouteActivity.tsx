@@ -1,4 +1,4 @@
-import { Show, createMemo, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -32,7 +32,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
-  const selection = createMemo(() => ({ startTime: props.startTime, endTime: props.endTime }))
+  const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
@@ -70,11 +70,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
-          {/*{props.endTime !== undefined && (*/}
-          {/*<div class="text-center text-sm text-gray-600 mt-2">You're viewing a route section. <A href={`/${props.dongleId}/${props.dateStr}/${props.startTime}`} class="ml-1">X</A></div>*/}
-          {/*)}*/}
 
-          {/*{props.endTime !== undefined && (*/}
           <Show when={selection().endTime !== undefined}>
             <div class="flex items-center justify-center text-center text-sm text-gray-600 mt-2">
               <A href={`/${props.dongleId}/${props.dateStr}`}>
@@ -83,7 +79,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
               You're viewing a section of the route.
             </div>
           </Show>
-          {/*// )}*/}
         </div>
 
         <div class="flex flex-col gap-2">
