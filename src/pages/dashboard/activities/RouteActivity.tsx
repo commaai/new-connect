@@ -73,7 +73,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
           <Show when={selection().endTime !== undefined}>
             <A
-              class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-2"
+              class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-3"
               href={`/${props.dongleId}/${props.dateStr}`}
             >
               You're viewing a section of the route.
