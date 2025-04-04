@@ -20,6 +20,7 @@ type RouteActivityProps = {
   dongleId: string
   dateStr: string
   startTime: number
+  endTime: number | undefined
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
@@ -29,6 +30,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+
+  // TODO: move this to dashboard?
+  const selection = { startTime: props.startTime, endTime: props.endTime }
+  console.log("selection", selection)
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
@@ -64,7 +69,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} selection={selection} />
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 

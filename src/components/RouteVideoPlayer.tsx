@@ -12,6 +12,7 @@ type RouteVideoPlayerProps = {
   startTime: number
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
+  selection: { startTime: number; endTime: number | undefined }
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
@@ -57,10 +58,30 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   const onTimeUpdate = (e: Event) => {
-    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
+    const current = (e.currentTarget as HTMLVideoElement).currentTime
+    setCurrentTime(current)
+    if (current < props.selection.startTime) {
+      // video.pause()
+      video.currentTime = props.selection.startTime
+    }
+    if (props.selection.endTime !== undefined) {
+      if (current >= props.selection.endTime) {
+        // video.pause()
+        video.currentTime = props.selection.startTime
+      }
+    }
+
+    // setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
     if (video.paused) updateProgress()
   }
-  const onLoadedMetadata = () => setDuration(video.duration)
+  const onLoadedMetadata = () => {
+    let duration = video.duration
+    // TODO still want to show the entire thing
+    // if (props.selection.endTime !== undefined) {
+    //   duration = props.selection.endTime - props.selection.startTime
+    // }
+    setDuration(duration)
+  }
   const onPlay = () => {
     setIsPlaying(true)
     startProgressTracking()
@@ -73,7 +94,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   onMount(() => {
-    if (!Number.isNaN(props.startTime)) {
+    // if (!Number.isNaN(props.startTime)) {
+    //   video.currentTime = props.startTime
+    // }
+
+    if (!Number.isNaN(props.selection.startTime)) {  // TODO: it should always be a number
       video.currentTime = props.startTime
     }
 

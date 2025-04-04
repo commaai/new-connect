@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createEffect, createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -108,7 +108,12 @@ const Dashboard: Component<RouteSectionProps> = () => {
       dongleId: parts[0] as string | undefined,
       dateStr: parts[1] as string | undefined,
       startTime: parts[2] ? Number(parts[2]) : 0,
+      endTime: parts[3] ? Number(parts[3]) : undefined,
     }
+  })
+
+  createEffect(() => {
+    console.log("URL State:", urlState())
   })
 
   const [devices] = createResource(getDevices, { initialValue: [] })
@@ -146,7 +151,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
                   <Match when={urlState().dateStr} keyed>
-                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} />}
+                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />}
                   </Match>
                 </Switch>
               }
