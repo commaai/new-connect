@@ -6,7 +6,7 @@ import { formatDistance, formatRouteDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
 
 const formatEngagement = (timeline: TimelineStatistics | undefined): string | undefined => {
-  if (!timeline) return undefined
+  if (!timeline || timeline.duration === 0) return undefined
   const { engagedDuration, duration } = timeline
   return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
 }
