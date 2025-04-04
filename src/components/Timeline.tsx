@@ -1,4 +1,4 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup } from 'solid-js'
+import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -176,7 +176,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        {renderTimelineEvents(props.route, props.events)}
+        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events)}</Suspense>
         <div
           class="absolute top-0 z-10 h-full"
           style={{
