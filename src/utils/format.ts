@@ -87,7 +87,7 @@ const hexToRgb = (hex: string): [number, number, number] => {
 
 const rgbToHex = (rgb: [number, number, number]): string => '#' + rgb.map((v) => v.toString(16).padStart(2, '0')).join('')
 
-const blendChannel = (a: number, b: number, mix: number): number => Math.round(a * mix + b * (1 - mix))
+const blend = (a: number, b: number, mix: number): number => Math.round(a * mix + b * (1 - mix))
 
 export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 9): string => {
   const [r1, g1, b1] = hexToRgb(colorA)
@@ -102,7 +102,5 @@ export const dateToGradient = (date: Date, colorA: string, colorB: string, cente
   const theta = t * 2 * Math.PI
   const mix = (1 + Math.cos(theta)) / 2
 
-  const rgb: [number, number, number] = [blendChannel(r1, r2, mix), blendChannel(g1, g2, mix), blendChannel(b1, b2, mix)]
-
-  return rgbToHex(rgb)
+  return rgbToHex([blend(r1, r2, mix), blend(g1, g2, mix), blend(b1, b2, mix)])
 }
