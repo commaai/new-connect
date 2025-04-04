@@ -64,7 +64,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
     if (props.selection.endTime !== undefined) {
       if (current > props.selection.endTime) {
-        // video.currentTime = Math.min(props.selection.startTime, duration())
         video.currentTime = props.selection.startTime
       }
     }
