@@ -1,4 +1,4 @@
-import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -15,11 +15,13 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
   dongleId: string
   dateStr: string
   startTime: number
+  endTime: number | undefined
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
@@ -29,6 +31,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+
+  const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
@@ -64,8 +68,18 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+
+          <Show when={selection().startTime || selection().endTime}>
+            <A
+              class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-4"
+              href={`/${props.dongleId}/${props.dateStr}`}
+            >
+              Clear current route selection
+              <IconButton name="close_small" />
+            </A>
+          </Show>
         </div>
 
         <div class="flex flex-col gap-2">
