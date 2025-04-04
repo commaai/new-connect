@@ -1,4 +1,4 @@
-import { Suspense, createEffect, createResource, createSignal, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -65,12 +65,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          {/*<Suspense fallback={<span>hi</span>}>*/}
-          {/*<Suspense fallback={<div class="skeleton-loader size-full min-h-10"></div>}>*/}
-            <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
-          {/*</Suspense>*/}
-
-          {/*</Suspense>*/}
+          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
