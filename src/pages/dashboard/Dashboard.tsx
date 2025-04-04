@@ -104,11 +104,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
   const urlState = createMemo(() => {
     const parts = location.pathname.split('/').slice(1).filter(Boolean)
+    const startTime = parts[2] ? Math.max(Number(parts[2]), 0) : 0
+    const endTime = parts[3] ? Math.max(Number(parts[3]), startTime + 1) : undefined
     return {
       dongleId: parts[0] as string | undefined,
       dateStr: parts[1] as string | undefined,
-      startTime: parts[2] ? Number(parts[2]) : 0,
-      endTime: parts[3] ? Number(parts[3]) : undefined,
+      startTime: startTime,
+      endTime: endTime,
     }
   })
 
