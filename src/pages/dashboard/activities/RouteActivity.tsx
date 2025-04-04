@@ -71,7 +71,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
           <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
 
-          <Show when={selection().endTime !== undefined}>
+          <Show when={selection().startTime || selection().endTime}>
             <A
               class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-4"
               href={`/${props.dongleId}/${props.dateStr}`}
