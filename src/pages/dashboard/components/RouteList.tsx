@@ -37,7 +37,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
           </span>
         }
-        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs"/>}>{location()}</Suspense>}
+        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
         trailing={
           <Suspense>
             <Show when={timeline()?.userFlags}>
