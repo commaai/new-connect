@@ -12,7 +12,7 @@ const ToggleButton: VoidComponent<{
   onToggle: () => void
 }> = (props) => (
   <button
-    class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low"
+    class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low rounded-md"
     onClick={() => props.onToggle()}
   >
     <span class="text-body-md text-on-surface-variant">{props.label}</span>
