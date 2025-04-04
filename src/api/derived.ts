@@ -190,6 +190,7 @@ export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
 export const generateTimelineStatistics = (route: Route | undefined, timeline: TimelineEvent[]): TimelineStatistics | undefined => {
+  // TODO: make route and timeline non-undefined
   if (!route || timeline.length == 0) return undefined
   let engagedDuration = 0
   let userFlags = 0
