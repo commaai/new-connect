@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { dateToGradient, formatDate, formatDistance, formatDuration } from './format'
+import { dateTimeToColorBetween, formatDate, formatDistance, formatDuration } from './format'
 
 describe('formatDistance', () => {
   it('should format distance', () => {
@@ -53,15 +53,11 @@ describe('formatDate', () => {
   })
 })
 
-describe('dateToGradient', () => {
-  it('should generate gradients', () => {
-    expect(dateToGradient(new Date('2025-02-01T00:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
-    expect(dateToGradient(new Date('2025-02-01T06:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
-    expect(dateToGradient(new Date('2025-02-01T12:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
-    expect(dateToGradient(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
-  })
-
-  it('should fail to generate gradients', () => {
-    expect(() => dateToGradient(new Date('2025-02-01T00:00:00.000Z'), '#fcd', '#38f')).toThrow()
+describe('dateTimeToColorBetween', () => {
+  it('should generate a color between two colors', () => {
+    expect(dateTimeToColorBetween(new Date('2025-02-01T00:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T06:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a907a')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T12:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a907a')
   })
 })
