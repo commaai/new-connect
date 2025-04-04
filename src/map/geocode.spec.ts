@@ -26,10 +26,10 @@ describe('getPlaceName', () => {
   })
 
   test('normal usage', async () => {
-    expect(await getPlaceName([-117.168638, 32.723695])).toBe('India Street')
-    expect(await getPlaceName([-118.192757, 33.763015])).toBe('Shoreline Drive')
-    expect(await getPlaceName([-0.113643, 51.504546])).toBe('A301')
-    expect(await getPlaceName([5.572254, 50.64428])).toBe('Rue Joffre')
-    expect(await getPlaceName([-2.236802, 53.480931])).toBe('Piccadilly Gardens')
+    expect(await getPlaceName([-117.168638, 32.723695])).toBe('Little Italy')
+    expect(await getPlaceName([-118.192757, 33.763015])).toBe('Downtown Long Beach')
+    expect(await getPlaceName([-0.113643, 51.504546])).toBe('Waterloo')
+    expect(await getPlaceName([5.572254, 50.64428])).toBe('Liège')
+    expect(await getPlaceName([-2.236802, 53.480931])).toBe('Northern Quarter')
   })
 })
