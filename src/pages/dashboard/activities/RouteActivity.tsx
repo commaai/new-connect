@@ -1,4 +1,4 @@
-import { createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -42,6 +42,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     if (video) video.currentTime = newTime
   }
 
+  createEffect(() => {
+    routeName() // track changes
+    setSeekTime(props.startTime)
+    onTimelineChange(props.startTime)
+  })
+
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
   createResource(
@@ -59,13 +65,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route.latest} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
         </div>
 
         <div class="flex flex-col gap-2">
           <h3 class="text-label-md uppercase">Route Info</h3>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route.latest} timeline={timeline()} />
+            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>
