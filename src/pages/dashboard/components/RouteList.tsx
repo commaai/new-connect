@@ -130,7 +130,10 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
           return (
             <Suspense
               fallback={
-                <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+                <>
+                  <h2 class="skeleton-loader rounded-md min-h-7"></h2>
+                  <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+                </>
               }
             >
               <For each={routes()}>
