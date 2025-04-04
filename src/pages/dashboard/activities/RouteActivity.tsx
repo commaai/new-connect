@@ -23,11 +23,11 @@ type RouteActivityProps = {
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
-  const [seekTime, setSeekTime] = createSignal(props.startTime)
+  const initialSeekTime = () => props.startTime
+  const [seekTime, setSeekTime] = createSignal(initialSeekTime())
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const initialSeekTime = () => props.startTime
   const [route] = createResource(routeName, getRoute)
   const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
 
