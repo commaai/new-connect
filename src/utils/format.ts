@@ -89,7 +89,7 @@ const rgbToHex = (rgb: [number, number, number]): string => '#' + rgb.map((v) =>
 
 const blend = (a: number, b: number, mix: number): number => Math.round(a * mix + b * (1 - mix))
 
-export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 9, power = 6): string => {
+export const dateToGradient = (date: Date, colorA: string, colorB: string, centerHour = 12, power = 6): string => {
   const [r1, g1, b1] = hexToRgb(colorA)
   const [r2, g2, b2] = hexToRgb(colorB)
 
