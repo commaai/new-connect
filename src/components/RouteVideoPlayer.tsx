@@ -1,4 +1,4 @@
-import { Show, createEffect, createResource, createSignal, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createResource, createSignal, on, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
@@ -14,8 +14,11 @@ type RouteVideoPlayerProps = {
   ref: (el?: HTMLVideoElement) => void
 }
 
+const ERROR_MISSING_SEGMENT = 'This video segment has not uploaded yet or has been deleted.'
+
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
-  const [streamUrl] = createResource(() => props.routeName, getQCameraStreamUrl)
+  const routeName = () => props.routeName
+  const [streamUrl] = createResource(routeName, getQCameraStreamUrl)
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
@@ -24,14 +27,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
-  const [isErrored, setErrored] = createSignal(false)
+  const [errorMessage, setErrorMessage] = createSignal<string>('')
 
   const onLoadedData = () => {
     setVideoLoading(false)
-    setErrored(false)
+    setErrorMessage('')
   }
   const onError = () => {
-    setErrored(true)
+    setErrorMessage(ERROR_MISSING_SEGMENT)
     setVideoLoading(false)
   }
   const updateProgress = () => props.onProgress?.(video.currentTime)
@@ -134,11 +137,12 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   })
 
   // State reset on route change
-  createEffect(() => {
-    props.routeName // track changes
-    setVideoLoading(true)
-    setErrored(false)
-  })
+  createEffect(
+    on(routeName, () => {
+      setVideoLoading(true)
+      setErrorMessage('')
+    }),
+  )
 
   createEffect(() => {
     const url = streamUrl()
@@ -180,10 +184,10 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       </Show>
 
       {/* Error message */}
-      <Show when={isErrored()}>
+      <Show when={errorMessage()}>
         <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1">
           <IconButton name="error" />
-          <span class="w-[90%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
+          <span class="w-[90%] text-center text-wrap">{errorMessage()}</span>
         </div>
       </Show>
 
