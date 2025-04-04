@@ -6,12 +6,15 @@ import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
 
+type Selection = { startTime: number; endTime: number }
+
 type RouteVideoPlayerProps = {
   class?: string
   routeName: string
   startTime: number
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
+  selection?: Selection | null
 }
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
@@ -56,11 +59,28 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     togglePlayback()
   }
 
+  createEffect(() => {
+    console.log("selection", props.selection)
+  })
+
   const onTimeUpdate = (e: Event) => {
-    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
+    const current = (e.currentTarget as HTMLVideoElement).currentTime
+    setCurrentTime(current)
+    // If a selection is active, manually loop the video within the selection boundaries.
+    if (props.selection) {
+      if (current >= props.selection.endTime) {
+        video.currentTime = props.selection.startTime
+      }
+    }
     if (video.paused) updateProgress()
   }
-  const onLoadedMetadata = () => setDuration(video.duration)
+  const onLoadedMetadata = () => {
+    setDuration(video.duration)
+    // If a selection exists, jump to its startTime once metadata is loaded.
+    if (props.selection) {
+      video.currentTime = props.selection.startTime
+    }
+  }
   const onPlay = () => {
     setIsPlaying(true)
     startProgressTracking()
@@ -73,8 +93,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   onMount(() => {
+    // Initialize currentTime to either the provided startTime or selection.startTime if available.
     if (!Number.isNaN(props.startTime)) {
-      video.currentTime = props.startTime
+      video.currentTime = props.selection ? props.selection.startTime : props.startTime
     }
 
     props.ref?.(video)
@@ -123,7 +144,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   })
 
-  // State reset on route change
+  // Reset video state when route changes.
   createEffect(() => {
     props.routeName // track changes
     setVideoLoading(true)
@@ -139,6 +160,13 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       player.loadSource(url)
     } else {
       video.src = url
+    }
+  })
+
+  // When a new selection is provided, update the video's current time.
+  createEffect(() => {
+    if (props.selection && video) {
+      video.currentTime = props.selection.startTime
     }
   })
 
@@ -159,7 +187,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           muted
           controls={false}
           playsinline
-          loop
+          // Use native looping only if no selection is provided.
+          loop={props.selection ? false : true}
           disablepictureinpicture
         />
       </div>
@@ -173,7 +202,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       <Show when={isErrored()}>
         <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1">
           <IconButton name="error" />
-          <span class="w-[90%] text-center text-wrap">This video segment has not uploaded yet or has been deleted.</span>
+          <span class="w-[90%] text-center text-wrap">
+            This video segment has not uploaded yet or has been deleted.
+          </span>
         </div>
       </Show>
 

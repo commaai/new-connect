@@ -58,14 +58,16 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     },
   )
 
+  const [selection, setSelection] = createSignal<{ startTime: number; endTime: number } | null>(null);
+
   return (
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} startTime={seekTime()} onProgress={setSeekTime} selection={selection()} />
+          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} selection={selection()} setSelection={setSelection} />
         </div>
 
         <div class="flex flex-col gap-2">
