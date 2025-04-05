@@ -2,12 +2,13 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import { getTimelineStatistics } from '~/api/derived'
+import {getTimelineEvents, getTimelineStatistics} from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { RouteSegments } from '~/api/types'
+import { setCurrentRoute, setCurrentEvents } from '~/store'
 
 interface RouteCardProps {
   route: RouteSegments
@@ -16,6 +17,7 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs(props.route.start_time_utc_millis)
   const endTime = () => dayjs(props.route.end_time_utc_millis)
+  const [events] = createResource(() => props.route, getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -29,7 +31,12 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   })
 
   return (
-    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
+    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary"
+    onClick={() => {
+      setCurrentRoute(props.route)
+      setCurrentEvents(events())
+      console.log('set route to', props.route.fullname)
+    }}>
       <CardHeader
         headline={
           <span>

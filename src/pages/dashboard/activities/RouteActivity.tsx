@@ -3,7 +3,8 @@ import { Show, createEffect, createResource, createSignal, Suspense, type VoidCo
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import { getRoute } from '~/api/route'
+// import { getRoute } from '~/api/route'
+import { currentRoute, currentEvents } from '~/store'
 import { dayjs } from '~/utils/format'
 
 import IconButton from '~/components/material/IconButton'
@@ -29,15 +30,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+  // const [route] = createResource(routeName, getRoute)
+  const [startTime] = createResource(() => dayjs(currentRoute()?.start_time)?.format('ddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  // const [events] = createResource(currentRoute(), getTimelineEvents, { initialValue: [] })
   const [timeline] = createResource(
-    () => [route(), events()] as const,
+    () => [currentRoute(), currentEvents()] as const,
     ([r, e]) => generateTimelineStatistics(r, e),
   )
 
@@ -47,7 +48,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   }
 
   createEffect(() => {
+    console.log("got route", currentRoute())
+  })
+
+  createEffect(() => {
     routeName() // track changes
+    // currentRoute()
     setSeekTime(props.startTime)
     onTimelineChange(props.startTime)
   })
@@ -69,7 +75,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline class="mb-1" route={currentRoute()} seekTime={seekTime()} updateTime={onTimelineChange} events={currentEvents()} />
 
           <Show when={selection().startTime || selection().endTime}>
             <A
@@ -85,16 +91,16 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
+            <RouteStatistics class="p-5" route={currentRoute()} timeline={timeline()} />
 
-            <RouteActions routeName={routeName()} route={route()} />
+            <RouteActions routeName={routeName()} route={currentRoute()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Upload Files</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteUploadButtons route={route()} />
+            <RouteUploadButtons route={currentRoute()} />
           </div>
         </div>
 
@@ -102,7 +108,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <span class="text-label-md uppercase">Route Map</span>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
-              <RouteStaticMap route={route()} />
+              <RouteStaticMap route={currentRoute()} />
             </Suspense>
           </div>
         </div>
