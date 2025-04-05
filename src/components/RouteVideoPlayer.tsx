@@ -5,11 +5,10 @@ import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
-import { currentRoute } from '~/store'
 
 type RouteVideoPlayerProps = {
   class?: string
-  // routeName: string
+  routeName: string
   selection: { startTime: number; endTime: number | undefined }
   onProgress: (seekTime: number) => void
   ref: (el?: HTMLVideoElement) => void
@@ -19,8 +18,8 @@ const ERROR_MISSING_SEGMENT = 'This video segment has not uploaded yet or has be
 const ERROR_UNSUPPORTED_BROWSER = 'This browser does not support Media Source Extensions API.'
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
-  // const routeName = () => props.routeName
-  const [streamUrl] = createResource(currentRoute()?.fullname, getQCameraStreamUrl)
+  const routeName = () => props.routeName
+  const [streamUrl] = createResource(routeName, getQCameraStreamUrl)
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
@@ -141,7 +140,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   // State reset on route change
   createEffect(
-    on(currentRoute(), () => {
+    on(routeName, () => {
       setVideoLoading(true)
       setErrorMessage('')
     }),

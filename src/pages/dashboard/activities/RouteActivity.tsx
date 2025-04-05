@@ -66,7 +66,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
-          <RouteVideoPlayer ref={setVideoRef} selection={selection()} onProgress={setSeekTime} />
+          <RouteVideoPlayer routeName={currentRoute()?.fullname} ref={setVideoRef} selection={selection()} onProgress={setSeekTime} />
           <Timeline class="mb-1" route={currentRoute()} seekTime={seekTime()} updateTime={onTimelineChange} events={currentEvents()} />
 
           <Show when={selection().startTime || selection().endTime}>
