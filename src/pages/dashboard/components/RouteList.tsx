@@ -1,5 +1,9 @@
 import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 import { fetcher } from '~/api'
 import { getTimelineStatistics } from '~/api/derived'
@@ -7,15 +11,15 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments, Route } from '~/api/types'
+import type { Route } from '~/api/types'
 
 interface RouteCardProps {
   route: Route
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  const startTime = () => dayjs(props.route.start_time)
-  const endTime = () => dayjs(props.route.end_time)
+  const startTime = () => dayjs.utc(props.route.start_time).local()
+  const endTime = () => dayjs.utc(props.route.end_time).local()
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -76,7 +80,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&end=${previousPageData.at(-1)!.start_time - 1}`
+    return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time - 1}`
   }
   const getPage = (page: number): Promise<Route[]> => {
     if (pages[page] === undefined) {
@@ -103,7 +107,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   // Group and display headers for each day
   let prevDayHeader: string | null = null
   function getDayHeader(route: Route): string | null {
-    const date = dayjs(route.start_time)
+    const date = dayjs.utc(route.start_time).local()
     let dayHeader = null
     if (date.isSame(dayjs(), 'day')) {
       dayHeader = `Today – ${date.format('dddd, MMM D')}`
