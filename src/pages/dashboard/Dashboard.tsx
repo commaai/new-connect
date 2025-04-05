@@ -150,7 +150,12 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   </Match>
                   <Match when={urlState().dateStr}>
                     {(dateStr) => (
-                      <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} endTime={urlState().endTime} />
+                      <RouteActivity
+                        dongleId={dongleId}
+                        dateStr={dateStr()}
+                        startTime={urlState().startTime}
+                        endTime={urlState().endTime}
+                      />
                     )}
                   </Match>
                 </Switch>

@@ -28,7 +28,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
-  // const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [startTime] = createResource(() => dayjs(currentRoute()?.start_time)?.format('ddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
@@ -44,7 +43,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   }
 
   createEffect(() => {
-    // routeName() // track changes
     currentRoute()
     setSeekTime(props.startTime)
     onTimelineChange(props.startTime)

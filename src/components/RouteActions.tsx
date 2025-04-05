@@ -2,7 +2,7 @@ import { createSignal, Show, type VoidComponent, createEffect, createResource } 
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/api/types'
 
@@ -38,7 +38,6 @@ interface RouteActionsProps {
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  // const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
   const [preservedRoutesResource] = createResource(() => props.route?.dongle_id, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
