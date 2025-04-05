@@ -103,13 +103,13 @@ export interface RouteShareSignature extends Record<string, string> {
   sig: string
 }
 
-export interface RouteSegments extends Route {
-  end_time_utc_millis: number
-  is_preserved: boolean
-  share_exp: RouteShareSignature['exp']
-  share_sig: RouteShareSignature['sig']
-  start_time_utc_millis: number
-}
+// export interface RouteSegments extends Route {
+//   end_time_utc_millis: number
+//   is_preserved: boolean
+//   share_exp: RouteShareSignature['exp']
+//   share_sig: RouteShareSignature['sig']
+//   start_time_utc_millis: number
+// }
 
 export interface Files {
   cameras: string[]

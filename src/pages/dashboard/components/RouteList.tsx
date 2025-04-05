@@ -80,7 +80,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time - 1}`
+    return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time}`
   }
   const getPage = (page: number): Promise<Route[]> => {
     if (pages[page] === undefined) {
