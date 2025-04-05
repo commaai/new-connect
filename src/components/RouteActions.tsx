@@ -32,12 +32,7 @@ const ToggleButton: VoidComponent<{
   </button>
 )
 
-interface RouteActionsProps {
-  // TODO: this should only ever be defined
-  // route: Route | undefined
-}
-
-const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
+const RouteActions: VoidComponent = () => {
   const [preservedRoutesResource] = createResource(() => currentRoute()?.dongle_id, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
