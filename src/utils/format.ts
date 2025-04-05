@@ -78,17 +78,46 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   return date.format('MMMM Do' + yearStr)
 }
 
-export const dateTimeToColorBetween = (date: Date, startColor: string, endColor: string): string => {
+function l(t: number) {
+  const startTime = 6
+  const endTime = 5 + 12
+  const fadeHours = 2
+  if ((startTime < t) && (t < (startTime + fadeHours))) return (t - startTime) / fadeHours
+  if ((endTime < t) && (t < (endTime + fadeHours))) return (t - endTime) / fadeHours
+  if ((startTime < t) && (t < (endTime + fadeHours))) return 1
+  // if ((startTime + 2) < t && t < endTime) return 1
+
+  // if (t < 6) return 0
+  // if (t > (7.5 + 12)) return 0
+  // if (t < 8) return Math.min((t - 5)/2, 1)
+  // if (t > 18) return 1-Math.min((t - 17), 1)
+  return 0
+  // return 1 / (1 + Math.exp(-2 * (t - 6))) - 1 / (1 + Math.exp(-2 * (t - 19)));
+}
+
+export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColor: string, endColor: string): { start: string; end: string } => {
   const toRGB = (hex: string): number[] => hex.match(/\w\w/g)!.map((x) => parseInt(x, 16))
   const toHex = (rgb: number[]): string => rgb.map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')
 
-  const minutes = date.getHours() * 60 + date.getMinutes()
-  const t = minutes / 720
-  const blendFactor = t <= 1 ? t : 2 - t
+  const hoursStart = startTime.getHours() + startTime.getMinutes() / 60
+  const hoursEnd = endTime.getHours() + endTime.getMinutes() / 60
+  // const minutes = startTime.getHours() * 60 + startTime.getMinutes()
+  // const t = minutes / 720
+  // const blendFactor = t <= 1 ? t : 2 - t
+  // const blendFactor = Math.max(Math.min(Math.sin(Math.PI / 14 * (hours - 5)), 1), 0)
+  const blendFactorStart = l(hoursStart)
+  const blendFactorEnd = l(hoursEnd)
+  console.log('hoursStart', hoursStart, 't', 'blendFactorStart', blendFactorStart)
+
 
   const rgb1 = toRGB(startColor)
   const rgb2 = toRGB(endColor)
-  const blended = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactor)
+  // const blended = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactor)
+  const blendedStart = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorStart)
+  const blendedEnd = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorEnd)
 
-  return `#${toHex(blended)}`
+  const start = `#${toHex(blendedStart)}`
+  const end = `#${toHex(blendedEnd)}`
+  return {start, end}
+  // return `#${toHex(blended)}`
 }
