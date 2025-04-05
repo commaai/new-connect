@@ -1,4 +1,5 @@
 export const ATHENA_URL = 'https://athena.comma.ai'
-export const API_URL = 'https://api.comma.ai'
+export const REAL_API_URL = 'https://api.comma.ai'
+export const API_URL = 'http://127.0.0.1:1234'
 export const BILLING_URL = 'https://billing.comma.ai'
 export const USERADMIN_URL = 'https://useradmin.comma.ai'
