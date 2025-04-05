@@ -1,9 +1,8 @@
 import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
-import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import { currentRoute, currentEvents } from '~/store'
+import { currentDevice, currentRoute, currentEvents } from '~/store'
 import { dayjs } from '~/utils/format'
 
 import IconButton from '~/components/material/IconButton'
@@ -18,8 +17,7 @@ import { generateTimelineStatistics } from '~/api/derived'
 import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
-  dongleId: string
-  dateStr: string
+  dateStr: string // TODO: move to route
   startTime: number
   endTime: number | undefined
 }
@@ -48,10 +46,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     onTimelineChange(props.startTime)
   })
 
-  const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
   createResource(
-    () => [device(), profile(), props.dateStr] as const,
+    () => [currentDevice(), profile(), props.dateStr] as const,
     async ([device, profile, dateStr]) => {
       if (!device || !profile || (!device.is_owner && !profile.superuser)) return
       await setRouteViewed(device.dongle_id, dateStr)
@@ -60,7 +57,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>{startTime()}</TopAppBar>
+      <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${currentDevice()?.dongle_id}`} />}>
+        {startTime()}
+      </TopAppBar>
 
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
@@ -68,10 +67,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} events={currentEvents()} />
 
           <Show when={selection().startTime || selection().endTime}>
-            <A
-              class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-4"
-              href={`/${props.dongleId}/${props.dateStr}`}
-            >
+            <A class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-4" href={`/${currentRoute()?.fullname}`}>
               Clear current route selection
               <IconButton name="close_small" />
             </A>
