@@ -33,12 +33,13 @@ const ToggleButton: VoidComponent<{
 )
 
 interface RouteActionsProps {
-  routeName: string
+  // TODO: this should only ever be defined
   route: Route | undefined
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
+  // const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
+  const [preservedRoutesResource] = createResource(() => props.route?.dongle_id, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
@@ -81,7 +82,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
       try {
         const newValue = !currentValue
-        await setRoutePreserved(props.routeName, newValue)
+        await setRoutePreserved(props.route?.fullname, newValue)
         setIsPreserved(newValue)
       } catch (err) {
         console.error('Failed to update preserved toggle', err)
@@ -90,10 +91,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  const currentRouteId = () => props.routeName.replace('|', '/')
+  const currentRouteId = () => props.route?.fullname?.replace('|', '/') || ''
 
   const copyCurrentRouteId = async () => {
-    if (!props.routeName || !navigator.clipboard) return
+    if (!props.route?.fullname || !navigator.clipboard) return
 
     try {
       await navigator.clipboard.writeText(currentRouteId())

@@ -148,10 +148,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  {/*TODO: can remove keyed now?*/}
-                  <Match when={urlState().dateStr} keyed>
+                  <Match when={urlState().dateStr}>
                     {(dateStr) => (
-                      <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />
+                      <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} endTime={urlState().endTime} />
                     )}
                   </Match>
                 </Switch>
