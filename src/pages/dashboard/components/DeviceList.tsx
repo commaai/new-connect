@@ -21,8 +21,8 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const isSelected = (device: Device) => location.pathname.includes(device.dongle_id)
   const onClick = (device: Device) => () => {
     setOpen(false)
-    storage.setItem('lastSelectedDongleId', device.dongle_id)
     setCurrentDevice(device)
+    storage.setItem('lastSelectedDongleId', device.dongle_id)
   }
 
   return (

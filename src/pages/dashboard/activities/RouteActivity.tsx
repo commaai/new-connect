@@ -15,7 +15,7 @@ import RouteStatistics from '~/components/RouteStatistics'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { generateTimelineStatistics } from '~/api/derived'
 import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
@@ -46,10 +46,6 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     const video = videoRef()
     if (video) video.currentTime = newTime
   }
-
-  createEffect(() => {
-    console.log("got route", currentRoute())
-  })
 
   createEffect(() => {
     routeName() // track changes

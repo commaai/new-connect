@@ -2,7 +2,7 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 
 import { fetcher } from '~/api'
-import {getTimelineEvents, getTimelineStatistics} from '~/api/derived'
+import { getTimelineEvents, getTimelineStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
@@ -31,12 +31,16 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   })
 
   return (
-    <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary"
-    onClick={() => {
-      setCurrentRoute(props.route)
-      setCurrentEvents(events())
-      console.log('set route to', props.route.fullname)
-    }}>
+    <Card
+      class="max-w-none"
+      href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`}
+      activeClass="md:before:bg-primary"
+      onClick={() => {
+        setCurrentRoute(props.route)
+        setCurrentEvents(events())
+        console.log('set route to', props.route.fullname)
+      }}
+    >
       <CardHeader
         headline={
           <span>

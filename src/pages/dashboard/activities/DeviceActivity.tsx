@@ -32,7 +32,7 @@ interface SnapshotResponse {
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const deviceName = () => (currentDevice() ? getDeviceName(currentDevice()) : '')
   // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
-  const isDeviceUser = () => (currentDevice()?.is_owner || currentDevice()?.alias !== SHARED_DEVICE)
+  const isDeviceUser = () => currentDevice()?.is_owner || currentDevice()?.alias !== SHARED_DEVICE
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createSignal<{
     error: string | null
@@ -125,18 +125,16 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
-            {/*<Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>*/}
-              <div class="inline-flex items-center gap-2">
-                <div
-                  class={clsx(
-                    'm-2 size-2 shrink-0 rounded-full',
-                    currentDevice() && deviceIsOnline(currentDevice()) ? 'bg-green-400' : 'bg-gray-400',
-                  )}
-                />
+            <div class="inline-flex items-center gap-2">
+              <div
+                class={clsx(
+                  'm-2 size-2 shrink-0 rounded-full',
+                  currentDevice() && deviceIsOnline(currentDevice()) ? 'bg-green-400' : 'bg-gray-400',
+                )}
+              />
 
-                {<div class="text-xl font-bold">{deviceName()}</div>}
-              </div>
-            {/*</Suspense>*/}
+              {<div class="text-xl font-bold">{deviceName()}</div>}
+            </div>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={() => void takeSnapshot()} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
