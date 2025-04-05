@@ -2,9 +2,9 @@ import { createSignal, Show, type VoidComponent, createEffect, createResource } 
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
-import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
+import { setRoutePublic, setRoutePreserved, getPreservedRoutes } from '~/api/route'
 import Icon from '~/components/material/Icon'
-import type { Route } from '~/api/types'
+import { currentRoute } from '~/store'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -32,13 +32,8 @@ const ToggleButton: VoidComponent<{
   </button>
 )
 
-interface RouteActionsProps {
-  routeName: string
-  route: Route | undefined
-}
-
-const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
+const RouteActions: VoidComponent = () => {
+  const [preservedRoutesResource] = createResource(() => currentRoute()?.dongle_id, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
@@ -47,12 +42,13 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   createEffect(() => {
     const preservedRoutes = preservedRoutesResource()
-    if (!props.route) return
-    setIsPublic(props.route.is_public)
-    if (props.route.is_preserved) {
+    const route = currentRoute()
+    if (!route) return
+    setIsPublic(route.is_public)
+    if (route.is_preserved) {
       setIsPreserved(true)
     } else if (preservedRoutes) {
-      const { fullname } = props.route
+      const { fullname } = route
       setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
     } else {
       setIsPreserved(undefined)
@@ -64,12 +60,14 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   const toggleRoute = async (property: 'public' | 'preserved') => {
     setError(null)
+    const route = currentRoute()
+    if (!route) return
     if (property === 'public') {
       const currentValue = isPublic()
       if (currentValue === undefined) return
       try {
         const newValue = !currentValue
-        await setRoutePublic(props.routeName, newValue)
+        await setRoutePublic(route.fullname, newValue)
         setIsPublic(newValue)
       } catch (err) {
         console.error('Failed to update public toggle', err)
@@ -81,7 +79,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
       try {
         const newValue = !currentValue
-        await setRoutePreserved(props.routeName, newValue)
+        await setRoutePreserved(route.fullname, newValue)
         setIsPreserved(newValue)
       } catch (err) {
         console.error('Failed to update preserved toggle', err)
@@ -90,10 +88,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  const currentRouteId = () => props.routeName.replace('|', '/')
+  const currentRouteId = () => currentRoute()?.fullname?.replace('|', '/') || ''
 
   const copyCurrentRouteId = async () => {
-    if (!props.routeName || !navigator.clipboard) return
+    if (!currentRoute()?.fullname || !navigator.clipboard) return
 
     try {
       await navigator.clipboard.writeText(currentRouteId())

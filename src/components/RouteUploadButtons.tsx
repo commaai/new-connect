@@ -5,7 +5,7 @@ import clsx from 'clsx'
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { uploadAllSegments, type FileType } from '~/api/file'
-import type { Route } from '~/api/types'
+import { currentRoute } from '~/store'
 
 const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
 type ButtonType = (typeof BUTTON_TYPES)[number]
@@ -54,11 +54,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   )
 }
 
-interface RouteUploadButtonsProps {
-  route: Route | undefined
-}
-
-const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
+const RouteUploadButtons: VoidComponent = () => {
   const [uploadStore, setUploadStore] = createStore({
     states: {
       road: 'idle',
@@ -71,7 +67,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
 
   createEffect(
     on(
-      () => props.route,
+      () => currentRoute(),
       () => {
         abortController().abort()
         setAbortController(new AbortController())
@@ -81,8 +77,9 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   )
 
   const handleUpload = async (type: ButtonType) => {
-    if (!props.route) return
-    const { fullname, maxqlog } = props.route
+    const route = currentRoute()
+    if (!route) return
+    const { fullname, maxqlog } = route
     const { signal } = abortController()
 
     const updateButtonStates = (types: readonly ButtonType[], state: ButtonState) => {

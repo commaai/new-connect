@@ -5,6 +5,7 @@ import clsx from 'clsx'
 import { useDrawerContext } from '~/components/material/Drawer'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/api/types'
+import { setCurrentDevice } from '~/store'
 import { getDeviceName, deviceIsOnline } from '~/utils/device'
 import storage from '~/utils/storage'
 
@@ -20,6 +21,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const isSelected = (device: Device) => location.pathname.includes(device.dongle_id)
   const onClick = (device: Device) => () => {
     setOpen(false)
+    setCurrentDevice(device)
     storage.setItem('lastSelectedDongleId', device.dongle_id)
   }
 

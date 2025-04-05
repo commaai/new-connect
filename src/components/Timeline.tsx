@@ -3,10 +3,11 @@ import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import type { TimelineEvent } from '~/api/derived'
-import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
+import { currentRoute } from '~/store'
 
-function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
+function renderTimelineEvents(events: TimelineEvent[]) {
+  const route = currentRoute()
   if (!route) return
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
@@ -91,14 +92,13 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
   events: TimelineEvent[]
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const route = () => props.route
+  const route = () => currentRoute()
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
   const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
@@ -139,13 +139,13 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     }
 
     const onMouseDown = (ev: MouseEvent) => {
-      if (!props.route) return
+      if (!currentRoute()) return
       updateMarker(ev.clientX)
       onStart()
     }
 
     const onTouchStart = (ev: TouchEvent) => {
-      if (ev.touches.length !== 1 || !props.route) return
+      if (ev.touches.length !== 1 || !currentRoute()) return
       updateMarker(ev.touches[0].clientX)
       onStart()
     }
@@ -177,7 +177,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         title="Disengaged"
       >
         <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">
-          <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.route, props.events)}</Suspense>
+          <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.events)}</Suspense>
         </div>
         <div
           class="absolute top-0 z-10 h-full"
