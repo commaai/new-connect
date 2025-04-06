@@ -78,46 +78,18 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   return date.format('MMMM Do' + yearStr)
 }
 
-function l(t: number) {
-  // these are averages throughout the year in San Diego
-  // TODO: calculate correct times based on route date (for winter)
-  const sunrise = 6.5
-  const sunset = 6.5 + 12
-  const twilight = 0.5  // civil twilight is 25 minutes on average
-  // looked outside and it got dark at 7:40 (sunset was 7:11)
+export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
+  const sunrise = 6.5 // safe estimate year-round
+  const sunset = 6 + 12 // FIXME: average is 6:30, but it's better to false positive night than day
+  const twilight = 0.5 // civil twilight is when it gets dark
 
-  if ((sunrise < t) && (t < (sunrise + twilight))) return (t - sunrise) / twilight
-  if ((sunset < t) && (t < (sunset + twilight))) return 1 - (t - sunset) / twilight
-  if ((sunrise < t) && (t < (sunset + twilight))) return 1
-  return 0
-}
+  const hours = startTime.getHours() + startTime.getMinutes() / 60
 
-export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColor: string, endColor: string): { start: string; end: string } => {
-  const toRGB = (hex: string): number[] => hex.match(/\w\w/g)!.map((x) => parseInt(x, 16))
-  const toHex = (rgb: number[]): string => rgb.map((x) => Math.round(x).toString(16).padStart(2, '0')).join('')
+  let blendFactor = 0
+  if (sunrise < hours && hours < sunrise + twilight) blendFactor = (hours - sunrise) / twilight
+  else if (sunset < hours && hours < sunset + twilight) blendFactor = 1 - (hours - sunset) / twilight
+  else if (sunrise < hours && hours < sunset + twilight) blendFactor = 1
 
-  const hoursStart = startTime.getHours() + startTime.getMinutes() / 60
-  const hoursEnd = endTime.getHours() + endTime.getMinutes() / 60
-  const hoursAvg = hoursEnd  // (hoursStart + hoursEnd) / 2
-  // const minutes = startTime.getHours() * 60 + startTime.getMinutes()
-  // const t = minutes / 720
-  // const blendFactor = t <= 1 ? t : 2 - t
-  // const blendFactor = Math.max(Math.min(Math.sin(Math.PI / 14 * (hours - 5)), 1), 0)
-  const blendFactorStart = l(hoursStart)
-  const blendFactorEnd = l(hoursEnd)
-  const blendFactorAvg = l(hoursAvg)
-  console.log('hoursStart', hoursStart, 'hoursEnd', hoursEnd, 'hoursAvg', hoursAvg, blendFactorAvg)
-
-  const rgb1 = toRGB(startColor)
-  const rgb2 = toRGB(endColor)
-  // const blended = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactor)
-  const blendedStart = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorStart)
-  const blendedEnd = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorEnd)
-  const blendedAvg = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorAvg)
-
-  // const start = `#${toHex(blendedStart)}`
-  // const end = `#${toHex(blendedEnd)}`
-  const avg = `#${toHex(blendedAvg)}`
-  return {start: avg, end: avg}
-  // return `#${toHex(blended)}`
+  const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
+  return `rgb(${blended.join(', ')})`
 }

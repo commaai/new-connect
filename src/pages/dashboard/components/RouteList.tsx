@@ -21,8 +21,7 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
-  // const color = () => dateTimeToColorBetween(startTime().toDate(), '#4953de', '#ffc233')
-  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), '#1E398A', '#DAA11C')
+  const color = () => dateTimeToColorBetween(startTime().toDate(), [30, 57, 138], [218, 161, 28])
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -58,9 +57,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <CardContent>
         <RouteStatistics route={props.route} timeline={timeline()} />
       </CardContent>
-      {/*<div class="h-2 w-full" style={{ background: color() }} />*/}
-      <div class="h-2 w-full" style={{ background: `linear-gradient(in srgb to right, ${color().start} 0%, ${color().end} 100%)` }} />
-      {/*<div class="h-2 w-full" style='background: linear-gradient(in srgb to right, #12254E 40%, #ffc233 60%)' />*/}
+      <div class="h-2 w-full" style={{ background: color() }} />
     </Card>
   )
 }
