@@ -176,7 +176,9 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        <Suspense fallback={<div class="skeleton-loader size-full"></div>}>{renderTimelineEvents(props.route, props.events)}</Suspense>
+        <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">
+          <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.route, props.events)}</Suspense>
+        </div>
         <div
           class="absolute top-0 z-10 h-full"
           style={{
