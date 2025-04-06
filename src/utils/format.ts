@@ -93,6 +93,6 @@ export const dateTimeToColorBetween = (startTime: Date, startColor: number[], en
     blendFactor = Math.max(1 - (hours - sunset) / fade, 0)
   }
 
-  const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
+  const blended = startColor.map((c, i) => Math.round(c + (endColor[i] - c) * blendFactor))
   return `rgb(${blended.join(', ')})`
 }
