@@ -12,9 +12,9 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import { getPlaceName } from '~/map/geocode'
+import { queries } from '~/pages/dashboard/activities/RouteActivity'
 import type { Route } from '~/api/types'
 import { dateTimeToColorBetween } from '~/utils/format'
-import { queries } from '../activities/RouteActivity'
 
 interface RouteCardProps {
   route: Route
