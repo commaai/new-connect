@@ -1,3 +1,4 @@
+import { VoidComponent } from 'solid-js'
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { configure, render, waitFor } from '@solidjs/testing-library'
 
@@ -11,23 +12,23 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 
 const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
-const renderApp = (location: string) => {
+const TestApp: VoidComponent<{ location: string }> = (props) => {
   // @solidjs/testing-library doesn't handle the QueryClientProvider wrapping, we need to own it here
   const history = createMemoryHistory()
-  history.set({ value: location, scroll: false, replace: true })
-  return render(
-    () => (
-      <QueryClientProvider client={createTestQueryClient()}>
-        <MemoryRouter history={history}>
+  history.set({ value: props.location, scroll: false, replace: true })
+
+  return (
+    <QueryClientProvider client={createTestQueryClient()}>
+      <MemoryRouter history={history}>
+        <AppLayout>
           <Routes />
-        </MemoryRouter>
-      </QueryClientProvider>
-    ),
-    {
-      wrapper: AppLayout,
-    },
+        </AppLayout>
+      </MemoryRouter>
+    </QueryClientProvider>
   )
 }
+
+const renderApp = (location: string) => render(() => <TestApp location={location} />)
 
 beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
 beforeEach(() => clearAccessToken())
