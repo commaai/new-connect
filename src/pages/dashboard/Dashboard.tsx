@@ -83,6 +83,7 @@ const DashboardLayout: Component<{
   paneTwo: JSXElement
   paneTwoContent: boolean
 }> = (props) => {
+  const { modal } = useDrawerContext()
   return (
     <div class="relative size-full overflow-hidden">
       <div
@@ -93,7 +94,19 @@ const DashboardLayout: Component<{
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
-        <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
+        <div class="min-w-full overflow-y-scroll">
+          <TopAppBar
+            class="font-bold"
+            leading={
+              <Show when={!modal()} fallback={<DrawerToggleButton />}>
+                <img alt="" src="/images/comma-white.png" class="h-8" />
+              </Show>
+            }
+          >
+            connect
+          </TopAppBar>
+          {props.paneOne}
+        </div>
         <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
       </div>
     </div>
@@ -128,7 +141,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
           <PairActivity />
         </Match>
