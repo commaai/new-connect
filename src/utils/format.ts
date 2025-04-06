@@ -79,14 +79,25 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 }
 
 function l(t: number) {
-  t = t + 1
-  const startTime = 6.5
-  const endTime = 6 + 12
-  const fadeHours = 0.5
-  if ((startTime < t) && (t < (startTime + fadeHours))) return (t - startTime) / fadeHours
-  if ((endTime < t) && (t < (endTime + fadeHours))) return 1 - (t - endTime) / fadeHours
-  if ((startTime < t) && (t < (endTime + fadeHours))) return 1
-  // if ((startTime + 2) < t && t < endTime) return 1
+  // these are averages throughout the year in San Diego
+  // TODO: calculate correct times based on route date
+  const sunrise = 6.5
+  const sunset = 6.5 + 12
+  const twilight = 0.5  // civil twilight is 25 minutes on average
+  // looked outside and it got dark at 7:40 (sunset was 7:11)
+  // t = t + 1
+
+  if ((sunrise < t) && (t < (sunrise + twilight))) return (t - sunrise) / twilight
+  if ((sunset < t) && (t < (sunset + twilight))) return 1 - (t - sunset) / twilight
+  if ((sunrise < t) && (t < (sunset + twilight))) return 1
+
+  // const startTime = 6.5
+  // const endTime = 6 + 12
+  // const fadeHours = 0.5
+  // if ((startTime < t) && (t < (startTime + fadeHours))) return (t - startTime) / fadeHours
+  // if ((endTime < t) && (t < (endTime + fadeHours))) return 1 - (t - endTime) / fadeHours
+  // if ((startTime < t) && (t < (endTime + fadeHours))) return 1
+  // // if ((startTime + 2) < t && t < endTime) return 1
 
   // if (t < 6) return 0
   // if (t > (7.5 + 12)) return 0
@@ -102,7 +113,7 @@ export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColo
 
   const hoursStart = startTime.getHours() + startTime.getMinutes() / 60
   const hoursEnd = endTime.getHours() + endTime.getMinutes() / 60
-  const hoursAvg = (hoursStart + hoursEnd) / 2
+  const hoursAvg = hoursEnd  // (hoursStart + hoursEnd) / 2
   // const minutes = startTime.getHours() * 60 + startTime.getMinutes()
   // const t = minutes / 720
   // const blendFactor = t <= 1 ? t : 2 - t
