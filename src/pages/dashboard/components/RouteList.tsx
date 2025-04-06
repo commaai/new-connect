@@ -57,7 +57,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <CardContent>
         <RouteStatistics route={props.route} timeline={timeline()} />
       </CardContent>
-      <div class="h-2 w-full" style={{ background: color() }} />
+      <div class="h-2.5 w-full" style={{ background: color() }} />
     </Card>
   )
 }
