@@ -15,7 +15,7 @@ const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries:
 const TestApp: VoidComponent<{ location: string }> = (props) => {
   // the Router renders the component defined in each Route. we need to wrap the QueryClientProvider
   // around the Router so that the QueryClient is available to the Route components. so, create
-  // our own memory wrapper instead of the internal @solidjs/testing-library Router wrapper
+  // our own MemoryRouter instead of the internal @solidjs/testing-library wrapper
   const history = createMemoryHistory()
   history.set({ value: props.location, scroll: false, replace: true })
 
