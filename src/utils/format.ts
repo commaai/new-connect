@@ -102,23 +102,26 @@ export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColo
 
   const hoursStart = startTime.getHours() + startTime.getMinutes() / 60
   const hoursEnd = endTime.getHours() + endTime.getMinutes() / 60
+  const hoursAvg = (hoursStart + hoursEnd) / 2
   // const minutes = startTime.getHours() * 60 + startTime.getMinutes()
   // const t = minutes / 720
   // const blendFactor = t <= 1 ? t : 2 - t
   // const blendFactor = Math.max(Math.min(Math.sin(Math.PI / 14 * (hours - 5)), 1), 0)
   const blendFactorStart = l(hoursStart)
   const blendFactorEnd = l(hoursEnd)
-  console.log('hoursStart', hoursStart, 't', 'blendFactorStart', blendFactorStart)
-
+  const blendFactorAvg = l(hoursAvg)
+  console.log('hoursStart', hoursStart, 'hoursEnd', hoursEnd, 'hoursAvg', hoursAvg, blendFactorAvg)
 
   const rgb1 = toRGB(startColor)
   const rgb2 = toRGB(endColor)
   // const blended = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactor)
   const blendedStart = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorStart)
   const blendedEnd = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorEnd)
+  const blendedAvg = rgb1.map((c, i) => c + (rgb2[i] - c) * blendFactorAvg)
 
-  const start = `#${toHex(blendedStart)}`
-  const end = `#${toHex(blendedEnd)}`
-  return {start, end}
+  // const start = `#${toHex(blendedStart)}`
+  // const end = `#${toHex(blendedEnd)}`
+  const avg = `#${toHex(blendedAvg)}`
+  return {start: avg, end: avg}
   // return `#${toHex(blended)}`
 }
