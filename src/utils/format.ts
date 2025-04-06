@@ -79,11 +79,11 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 }
 
 function l(t: number) {
-  const startTime = 6
-  const endTime = 5 + 12
-  const fadeHours = 2
+  const startTime = 6.5
+  const endTime = 6 + 12
+  const fadeHours = 1
   if ((startTime < t) && (t < (startTime + fadeHours))) return (t - startTime) / fadeHours
-  if ((endTime < t) && (t < (endTime + fadeHours))) return (t - endTime) / fadeHours
+  if ((endTime < t) && (t < (endTime + fadeHours))) return 1 - (t - endTime) / fadeHours
   if ((startTime < t) && (t < (endTime + fadeHours))) return 1
   // if ((startTime + 2) < t && t < endTime) return 1
 

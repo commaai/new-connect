@@ -22,7 +22,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
   // const color = () => dateTimeToColorBetween(startTime().toDate(), '#4953de', '#ffc233')
-  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), '#12254E', '#ffc233')
+  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), '#2341AC', '#ffc233')
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
