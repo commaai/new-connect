@@ -13,6 +13,8 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import { getPlaceName } from '~/map/geocode'
 import type { Route } from '~/api/types'
 import { dateTimeToColorBetween } from '~/utils/format'
+import { useQueryClient } from '@tanstack/solid-query'
+import { queries } from '../activities/RouteActivity'
 
 interface RouteCardProps {
   route: Route
@@ -79,6 +81,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
 const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
+  const queryClient = useQueryClient()
   const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -147,6 +150,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 {(route) => {
                   const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
+                  queryClient.setQueryData(queries.forRouteName(route.fullname), route)
                   return (
                     <>
                       <Show when={dayHeader}>
