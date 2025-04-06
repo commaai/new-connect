@@ -2,6 +2,7 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import timezone from 'dayjs/plugin/timezone.js'
+import { useQueryClient } from '@tanstack/solid-query'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -13,7 +14,6 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import { getPlaceName } from '~/map/geocode'
 import type { Route } from '~/api/types'
 import { dateTimeToColorBetween } from '~/utils/format'
-import { useQueryClient } from '@tanstack/solid-query'
 import { queries } from '../activities/RouteActivity'
 
 interface RouteCardProps {
