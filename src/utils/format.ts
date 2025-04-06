@@ -80,31 +80,16 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 
 function l(t: number) {
   // these are averages throughout the year in San Diego
-  // TODO: calculate correct times based on route date
+  // TODO: calculate correct times based on route date (for winter)
   const sunrise = 6.5
   const sunset = 6.5 + 12
   const twilight = 0.5  // civil twilight is 25 minutes on average
   // looked outside and it got dark at 7:40 (sunset was 7:11)
-  // t = t + 1
 
   if ((sunrise < t) && (t < (sunrise + twilight))) return (t - sunrise) / twilight
   if ((sunset < t) && (t < (sunset + twilight))) return 1 - (t - sunset) / twilight
   if ((sunrise < t) && (t < (sunset + twilight))) return 1
-
-  // const startTime = 6.5
-  // const endTime = 6 + 12
-  // const fadeHours = 0.5
-  // if ((startTime < t) && (t < (startTime + fadeHours))) return (t - startTime) / fadeHours
-  // if ((endTime < t) && (t < (endTime + fadeHours))) return 1 - (t - endTime) / fadeHours
-  // if ((startTime < t) && (t < (endTime + fadeHours))) return 1
-  // // if ((startTime + 2) < t && t < endTime) return 1
-
-  // if (t < 6) return 0
-  // if (t > (7.5 + 12)) return 0
-  // if (t < 8) return Math.min((t - 5)/2, 1)
-  // if (t > 18) return 1-Math.min((t - 17), 1)
   return 0
-  // return 1 / (1 + Math.exp(-2 * (t - 6))) - 1 / (1 + Math.exp(-2 * (t - 19)));
 }
 
 export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColor: string, endColor: string): { start: string; end: string } => {
