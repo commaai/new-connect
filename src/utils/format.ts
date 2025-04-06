@@ -79,17 +79,17 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 }
 
 export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
-  const fadeStart = 5 // hours
-  const fadeEnd = 6 + 12
+  const sunrise = 5 // hours
+  const sunset = 6 + 12
   const fade = 2
 
   const hours = startTime.getHours() + startTime.getMinutes() / 60
 
   let blendFactor = 0
-  if (fadeStart < hours && hours < fadeEnd) {
-    blendFactor = Math.min((hours - fadeStart) / fade, 1)
-  } else if (fadeEnd <= hours) {
-    blendFactor = Math.max(1 - (hours - fadeEnd) / fade, 0)
+  if (sunrise < hours && hours < sunset) {
+    blendFactor = Math.min((hours - sunrise) / fade, 1)
+  } else if (sunset <= hours) {
+    blendFactor = Math.max(1 - (hours - sunset) / fade, 0)
   }
 
   const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
