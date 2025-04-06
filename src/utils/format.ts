@@ -78,13 +78,15 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   return date.format('MMMM Do' + yearStr)
 }
 
-export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
+export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColor: number[], endColor: number[]): string => {
   // FIXME: adjust based on season
   const sunrise = 5.5 // hours
   const sunset = 6.5 + 12
   const fade = 1.5 // wide transition since this accounts for different seasons
 
-  const hours = startTime.getHours() + startTime.getMinutes() / 60
+  const startHours = startTime.getHours() + startTime.getMinutes() / 60
+  const endHours = endTime.getHours() + endTime.getMinutes() / 60
+  const hours = (startHours + endHours) / 2
 
   let blendFactor = 0
   if (sunrise < hours && hours < sunset) {
