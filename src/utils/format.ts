@@ -86,9 +86,11 @@ export const dateTimeToColorBetween = (startTime: Date, startColor: number[], en
   const hours = startTime.getHours() + startTime.getMinutes() / 60
 
   let blendFactor = 0
-  if (fadeStart < hours && hours < fadeStart + fade) blendFactor = (hours - fadeStart) / fade
-  else if (fadeEnd < hours && hours < fadeEnd + fade) blendFactor = 1 - (hours - fadeEnd) / fade
-  else if (fadeStart < hours && hours < fadeEnd + fade) blendFactor = 1
+  if (fadeStart < hours && hours < fadeEnd) {
+    blendFactor = Math.min((hours - fadeStart) / fade, 1)
+  } else if (fadeEnd <= hours) {
+    blendFactor = Math.max(1 - (hours - fadeEnd) / fade, 0)
+  }
 
   const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
   return `rgb(${blended.join(', ')})`
