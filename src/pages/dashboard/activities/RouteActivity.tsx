@@ -27,7 +27,7 @@ type RouteActivityProps = {
 
 export const queries = {
   prefix: ['route'],
-  route: () => [...queries.prefix],
+  route: () => queries.prefix,
   forRouteName: (routeName: string) => [...queries.route(), routeName],
   getRoute: (routeName: string) => queryOptions({ queryKey: queries.forRouteName(routeName), queryFn: () => getRoute(routeName) }),
 }
