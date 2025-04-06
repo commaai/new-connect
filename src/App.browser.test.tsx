@@ -13,7 +13,8 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })
 
 const TestApp: VoidComponent<{ location: string }> = (props) => {
-  // @solidjs/testing-library mounts the component inside the Router; we need to wrap the Provider around the Router
+  // @solidjs/testing-library renders the component inside the Router. we need to wrap the Provider around the Router
+  // so that the QueryClient is available to all tests
   const history = createMemoryHistory()
   history.set({ value: props.location, scroll: false, replace: true })
 
