@@ -150,7 +150,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 {(route) => {
                   const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
-                  queryClient.setQueryData(queries.forRouteName(route.fullname), route)
+                  queryClient.setQueryData(queries.forRoute(route.fullname), route)
                   return (
                     <>
                       <Show when={dayHeader}>
