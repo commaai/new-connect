@@ -77,3 +77,21 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
 }
+
+export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
+  const sunrise = 5 // hours
+  const sunset = 5 + 12
+  const fade = 2 // wide transition since this accounts for different seasons
+
+  const hours = startTime.getHours() + startTime.getMinutes() / 60
+
+  let blendFactor = 0
+  if (sunrise < hours && hours < sunset) {
+    blendFactor = Math.min((hours - sunrise) / fade, 1)
+  } else if (sunset <= hours) {
+    blendFactor = Math.max(1 - (hours - sunset) / fade, 0)
+  }
+
+  const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
+  return `rgb(${blended.join(', ')})`
+}

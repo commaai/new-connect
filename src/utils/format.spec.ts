@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { formatDate, formatDistance, formatDuration } from './format'
+import { dateTimeToColorBetween, formatDate, formatDistance, formatDuration } from './format'
 
 describe('formatDistance', () => {
   it('should format distance', () => {
@@ -50,5 +50,14 @@ describe('formatDate', () => {
     expect(formatDate(1482652800)).toBe('December 25th, 2016')
     expect(formatDate(1738943059)).toBe('February 7th')
     expect(formatDate(1738943059000)).toBe('February 7th')
+  })
+})
+
+describe('dateTimeToColorBetween', () => {
+  it('should generate a color between two colors', () => {
+    expect(dateTimeToColorBetween(new Date('2025-02-01T00:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(30, 57, 138)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T06:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(124, 109, 83)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T12:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(218, 161, 28)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T18:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(124, 109, 83)')
   })
 })

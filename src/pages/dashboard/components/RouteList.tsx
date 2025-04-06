@@ -12,6 +12,7 @@ import Icon from '~/components/material/Icon'
 import RouteStatistics from '~/components/RouteStatistics'
 import { getPlaceName } from '~/map/geocode'
 import type { Route } from '~/api/types'
+import { dateTimeToColorBetween } from '~/utils/format'
 
 interface RouteCardProps {
   route: Route
@@ -20,6 +21,7 @@ interface RouteCardProps {
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
+  const color = () => dateTimeToColorBetween(startTime().toDate(), [30, 57, 138], [218, 161, 28])
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -55,6 +57,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       <CardContent>
         <RouteStatistics route={props.route} timeline={timeline()} />
       </CardContent>
+      <div class="h-2 w-full" style={{ background: color() }} />
     </Card>
   )
 }
