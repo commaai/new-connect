@@ -1,6 +1,6 @@
 import { QueryClient } from '@tanstack/solid-query'
 import { queries as uploadQueue } from '~/components/UploadQueue'
-import { queries as route } from '~/pages/dashboard/activities/RouteActivity'
+import { queries as routes } from '~/pages/dashboard/activities/RouteActivity'
 
 const dontRefetchOften = {
   staleTime: 1000 * 60 * 60, // 1 hour
@@ -15,7 +15,7 @@ export const getAppQueryClient = () => {
 
   queryClient.setQueryDefaults(uploadQueue.online(), pollingConfig)
   queryClient.setQueryDefaults(uploadQueue.offline(), pollingConfig)
-  queryClient.setQueryDefaults(route.prefix, { ...dontRefetchOften, ...useSuspense })
+  queryClient.setQueryDefaults(routes.route(), { ...dontRefetchOften, ...useSuspense })
 
   return queryClient
 }
