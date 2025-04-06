@@ -22,7 +22,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
   // const color = () => dateTimeToColorBetween(startTime().toDate(), '#4953de', '#ffc233')
-  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), '#2341AC', '#ffc233')
+  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), '#1E398A', '#ffc233')
   const [timeline] = createResource(() => props.route, getTimelineStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -84,7 +84,7 @@ const PAGE_SIZE = 10
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: Route[]): string | undefined => {
-    if (!previousPageData) return endpoint()
+    if (!previousPageData) return `${endpoint()}&created_before=${1738113404}`
     if (previousPageData.length === 0) return undefined
     return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time}`
   }
