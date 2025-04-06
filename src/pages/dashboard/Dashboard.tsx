@@ -1,8 +1,9 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, onMount, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
-import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
+import { Navigate, type RouteSectionProps, useLocation, useNavigate } from '@solidjs/router'
 import clsx from 'clsx'
 
+import { getAccessToken } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -24,10 +25,15 @@ import SettingsActivity from './activities/SettingsActivity'
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
+  const navigate = useNavigate()
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
   const [profile] = createResource(getProfile)
+
+  onMount(() => {
+    if (!getAccessToken()) navigate('/login')
+  })
 
   return (
     <>
