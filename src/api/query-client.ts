@@ -9,7 +9,7 @@ export const getAppQueryClient = () => {
 
   queryClient.setQueryDefaults(uploadQueue.online(), pollingConfig)
   queryClient.setQueryDefaults(uploadQueue.offline(), pollingConfig)
-  queryClient.setQueryDefaults(routes.route(), { refetchOnMount: false })
+  queryClient.setQueryDefaults(routes.route, { refetchOnMount: false })
 
   return queryClient
 }
