@@ -79,9 +79,10 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 }
 
 export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
-  const sunrise = 5 // hours
-  const sunset = 5 + 12
-  const fade = 2 // wide transition since this accounts for different seasons
+  // FIXME: adjust based on season
+  const sunrise = 5.5 // hours
+  const sunset = 6.5 + 12
+  const fade = 1.5 // wide transition since this accounts for different seasons
 
   const hours = startTime.getHours() + startTime.getMinutes() / 60
 
@@ -92,6 +93,6 @@ export const dateTimeToColorBetween = (startTime: Date, startColor: number[], en
     blendFactor = Math.max(1 - (hours - sunset) / fade, 0)
   }
 
-  const blended = startColor.map((c, i) => c + (endColor[i] - c) * blendFactor)
+  const blended = startColor.map((c, i) => Math.round(c + (endColor[i] - c) * blendFactor))
   return `rgb(${blended.join(', ')})`
 }
