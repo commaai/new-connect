@@ -1,12 +1,12 @@
 import { VoidComponent } from 'solid-js'
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { configure, render, waitFor } from '@solidjs/testing-library'
+import { createMemoryHistory, MemoryRouter } from '@solidjs/router'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
-import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
-import { createMemoryHistory, MemoryRouter } from '@solidjs/router'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 
