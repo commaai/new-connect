@@ -30,7 +30,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('ddd, MMM D, YYYY'))
+  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('dddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
