@@ -16,6 +16,7 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
+import { createQuery, queryOptions } from '@tanstack/solid-query'
 
 type RouteActivityProps = {
   dongleId: string
@@ -24,17 +25,24 @@ type RouteActivityProps = {
   endTime: number | undefined
 }
 
+export const queries = {
+  prefix: ['route'],
+  route: () => queries.prefix,
+  forRouteName: (routeName: string) => [queries.route(), routeName],
+  getRoute: (routeName: string) => queryOptions({ queryKey: queries.forRouteName(routeName), queryFn: () => getRoute(routeName) }),
+}
+
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('dddd, MMM D, YYYY'))
+  const route = createQuery(() => queries.getRoute(routeName()))
+  const [startTime] = createResource(route, (route) => dayjs(route.data?.start_time)?.format('dddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  const [statistics] = createResource(route, getRouteStatistics)
+  const [statistics] = createResource(route.data, getRouteStatistics)
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -80,16 +88,16 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
+            <RouteStatisticsBar class="p-5" route={route.data} statistics={statistics} />
 
-            <RouteActions routeName={routeName()} route={route()} />
+            <RouteActions routeName={routeName()} route={route.data} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Upload Files</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteUploadButtons route={route()} />
+            <RouteUploadButtons route={route.data} />
           </div>
         </div>
 
@@ -97,7 +105,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <span class="text-label-md uppercase">Route Map</span>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
-              <RouteStaticMap route={route()} />
+              <RouteStaticMap route={route.data} />
             </Suspense>
           </div>
         </div>
