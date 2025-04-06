@@ -79,7 +79,7 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 }
 
 export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
-  const fadeStart = 5  // hours
+  const fadeStart = 5 // hours
   const fadeEnd = 6 + 12
   const fade = 2
 

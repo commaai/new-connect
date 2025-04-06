@@ -81,7 +81,7 @@ const PAGE_SIZE = 10
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: Route[]): string | undefined => {
-    if (!previousPageData) return endpoint() // `${endpoint()}&created_before=${1737949404}`
+    if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
     return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time}`
   }

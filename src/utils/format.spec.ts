@@ -55,9 +55,9 @@ describe('formatDate', () => {
 
 describe('dateTimeToColorBetween', () => {
   it('should generate a color between two colors', () => {
-    expect(dateTimeToColorBetween(new Date('2025-02-01T00:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#fcd265')
-    expect(dateTimeToColorBetween(new Date('2025-02-01T06:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a907a')
-    expect(dateTimeToColorBetween(new Date('2025-02-01T12:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#384d8f')
-    expect(dateTimeToColorBetween(new Date('2025-02-01T18:00:00.000Z'), '#fcd265', '#384d8f')).toBe('#9a907a')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T00:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(30, 57, 138)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T06:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(124, 109, 83)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T12:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(218, 161, 28)')
+    expect(dateTimeToColorBetween(new Date('2025-02-01T18:00:00.000Z'), [30, 57, 138], [218, 161, 28])).toBe('rgb(218, 161, 28)')
   })
 })
