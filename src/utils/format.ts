@@ -81,7 +81,7 @@ export const formatDate = (input: dayjs.ConfigType): string => {
 export const dateTimeToColorBetween = (startTime: Date, startColor: number[], endColor: number[]): string => {
   const sunrise = 5 // hours
   const sunset = 5 + 12
-  const fade = 2 // wide transition since this accounts for varying daylight
+  const fade = 2 // wide transition since this accounts for different seasons
 
   const hours = startTime.getHours() + startTime.getMinutes() / 60
 
