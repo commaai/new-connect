@@ -59,11 +59,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   return (
     <>
-      <TopAppBar
-        component="span"
-        class="h-[28px] ml-4 mb-4"
-        leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}
-      >
+      <TopAppBar class="h-[28px]" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
         {startTime()}
       </TopAppBar>
 

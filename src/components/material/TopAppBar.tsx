@@ -11,7 +11,7 @@ type TopAppBarProps = {
 
 const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
   return (
-    <div class={clsx('flex gap-4 items-center', props.class)}>
+    <div class={clsx('flex gap-4 items-center mb-4 ml-4', props.class)}>
       {props.leading}
       <Dynamic class="grow truncate text-title-lg" component={props.component || 'h2'}>
         {props.children}
