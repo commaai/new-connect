@@ -58,11 +58,11 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <Header title="connect">
         <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
+          <span class="text-label-sm text-on-surface-variant">{profile()?.user_id}</span>
           <div class="inline-flex items-center justify-center rounded-full bg-primary-container">
             <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
           </div>
-          <span class="text-label-sm text-on-surface-variant">{profile()?.user_id}</span>
-          <IconButton href={'/logout'} name="logout" filled />
+          <IconButton href="/logout" name="logout" />
         </Suspense>
       </Header>
       <nav
