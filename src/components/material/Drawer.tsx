@@ -1,5 +1,5 @@
 import { createContext, createResource, createSignal, Show, Suspense, useContext } from 'solid-js'
-import type { Accessor, JSXElement, ParentComponent, Setter } from 'solid-js'
+import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -24,12 +24,45 @@ export function useDrawerContext() {
 
 const PEEK = 56
 
+const AppHeader: VoidComponent = () => {
+  const navigate = useNavigate()
+  const [profile] = createResource(getProfile)
+  const { modal, setOpen } = useDrawerContext()
+  const navHome = () => navigate('/')
+
+  return (
+    <TopAppBar
+      class="fixed top-0 left-0 right-0 h-16"
+      leading={
+        <Show
+          when={modal()}
+          fallback={<img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+        >
+          <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
+        </Show>
+      }
+      trailing={
+        <div class="flex items-center gap-2 mr-4">
+          <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
+            <span class="text-label-sm truncate w-36 text-right">{profile()?.user_id}</span>
+            <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
+            <IconButton href="/logout" name="logout" />
+          </Suspense>
+        </div>
+      }
+    >
+      <span class="cursor-pointer" onClick={navHome}>
+        connect
+      </span>
+    </TopAppBar>
+  )
+}
+
 interface DrawerProps {
   drawer: JSXElement
 }
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
-  const navigate = useNavigate()
   const dimensions = useDimensions()
   const drawerWidth = () => Math.min(dimensions().width - PEEK, 320)
   const modal = () => dimensions().width < 1280
@@ -38,40 +71,9 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const [open, setOpen] = createSignal(false)
   const drawerVisible = () => !modal() || open()
 
-  const [profile] = createResource(getProfile)
-
-  const navHome = () => navigate('/')
-
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
-      <TopAppBar
-        class="fixed top-0 left-0 right-0 h-16"
-        leading={
-          <Show
-            when={modal()}
-            fallback={
-              <img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />
-            }
-          >
-            <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
-          </Show>
-        }
-        trailing={
-          <div class="flex items-center gap-2 mr-4">
-            <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
-              <span class="text-label-sm text-on-surface-variant truncate">{profile()?.user_id}</span>
-              <div class="inline-flex items-center justify-center rounded-full bg-primary-container">
-                <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
-              </div>
-              <IconButton href="/logout" name="logout" />
-            </Suspense>
-          </div>
-        }
-      >
-        <span class="cursor-pointer" onClick={navHome}>
-          connect
-        </span>
-      </TopAppBar>
+      <AppHeader />
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
