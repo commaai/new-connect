@@ -6,6 +6,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import { useDimensions } from '~/utils/window'
 import { getProfile } from '~/api/profile'
 import { USERADMIN_URL } from '~/api/config'
+import { useNavigate } from '@solidjs/router'
 
 interface DrawerContext {
   modal: Accessor<boolean>
@@ -28,6 +29,7 @@ interface DrawerProps {
 }
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
+  const navigate = useNavigate()
   const dimensions = useDimensions()
   const drawerWidth = () => Math.min(dimensions().width - PEEK, 320)
   const modal = () => dimensions().width < 1280
@@ -43,7 +45,10 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       <TopAppBar
         class="fixed top-0 left-0 right-0 h-16"
         leading={
-          <Show when={modal()} fallback={<img alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}>
+          <Show
+            when={modal()}
+            fallback={<img onClick={() => navigate('/')} alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+          >
             <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
           </Show>
         }
@@ -59,7 +64,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
           </div>
         }
       >
-        connect
+        <span onClick={() => navigate('/')}>connect</span>
       </TopAppBar>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
