@@ -40,6 +40,8 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   const [profile] = createResource(getProfile)
 
+  const navHome = () => navigate('/')
+
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <TopAppBar
@@ -47,7 +49,9 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         leading={
           <Show
             when={modal()}
-            fallback={<img onClick={() => navigate('/')} alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+            fallback={
+              <img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />
+            }
           >
             <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
           </Show>
@@ -64,7 +68,9 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
           </div>
         }
       >
-        <span onClick={() => navigate('/')}>connect</span>
+        <span class="cursor-pointer" onClick={navHome}>
+          connect
+        </span>
       </TopAppBar>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
