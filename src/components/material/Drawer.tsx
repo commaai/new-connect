@@ -2,6 +2,7 @@ import { createContext, createResource, createSignal, Show, Suspense, useContext
 import type { Accessor, JSXElement, ParentComponent, Setter } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
 import { useDimensions } from '~/utils/window'
 import { getProfile } from '~/api/profile'
 import { USERADMIN_URL } from '~/api/config'
@@ -18,23 +19,6 @@ export function useDrawerContext() {
   const context = useContext(DrawerContext)
   if (!context) throw new Error("can't find DrawerContext")
   return context
-}
-
-export const Header: ParentComponent<{ title?: string }> = (props) => {
-  const { modal, setOpen } = useDrawerContext()
-  return (
-    <header class="fixed top-0 left-0 right-0 h-16">
-      <div class="flex h-full items-center px-4">
-        <div class="flex items-center gap-4">
-          <Show when={modal()} fallback={<img alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}>
-            <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
-          </Show>
-          {props.title && <h1 class="text-xl font-medium">{props.title}</h1>}
-        </div>
-        <div class="ml-auto flex items-center gap-2">{props.children}</div>
-      </div>
-    </header>
-  )
 }
 
 const PEEK = 56
@@ -56,15 +40,27 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
-      <Header title="connect">
-        <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
-          <span class="text-label-sm text-on-surface-variant truncate">{profile()?.user_id}</span>
-          <div class="inline-flex items-center justify-center rounded-full bg-primary-container">
-            <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
+      <TopAppBar
+        class="fixed top-0 left-0 right-0 h-16"
+        leading={
+          <Show when={modal()} fallback={<img alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}>
+            <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
+          </Show>
+        }
+        trailing={
+          <div class="flex items-center gap-2 mr-4">
+            <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
+              <span class="text-label-sm text-on-surface-variant truncate">{profile()?.user_id}</span>
+              <div class="inline-flex items-center justify-center rounded-full bg-primary-container">
+                <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
+              </div>
+              <IconButton href="/logout" name="logout" />
+            </Suspense>
           </div>
-          <IconButton href="/logout" name="logout" />
-        </Suspense>
-      </Header>
+        }
+      >
+        connect
+      </TopAppBar>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
