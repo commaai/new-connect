@@ -36,12 +36,13 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const route = createQuery(() => queries.getRoute(routeName()))
-  const [startTime] = createResource(route, (route) => dayjs(route.data?.start_time)?.format('dddd, MMM D, YYYY'))
+  const routeQuery = createQuery(() => queries.getRoute(routeName()))
+  const route = () => routeQuery.data
+  const [startTime] = createResource(route, (route) => dayjs(route?.start_time)?.format('dddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  const [statistics] = createResource(route.data, getRouteStatistics)
+  const [statistics] = createResource(route(), getRouteStatistics)
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -87,16 +88,16 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatisticsBar class="p-5" route={route.data} statistics={statistics} />
+            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
 
-            <RouteActions routeName={routeName()} route={route.data} />
+            <RouteActions routeName={routeName()} route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Upload Files</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteUploadButtons route={route.data} />
+            <RouteUploadButtons route={route()} />
           </div>
         </div>
 
@@ -104,7 +105,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
           <span class="text-label-md uppercase">Route Map</span>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
-              <RouteStaticMap route={route.data} />
+              <RouteStaticMap route={route()} />
             </Suspense>
           </div>
         </div>
