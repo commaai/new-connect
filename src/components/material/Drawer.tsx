@@ -51,7 +51,7 @@ const AppHeader: VoidComponent = () => {
         </div>
       }
     >
-      <span class="cursor-pointer" onClick={navHome}>
+      <span class="cursor-pointer font-bold" onClick={navHome}>
         connect
       </span>
     </TopAppBar>
