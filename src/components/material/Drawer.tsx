@@ -44,7 +44,7 @@ const AppHeader: VoidComponent = () => {
       trailing={
         <div class="flex items-center gap-2 mr-4">
           <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
-            <span class="text-label-sm truncate w-36 text-right">{profile()?.user_id}</span>
+            <span class="text-label-sm truncate w-[30vw] text-right">{profile()?.user_id}</span>
             <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
             <IconButton href="/logout" name="logout" />
           </Suspense>
