@@ -90,7 +90,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
       pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        return key ? fetcher<Route[]>(key) : []
+        return key ? fetcher<Route[]>(key).catch(() => []) : []
       })()
     }
     return pages[page]
