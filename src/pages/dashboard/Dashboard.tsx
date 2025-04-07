@@ -99,7 +99,7 @@ const DashboardLayout: Component<{
             class="font-bold"
             leading={
               <Show when={!modal()} fallback={<DrawerToggleButton />}>
-                <img alt="" src="/images/comma-white.png" class="h-8" />
+                <img alt="Comma logo" src="/images/comma-white.svg" height="32" width="32" />
               </Show>
             }
           >
