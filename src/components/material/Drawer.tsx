@@ -3,8 +3,8 @@ import type { Accessor, JSXElement, ParentComponent, Setter } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
 import { useDimensions } from '~/utils/window'
-import Icon from './Icon'
 import { getProfile } from '~/api/profile'
+import { USERADMIN_URL } from '~/api/config'
 
 interface DrawerContext {
   modal: Accessor<boolean>
@@ -23,7 +23,7 @@ export function useDrawerContext() {
 export const Header: ParentComponent<{ title?: string }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   return (
-    <header class="fixed top-0 left-0 right-0 z-50 h-16">
+    <header class="fixed top-0 left-0 right-0 h-16">
       <div class="flex h-full items-center px-4">
         <div class="flex items-center gap-4">
           <Show when={modal()} fallback={<img alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}>
@@ -51,15 +51,18 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   const [open, setOpen] = createSignal(false)
   const drawerVisible = () => !modal() || open()
+
   const [profile] = createResource(getProfile)
 
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <Header title="connect">
-        <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
-          <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-            <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+        <Suspense fallback={<div class="h-[32px] w-[180px] rounded-md skeleton-loader" />}>
+          <div class="inline-flex items-center justify-center rounded-full bg-primary-container">
+            <IconButton href={USERADMIN_URL} name={!profile() ? 'person_off' : 'person'} filled target="_blank" />
           </div>
+          <span class="text-label-sm text-on-surface-variant">{profile()?.user_id}</span>
+          <IconButton href={'/logout'} name="logout" filled />
         </Suspense>
       </Header>
       <nav
