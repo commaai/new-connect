@@ -1,8 +1,10 @@
-import { createContext, createSignal, Show, useContext } from 'solid-js'
-import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
+import { createContext, createResource, createSignal, Show, Suspense, useContext } from 'solid-js'
+import type { Accessor, JSXElement, ParentComponent, Setter } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
 import { useDimensions } from '~/utils/window'
+import Icon from './Icon'
+import { getProfile } from '~/api/profile'
 
 interface DrawerContext {
   modal: Accessor<boolean>
@@ -18,12 +20,20 @@ export function useDrawerContext() {
   return context
 }
 
-export const DrawerToggleButton: VoidComponent = () => {
+export const Header: ParentComponent<{ title?: string }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   return (
-    <Show when={modal()}>
-      <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
-    </Show>
+    <header class="fixed top-0 left-0 right-0 z-50 h-16">
+      <div class="flex h-full items-center px-4">
+        <div class="flex items-center gap-4">
+          <Show when={modal()} fallback={<img alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}>
+            <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
+          </Show>
+          {props.title && <h1 class="text-xl font-medium">{props.title}</h1>}
+        </div>
+        <div class="ml-auto flex items-center gap-2">{props.children}</div>
+      </div>
+    </header>
   )
 }
 
@@ -41,20 +51,28 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   const [open, setOpen] = createSignal(false)
   const drawerVisible = () => !modal() || open()
+  const [profile] = createResource(getProfile)
 
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
+      <Header title="connect">
+        <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
+          <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
+            <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+          </div>
+        </Suspense>
+      </Header>
       <nav
         class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
         style={{
           left: drawerVisible() ? 0 : `${-PEEK}px`,
           opacity: drawerVisible() ? 1 : 0.5,
           width: `${drawerWidth()}px`,
+          top: '4rem',
+          height: 'calc(100vh - 4rem)',
         }}
       >
-        <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
-          {props.drawer}
-        </div>
+        <div class="flex size-full flex-col rounded-r-lg text-on-surface-variant sm:rounded-r-none">{props.drawer}</div>
       </nav>
 
       <main
@@ -62,6 +80,8 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
         style={{
           left: drawerVisible() ? `${drawerWidth()}px` : 0,
           width: contentWidth(),
+          top: '4rem',
+          height: 'calc(100vh - 4rem)',
         }}
       >
         {props.children}

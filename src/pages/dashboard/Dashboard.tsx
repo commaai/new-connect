@@ -1,21 +1,21 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
+<<<<<<< HEAD
 
 import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
+=======
+>>>>>>> 9bded7b (most of framework done, needs polish)
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 import type { Device } from '~/api/types'
 
 import Button from '~/components/material/Button'
-import ButtonBase from '~/components/material/ButtonBase'
-import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
+import Drawer, { useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
@@ -25,28 +25,16 @@ import SettingsActivity from './activities/SettingsActivity'
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
-  const { modal, setOpen } = useDrawerContext()
+  const { setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
-
-  const [profile] = createResource(getProfile)
-
   return (
     <>
-      <TopAppBar
-        component="h1"
-        leading={
-          <Show when={modal()}>
-            <IconButton name="arrow_back" onClick={onClose} />
-          </Show>
-        }
-      >
-        Devices
-      </TopAppBar>
-      <DeviceList class="overflow-y-auto p-2" devices={props.devices} />
+      <DeviceList class="overflow-y-auto px-2" devices={props.devices} />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
+<<<<<<< HEAD
       <div class="m-4 mt-0">
         <ButtonBase href={USERADMIN_URL}>
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
@@ -64,6 +52,8 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
           </Suspense>
         </ButtonBase>
       </div>
+=======
+>>>>>>> 9bded7b (most of framework done, needs polish)
     </>
   )
 }
@@ -118,7 +108,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch>
         <Match when={!isSignedIn() || (!profile.loading && !profile.latest)}>
           <Navigate href="/login" />
         </Match>
