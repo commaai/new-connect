@@ -159,8 +159,8 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
 
   createEffect(() => {
     const total = duration()
-    const pct = total ? (props.seekTime / duration()) * 100 : 0
-    setMarkerOffsetPct(Math.max(Math.min(pct, 100), 0))
+    const pct = total ? props.seekTime / total : 0
+    setMarkerOffsetPct(Math.max(Math.min(pct, 1), 0) * 100)
   })
 
   return (
