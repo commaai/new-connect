@@ -10,11 +10,11 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteActions from '~/components/RouteActions'
 import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatistics from '~/components/RouteStatistics'
+import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import { generateTimelineStatistics, getTimelineEvents } from '~/api/derived'
+import { generateRouteStatistics, getTimelineEvents } from '~/api/derived'
 import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
@@ -36,9 +36,9 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [timeline] = createResource(
+  const [statistics] = createResource(
     () => [route(), events()] as const,
-    ([r, e]) => generateTimelineStatistics(r, e),
+    ([r, e]) => generateRouteStatistics(r, e),
   )
 
   const onTimelineChange = (newTime: number) => {
@@ -85,7 +85,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatistics class="p-5" route={route()} timeline={timeline()} />
+            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics()} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>
