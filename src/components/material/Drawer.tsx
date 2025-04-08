@@ -36,9 +36,7 @@ const AppHeader: VoidComponent = () => {
       leading={
         <Show
           when={modal()}
-          fallback={
-            <img onClick={navHome} class="cursor-pointer m-2" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />
-          }
+          fallback={<img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
         >
           <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
         </Show>
