@@ -1,14 +1,11 @@
-import { For, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
+import { createEffect, createSignal, For, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import type { TimelineEvent } from '~/api/derived'
-import type { Route } from '~/api/types'
-import { getRouteDuration } from '~/utils/format'
+import type { RouteStatistics } from '~/api/derived'
 
-function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
-  if (!route) return
-  const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
+function renderTimelineEvents(statistics: RouteStatistics | undefined) {
+  if (!statistics) return
+  const { routeDurationMs: duration, timelineEvents: events } = statistics
   return (
     <For each={events}>
       {(event) => {
@@ -91,16 +88,15 @@ const MARKER_WIDTH = 3
 
 interface TimelineProps {
   class?: string
-  route: Route | undefined
   seekTime: number
   updateTime: (time: number) => void
-  events: TimelineEvent[]
+  statistics: RouteStatistics | undefined
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const duration = () => getRouteDuration(props.route)?.asSeconds() ?? 0
+  const duration = () => (props.statistics?.routeDurationMs ?? 0) / 1000
 
   let ref!: HTMLDivElement
 
@@ -137,13 +133,13 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
     }
 
     const onMouseDown = (ev: MouseEvent) => {
-      if (!props.route) return
+      if (!props.statistics) return
       updateMarker(ev.clientX)
       onStart()
     }
 
     const onTouchStart = (ev: TouchEvent) => {
-      if (ev.touches.length !== 1 || !props.route) return
+      if (ev.touches.length !== 1 || !props.statistics) return
       updateMarker(ev.touches[0].clientX)
       onStart()
     }
@@ -175,9 +171,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">
-          <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.route, props.events)}</Suspense>
-        </div>
+        <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">{renderTimelineEvents(props.statistics)}</div>
         <div
           class="absolute top-0 z-10 h-full"
           style={{
