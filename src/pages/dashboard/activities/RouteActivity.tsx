@@ -1,4 +1,4 @@
-import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, Show, Suspense, on, type VoidComponent } from 'solid-js'
 
 import { setRouteViewed } from '~/api/athena'
 import { getDevice } from '~/api/devices'
@@ -46,11 +46,12 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     if (video) video.currentTime = newTime
   }
 
-  createEffect(() => {
-    routeName() // track changes
-    setSeekTime(props.startTime)
-    onTimelineChange(props.startTime)
-  })
+  createEffect(
+    on(routeName, () => {
+      setSeekTime(props.startTime)
+      onTimelineChange(props.startTime)
+    }),
+  )
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
