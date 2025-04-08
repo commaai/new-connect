@@ -5,7 +5,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { useDimensions } from '~/utils/window'
 import { USERADMIN_URL } from '~/api/config'
-import { useNavigate } from '@solidjs/router'
+import { useLocation, useNavigate } from '@solidjs/router'
 
 interface DrawerContext {
   modal: Accessor<boolean>
@@ -24,11 +24,12 @@ export function useDrawerContext() {
 const PEEK = 56
 
 const AppHeader: VoidComponent = () => {
+  const location = useLocation()
   const navigate = useNavigate()
   const { modal, open, setOpen } = useDrawerContext()
   const goHome = () => {
     setOpen(false)
-    navigate('/')
+    if (location.pathname !== '/') navigate('/')
   }
 
   return (
