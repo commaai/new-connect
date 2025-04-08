@@ -1,4 +1,4 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
+import { For, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -98,10 +98,9 @@ interface TimelineProps {
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const route = () => props.route
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
+  const duration = () => getRouteDuration(props.route)?.asSeconds() ?? 0
 
   let ref!: HTMLDivElement
 

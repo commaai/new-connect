@@ -99,8 +99,8 @@ const Dashboard: Component<RouteSectionProps> = () => {
     return {
       dongleId: parts[0] as string | undefined,
       dateStr: parts[1] as string | undefined,
-      startTime: startTime,
-      endTime: endTime,
+      startTime,
+      endTime,
     }
   })
 
