@@ -26,7 +26,10 @@ const PEEK = 56
 const AppHeader: VoidComponent = () => {
   const navigate = useNavigate()
   const { modal, open, setOpen } = useDrawerContext()
-  const navHome = () => navigate('/')
+  const goHome = () => {
+    setOpen(false)
+    navigate('/')
+  }
 
   return (
     <TopAppBar
@@ -34,7 +37,7 @@ const AppHeader: VoidComponent = () => {
       leading={
         <Show
           when={modal()}
-          fallback={<img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+          fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
         >
           <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
         </Show>
@@ -46,7 +49,7 @@ const AppHeader: VoidComponent = () => {
         </div>
       }
     >
-      <span class="cursor-pointer font-bold" onClick={navHome}>
+      <span class="cursor-pointer font-bold" onClick={goHome}>
         connect
       </span>
     </TopAppBar>
