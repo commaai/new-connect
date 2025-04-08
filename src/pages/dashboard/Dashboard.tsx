@@ -25,15 +25,10 @@ import SettingsActivity from './activities/SettingsActivity'
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
-  const navigate = useNavigate()
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
   const [profile] = createResource(getProfile)
-
-  onMount(() => {
-    if (!getAccessToken()) navigate('/login')
-  })
 
   return (
     <>
@@ -108,6 +103,7 @@ const DashboardLayout: Component<{
 
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const urlState = createMemo(() => {
     const parts = location.pathname.split('/').slice(1).filter(Boolean)
     const startTime = parts[2] ? Math.max(Number(parts[2]), 0) : 0
@@ -131,6 +127,10 @@ const Dashboard: Component<RouteSectionProps> = () => {
     if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
     return devices()?.[0]?.dongle_id
   }
+
+  onMount(() => {
+    if (!getAccessToken()) navigate('/login')
+  })
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
