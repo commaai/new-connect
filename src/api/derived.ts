@@ -71,8 +71,8 @@ type UserFlagTimelineEvent = {
 export type TimelineEvent = EngagedTimelineEvent | AlertTimelineEvent | OverridingTimelineEvent | UserFlagTimelineEvent
 
 export interface RouteStatistics {
-  duration: number
-  engagedDuration: number
+  routeDurationMs: number
+  engagedDurationMs: number
   userFlags: number
 }
 
@@ -190,20 +190,20 @@ export const getTimelineEvents = (route: Route): Promise<TimelineEvent[]> =>
   getDriveEvents(route).then((events) => generateTimelineEvents(route, events))
 
 export const generateRouteStatistics = (route: Route | undefined, timeline: TimelineEvent[]): RouteStatistics => {
-  let engagedDuration = 0
+  let engagedDurationMs = 0
   let userFlags = 0
   timeline.forEach((ev) => {
     if (ev.type === 'engaged') {
-      engagedDuration += ev.end_route_offset_millis - ev.route_offset_millis
+      engagedDurationMs += ev.end_route_offset_millis - ev.route_offset_millis
     } else if (ev.type === 'user_flag') {
       userFlags += 1
     }
   })
 
   return {
-    engagedDuration,
+    routeDurationMs: getRouteDuration(route)?.asMilliseconds() ?? 0,
+    engagedDurationMs,
     userFlags,
-    duration: getRouteDuration(route)?.asMilliseconds() ?? 0,
   }
 }
 
