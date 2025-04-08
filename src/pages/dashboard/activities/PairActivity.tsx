@@ -1,5 +1,5 @@
 import { onCleanup, onMount, type JSX, type VoidComponent } from 'solid-js'
-import { useLocation, useNavigate } from '@solidjs/router'
+import { useLocation } from '@solidjs/router'
 import { createMachine } from '@solid-primitives/state-machine'
 import QrScanner from 'qr-scanner'
 
@@ -11,7 +11,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
 
-const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
+const PairActivity: VoidComponent<{ onPaired: (dongleId: string) => void }> = (props) => {
   const { pair } = useLocation().query
   const pairToken: string | undefined = Array.isArray(pair) ? pair[0] : pair
 
@@ -75,13 +75,8 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
         )
       },
       pairing(input, to) {
-        const navigate = useNavigate()
-
         pairDevice(input.pairToken)
-          .then((dongleId) => {
-            props.onPaired()
-            navigate(`/${dongleId}`)
-          })
+          .then(props.onPaired)
           .catch((reason) => {
             let error: Error
             if (reason instanceof Error) {

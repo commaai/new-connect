@@ -1,6 +1,6 @@
 import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
-import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
+import { Navigate, type RouteSectionProps, useLocation, useNavigate } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
@@ -102,6 +102,7 @@ const DashboardLayout: Component<{
 
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
+  const navigate = useNavigate()
   const urlState = createMemo(() => {
     const parts = location.pathname.split('/').slice(1).filter(Boolean)
     const startTime = parts[2] ? Math.max(Number(parts[2]), 0) : 0
@@ -126,11 +127,16 @@ const Dashboard: Component<RouteSectionProps> = () => {
     return devices()?.[0]?.dongle_id
   }
 
+  const onPaired = (dongleId: string) => {
+    refetch()
+    navigate(`/${dongleId}`)
+  }
+
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
-          <PairActivity onPaired={refetch} />
+          <PairActivity onPaired={onPaired} />
         </Match>
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (
