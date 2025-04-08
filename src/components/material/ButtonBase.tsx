@@ -7,6 +7,7 @@ export type ButtonBaseProps = JSX.ButtonHTMLAttributes<HTMLButtonElement> & {
   class?: string
   onClick?: (e: MouseEvent) => void
   href?: string
+  external?: boolean
   activeClass?: string
 }
 
@@ -15,19 +16,26 @@ const ButtonBase: Component<ButtonBaseProps> = (props) => {
     props.onClick?.(e)
   }
 
-  const [, rest] = splitProps(props, ['class', 'onClick', 'href'])
+  const classNames = () => clsx('relative isolate overflow-hidden', props.class)
+  const [, rest] = splitProps(props, ['class', 'external', 'onClick', 'href'])
   return (
     <Show
       when={props.href}
       fallback={
-        <button class={clsx('relative isolate overflow-hidden', props.class)} onClick={onClick} {...rest}>
+        <button class={classNames()} onClick={onClick} {...rest}>
           {props.children}
         </button>
       }
       keyed
     >
       {(href) => (
-        <A class={clsx('relative isolate overflow-hidden', props.class)} onClick={onClick} href={href} activeClass={props.activeClass}>
+        <A
+          class={classNames()}
+          onClick={onClick}
+          href={href}
+          activeClass={props.activeClass}
+          target={props.external ? '_blank' : undefined}
+        >
           {props.children}
         </A>
       )}
