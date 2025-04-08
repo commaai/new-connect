@@ -27,7 +27,7 @@ const PEEK = 56
 const AppHeader: VoidComponent = () => {
   const navigate = useNavigate()
   const [profile] = createResource(getProfile)
-  const { modal, setOpen } = useDrawerContext()
+  const { modal, open, setOpen } = useDrawerContext()
   const navHome = () => navigate('/')
 
   return (
@@ -40,7 +40,7 @@ const AppHeader: VoidComponent = () => {
             <img onClick={navHome} class="cursor-pointer m-2" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />
           }
         >
-          <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
+          <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
         </Show>
       }
       trailing={
