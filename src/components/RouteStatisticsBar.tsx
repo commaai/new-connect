@@ -2,7 +2,7 @@ import type { VoidComponent } from 'solid-js'
 
 import type { RouteStatistics } from '~/api/derived'
 import type { Route } from '~/api/types'
-import { formatDistance, formatRouteDuration } from '~/utils/format'
+import { formatDistance, formatDuration, formatRouteDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
 
 const formatEngagement = (statistics: RouteStatistics | undefined): string | undefined => {
@@ -19,7 +19,13 @@ const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefin
       class={props.class}
       statistics={[
         { label: 'Distance', value: () => formatDistance(props.route?.length) },
-        { label: 'Duration', value: () => (props.route ? formatRouteDuration(props.route) : undefined) },
+        {
+          label: 'Duration',
+          value: () => {
+            if (props.statistics) return formatDuration(props.statistics.routeDurationMs / (60 * 1000))
+            return formatRouteDuration(props.route)
+          },
+        },
         { label: 'Engaged', value: () => formatEngagement(props.statistics) },
       ]}
     />
