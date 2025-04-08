@@ -96,7 +96,7 @@ const PairActivity: VoidComponent = () => {
 
             <div class="flex flex-col items-center gap-4">
               <Icon name="autorenew" class="animate-spin" size="40" />
-              Pairing your device...
+              <span class="text-title-md">Fetching subscription status...</span>
             </div>
           </>
         )
