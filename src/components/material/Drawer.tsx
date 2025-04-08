@@ -32,11 +32,13 @@ const AppHeader: VoidComponent = () => {
 
   return (
     <TopAppBar
-      class="fixed top-0 left-0 right-0 h-16"
+      class="fixed top-0 left-0 right-0 h-16 p-4"
       leading={
         <Show
           when={modal()}
-          fallback={<img onClick={navHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+          fallback={
+            <img onClick={navHome} class="cursor-pointer m-2" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />
+          }
         >
           <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
         </Show>
