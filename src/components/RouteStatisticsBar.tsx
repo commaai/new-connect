@@ -6,9 +6,9 @@ import { formatDistance, formatRouteDuration } from '~/utils/format'
 import StatisticBar from './StatisticBar'
 
 const formatEngagement = (statistics: RouteStatistics | undefined): string | undefined => {
-  if (!statistics || statistics.duration === 0) return undefined
-  const { engagedDuration, duration } = statistics
-  return `${(100 * (engagedDuration / duration)).toFixed(0)}%`
+  if (!statistics || statistics.routeDurationMs === 0) return undefined
+  const { engagedDurationMs, routeDurationMs } = statistics
+  return `${(100 * (engagedDurationMs / routeDurationMs)).toFixed(0)}%`
 }
 
 const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefined; statistics: RouteStatistics | undefined }> = (
