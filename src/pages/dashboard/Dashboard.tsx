@@ -3,7 +3,7 @@ import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getAccessToken } from '~/api/auth/client'
+import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -119,7 +119,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={!getAccessToken() || (!profile.loading && !profile.latest)}>
+        <Match when={!isSignedIn() || (!profile.loading && !profile.latest)}>
           <Navigate href="/login" />
         </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
