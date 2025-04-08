@@ -184,7 +184,11 @@ const generateTimelineEvents = (routeDurationMs: number, events: DriveEvent[]): 
   return res
 }
 
-const generateRouteStatistics = (routeDurationMs: number, timelineEvents: TimelineEvent[]): RouteStatistics => {
+export const getRouteStatistics = async (route: Route): Promise<RouteStatistics> => {
+  const driveEvents = await getDriveEvents(route)
+  const routeDurationMs = driveEvents.reduce((max, ev) => Math.max(max, ev.route_offset_millis), 0)
+  const timelineEvents = generateTimelineEvents(routeDurationMs, driveEvents)
+
   let engagedDurationMs = 0
   let userFlags = 0
   timelineEvents.forEach((ev) => {
@@ -201,11 +205,4 @@ const generateRouteStatistics = (routeDurationMs: number, timelineEvents: Timeli
     engagedDurationMs,
     userFlags,
   }
-}
-
-export const getRouteStatistics = async (route: Route) => {
-  const driveEvents = await getDriveEvents(route)
-  const routeDurationMs = driveEvents.reduce((max, ev) => Math.max(max, ev.route_offset_millis), 0)
-  const timelineEvents = generateTimelineEvents(routeDurationMs, driveEvents)
-  return generateRouteStatistics(routeDurationMs, timelineEvents)
 }
