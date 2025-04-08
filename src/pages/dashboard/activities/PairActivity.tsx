@@ -78,10 +78,8 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
         const navigate = useNavigate()
 
         pairDevice(input.pairToken)
-          .then((dongleId) => {
-            props.onPaired()
-            navigate(`/${dongleId}`)
-          })
+          .then(props.onPaired)
+          .then((dongleId) => navigate(`/${dongleId}`))
           .catch((reason) => {
             let error: Error
             if (reason instanceof Error) {
