@@ -111,8 +111,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       const fraction = x / rect.width
       // Update marker immediately without waiting for video
       setMarkerOffsetPct(fraction * 100)
-      const newTime = duration() * fraction
-      props.updateTime(newTime)
+      props.updateTime(duration() * fraction)
     }
 
     const onStart = () => {
@@ -158,7 +157,8 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   createEffect(() => {
-    setMarkerOffsetPct((props.seekTime / duration()) * 100)
+    if (duration() === 0) setMarkerOffsetPct(0)
+    else setMarkerOffsetPct((props.seekTime / duration()) * 100)
   })
 
   return (
