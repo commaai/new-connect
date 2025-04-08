@@ -1,10 +1,9 @@
-import { createContext, createResource, createSignal, Show, Suspense, useContext } from 'solid-js'
+import { createContext, createSignal, Show, useContext } from 'solid-js'
 import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { useDimensions } from '~/utils/window'
-import { getProfile } from '~/api/profile'
 import { USERADMIN_URL } from '~/api/config'
 import { useNavigate } from '@solidjs/router'
 
@@ -26,7 +25,6 @@ const PEEK = 56
 
 const AppHeader: VoidComponent = () => {
   const navigate = useNavigate()
-  const [profile] = createResource(getProfile)
   const { modal, open, setOpen } = useDrawerContext()
   const navHome = () => navigate('/')
 
@@ -43,9 +41,6 @@ const AppHeader: VoidComponent = () => {
       }
       trailing={
         <div class="flex items-center gap-2">
-          <Suspense fallback={<div class="h-[32px] w-[30vw] rounded-md skeleton-loader" />}>
-            <span class="text-title-sm truncate w-[30vw] text-right">{profile()?.user_id}</span>
-          </Suspense>
           <IconButton href={USERADMIN_URL} name="person" filled target="_blank" />
           <IconButton href="/logout" name="logout" />
         </div>
