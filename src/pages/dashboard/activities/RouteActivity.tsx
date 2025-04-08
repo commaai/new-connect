@@ -1,6 +1,8 @@
 import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
+import { A } from '@solidjs/router'
 
 import { setRouteViewed } from '~/api/athena'
+import { getRouteStatistics } from '~/api/derived'
 import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
@@ -14,8 +16,6 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import { generateRouteStatistics, getTimelineEvents } from '~/api/derived'
-import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
   dongleId: string
@@ -34,12 +34,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [statistics] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateRouteStatistics(r, e),
-  )
+  const [statistics] = createResource(route, getRouteStatistics)
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -69,7 +64,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} statistics={statistics()} />
 
           <Show when={selection().startTime || selection().endTime}>
             <A
