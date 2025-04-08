@@ -114,7 +114,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [devices] = createResource(getDevices, { initialValue: [] })
+  const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
   const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
@@ -130,7 +130,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
-          <PairActivity />
+          <PairActivity onPaired={refetch} />
         </Match>
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (

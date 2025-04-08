@@ -11,7 +11,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
 
-const PairActivity: VoidComponent = () => {
+const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
   const { pair } = useLocation().query
   const pairToken: string | undefined = Array.isArray(pair) ? pair[0] : pair
 
@@ -78,7 +78,10 @@ const PairActivity: VoidComponent = () => {
         const navigate = useNavigate()
 
         pairDevice(input.pairToken)
-          .then((dongleId) => navigate(`/${dongleId}`))
+          .then((dongleId) => {
+            props.onPaired()
+            navigate(`/${dongleId}`)
+          })
           .catch((reason) => {
             let error: Error
             if (reason instanceof Error) {
