@@ -16,7 +16,6 @@ import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
-import CircularProgress from '~/components/material/CircularProgress'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -281,7 +280,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       <Suspense
         fallback={
           <div class="my-2 flex flex-col items-center gap-4">
-            <CircularProgress />
+            <Icon name="autorenew" class="animate-spin" />
             Fetching subscription status...
           </div>
         }

@@ -5,11 +5,11 @@ import QrScanner from 'qr-scanner'
 
 import { pairDevice } from '~/api/devices'
 import Button from '~/components/material/Button'
-import CircularProgress from '~/components/material/CircularProgress'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
+import Icon from '~/components/material/Icon'
 
 const PairActivity: VoidComponent = () => {
   const { pair } = useLocation().query
@@ -95,7 +95,7 @@ const PairActivity: VoidComponent = () => {
             <TopAppBar>Add new device</TopAppBar>
 
             <div class="flex flex-col items-center gap-4">
-              <CircularProgress class="m-4" color="primary" size={64} />
+              <Icon name="autorenew" class="animate-spin" size="40" />
               Pairing your device...
             </div>
           </>
