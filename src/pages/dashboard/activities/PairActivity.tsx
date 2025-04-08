@@ -5,11 +5,11 @@ import QrScanner from 'qr-scanner'
 
 import { pairDevice } from '~/api/devices'
 import Button from '~/components/material/Button'
+import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
-import Icon from '~/components/material/Icon'
 
 const PairActivity: VoidComponent = () => {
   const { pair } = useLocation().query
