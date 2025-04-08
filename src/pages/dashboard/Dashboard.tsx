@@ -2,12 +2,8 @@ import { createMemo, createResource, lazy, Match, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
-<<<<<<< HEAD
 
 import { isSignedIn } from '~/api/auth/client'
-import { USERADMIN_URL } from '~/api/config'
-=======
->>>>>>> 9bded7b (most of framework done, needs polish)
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
@@ -34,26 +30,6 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
-<<<<<<< HEAD
-      <div class="m-4 mt-0">
-        <ButtonBase href={USERADMIN_URL}>
-          <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
-            <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
-              <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-                <Icon name="person" filled />
-              </div>
-              <div class="min-w-0 mx-3">
-                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
-              </div>
-              <div class="grow" />
-              <IconButton name="logout" href="/logout" />
-            </div>
-          </Suspense>
-        </ButtonBase>
-      </div>
-=======
->>>>>>> 9bded7b (most of framework done, needs polish)
     </>
   )
 }
