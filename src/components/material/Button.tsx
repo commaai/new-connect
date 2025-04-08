@@ -3,7 +3,7 @@ import { Show, splitProps } from 'solid-js'
 import clsx from 'clsx'
 
 import ButtonBase, { ButtonBaseProps } from './ButtonBase'
-import CircularProgress from './CircularProgress'
+import Icon from './Icon'
 
 type ButtonProps = ButtonBaseProps & {
   color?: 'primary' | 'secondary' | 'tertiary' | 'error'
@@ -42,7 +42,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       {props.leading}
       <span class={clsx('text-label-lg', props.loading && 'invisible')}>{props.children}</span>
       <Show when={props.loading}>
-        <CircularProgress class="absolute left-1/2 top-1/2 ml-[-10px] mt-[-10px]" color="inherit" size={20} />
+        <Icon name="autorenew" class="absolute left-1/2 top-1/2 ml-[-10px] mt-[-10px] animate-spin" size="20" />
       </Show>
       {props.trailing}
     </ButtonBase>

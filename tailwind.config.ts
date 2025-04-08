@@ -226,28 +226,6 @@ export default {
             right: '-8%',
           },
         },
-        'circular-rotate': {
-          '0%': {
-            transform: 'rotate(0deg)',
-          },
-          '100%': {
-            transform: 'rotate(360deg)',
-          },
-        },
-        'circular-dash': {
-          '0%': {
-            strokeDasharray: '1px, 200px',
-            strokeDashoffset: '0',
-          },
-          '50%': {
-            strokeDasharray: '100px, 200px',
-            strokeDashoffset: '-15',
-          },
-          '100%': {
-            strokeDasharray: '100px, 200px',
-            strokeDashoffset: '-125',
-          },
-        },
       },
       screens: {
         // Larger screen phones (iPhone Pro/Max, Galaxy Ultra, Pixel XL/Pro...)
@@ -256,8 +234,6 @@ export default {
       animation: {
         indeterminate1: 'indeterminate1 2.1s cubic-bezier(0.65, 0.815, 0.735, 0.395) infinite',
         indeterminate2: 'indeterminate2 2.1s cubic-bezier(0.165, 0.84, 0.44, 1) 1.15s infinite',
-        'circular-rotate': 'circular-rotate 1.4s linear infinite',
-        'circular-dash': 'circular-dash 1.4s ease-in-out infinite',
       },
       transitionProperty: {
         indeterminate: 'transform, background-color',
