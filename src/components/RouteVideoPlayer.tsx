@@ -14,6 +14,8 @@ type RouteVideoPlayerProps = {
   ref: (el?: HTMLVideoElement) => void
 }
 
+const PlaybackRate = [0.25, 0.5, 1, 2, 4]
+
 const ERROR_MISSING_SEGMENT = 'This video segment has not uploaded yet or has been deleted.'
 const ERROR_UNSUPPORTED_BROWSER = 'This browser does not support Media Source Extensions API.'
 
@@ -27,6 +29,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [isPlaying, setIsPlaying] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
+  const [playbackRate, setPlaybackRate] = createSignal(1)
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [errorMessage, setErrorMessage] = createSignal<string>('')
 
@@ -56,8 +59,15 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   }
   const onClick = (e: Event) => {
+    console.debug('onClick', e)
     e.preventDefault()
     togglePlayback()
+  }
+  const togglePlaybackRate = (e: Event) => {
+    console.debug('togglePlaybackRate')
+    e.stopPropagation()
+    const currentIndex = PlaybackRate.indexOf(playbackRate())
+    video.playbackRate = PlaybackRate[(currentIndex + 1) % PlaybackRate.length]
   }
 
   const onTimeUpdate = (e: Event) => {
@@ -85,6 +95,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     if (!isPlaying()) return
     void video.play()
   }
+  const onRateChange = () => setPlaybackRate(video.playbackRate)
 
   onMount(() => {
     if (props.selection.startTime > 0) {
@@ -100,6 +111,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     video.addEventListener('pause', onPause)
     video.addEventListener('ended', onEnded)
     video.addEventListener('stalled', onStalled)
+    video.addEventListener('ratechange', onRateChange)
     video.addEventListener('loadeddata', onLoadedData)
     video.addEventListener('error', onError)
 
@@ -199,11 +211,17 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
         {/* Controls container */}
-        <div class="relative flex w-full items-center gap-3 pb-3 px-2">
+        <div class="relative flex w-full items-center gap-3 pb-3 pl-2 pr-4 font-mono text-sm text-on-surface">
           <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
-          <div class="font-mono text-sm text-on-surface">
+          <div>
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
+          </div>
+
+          <div class="grow" />
+
+          <div class="size-8 text-center" onClick={togglePlaybackRate}>
+            {playbackRate().toString()}x
           </div>
         </div>
       </div>
