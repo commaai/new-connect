@@ -49,9 +49,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     const preservedRoutes = preservedRoutesResource()
     if (!props.route) return
     setIsPublic(props.route.is_public)
-    if (props.route.is_preserved) {
-      setIsPreserved(true)
-    } else if (preservedRoutes) {
+    if (preservedRoutes) {
       const { fullname } = props.route
       setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
     } else {
