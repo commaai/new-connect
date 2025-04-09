@@ -36,7 +36,7 @@ export async function refreshAccessToken(code: string, provider: string): Promis
 export const accessToken: Accessor<string | null> = () => {
   if (!initialized) {
     initialized = true
-    _setAccessToken(window.localStorage.getItem(AUTH_KEY))
+    _setAccessToken(localStorage.getItem(AUTH_KEY))
   }
   return _accessToken()
 }
