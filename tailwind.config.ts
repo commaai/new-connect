@@ -14,13 +14,81 @@ export default {
       xl: '1.75em',
       full: '9999px',
     },
-    fontWeight: {
-      light: '300',
-      regular: '400',
-      medium: '500',
-      semibold: '600',
-      bold: '700',
-      extrabold: '800',
+    fontFamily: {
+      sans: ['Inter', ...defaultTheme.fontFamily.sans],
+      mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
+    },
+    fontSize: {
+      'display-sm': [
+        '36px',
+        {
+          lineHeight: '44px',
+          fontWeight: 400,
+          letterSpacing: 'initial',
+        },
+      ],
+      'headline-md': [
+        '28px',
+        {
+          lineHeight: '36px',
+          fontWeight: 400,
+          letterSpacing: 'initial',
+        },
+      ],
+      'title-lg': [
+        '22px',
+        {
+          lineHeight: '28px',
+          fontWeight: 400,
+          letterSpacing: 'initial',
+        },
+      ],
+      'title-md': [
+        '16px',
+        {
+          lineHeight: '24px',
+          fontWeight: 500,
+          letterSpacing: '0.15px',
+        },
+      ],
+      'label-lg': [
+        '14px',
+        {
+          lineHeight: '20px',
+          fontWeight: 500,
+          letterSpacing: '0.1px',
+        },
+      ],
+      'label-md': [
+        '12px',
+        {
+          lineHeight: '16px',
+          fontWeight: 500,
+          letterSpacing: '0.5px',
+        },
+      ],
+      'label-sm': [
+        '11px',
+        {
+          lineHeight: '16px',
+          fontWeight: 500,
+          letterSpacing: '0.5px',
+        },
+      ],
+      'body-lg': [
+        '16px',
+        {
+          lineHeight: '24px',
+          letterSpacing: '0.5px',
+        },
+      ],
+      'body-md': [
+        '14px',
+        {
+          lineHeight: '20px',
+          letterSpacing: '0.25px',
+        },
+      ],
     },
     extend: {
       colors: Object.fromEntries(
@@ -76,82 +144,6 @@ export default {
           'surface-container-highest',
         ].map((name) => [name, `var(--color-${name})`]),
       ),
-      fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
-        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
-      },
-      fontSize: {
-        'display-sm': [
-          '36px',
-          {
-            lineHeight: '44px',
-            fontWeight: 400,
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-md': [
-          '28px',
-          {
-            lineHeight: '36px',
-            fontWeight: 400,
-            letterSpacing: 'initial',
-          },
-        ],
-        'title-lg': [
-          '22px',
-          {
-            lineHeight: '28px',
-            fontWeight: 400,
-            letterSpacing: 'initial',
-          },
-        ],
-        'title-md': [
-          '16px',
-          {
-            lineHeight: '24px',
-            fontWeight: 500,
-            letterSpacing: '0.15px',
-          },
-        ],
-        'label-lg': [
-          '14px',
-          {
-            lineHeight: '20px',
-            fontWeight: 500,
-            letterSpacing: '0.1px',
-          },
-        ],
-        'label-md': [
-          '12px',
-          {
-            lineHeight: '16px',
-            fontWeight: 500,
-            letterSpacing: '0.5px',
-          },
-        ],
-        'label-sm': [
-          '11px',
-          {
-            lineHeight: '16px',
-            fontWeight: 500,
-            letterSpacing: '0.5px',
-          },
-        ],
-        'body-lg': [
-          '16px',
-          {
-            lineHeight: '24px',
-            letterSpacing: '0.5px',
-          },
-        ],
-        'body-md': [
-          '14px',
-          {
-            lineHeight: '20px',
-            letterSpacing: '0.25px',
-          },
-        ],
-      },
       keyframes: {
         shimmer: {
           '100%': {
