@@ -2,22 +2,23 @@ import type { Config } from 'tailwindcss'
 import * as defaultTheme from 'tailwindcss/defaultTheme'
 
 const fontSize = {
-  'display-lg': ['57px', { lineHeight: '64px', fontWeight: 400, letterSpacing: '-0.25px' }],
-  'display-md': ['45px', { lineHeight: '52px', fontWeight: 400, letterSpacing: 'initial' }],
-  'display-sm': ['36px', { lineHeight: '44px', fontWeight: 400, letterSpacing: 'initial' }],
-  'headline-lg': ['32px', { lineHeight: '40px', fontWeight: 400, letterSpacing: 'initial' }],
-  'headline-md': ['28px', { lineHeight: '36px', fontWeight: 400, letterSpacing: 'initial' }],
-  'headline-sm': ['24px', { lineHeight: '32px', fontWeight: 400, letterSpacing: 'initial' }],
-  'title-lg': ['22px', { lineHeight: '28px', fontWeight: 400, letterSpacing: 'initial' }],
+  'display-lg': ['57px', { lineHeight: '64px', letterSpacing: '-0.25px' }],
+  'display-md': ['45px', { lineHeight: '52px', letterSpacing: 'initial' }],
+  'display-sm': ['36px', { lineHeight: '44px', letterSpacing: 'initial' }],
+  'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: 'initial' }],
+  'headline-md': ['28px', { lineHeight: '36px', letterSpacing: 'initial' }],
+  'headline-sm': ['24px', { lineHeight: '32px', letterSpacing: 'initial' }],
+  'title-lg': ['22px', { lineHeight: '28px', letterSpacing: 'initial' }],
   'title-md': ['16px', { lineHeight: '24px', fontWeight: 500, letterSpacing: '0.15px' }],
   'title-sm': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
   'label-lg': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
-  'label-md': ['12px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
-  'label-sm': ['11px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
-  'body-lg': ['16px', { lineHeight: '24px', fontWeight: 400, letterSpacing: '0.5px' }],
-  'body-md': ['14px', { lineHeight: '20px', fontWeight: 400, letterSpacing: '0.25px' }],
-  'body-sm': ['12px', { lineHeight: '16px', fontWeight: 400, letterSpacing: '0.4px' }],
-} as Record<string, [string, { lineHeight: string; fontWeight: number; letterSpacing: string }]>
+  'label-md': ['13px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.25px' }],
+  // 'label-md': ['12px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+  // 'label-sm': ['11px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+  'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0.5px' }],
+  'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0.25px' }],
+  // 'body-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.4px' }],
+} as Record<string, [string, { lineHeight: string; fontWeight?: number; letterSpacing: string }]>
 
 export default {
   content: ['./src/**/*.{ts,tsx}', './index.html'],
@@ -31,6 +32,14 @@ export default {
       lg: '1em',
       xl: '1.75em',
       full: '9999px',
+    },
+    fontWeight: {
+      light: '300',
+      regular: '400',
+      medium: '500',
+      semibold: '600',
+      bold: '700',
+      extrabold: '800',
     },
     fontFamily: {
       sans: ['Inter', ...defaultTheme.fontFamily.sans],
