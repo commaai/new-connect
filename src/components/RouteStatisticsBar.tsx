@@ -1,4 +1,4 @@
-import type { VoidComponent } from 'solid-js'
+import type { Resource, VoidComponent } from 'solid-js'
 
 import type { RouteStatistics } from '~/api/derived'
 import type { Route } from '~/api/types'
@@ -11,9 +11,7 @@ const formatEngagement = (statistics: RouteStatistics | undefined): string | und
   return `${(100 * (engagedDurationMs / routeDurationMs)).toFixed(0)}%`
 }
 
-const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefined; statistics: RouteStatistics | undefined }> = (
-  props,
-) => {
+const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefined; statistics: Resource<RouteStatistics> }> = (props) => {
   return (
     <StatisticBar
       class={props.class}
@@ -22,11 +20,13 @@ const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefin
         {
           label: 'Duration',
           value: () => {
-            if (props.statistics) return formatDuration(props.statistics.routeDurationMs / (60 * 1000))
+            if (props.statistics.state === 'ready' || props.statistics.state === 'refreshing') {
+              return formatDuration(props.statistics.latest.routeDurationMs / (60 * 1000))
+            }
             return formatRouteDuration(props.route)
           },
         },
-        { label: 'Engaged', value: () => formatEngagement(props.statistics) },
+        { label: 'Engaged', value: () => formatEngagement(props.statistics()) },
       ]}
     />
   )

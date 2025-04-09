@@ -22,7 +22,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
   const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), [30, 57, 138], [218, 161, 28])
-  const [statistics] = createResource(() => props.route, getRouteStatistics)
+  const [statistics] = createResource(() => getRouteStatistics(props.route))
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
@@ -55,7 +55,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatisticsBar route={props.route} statistics={statistics()} />
+        <RouteStatisticsBar route={props.route} statistics={statistics} />
       </CardContent>
       <div class="h-2.5 w-full" style={{ background: color() }} />
     </Card>
