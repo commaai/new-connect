@@ -51,7 +51,7 @@ export const formatVideoTime = (seconds: number): string => {
 }
 
 export const getRouteDuration = (route: Route | undefined): Duration | undefined => {
-  if (!route || !route.end_time) return undefined
+  if (!route || !route.start_time || !route.end_time) return undefined
   const startTime = dayjs(route.start_time)
   const endTime = dayjs(route.end_time)
   return dayjs.duration(endTime.diff(startTime))

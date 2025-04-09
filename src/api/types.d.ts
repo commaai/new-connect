@@ -86,7 +86,7 @@ export interface Route extends ApiResponseBase {
   radar?: boolean
   start_lat?: number
   start_lng?: number
-  start_time: string
+  start_time?: string
   url: string
   user_id: string | null
   version?: string
