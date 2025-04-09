@@ -11,25 +11,17 @@ export const parseRouteName = (routeName: string): RouteInfo => {
 
 export const getRoute = (routeName: Route['fullname']) => fetcher<Route>(`/v1/route/${routeName}/`)
 
-const getRouteShareSignature = (routeName: string) => fetcher<RouteShareSignature>(`/v1/route/${routeName}/share_signature`)
-
-const createQCameraStreamUrl = (routeName: Route['fullname'], signature: RouteShareSignature): string =>
-  `${API_URL}/v1/route/${routeName}/qcamera.m3u8?${new URLSearchParams(signature).toString()}`
-
-const getQCameraStreamUrl = useRouteCache(
-  (route: Route) =>
-    getRouteShareSignature(route.fullname)
-      .then((signature) => createQCameraStreamUrl(route.fullname, signature))
-      .catch(() => undefined),
-  { ignoreMaxqlog: true },
+const getRouteShareSignature = useRouteCache(
+  (route: Route) => fetcher<RouteShareSignature>(`/v1/route/${route.fullname}/share_signature`),
+  [],
 )
 
-export const getQCameraStreamBlobUrl = useRouteCache(async (route: Route) => {
-  const streamUrl = await getQCameraStreamUrl(route)
-  if (!streamUrl) return undefined
-  const blob = await (await fetch(streamUrl)).blob()
-  return URL.createObjectURL(blob)
-})
+export const getQCameraStreamUrl = (route: Route) =>
+  getRouteShareSignature(route)
+    .then((signature) => {
+      return `${API_URL}/v1/route/${route.fullname}/qcamera.m3u8?${new URLSearchParams(signature).toString()}&maxqcamera=${route.maxqcamera}`
+    })
+    .catch(() => undefined)
 
 export const setRoutePublic = (routeName: string, isPublic: boolean): Promise<Route> =>
   fetcher<Route>(`/v1/route/${routeName}/`, {

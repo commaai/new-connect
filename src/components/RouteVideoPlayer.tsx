@@ -1,7 +1,7 @@
 import { Show, createEffect, createResource, createSignal, on, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { getQCameraStreamBlobUrl } from '~/api/route'
+import { getQCameraStreamUrl } from '~/api/route'
 import type { Route } from '~/api/types'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
@@ -20,7 +20,7 @@ const ERROR_UNSUPPORTED_BROWSER = 'This browser does not support Media Source Ex
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const route = () => props.route
-  const [streamUrl] = createResource(route, getQCameraStreamBlobUrl)
+  const [streamUrl] = createResource(route, getQCameraStreamUrl)
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
