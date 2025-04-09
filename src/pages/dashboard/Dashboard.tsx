@@ -105,7 +105,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   })
 
   const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
-  const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -119,7 +118,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={!isSignedIn() || (!profile.loading && !profile.latest)}>
+        <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
