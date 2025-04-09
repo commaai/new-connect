@@ -1,6 +1,11 @@
+import { createSignal, type Accessor } from 'solid-js'
+
 import { API_URL } from '../config'
 
 const AUTH_KEY = 'ai.comma.api.authorization'
+
+let initialized = false
+const [_accessToken, _setAccessToken] = createSignal<string | null>(null)
 
 export async function refreshAccessToken(code: string, provider: string): Promise<void> {
   try {
@@ -28,28 +33,27 @@ export async function refreshAccessToken(code: string, provider: string): Promis
   }
 }
 
-export function getAccessToken(): string | null {
-  if (typeof window === 'undefined') {
-    return null
+export const accessToken: Accessor<string | null> = () => {
+  if (!initialized) {
+    initialized = true
+    _setAccessToken(localStorage.getItem(AUTH_KEY))
   }
-  return window.localStorage.getItem(AUTH_KEY)
+  return _accessToken()
 }
 
-export function setAccessToken(token: string): void {
-  if (typeof window === 'undefined') {
-    return
+export function setAccessToken(token: string | null): void {
+  _setAccessToken(token)
+  if (token === null) {
+    localStorage.removeItem(AUTH_KEY)
+  } else {
+    localStorage.setItem(AUTH_KEY, token)
   }
-  window.localStorage.setItem(AUTH_KEY, token)
-}
-
-export function clearAccessToken(): void {
-  setAccessToken('')
 }
 
 export function isSignedIn(): boolean {
-  return !!getAccessToken()
+  return !!accessToken()
 }
 
 export function signOut(): void {
-  clearAccessToken()
+  setAccessToken(null)
 }
