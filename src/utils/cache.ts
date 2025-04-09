@@ -1,8 +1,8 @@
 import { Route } from '~/api/types'
 
-type RouteKey = keyof Route
+type RouteKey = Exclude<keyof Route, 'fullname'>
 
-export const useRouteCache = <T>(fn: (route: Route) => Promise<T>, keys: readonly RouteKey[] = ['maxqlog']) => {
+export const useRouteCache = <T>(fn: (route: Route) => Promise<T>, keys: RouteKey[] = ['maxqlog']) => {
   const cache = new Map<string, [string, Promise<T>]>()
   return (route: Route) => {
     let res = cache.get(route.fullname)
