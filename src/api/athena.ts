@@ -7,6 +7,15 @@ export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, bool
 export const setRouteViewed = (dongleId: string, route: string) =>
   makeAthenaCall<{ route: string }, void>(dongleId, 'setRouteViewed', { route })
 
+export const takeSnapshot = (dongleId: string) =>
+  makeAthenaCall<
+    void,
+    {
+      jpegFront?: string
+      jpegBack?: string
+    }
+  >(dongleId, 'takeSnapshot')
+
 export const makeAthenaCall = async <REQ, RES>(
   dongleId: string,
   method: string,
