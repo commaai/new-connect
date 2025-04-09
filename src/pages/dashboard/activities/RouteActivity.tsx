@@ -3,8 +3,6 @@ import { A } from '@solidjs/router'
 
 import { setRouteViewed } from '~/api/athena'
 import { getRouteStatistics } from '~/api/derived'
-import { getDevice } from '~/api/devices'
-import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
 
@@ -16,6 +14,11 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
+import { createQuery, queryOptions } from '@tanstack/solid-query'
+import { Route } from '~/api/types'
+import { getPlaceName } from '~/map/geocode'
+import { queries as deviceQueries } from './DeviceActivity'
+import { queries as dashboardQueries } from '../Dashboard'
 
 type RouteActivityProps = {
   dongleId: string
@@ -24,17 +27,49 @@ type RouteActivityProps = {
   endTime: number | undefined
 }
 
+export const queries = {
+  route: ['route'],
+  statistics: () => [...queries.route, 'statistics'],
+  location: () => [...queries.route, 'location'],
+  forRoute: (routeName: string) => [...queries.route, routeName],
+  forRouteStatistics: (routeName: string) => [...queries.statistics(), routeName],
+  forRouteLocation: (routeName: string) => [...queries.location(), routeName],
+  getRoute: (routeName: string) => queryOptions({ queryKey: queries.forRoute(routeName), queryFn: () => getRoute(routeName) }),
+  getRouteStatistics: (route?: Route) =>
+    queryOptions({
+      queryKey: queries.forRouteStatistics(route?.fullname ?? ''),
+      queryFn: () => getRouteStatistics(route!),
+      enabled: !!route,
+    }),
+  getRouteLocation: (route?: Route) =>
+    queryOptions({
+      queryKey: queries.forRouteLocation(route?.fullname ?? ''),
+      queryFn: async () => {
+        const startPos = [route?.start_lng || 0, route?.start_lat || 0]
+        const endPos = [route?.end_lng || 0, route?.end_lat || 0]
+        const startPlace = await getPlaceName(startPos)
+        const endPlace = await getPlaceName(endPos)
+        if (!startPlace && !endPlace) return ''
+        if (!endPlace || startPlace === endPlace) return startPlace
+        if (!startPlace) return endPlace
+        return `${startPlace} to ${endPlace}`
+      },
+      enabled: !!route,
+    }),
+}
+
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('dddd, MMM D, YYYY'))
+  const routeQuery = createQuery(() => queries.getRoute(routeName()))
+  const route = () => routeQuery.data
+  const [startTime] = createResource(route, (route) => dayjs(route?.start_time)?.format('dddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  const [statistics] = createResource(route, getRouteStatistics)
+  const statistics = createQuery(() => queries.getRouteStatistics(route()))
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -47,15 +82,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     onTimelineChange(props.startTime)
   })
 
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [profile] = createResource(getProfile)
-  createResource(
-    () => [device(), profile(), props.dateStr] as const,
-    async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
-    },
-  )
+  const device = createQuery(() => deviceQueries.getDevice(props.dongleId))
+  const profile = createQuery(dashboardQueries.getProfile)
+  createEffect(() => {
+    if (device.data && profile.data) {
+      if (!device.data.is_owner && !profile.data.superuser) return
+      setRouteViewed(device.data.dongle_id, props.dateStr)
+    }
+  })
 
   return (
     <>
@@ -64,7 +98,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} statistics={statistics()} />
+          <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} statistics={statistics.data} />
 
           <Show when={selection().startTime || selection().endTime}>
             <A
@@ -80,7 +114,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
+            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics.data} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>

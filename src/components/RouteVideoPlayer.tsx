@@ -1,10 +1,11 @@
-import { Show, createEffect, createResource, createSignal, on, onCleanup, onMount, type VoidComponent } from 'solid-js'
+import { Show, createEffect, createSignal, on, onCleanup, onMount, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
+import { createQuery } from '@tanstack/solid-query'
 
 type RouteVideoPlayerProps = {
   class?: string
@@ -19,7 +20,12 @@ const ERROR_UNSUPPORTED_BROWSER = 'This browser does not support Media Source Ex
 
 const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const routeName = () => props.routeName
-  const [streamUrl] = createResource(routeName, getQCameraStreamUrl)
+  const streamUrl = createQuery(() => ({
+    queryKey: ['streamUrl', routeName()],
+    queryFn: () => getQCameraStreamUrl(routeName()),
+    enabled: !!routeName(),
+    refetchOnMount: false,
+  }))
   const [hls, setHls] = createSignal<Hls | null>()
   let video!: HTMLVideoElement
   let controls!: HTMLDivElement
@@ -147,7 +153,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   )
 
   createEffect(() => {
-    const url = streamUrl()
+    const url = streamUrl.data
     const player = hls()
     if (!url || player === undefined) return
 

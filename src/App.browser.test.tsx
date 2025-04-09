@@ -1,5 +1,8 @@
+import { VoidComponent } from 'solid-js'
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { configure, render, waitFor } from '@solidjs/testing-library'
+import { createMemoryHistory, MemoryRouter } from '@solidjs/router'
+import { QueryClient, QueryClientProvider } from '@tanstack/solid-query'
 
 import { clearAccessToken, setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
@@ -7,7 +10,27 @@ import { AppLayout, Routes } from './App'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 
-const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
+const createTestQueryClient = () => new QueryClient({ defaultOptions: { queries: { retry: false } } })
+
+const TestApp: VoidComponent<{ location: string }> = (props) => {
+  // the Router renders the component defined in each Route. we need to wrap the QueryClientProvider
+  // around the Router so that the QueryClient is available to the Route components. so, create
+  // our own MemoryRouter instead of the internal @solidjs/testing-library wrapper
+  const history = createMemoryHistory()
+  history.set({ value: props.location, scroll: false, replace: true })
+
+  return (
+    <QueryClientProvider client={createTestQueryClient()}>
+      <MemoryRouter history={history}>
+        <AppLayout>
+          <Routes />
+        </AppLayout>
+      </MemoryRouter>
+    </QueryClientProvider>
+  )
+}
+
+const renderApp = (location: string) => render(() => <TestApp location={location} />)
 
 beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
 beforeEach(() => clearAccessToken())

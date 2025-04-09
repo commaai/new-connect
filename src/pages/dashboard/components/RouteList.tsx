@@ -2,17 +2,17 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import timezone from 'dayjs/plugin/timezone.js'
+import { createQuery, useQueryClient } from '@tanstack/solid-query'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
-import { fetcher } from '~/api'
-import { getRouteStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatisticsBar from '~/components/RouteStatisticsBar'
-import { getPlaceName } from '~/map/geocode'
+import { queries } from '~/pages/dashboard/activities/RouteActivity'
 import type { Route } from '~/api/types'
 import { dateTimeToColorBetween } from '~/utils/format'
+import { fetcher } from '~/api'
 
 interface RouteCardProps {
   route: Route
@@ -22,17 +22,8 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const startTime = () => dayjs.utc(props.route.start_time).local()
   const endTime = () => dayjs.utc(props.route.end_time).local()
   const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), [30, 57, 138], [218, 161, 28])
-  const [statistics] = createResource(() => props.route, getRouteStatistics)
-  const [location] = createResource(async () => {
-    const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
-    const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
-    const startPlace = await getPlaceName(startPos)
-    const endPlace = await getPlaceName(endPos)
-    if (!startPlace && !endPlace) return ''
-    if (!endPlace || startPlace === endPlace) return startPlace
-    if (!startPlace) return endPlace
-    return `${startPlace} to ${endPlace}`
-  })
+  const statistics = createQuery(() => queries.getRouteStatistics(props.route))
+  const location = createQuery(() => queries.getRouteLocation(props.route))
 
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
@@ -42,10 +33,10 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
             {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
           </span>
         }
-        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
+        subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location.data}</Suspense>}
         trailing={
           <Suspense>
-            <Show when={statistics()?.userFlags}>
+            <Show when={statistics.data?.userFlags}>
               <div class="flex items-center justify-center rounded-full p-1 border-amber-300 border-2">
                 <Icon class="text-yellow-300" size="24" name="flag" filled />
               </div>
@@ -55,7 +46,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatisticsBar route={props.route} statistics={statistics} />
+        <RouteStatisticsBar route={props.route} statistics={statistics.data!} />
       </CardContent>
       <div class="h-2.5 w-full" style={{ background: color() }} />
     </Card>
@@ -79,6 +70,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
 const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
+  const queryClient = useQueryClient()
   const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -147,6 +139,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 {(route) => {
                   const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
+                  queryClient.setQueryData(queries.forRoute(route.fullname), route)
                   return (
                     <>
                       <Show when={dayHeader}>
