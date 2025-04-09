@@ -17,6 +17,7 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
+import { createQuery, queryOptions } from '@tanstack/solid-query'
 
 type RouteActivityProps = {
   dongleId: string
@@ -25,17 +26,24 @@ type RouteActivityProps = {
   endTime: number | undefined
 }
 
+export const queries = {
+  route: ['route'],
+  forRoute: (routeName: string) => [...queries.route, routeName],
+  getRoute: (routeName: string) => queryOptions({ queryKey: queries.forRoute(routeName), queryFn: () => getRoute(routeName) }),
+}
+
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
-  const [route] = createResource(routeName, getRoute)
-  const [startTime] = createResource(route, (route) => dayjs(route.start_time)?.format('dddd, MMM D, YYYY'))
+  const routeQuery = createQuery(() => queries.getRoute(routeName()))
+  const route = () => routeQuery.data
+  const [startTime] = createResource(route, (route) => dayjs(route?.start_time)?.format('dddd, MMM D, YYYY'))
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  const [statistics] = createResource(route, getRouteStatistics)
+  const [statistics] = createResource(route(), getRouteStatistics)
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()

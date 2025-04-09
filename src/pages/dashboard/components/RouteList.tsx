@@ -2,6 +2,7 @@ import { createEffect, createResource, createSignal, For, Index, onCleanup, onMo
 import dayjs from 'dayjs'
 import utc from 'dayjs/plugin/utc.js'
 import timezone from 'dayjs/plugin/timezone.js'
+import { useQueryClient } from '@tanstack/solid-query'
 dayjs.extend(utc)
 dayjs.extend(timezone)
 
@@ -11,6 +12,7 @@ import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
 import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import { getPlaceName } from '~/map/geocode'
+import { queries } from '~/pages/dashboard/activities/RouteActivity'
 import type { Route } from '~/api/types'
 import { dateTimeToColorBetween } from '~/utils/format'
 
@@ -75,6 +77,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
 const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
+  const queryClient = useQueryClient()
   const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
   const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
@@ -143,6 +146,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 {(route) => {
                   const firstHeader = prevDayHeader === null
                   const dayHeader = getDayHeader(route)
+                  queryClient.setQueryData(queries.forRoute(route.fullname), route)
                   return (
                     <>
                       <Show when={dayHeader}>
