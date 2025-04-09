@@ -15,7 +15,7 @@ const ToggleButton: VoidComponent<{
     class="flex w-full items-center justify-between p-2 transition-colors hover:bg-surface-container-low rounded-md"
     onClick={() => props.onToggle()}
   >
-    <span class="text-body-md text-on-surface-variant">{props.label}</span>
+    <span class="text-sm text-on-surface-variant">{props.label}</span>
 
     {/* Toggle Switch */}
     <div
@@ -104,7 +104,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   return (
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
-      <div class="font-mono text-body-sm text-zinc-500">
+      <div class="font-mono text-xs text-zinc-500">
         <div class="flex justify-between">
           <span class="mb-2 text-on-surface-variant">Route ID:</span>
           <a href={useradminUrl()} class="text-blue-400 hover:text-blue-500 duration-200" target="_blank" rel="noopener noreferrer">
@@ -115,7 +115,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           onClick={() => void copyCurrentRouteId()}
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
-          <div class="lg:text-body-md">
+          <div class="lg:text-sm">
             <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
             <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
           </div>
@@ -129,7 +129,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
       </div>
 
       <Show when={error()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
+        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
           <Icon class="text-error" name="error" size="20" />
           {error()}
         </div>

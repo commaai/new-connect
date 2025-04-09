@@ -69,12 +69,12 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
         <div class="flex items-center min-w-0 flex-1">
           <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item().isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[item().route, item().segment, item().filename].join(' ')}</span>
+            <span class="text-xs font-mono truncate text-on-surface">{[item().route, item().segment, item().filename].join(' ')}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
           <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={cancel} />}>
-            <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
+            <span class="text-xs font-mono whitespace-nowrap pr-[0.5rem]">
               {item().id ? `${Math.round(item().progress * 100)}%` : 'Offline'}
             </span>
           </Show>
@@ -90,7 +90,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
 const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message: string }> = (props) => (
   <div class="flex items-center gap-2">
     <Icon name={props.icon} class={props.iconClass} />
-    <span class="text-body-lg">{props.message}</span>
+    <span class="text-md">{props.message}</span>
   </div>
 )
 

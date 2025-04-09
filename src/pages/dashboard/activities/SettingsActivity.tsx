@@ -79,9 +79,9 @@ const PlanSelector: ParentComponent<{
               onClick={() => props.setPlan(plan.name)}
               disabled={plan.disabled || props.disabled}
             >
-              <span class="text-body-lg">{PrimePlanName[plan.name].toLowerCase()}</span>
-              <span class="text-title-lg font-bold">{formatCurrency(plan.amount)}/month</span>
-              <span class="text-label-md">{plan.description}</span>
+              <span class="text-md">{PrimePlanName[plan.name].toLowerCase()}</span>
+              <span class="text-lg font-bold">{formatCurrency(plan.amount)}/month</span>
+              <span class="text-xs">{plan.description}</span>
             </ButtonBase>
           )}
         </For>
@@ -199,7 +199,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </p>
 
       <Show when={stripeCancelled()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
           <Icon name="error" class="text-error" size="20" />
           Checkout cancelled
         </div>
@@ -217,7 +217,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
       <Show when={uiState()?.disabledDataPlanText} keyed>
         {(text) => (
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
             <Icon name="info" size="20" />
             {text}
           </div>
@@ -233,7 +233,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </Show>
 
       <Show when={uiState()?.chargeText} keyed>
-        {(text) => <p class="text-label-lg">{text}</p>}
+        {(text) => <p class="text-sm">{text}</p>}
       </Show>
     </div>
   )
@@ -281,13 +281,13 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         fallback={
           <div class="my-2 flex flex-col items-center gap-4">
             <Icon name="autorenew" class="animate-spin" size="40" />
-            <span class="text-title-md">Fetching subscription status...</span>
+            <span class="text-md">Fetching subscription status...</span>
           </div>
         }
       >
         <Switch>
           <Match when={stripeSession.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-body-md font-semibold text-error-container">
+            <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-sm font-semibold text-error-container">
               <Icon name="error" size="20" />
               Unable to check payment status: {stripeSession.error}
             </div>
@@ -296,21 +296,21 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
             {(paymentStatus) => (
               <Switch>
                 <Match when={paymentStatus === 'unpaid'}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
                     <Icon name="payments" size="20" />
                     Waiting for confirmed payment...
                   </div>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && !subscription()}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
                     <Icon class="animate-spin" name="autorenew" size="20" />
                     Processing subscription...
                   </div>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && subscription()}>
-                  <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-body-md text-on-tertiary-container">
+                  <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-sm text-on-tertiary-container">
                     <Icon name="check" size="20" />
                     <div class="flex flex-col gap-2">
                       <p class="font-semibold">comma prime activated</p>
@@ -328,14 +328,14 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
         <Switch>
           <Match when={cancelData.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
               <Icon class="text-error" name="error" size="20" />
               Failed to cancel subscription: {cancelData.error}
             </div>
           </Match>
 
           <Match when={cancelData.state === 'ready'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-body-md text-on-surface">
+            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
               <Icon name="check" size="20" />
               Subscription cancelled
             </div>
@@ -374,8 +374,8 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           onClick={() => setCancelDialog(false)}
         >
           <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-            <h2 class="text-headline-sm">Cancel subscription</h2>
-            <p class="text-body-md">Are you sure you want to cancel your subscription?</p>
+            <h2 class="text-lg">Cancel subscription</h2>
+            <p class="text-sm">Are you sure you want to cancel your subscription?</p>
             <div class="mt-4 flex flex-wrap justify-stretch gap-4">
               <Button
                 color="error"
@@ -411,9 +411,9 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <h2 class="text-headline-sm">{deviceName()}</h2>
+        <h2 class="text-lg">{deviceName()}</h2>
         <Show when={unpairData.error}>
-          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-body-md text-on-surface">
+          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
             <Icon class="text-error" name="error" size="20" />
             {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
           </div>
@@ -422,7 +422,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
           Unpair this device
         </Button>
         <hr class="mx-4 opacity-20" />
-        <h2 class="text-headline-sm">comma prime</h2>
+        <h2 class="text-lg">comma prime</h2>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>

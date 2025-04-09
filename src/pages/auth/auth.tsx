@@ -34,20 +34,20 @@ export default function Auth() {
       <div class="flex min-h-screen max-w-lg flex-col gap-8 items-center mx-auto justify-center text-on-background bg-background p-6">
         <div class="flex flex-col gap-4 items-center">
           <img src="/images/logo-connect-light.svg" alt="comma connect" width={96} height={96} />
-          <h1 class="text-display-sm">comma connect</h1>
+          <h1 class="text-2xl">comma connect</h1>
         </div>
         <Show
           when={error()}
           fallback={
             <div class="flex items-center gap-3">
               <Icon class="animate-spin" name="autorenew" size="24" />
-              <p class="text-title-lg">authenticating</p>
+              <p class="text-lg">authenticating</p>
             </div>
           }
         >
           <div class="flex gap-4 items-center">
             <Icon class="text-error shrink-0" name="error" size="24" />
-            <span class="text-body-lg">{error()}</span>
+            <span class="text-md">{error()}</span>
           </div>
           <Button color="secondary" href="/login">
             Try again

@@ -1,6 +1,24 @@
 import type { Config } from 'tailwindcss'
 import * as defaultTheme from 'tailwindcss/defaultTheme'
 
+const fontSize = {
+  'display-lg': ['57px', { lineHeight: '64px', letterSpacing: '-0.25px' }],
+  'display-md': ['45px', { lineHeight: '52px', letterSpacing: 'initial' }],
+  'display-sm': ['36px', { lineHeight: '44px', letterSpacing: 'initial' }],
+  'headline-lg': ['32px', { lineHeight: '40px', letterSpacing: 'initial' }],
+  'headline-md': ['28px', { lineHeight: '36px', letterSpacing: 'initial' }],
+  'headline-sm': ['24px', { lineHeight: '32px', letterSpacing: 'initial' }],
+  'title-lg': ['22px', { lineHeight: '28px', letterSpacing: 'initial' }],
+  'title-md': ['16px', { lineHeight: '24px', fontWeight: 500, letterSpacing: '0.15px' }],
+  'title-sm': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
+  'label-lg': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
+  'label-md': ['13px', { lineHeight: '18px', fontWeight: 500, letterSpacing: '0.2px' }],
+  // 'label-sm': ['11px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+  'body-lg': ['16px', { lineHeight: '24px', letterSpacing: '0.5px' }],
+  'body-md': ['14px', { lineHeight: '20px', letterSpacing: '0.25px' }],
+  // 'body-sm': ['12px', { lineHeight: '16px', letterSpacing: '0.4px' }],
+} as Record<string, [string, { lineHeight: string; fontWeight?: number; letterSpacing: string }]>
+
 export default {
   content: ['./src/**/*.{ts,tsx}', './index.html'],
   darkMode: ['class', '[data-theme="dark"]'],
@@ -21,6 +39,19 @@ export default {
       semibold: '600',
       bold: '700',
       extrabold: '800',
+    },
+    fontFamily: {
+      sans: ['Inter', ...defaultTheme.fontFamily.sans],
+      mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
+    },
+    fontSize: {
+      ...fontSize,
+      '2xl': fontSize['display-sm'],
+      xl: fontSize['headline-md'],
+      lg: fontSize['title-lg'],
+      md: fontSize['body-lg'],
+      sm: fontSize['body-md'],
+      xs: fontSize['label-md'],
     },
     extend: {
       colors: Object.fromEntries(
@@ -76,122 +107,6 @@ export default {
           'surface-container-highest',
         ].map((name) => [name, `var(--color-${name})`]),
       ),
-      fontFamily: {
-        sans: ['Inter', ...defaultTheme.fontFamily.sans],
-        mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
-      },
-      fontSize: {
-        'display-lg': [
-          '57px',
-          {
-            lineHeight: '64px',
-            letterSpacing: '-0.25px',
-          },
-        ],
-        'display-md': [
-          '45px',
-          {
-            lineHeight: '52px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'display-sm': [
-          '36px',
-          {
-            lineHeight: '44px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-lg': [
-          '32px',
-          {
-            lineHeight: '40px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-md': [
-          '28px',
-          {
-            lineHeight: '36px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-sm': [
-          '24px',
-          {
-            lineHeight: '32px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'title-lg': [
-          '22px',
-          {
-            lineHeight: '28px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'title-md': [
-          '16px',
-          {
-            lineHeight: '24px',
-            fontWeight: 500,
-            letterSpacing: '0.15px',
-          },
-        ],
-        'title-sm': [
-          '14px',
-          {
-            lineHeight: '20px',
-            fontWeight: 500,
-            letterSpacing: '0.1px',
-          },
-        ],
-        'label-lg': [
-          '14px',
-          {
-            lineHeight: '20px',
-            fontWeight: 500,
-            letterSpacing: 'initial',
-          },
-        ],
-        'label-md': [
-          '12px',
-          {
-            lineHeight: '18px',
-            fontWeight: 500,
-            letterSpacing: 'initial',
-          },
-        ],
-        'label-sm': [
-          '11px',
-          {
-            lineHeight: '16px',
-            fontWeight: 500,
-            letterSpacing: '0.5px',
-          },
-        ],
-        'body-lg': [
-          '16px',
-          {
-            lineHeight: '24px',
-            letterSpacing: '0.5px',
-          },
-        ],
-        'body-md': [
-          '14px',
-          {
-            lineHeight: '20px',
-            letterSpacing: '0.25px',
-          },
-        ],
-        'body-sm': [
-          '12px',
-          {
-            lineHeight: '16px',
-            letterSpacing: '0.4px',
-          },
-        ],
-      },
       keyframes: {
         shimmer: {
           '100%': {

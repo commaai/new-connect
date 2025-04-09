@@ -40,7 +40,7 @@ const State = (props: {
 }) => {
   return (
     <div class={clsx('absolute flex size-full items-center justify-center gap-2', props.opaque && 'bg-surface text-on-surface')}>
-      <span class="text-label-md">{props.children}</span>
+      <span class="text-xs">{props.children}</span>
       {props.trailing}
     </div>
   )

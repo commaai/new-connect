@@ -38,7 +38,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
             >
               <ListItemContent
                 headline={<span class="font-medium">{getDeviceName(device)}</span>}
-                subhead={<span class="font-mono text-label-md lowercase">{device.dongle_id}</span>}
+                subhead={<span class="font-mono text-xs lowercase">{device.dongle_id}</span>}
               />
             </ListItem>
           )}

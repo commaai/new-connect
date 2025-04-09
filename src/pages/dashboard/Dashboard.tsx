@@ -55,8 +55,8 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
                 <Icon name="person" filled />
               </div>
               <div class="min-w-0 mx-3">
-                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+                <div class="truncate text-sm text-on-surface">{profile()?.email}</div>
+                <div class="truncate text-xs text-on-surface-variant">{profile()?.user_id}</div>
               </div>
               <div class="grow" />
               <IconButton name="logout" href="/logout" />
@@ -133,7 +133,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   fallback={
                     <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
                       <Icon name="search" size="48" />
-                      <span class="text-title-md">Select a route to view</span>
+                      <span class="text-md">Select a route to view</span>
                     </div>
                   }
                 >

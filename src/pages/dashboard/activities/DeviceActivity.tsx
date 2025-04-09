@@ -103,7 +103,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                   )}
                 />
 
-                {<div class="text-xl font-bold">{deviceName()}</div>}
+                {<div class="text-lg font-bold">{deviceName()}</div>}
               </div>
             </Suspense>
             <div class="flex gap-4">

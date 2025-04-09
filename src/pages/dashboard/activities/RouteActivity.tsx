@@ -78,7 +78,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-label-md uppercase">Route Info</span>
+          <span class="text-sm">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
 
@@ -87,14 +87,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-label-md uppercase">Upload Files</span>
+          <span class="text-sm">Upload Files</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteUploadButtons route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-label-md uppercase">Route Map</span>
+          <span class="text-sm">Route Map</span>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
               <RouteStaticMap route={route()} />
