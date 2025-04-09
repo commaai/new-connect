@@ -56,7 +56,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
               </div>
               <div class="min-w-0 mx-3">
                 <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+                <div class="truncate text-label-md text-on-surface-variant">{profile()?.user_id}</div>
               </div>
               <div class="grow" />
               <IconButton name="logout" href="/logout" />
