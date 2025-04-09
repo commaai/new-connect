@@ -133,7 +133,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   fallback={
                     <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
                       <Icon name="search" size="48" />
-                      <span class="text-title-md">Select a route to view</span>
+                      <span class="text-md">Select a route to view</span>
                     </div>
                   }
                 >

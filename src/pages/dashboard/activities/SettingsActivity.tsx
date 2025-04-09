@@ -281,7 +281,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         fallback={
           <div class="my-2 flex flex-col items-center gap-4">
             <Icon name="autorenew" class="animate-spin" size="40" />
-            <span class="text-title-md">Fetching subscription status...</span>
+            <span class="text-md">Fetching subscription status...</span>
           </div>
         }
       >
