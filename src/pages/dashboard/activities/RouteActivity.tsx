@@ -83,7 +83,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   })
 
   const device = createQuery(() => deviceQueries.getDevice(props.dongleId))
-  const profile = createQuery(() => dashboardQueries.getProfile())
+  const profile = createQuery(dashboardQueries.getProfile)
   createEffect(() => {
     if (device.data && profile.data) {
       if (!device.data.is_owner && !profile.data.superuser) return
