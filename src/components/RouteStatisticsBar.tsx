@@ -19,12 +19,10 @@ const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefin
         { label: 'Distance', value: () => formatDistance(props.route?.length) },
         {
           label: 'Duration',
-          value: () => {
-            if (props.statistics.state === 'ready' || props.statistics.state === 'refreshing') {
-              return formatDuration(props.statistics().routeDurationMs / (60 * 1000))
-            }
-            return formatRouteDuration(props.route)
-          },
+          value: () =>
+            props.statistics.state === 'ready' || props.statistics.state === 'refreshing'
+              ? formatDuration(props.statistics().routeDurationMs / (60 * 1000))
+              : formatRouteDuration(props.route),
         },
         { label: 'Engaged', value: () => formatEngagement(props.statistics()) },
       ]}
