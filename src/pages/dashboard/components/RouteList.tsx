@@ -37,11 +37,7 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
-        headline={
-          <span>
-            {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-          </span>
-        }
+        headline={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
         subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
         trailing={
           <Suspense>
