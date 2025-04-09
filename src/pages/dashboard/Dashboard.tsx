@@ -3,6 +3,7 @@ import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
+import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -51,25 +52,14 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
             <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
               <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-                <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+                <Icon name="person" filled />
               </div>
-              <Show
-                when={profile()}
-                fallback={
-                  <>
-                    <div class="mx-3">Not signed in</div>
-                    <div class="grow" />
-                    <IconButton name="login" href="/login" />
-                  </>
-                }
-              >
-                <div class="min-w-0 mx-3">
-                  <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                  <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
-                </div>
-                <div class="grow" />
-                <IconButton name="logout" href="/logout" />
-              </Show>
+              <div class="min-w-0 mx-3">
+                <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
+                <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
+              </div>
+              <div class="grow" />
+              <IconButton name="logout" href="/logout" />
             </div>
           </Suspense>
         </ButtonBase>
@@ -115,7 +105,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   })
 
   const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
-  const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -129,6 +118,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+        <Match when={!isSignedIn()}>
+          <Navigate href="/login" />
+        </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
           <PairActivity onPaired={refetch} />
         </Match>
@@ -158,9 +150,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
               paneTwoContent={!!urlState().dateStr}
             />
           )}
-        </Match>
-        <Match when={!profile.loading && !profile.latest}>
-          <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
