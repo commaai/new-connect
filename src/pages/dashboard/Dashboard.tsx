@@ -42,9 +42,9 @@ const AppHeader: VoidComponent = () => {
         </Show>
       }
       trailing={
-        <div class="flex items-center gap-2">
-          <IconButton href={USERADMIN_URL} name="person" filled target="_blank" />
-          <IconButton href="/logout" name="logout" />
+        <div class="flex items-center gap-3">
+          <IconButton href={USERADMIN_URL} name="person" filled target="_blank" title="Useradmin" />
+          <IconButton href="/logout" name="logout" title="Sign out" />
         </div>
       }
     >
