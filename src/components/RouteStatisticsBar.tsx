@@ -21,7 +21,7 @@ const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefin
           label: 'Duration',
           value: () => {
             if (props.statistics.state === 'ready' || props.statistics.state === 'refreshing') {
-              return formatDuration(props.statistics.latest.routeDurationMs / (60 * 1000))
+              return formatDuration(props.statistics().routeDurationMs / (60 * 1000))
             }
             return formatRouteDuration(props.route)
           },
