@@ -25,7 +25,7 @@ import { isSignedIn } from '~/api/auth/client'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const queries = {
+export const queries = {
   profile: ['profile'],
   getProfile: () => queryOptions({ queryKey: queries.profile, queryFn: getProfile }),
 }
@@ -172,9 +172,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
               paneTwoContent={!!urlState().dateStr}
             />
           )}
-        </Match>
-        <Match when={!profile.loading && !profile.latest}>
-          <Navigate href="/login" />
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
