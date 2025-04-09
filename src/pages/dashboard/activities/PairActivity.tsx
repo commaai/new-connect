@@ -68,7 +68,9 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
           <div id="video-container" class="fixed inset-0 bg-black text-white">
             <video class="absolute inset-0 size-full object-cover" ref={videoRef} />
             <div class="prose absolute inset-0 flex flex-col justify-between pb-7">
-              <TopAppBar trailing={<IconButton name="close" href="/" />}>Add new device</TopAppBar>
+              <TopAppBar class="m-8" trailing={<IconButton name="close" href="/" />}>
+                Add new device
+              </TopAppBar>
               <h2 class="px-8 text-center text-title-md">Use the viewfinder to scan the QR code on your device</h2>
             </div>
           </div>
@@ -93,7 +95,7 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
 
         return (
           <>
-            <TopAppBar>Add new device</TopAppBar>
+            <TopAppBar class="m-8">Add new device</TopAppBar>
 
             <div class="flex flex-col items-center gap-4">
               <Icon name="autorenew" class="animate-spin" size="40" />
@@ -105,7 +107,9 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
       error(input, to) {
         return (
           <>
-            <TopAppBar trailing={<IconButton name="close" href="/" />}>Add new device</TopAppBar>
+            <TopAppBar class="m-8" trailing={<IconButton name="close" href="/" />}>
+              Add new device
+            </TopAppBar>
 
             <div class="flex flex-col items-center gap-4">
               An error occurred: {input.error.message}
