@@ -91,6 +91,8 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         setError('Failed to update toggle')
       }
     }
+
+    // TODO: mutate route so status is preserved
   }
 
   const currentRouteId = () => props.routeName.replace('|', '/')
