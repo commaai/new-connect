@@ -1,8 +1,6 @@
 import { Show, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { narrow } from '~/utils/reactivity'
-
 type LinearProgressProps = {
   class?: string
   progress?: number
@@ -27,7 +25,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
       )}
     >
       <Show
-        when={narrow(props.progress, (it) => it !== undefined)}
+        when={props.progress !== undefined}
         fallback={
           <>
             <div
@@ -39,12 +37,10 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
           </>
         }
       >
-        {(progress) => (
-          <div
-            class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', color().bar)}
-            style={{ width: `${progress() * 100}%` }}
-          />
-        )}
+        <div
+          class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', color().bar)}
+          style={{ width: `${props.progress! * 100}%` }}
+        />
       </Show>
     </div>
   )
