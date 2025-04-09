@@ -73,7 +73,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
-          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={cancel} />}>
+          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close" onClick={cancel} />}>
             <span class="text-xs font-mono whitespace-nowrap pr-[0.5rem]">
               {item().id ? `${Math.round(item().progress * 100)}%` : 'Offline'}
             </span>
