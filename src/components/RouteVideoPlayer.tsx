@@ -141,14 +141,10 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   // State reset on route change
   createEffect(
-    on(
-      route,
-      () => {
-        setVideoLoading(true)
-        setErrorMessage('')
-      },
-      { defer: true },
-    ),
+    on(route, () => {
+      setVideoLoading(true)
+      setErrorMessage('')
+    }),
   )
 
   createEffect(() => {
