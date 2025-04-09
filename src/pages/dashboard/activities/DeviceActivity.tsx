@@ -1,21 +1,19 @@
+import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
-import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
-import type { VoidComponent } from 'solid-js'
 
+import { takeSnapshot } from '~/api/athena'
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
-
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
+import UploadQueue from '~/components/UploadQueue'
 import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
-import UploadQueue from '~/components/UploadQueue'
-import { takeSnapshot } from '~/api/athena'
-import { createStore } from 'solid-js/store'
 
 type DeviceActivityProps = {
   dongleId: string
