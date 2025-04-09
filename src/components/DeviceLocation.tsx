@@ -184,14 +184,14 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       <Show when={locationData.loading}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
           <div class="mr-2 size-4 animate-spin rounded-full border-2 border-on-surface-variant border-t-transparent" />
-          <span class="text-label-lg">Locating...</span>
+          <span class="text-sm">Locating...</span>
         </div>
       </Show>
 
       <Show when={(locationData.error as Error)?.message}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
           <Icon class="mr-2" name="error" size="20" />
-          <span class="text-label-lg">{(locationData.error as Error).message}</span>
+          <span class="text-sm">{(locationData.error as Error).message}</span>
         </div>
       </Show>
 
@@ -202,7 +202,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         )}
       >
         <div class="mb-2 flex flex-row items-center justify-between gap-4">
-          <span class="truncate text-title-md">{selectedLocation()?.label}</span>
+          <span class="truncate text-md">{selectedLocation()?.label}</span>
           <IconButton name="close" onClick={() => setShowSelectedLocation(false)} />
         </div>
         <div class="flex flex-col items-end gap-3 xs:flex-row">
