@@ -75,7 +75,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
     if (video.paused) updateProgress()
   }
-  const onLoadedMetadata = () => setDuration(video.duration)
+  const onLoadedMetadata = () => setDuration(Math.ceil(video.duration))
   const onPlay = () => {
     setIsPlaying(true)
     startProgressTracking()
