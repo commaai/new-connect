@@ -1,5 +1,4 @@
 import type { Route } from '~/api/types'
-import { useRouteCache } from '~/utils/cache'
 
 export interface GPSPathPoint {
   t: number
@@ -91,9 +90,8 @@ const getDerived = async <T>(route: Route, fn: string): Promise<T[]> => {
   return (await Promise.all(results)).filter((it) => it !== undefined)
 }
 
-export const getCoords = useRouteCache(
-  (route: Route): Promise<GPSPathPoint[]> => getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat()),
-)
+export const getCoords = (route: Route): Promise<GPSPathPoint[]> =>
+  getDerived<GPSPathPoint[]>(route, 'coords.json').then((coords) => coords.flat())
 
 const getDriveEvents = (route: Route): Promise<DriveEvent[]> =>
   getDerived<DriveEvent[]>(route, 'events.json').then((events) => events.flat())
@@ -186,7 +184,7 @@ const generateTimelineEvents = (routeDurationMs: number, events: DriveEvent[]): 
   return res
 }
 
-export const getRouteStatistics = useRouteCache(async (route: Route): Promise<RouteStatistics> => {
+export const getRouteStatistics = async (route: Route): Promise<RouteStatistics> => {
   const driveEvents = await getDriveEvents(route)
   const routeDurationMs = driveEvents.reduce((max, ev) => Math.max(max, ev.route_offset_millis), 0)
   const timelineEvents = generateTimelineEvents(routeDurationMs, driveEvents)
@@ -207,4 +205,4 @@ export const getRouteStatistics = useRouteCache(async (route: Route): Promise<Ro
     engagedDurationMs,
     userFlags,
   }
-})
+}
