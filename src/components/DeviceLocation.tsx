@@ -206,7 +206,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
           <IconButton name="close" onClick={() => setShowSelectedLocation(false)} />
         </div>
         <div class="flex flex-col items-end gap-3 xs:flex-row">
-          <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
+          <span class="text-sm text-on-surface-variant">{selectedLocation()?.address}</span>
           <Button
             color="secondary"
             onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}

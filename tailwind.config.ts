@@ -1,6 +1,24 @@
 import type { Config } from 'tailwindcss'
 import * as defaultTheme from 'tailwindcss/defaultTheme'
 
+const fontSize = {
+  'display-lg': ['57px', { lineHeight: '64px', fontWeight: 400, letterSpacing: '-0.25px' }],
+  'display-md': ['45px', { lineHeight: '52px', fontWeight: 400, letterSpacing: 'initial' }],
+  'display-sm': ['36px', { lineHeight: '44px', fontWeight: 400, letterSpacing: 'initial' }],
+  'headline-lg': ['32px', { lineHeight: '40px', fontWeight: 400, letterSpacing: 'initial' }],
+  'headline-md': ['28px', { lineHeight: '36px', fontWeight: 400, letterSpacing: 'initial' }],
+  'headline-sm': ['24px', { lineHeight: '32px', fontWeight: 400, letterSpacing: 'initial' }],
+  'title-lg': ['22px', { lineHeight: '28px', fontWeight: 400, letterSpacing: 'initial' }],
+  'title-md': ['16px', { lineHeight: '24px', fontWeight: 500, letterSpacing: '0.15px' }],
+  'title-sm': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
+  'label-lg': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
+  'label-md': ['12px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+  'label-sm': ['11px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+  'body-lg': ['16px', { lineHeight: '24px', fontWeight: 400, letterSpacing: '0.5px' }],
+  'body-md': ['14px', { lineHeight: '20px', fontWeight: 400, letterSpacing: '0.25px' }],
+  'body-sm': ['12px', { lineHeight: '16px', fontWeight: 400, letterSpacing: '0.4px' }],
+} as Record<string, [string, { lineHeight: string; fontWeight: number; letterSpacing: string }]>
+
 export default {
   content: ['./src/**/*.{ts,tsx}', './index.html'],
   darkMode: ['class', '[data-theme="dark"]'],
@@ -19,14 +37,13 @@ export default {
       mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
     },
     fontSize: {
-      'display-sm': ['36px', { lineHeight: '44px', fontWeight: 400, letterSpacing: 'initial' }],
-      'headline-md': ['28px', { lineHeight: '36px', fontWeight: 400, letterSpacing: 'initial' }],
-      'title-lg': ['22px', { lineHeight: '28px', fontWeight: 400, letterSpacing: 'initial' }],
-      'title-md': ['16px', { lineHeight: '24px', fontWeight: 500, letterSpacing: '0.15px' }],
-      'label-lg': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
-      'label-md': ['12px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
-      'body-lg': ['16px', { lineHeight: '24px', fontWeight: 400, letterSpacing: '0.5px' }],
-      'body-md': ['14px', { lineHeight: '20px', fontWeight: 400, letterSpacing: '0.25px' }],
+      ...fontSize,
+      '2xl': fontSize['display-sm'],
+      xl: fontSize['headline-md'],
+      lg: fontSize['title-lg'],
+      md: fontSize['body-lg'],
+      sm: fontSize['body-md'],
+      xs: fontSize['label-md'],
     },
     extend: {
       colors: Object.fromEntries(

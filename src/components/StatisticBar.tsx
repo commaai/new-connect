@@ -8,7 +8,7 @@ const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string;
         <For each={props.statistics}>
           {(statistic) => (
             <div class="flex basis-0 grow flex-col justify-between">
-              <span class="text-label-md text-on-surface-variant">{statistic.label}</span>
+              <span class="text-xs text-on-surface-variant">{statistic.label}</span>
               <Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>
                 <span class="font-mono text-label-lg">{statistic.value()?.toString() ?? '—'}</span>
               </Suspense>
