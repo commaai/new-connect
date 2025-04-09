@@ -1,11 +1,6 @@
-import { createContext, createSignal, Show, useContext } from 'solid-js'
-import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
-
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
+import { createContext, createSignal, useContext } from 'solid-js'
+import type { Accessor, JSXElement, ParentComponent, Setter } from 'solid-js'
 import { useDimensions } from '~/utils/window'
-import { USERADMIN_URL } from '~/api/config'
-import { useNavigate } from '@solidjs/router'
 
 interface DrawerContext {
   modal: Accessor<boolean>
@@ -23,41 +18,9 @@ export function useDrawerContext() {
 
 const PEEK = 56
 
-const AppHeader: VoidComponent = () => {
-  const navigate = useNavigate()
-  const { modal, open, setOpen } = useDrawerContext()
-  const goHome = () => {
-    setOpen(false)
-    navigate('/')
-  }
-
-  return (
-    <TopAppBar
-      class="fixed top-0 left-0 right-0 h-16 p-4"
-      leading={
-        <Show
-          when={modal()}
-          fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
-        >
-          <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
-        </Show>
-      }
-      trailing={
-        <div class="flex items-center gap-2">
-          <IconButton href={USERADMIN_URL} name="person" filled target="_blank" />
-          <IconButton href="/logout" name="logout" />
-        </div>
-      }
-    >
-      <span class="cursor-pointer font-bold" onClick={goHome}>
-        connect
-      </span>
-    </TopAppBar>
-  )
-}
-
 interface DrawerProps {
   drawer: JSXElement
+  class?: string
 }
 
 const Drawer: ParentComponent<DrawerProps> = (props) => {
@@ -71,39 +34,36 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
 
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
-      <AppHeader />
-      <nav
-        class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
-        style={{
-          left: drawerVisible() ? 0 : `${-PEEK}px`,
-          opacity: drawerVisible() ? 1 : 0.5,
-          width: `${drawerWidth()}px`,
-          top: '4rem',
-          height: 'calc(100vh - 4rem)',
-        }}
-      >
-        <div class="flex size-full flex-col rounded-r-lg text-on-surface-variant sm:rounded-r-none">{props.drawer}</div>
-      </nav>
-
-      <main
-        class="absolute inset-y-0 overflow-y-auto bg-background transition-drawer duration-500"
-        style={{
-          left: drawerVisible() ? `${drawerWidth()}px` : 0,
-          width: contentWidth(),
-          top: '4rem',
-          height: 'calc(100vh - 4rem)',
-        }}
-      >
-        {props.children}
-        <div
-          class="absolute inset-0 z-[9999] bg-background transition-drawer duration-500"
+      <div class={props.class}>
+        <nav
+          class="hide-scrollbar inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer duration-500"
           style={{
-            'pointer-events': modal() && open() ? 'auto' : 'none',
-            opacity: modal() && open() ? 0.5 : 0,
+            left: drawerVisible() ? 0 : `${-PEEK}px`,
+            opacity: drawerVisible() ? 1 : 0.5,
+            width: `${drawerWidth()}px`,
           }}
-          onClick={() => setOpen(false)}
-        />
-      </main>
+        >
+          <div class="flex size-full flex-col rounded-r-lg text-on-surface-variant sm:rounded-r-none">{props.drawer}</div>
+        </nav>
+
+        <main
+          class="absolute inset-y-0 overflow-y-auto bg-background transition-drawer duration-500"
+          style={{
+            left: drawerVisible() ? `${drawerWidth()}px` : 0,
+            width: contentWidth(),
+          }}
+        >
+          {props.children}
+          <div
+            class="absolute inset-0 z-[9999] bg-background transition-drawer duration-500"
+            style={{
+              'pointer-events': modal() && open() ? 'auto' : 'none',
+              opacity: modal() && open() ? 0.5 : 0,
+            }}
+            onClick={() => setOpen(false)}
+          />
+        </main>
+      </div>
     </DrawerContext.Provider>
   )
 }

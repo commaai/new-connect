@@ -1,6 +1,6 @@
-import { createMemo, createResource, lazy, Match, Switch } from 'solid-js'
+import { createMemo, createResource, lazy, Match, Show, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
-import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
+import { Navigate, type RouteSectionProps, useLocation, useNavigate } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
@@ -17,8 +17,44 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
+import { USERADMIN_URL } from '~/api/config'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
+
+const AppHeader: VoidComponent = () => {
+  const navigate = useNavigate()
+  const { modal, open, setOpen } = useDrawerContext()
+  const goHome = () => {
+    setOpen(false)
+    navigate('/')
+  }
+
+  return (
+    <TopAppBar
+      class="fixed top-0 left-0 right-0 h-16 p-4"
+      leading={
+        <Show
+          when={modal()}
+          fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+        >
+          <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
+        </Show>
+      }
+      trailing={
+        <div class="flex items-center gap-2">
+          <IconButton href={USERADMIN_URL} name="person" filled target="_blank" />
+          <IconButton href="/logout" name="logout" />
+        </div>
+      }
+    >
+      <span class="cursor-pointer font-bold" onClick={goHome}>
+        connect
+      </span>
+    </TopAppBar>
+  )
+}
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { setOpen } = useDrawerContext()
@@ -41,6 +77,7 @@ const DashboardLayout: Component<{
 }> = (props) => {
   return (
     <div class="relative size-full overflow-hidden">
+      <AppHeader />
       <div
         class={clsx(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
@@ -83,7 +120,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+    <Drawer class="fixed inset-0 top-[4rem]" drawer={<DashboardDrawer devices={devices()} />}>
       <Switch>
         <Match when={!isSignedIn() || (!profile.loading && !profile.latest)}>
           <Navigate href="/login" />
