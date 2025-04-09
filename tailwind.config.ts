@@ -81,31 +81,11 @@ export default {
         mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
       },
       fontSize: {
-        'display-lg': [
-          '57px',
-          {
-            lineHeight: '64px',
-            letterSpacing: '-0.25px',
-          },
-        ],
-        'display-md': [
-          '45px',
-          {
-            lineHeight: '52px',
-            letterSpacing: 'initial',
-          },
-        ],
         'display-sm': [
           '36px',
           {
             lineHeight: '44px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-lg': [
-          '32px',
-          {
-            lineHeight: '40px',
+            fontWeight: 400,
             letterSpacing: 'initial',
           },
         ],
@@ -113,13 +93,7 @@ export default {
           '28px',
           {
             lineHeight: '36px',
-            letterSpacing: 'initial',
-          },
-        ],
-        'headline-sm': [
-          '24px',
-          {
-            lineHeight: '32px',
+            fontWeight: 400,
             letterSpacing: 'initial',
           },
         ],
@@ -127,6 +101,7 @@ export default {
           '22px',
           {
             lineHeight: '28px',
+            fontWeight: 400,
             letterSpacing: 'initial',
           },
         ],
@@ -138,7 +113,7 @@ export default {
             letterSpacing: '0.15px',
           },
         ],
-        'title-sm': [
+        'label-lg': [
           '14px',
           {
             lineHeight: '20px',
@@ -146,20 +121,12 @@ export default {
             letterSpacing: '0.1px',
           },
         ],
-        'label-lg': [
-          '14px',
-          {
-            lineHeight: '20px',
-            fontWeight: 500,
-            letterSpacing: 'initial',
-          },
-        ],
         'label-md': [
           '12px',
           {
-            lineHeight: '18px',
+            lineHeight: '16px',
             fontWeight: 500,
-            letterSpacing: 'initial',
+            letterSpacing: '0.5px',
           },
         ],
         'label-sm': [
@@ -182,13 +149,6 @@ export default {
           {
             lineHeight: '20px',
             letterSpacing: '0.25px',
-          },
-        ],
-        'body-sm': [
-          '12px',
-          {
-            lineHeight: '16px',
-            letterSpacing: '0.4px',
           },
         ],
       },

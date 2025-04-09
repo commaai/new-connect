@@ -174,9 +174,9 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
             color="secondary"
             class="bg-surface-container-low text-on-surface-variant"
             onClick={() => void requestUserLocation()}
-            trailing={<span class="pr-2 text-sm">Show my location</span>}
+            leading={<Icon name="my_location" size="20" />}
           >
-            <Icon name="my_location" size="20" />
+            Show my location
           </Button>
         </div>
       </Show>
@@ -184,14 +184,14 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       <Show when={locationData.loading}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
           <div class="mr-2 size-4 animate-spin rounded-full border-2 border-on-surface-variant border-t-transparent" />
-          <span class="text-sm">Locating...</span>
+          <span class="text-label-lg">Locating...</span>
         </div>
       </Show>
 
       <Show when={(locationData.error as Error)?.message}>
         <div class="absolute left-1/2 top-1/2 z-[5000] flex -translate-x-1/2 -translate-y-1/2 items-center rounded-full bg-surface-variant px-4 py-2 shadow">
           <Icon class="mr-2" name="error" size="20" />
-          <span class="text-sm">{(locationData.error as Error).message}</span>
+          <span class="text-label-lg">{(locationData.error as Error).message}</span>
         </div>
       </Show>
 

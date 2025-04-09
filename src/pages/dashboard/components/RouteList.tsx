@@ -151,9 +151,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                     <>
                       <Show when={dayHeader}>
                         <Show when={!firstHeader}>
-                          <div class="6 w-full" />
+                          <div class="w-full" />
                         </Show>
-                        <h2 class="px-4 text-xl font-bold">{dayHeader}</h2>
+                        <h2 class="px-4 text-label-lg">{dayHeader}</h2>
                       </Show>
                       <RouteCard route={route} />
                     </>

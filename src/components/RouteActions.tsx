@@ -104,7 +104,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   return (
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
-      <div class="font-mono text-body-sm text-zinc-500">
+      <div class="font-mono text-label-md text-zinc-500">
         <div class="flex justify-between">
           <span class="mb-2 text-on-surface-variant">Route ID:</span>
           <a href={useradminUrl()} class="text-blue-400 hover:text-blue-500 duration-200" target="_blank" rel="noopener noreferrer">
