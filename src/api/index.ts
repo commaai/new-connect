@@ -1,4 +1,4 @@
-import { getAccessToken } from './auth/client'
+import { accessToken } from './auth/client'
 import { API_URL } from './config'
 
 const populateFetchedAt = <T>(item: T): T => {
@@ -13,7 +13,7 @@ export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: s
     ...init,
     headers: {
       ...init?.headers,
-      Authorization: `JWT ${getAccessToken()}`,
+      Authorization: `JWT ${accessToken()}`,
     },
   })
   const res = await fetch(req)
