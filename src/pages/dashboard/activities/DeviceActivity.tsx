@@ -67,16 +67,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     document.body.removeChild(link)
   }
 
-  const clearImage = (index: number) => {
+  const clearImage = (index: number) =>
     setSnapshot(
       'images',
       snapshot.images.filter((_, i) => i !== index),
     )
-  }
 
-  const clearError = () => {
-    setSnapshot('error', null)
-  }
+  const clearError = () => setSnapshot('error', null)
 
   const { modal } = useDrawerContext()
 
