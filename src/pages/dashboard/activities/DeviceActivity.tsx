@@ -151,14 +151,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </Show>
           <Show when={snapshot.error}>
-            {(error) => (
-              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-                <div class="flex items-center p-4">
-                  <IconButton class="text-white" name="clear" onClick={clearError} />
-                  <span>Error: {error()}</span>
-                </div>
+            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+              <div class="flex items-center p-4">
+                <IconButton class="text-white" name="clear" onClick={clearError} />
+                <span>Error: {snapshot.error}</span>
               </div>
-            )}
+            </div>
           </Show>
         </div>
         <RouteList dongleId={props.dongleId} />
