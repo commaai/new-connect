@@ -1,6 +1,7 @@
 import type { Resource } from 'solid-js'
 
-// from https://github.com/solidjs/solid/blob/main/packages/solid/src/reactive/signal.ts#L483
+// these types aren't exported
+// from https://github.com/solidjs/solid/blob/v1.9.5/packages/solid/src/reactive/signal.ts#L483
 interface Ready<T> {
   state: 'ready'
   loading: false
