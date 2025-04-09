@@ -5,7 +5,6 @@ import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
 import { getDevices } from '~/api/devices'
-import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 import type { Device } from '~/api/types'
 
@@ -108,7 +107,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   })
 
   const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
-  const [profile] = createResource(getProfile)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -122,7 +120,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
   return (
     <Drawer class="fixed inset-0 top-[4rem]" drawer={<DashboardDrawer devices={devices()} />}>
       <Switch>
-        <Match when={!isSignedIn() || (!profile.loading && !profile.latest)}>
+        <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
