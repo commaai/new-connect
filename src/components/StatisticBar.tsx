@@ -10,7 +10,7 @@ const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string;
             <div class="flex basis-0 grow flex-col justify-between">
               <span class="text-xs text-on-surface-variant">{statistic.label}</span>
               <Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>
-                <span class="font-mono text-label-lg">{statistic.value()?.toString() ?? '—'}</span>
+                <span class="font-mono text-sm">{statistic.value()?.toString() ?? '—'}</span>
               </Suspense>
             </div>
           )}

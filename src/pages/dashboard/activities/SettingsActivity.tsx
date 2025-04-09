@@ -233,7 +233,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </Show>
 
       <Show when={uiState()?.chargeText} keyed>
-        {(text) => <p class="text-label-lg">{text}</p>}
+        {(text) => <p class="text-sm">{text}</p>}
       </Show>
     </div>
   )

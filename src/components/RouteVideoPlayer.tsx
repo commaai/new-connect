@@ -202,7 +202,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="relative flex w-full items-center gap-3 pb-3 px-2">
           <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
-          <div class="font-mono text-label-lg text-on-surface">
+          <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
         </div>
