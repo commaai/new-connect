@@ -3,8 +3,6 @@ import { createResource, createSignal, For, Show, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 
 import { getDevice, SHARED_DEVICE } from '~/api/devices'
-import { ATHENA_URL } from '~/api/config'
-import { getAccessToken } from '~/api/auth/client'
 
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -16,16 +14,11 @@ import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
 import UploadQueue from '~/components/UploadQueue'
+import { takeSnapshot } from '~/api/athena'
+import { createStore } from 'solid-js/store'
 
 type DeviceActivityProps = {
   dongleId: string
-}
-
-interface SnapshotResponse {
-  result?: {
-    jpegFront?: string
-    jpegBack?: string
-  }
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
@@ -36,7 +29,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
-  const [snapshot, setSnapshot] = createSignal<{
+  const [snapshot, setSnapshot] = createStore<{
     error: string | null
     fetching: boolean
     images: string[]
@@ -46,37 +39,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     images: [],
   })
 
-  const takeSnapshot = async () => {
-    setSnapshot({ error: null, fetching: true, images: [] })
-
+  const onClickSnapshot = async () => {
+    setSnapshot({ error: null, fetching: true })
     try {
-      const payload = {
-        method: 'takeSnapshot',
-        jsonrpc: '2.0',
-        id: 0,
-      }
-
-      const response = await fetch(`${ATHENA_URL}/${props.dongleId}`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `JWT ${getAccessToken()}`,
-        },
-        body: JSON.stringify(payload),
-      })
-
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`)
-      }
-
-      const resp: SnapshotResponse = (await response.json()) as SnapshotResponse
-      const images = []
-
-      if (resp.result?.jpegFront) images.push(resp.result.jpegFront)
-      if (resp.result?.jpegBack) images.push(resp.result.jpegBack)
-
+      const resp = await takeSnapshot(props.dongleId)
+      const images = [resp.result?.jpegFront, resp.result?.jpegBack].filter((it) => it !== undefined)
       if (images.length > 0) {
-        setSnapshot({ error: null, fetching: false, images })
+        setSnapshot('images', images)
       } else {
         throw new Error('No images found.')
       }
@@ -85,7 +54,9 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       if (error.includes('Device not registered')) {
         error = 'Device offline'
       }
-      setSnapshot({ error, fetching: false, images: [] })
+      setSnapshot('error', error)
+    } finally {
+      setSnapshot('fetching', false)
     }
   }
 
@@ -99,12 +70,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   }
 
   const clearImage = (index: number) => {
-    const newImages = snapshot().images.filter((_, i) => i !== index)
-    setSnapshot({ ...snapshot(), images: newImages })
+    setSnapshot(
+      'images',
+      snapshot.images.filter((_, i) => i !== index),
+    )
   }
 
   const clearError = () => {
-    setSnapshot({ ...snapshot(), error: null })
+    setSnapshot('error', null)
   }
 
   const { modal } = useDrawerContext()
@@ -140,7 +113,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </div>
             </Suspense>
             <div class="flex gap-4">
-              <IconButton name="camera" onClick={() => void takeSnapshot()} />
+              <IconButton name="camera" onClick={onClickSnapshot} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
@@ -162,7 +135,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Show>
         </div>
         <div class="flex flex-col gap-2">
-          <For each={snapshot().images}>
+          <For each={snapshot.images}>
             {(image, index) => (
               <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
                 <div class="relative p-4">
@@ -175,21 +148,23 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </div>
             )}
           </For>
-          {snapshot().fetching && (
+          <Show when={snapshot.fetching}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
               <div class="p-4">
                 <div>Loading snapshots...</div>
               </div>
             </div>
-          )}
-          {snapshot().error && (
-            <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="flex items-center p-4">
-                <IconButton class="text-white" name="clear" onClick={clearError} />
-                <span>Error: {snapshot().error}</span>
+          </Show>
+          <Show when={snapshot.error}>
+            {(error) => (
+              <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
+                <div class="flex items-center p-4">
+                  <IconButton class="text-white" name="clear" onClick={clearError} />
+                  <span>Error: {error()}</span>
+                </div>
               </div>
-            </div>
-          )}
+            )}
+          </Show>
         </div>
         <RouteList dongleId={props.dongleId} />
       </div>
