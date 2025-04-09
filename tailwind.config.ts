@@ -47,7 +47,7 @@ export default {
     fontSize: {
       ...fontSize,
       '2xl': fontSize['display-sm'],
-      xl: fontSize['headline-md'],
+      xl: fontSize['headline-sm'],
       lg: fontSize['title-lg'],
       md: fontSize['body-lg'],
       sm: fontSize['body-md'],
