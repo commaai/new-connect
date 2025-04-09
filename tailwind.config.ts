@@ -19,76 +19,15 @@ export default {
       mono: ['JetBrains Mono', ...defaultTheme.fontFamily.mono],
     },
     fontSize: {
-      'display-sm': [
-        '36px',
-        {
-          lineHeight: '44px',
-          fontWeight: 400,
-          letterSpacing: 'initial',
-        },
-      ],
-      'headline-md': [
-        '28px',
-        {
-          lineHeight: '36px',
-          fontWeight: 400,
-          letterSpacing: 'initial',
-        },
-      ],
-      'title-lg': [
-        '22px',
-        {
-          lineHeight: '28px',
-          fontWeight: 400,
-          letterSpacing: 'initial',
-        },
-      ],
-      'title-md': [
-        '16px',
-        {
-          lineHeight: '24px',
-          fontWeight: 500,
-          letterSpacing: '0.15px',
-        },
-      ],
-      'label-lg': [
-        '14px',
-        {
-          lineHeight: '20px',
-          fontWeight: 500,
-          letterSpacing: '0.1px',
-        },
-      ],
-      'label-md': [
-        '12px',
-        {
-          lineHeight: '16px',
-          fontWeight: 500,
-          letterSpacing: '0.5px',
-        },
-      ],
-      'label-sm': [
-        '11px',
-        {
-          lineHeight: '16px',
-          fontWeight: 500,
-          letterSpacing: '0.5px',
-        },
-      ],
-      'body-lg': [
-        '16px',
-        {
-          lineHeight: '24px',
-          letterSpacing: '0.5px',
-        },
-      ],
-      'body-md': [
-        '14px',
-        {
-          lineHeight: '20px',
-          letterSpacing: '0.25px',
-        },
-      ],
+      'display-sm': ['36px', { lineHeight: '44px', fontWeight: 400, letterSpacing: 'initial' }],
+      'headline-md': ['28px', { lineHeight: '36px', fontWeight: 400, letterSpacing: 'initial' }],
+      'title-lg': ['22px', { lineHeight: '28px', fontWeight: 400, letterSpacing: 'initial' }],
+      'title-md': ['16px', { lineHeight: '24px', fontWeight: 500, letterSpacing: '0.15px' }],
+      'label-lg': ['14px', { lineHeight: '20px', fontWeight: 500, letterSpacing: '0.1px' }],
+      'label-md': ['12px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+      'label-sm': ['11px', { lineHeight: '16px', fontWeight: 500, letterSpacing: '0.5px' }],
+      'body-lg': ['16px', { lineHeight: '24px', fontWeight: 400, letterSpacing: '0.5px' }],
+      'body-md': ['14px', { lineHeight: '20px', fontWeight: 400, letterSpacing: '0.25px' }],
     },
     extend: {
       colors: Object.fromEntries(
