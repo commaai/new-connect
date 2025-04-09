@@ -374,7 +374,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           onClick={() => setCancelDialog(false)}
         >
           <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-            <h2 class="text-xl">Cancel subscription</h2>
+            <h2 class="text-lg">Cancel subscription</h2>
             <p class="text-sm">Are you sure you want to cancel your subscription?</p>
             <div class="mt-4 flex flex-wrap justify-stretch gap-4">
               <Button
@@ -411,7 +411,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
     <>
       <TopAppBar leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>Device Settings</TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <h2 class="text-xl">{deviceName()}</h2>
+        <h2 class="text-lg">{deviceName()}</h2>
         <Show when={unpairData.error}>
           <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
             <Icon class="text-error" name="error" size="20" />
@@ -422,7 +422,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
           Unpair this device
         </Button>
         <hr class="mx-4 opacity-20" />
-        <h2 class="text-xl">comma prime</h2>
+        <h2 class="text-lg">comma prime</h2>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>
