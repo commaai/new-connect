@@ -1,5 +1,7 @@
-import type { VoidComponent } from 'solid-js'
+import { Show, type VoidComponent } from 'solid-js'
 import clsx from 'clsx'
+
+import { narrow } from '~/utils/reactivity'
 
 type LinearProgressProps = {
   class?: string
@@ -7,56 +9,43 @@ type LinearProgressProps = {
   color?: 'primary' | 'secondary' | 'tertiary' | 'error'
 }
 
-const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
-  const color = () => props.color || 'primary'
-  const containerColourClass = () =>
-    ({
-      primary: 'before:bg-primary',
-      secondary: 'before:bg-secondary',
-      tertiary: 'before:bg-tertiary',
-      error: 'before:bg-error',
-    })[color()]
-  const barColourClass = () =>
-    ({
-      primary: 'bg-primary ',
-      secondary: 'bg-secondary',
-      tertiary: 'bg-tertiary',
-      error: 'bg-error',
-    })[color()]
+const colorClasses = {
+  primary: { container: 'before:bg-primary', bar: 'bg-primary' },
+  secondary: { container: 'before:bg-secondary', bar: 'bg-secondary' },
+  tertiary: { container: 'before:bg-tertiary', bar: 'bg-tertiary' },
+  error: { container: 'before:bg-error', bar: 'bg-error' },
+}
 
+const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
+  const color = () => colorClasses[props.color || 'primary']
   return (
     <div
       class={clsx(
         'relative z-0 block h-1 overflow-hidden rounded-none bg-transparent before:absolute before:inset-0 before:opacity-30',
-        containerColourClass(),
+        color().container,
         props.class,
       )}
     >
-      {props.progress === undefined ? (
-        <>
+      <Show
+        when={narrow(props.progress, (it) => it !== undefined)}
+        fallback={
+          <>
+            <div
+              class={clsx('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate1', color().bar)}
+            />
+            <div
+              class={clsx('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate2', color().bar)}
+            />
+          </>
+        }
+      >
+        {(progress) => (
           <div
-            class={clsx(
-              'absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate',
-              'animate-indeterminate1',
-              barColourClass(),
-            )}
+            class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', color().bar)}
+            style={{ width: `${progress() * 100}%` }}
           />
-          <div
-            class={clsx(
-              'absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate',
-              'animate-indeterminate2',
-              barColourClass(),
-            )}
-          />
-        </>
-      ) : (
-        <div
-          class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', barColourClass())}
-          style={{
-            width: `${props.progress * 100}%`,
-          }}
-        />
-      )}
+        )}
+      </Show>
     </div>
   )
 }
