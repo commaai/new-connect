@@ -51,8 +51,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
   createEffect(() => {
-    if (!resolved(device) || !resolved(profile)) return
-    if (!device().is_owner && !profile().superuser) return
+    if (!resolved(device) || !resolved(profile) || (!device().is_owner && !profile().superuser)) return
     void setRouteViewed(device().dongle_id, props.dateStr)
   })
 
