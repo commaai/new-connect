@@ -7,6 +7,7 @@ import { getDevice } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
+import { resolved } from '~/utils/reactivity'
 
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
@@ -49,13 +50,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const [device] = createResource(() => props.dongleId, getDevice)
   const [profile] = createResource(getProfile)
-  createResource(
-    () => [device(), profile(), props.dateStr] as const,
-    async ([device, profile, dateStr]) => {
-      if (!device || !profile || (!device.is_owner && !profile.superuser)) return
-      await setRouteViewed(device.dongle_id, dateStr)
-    },
-  )
+  createEffect(() => {
+    if (!resolved(device) || !resolved(profile) || (!device().is_owner && !profile().superuser)) return
+    void setRouteViewed(device().dongle_id, props.dateStr)
+  })
 
   return (
     <>

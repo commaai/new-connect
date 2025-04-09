@@ -1,4 +1,4 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -55,8 +55,10 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
                 <Icon name="person" filled />
               </div>
               <div class="min-w-0 mx-3">
-                <div class="truncate text-sm text-on-surface">{profile()?.email}</div>
-                <div class="truncate text-xs text-on-surface-variant">{profile()?.user_id}</div>
+                <ErrorBoundary fallback="Error loading profile">
+                  <div class="truncate text-sm text-on-surface">{profile()?.email}</div>
+                  <div class="truncate text-xs text-on-surface-variant">{profile()?.user_id}</div>
+                </ErrorBoundary>
               </div>
               <div class="grow" />
               <IconButton name="logout" href="/logout" />
