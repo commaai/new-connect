@@ -1,4 +1,4 @@
-import { createResource, Match, Switch } from 'solid-js'
+import { Match, Switch } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -8,6 +8,7 @@ import { getThemeId } from '~/theme'
 import type { Route } from '~/api/types'
 
 import Icon from '~/components/material/Icon'
+import { createQuery } from '@tanstack/solid-query'
 
 const loadImage = (url: string | undefined): Promise<string | undefined> => {
   if (!url) {
@@ -52,9 +53,27 @@ type RouteStaticMapProps = {
 }
 
 const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
-  const [coords] = createResource(() => props.route, getCoords)
-  const [url] = createResource(coords, getStaticMapUrl)
-  const [loadedUrl] = createResource(url, loadImage)
+  // TODO: refactor to object
+  const coords = createQuery(() => ({
+    queryKey: ['coords', props.route?.fullname],
+    queryFn: () => getCoords(props.route!),
+    enabled: !!props.route,
+    refetchOnMount: false,
+  }))
+
+  const url = createQuery(() => ({
+    queryKey: ['staticMapUrl', coords.data],
+    queryFn: () => getStaticMapUrl(coords.data!),
+    enabled: !!coords.data,
+    refetchOnMount: false,
+  }))
+
+  const loadedUrl = createQuery(() => ({
+    queryKey: ['loadedMapUrl', url.data],
+    queryFn: () => loadImage(url.data),
+    enabled: !!url.data,
+    refetchOnMount: false,
+  }))
 
   return (
     <div class={clsx('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>
@@ -62,11 +81,11 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
         <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon name="error" filled />}>Problem loading map</State>
         </Match>
-        <Match when={coords()?.length === 0} keyed>
+        <Match when={coords.data?.length === 0} keyed>
           <State trailing={<Icon name="satellite_alt" filled />}>No GPS data</State>
         </Match>
-        <Match when={url() && loadedUrl()} keyed>
-          <img class="pointer-events-none size-full object-cover" src={loadedUrl()} alt="" />
+        <Match when={loadedUrl.data} keyed>
+          <img class="pointer-events-none size-full object-cover" src={loadedUrl.data} alt="" />
         </Match>
       </Switch>
     </div>

@@ -1,10 +1,9 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createEffect, createMemo, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
-import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import storage from '~/utils/storage'
 import type { Device } from '~/api/types'
@@ -20,14 +19,22 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import { createQuery, queryOptions, useQueryClient } from '@tanstack/solid-query'
+import { queries as deviceQueries } from './activities/DeviceActivity'
+import { isSignedIn } from '~/api/auth/client'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
+
+const queries = {
+  profile: ['profile'],
+  getProfile: () => queryOptions({ queryKey: queries.profile, queryFn: getProfile }),
+}
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
-  const [profile] = createResource(getProfile)
+  const profile = createQuery(queries.getProfile)
 
   return (
     <>
@@ -51,25 +58,14 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
             <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
               <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-                <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+                <Icon name="person" filled />
               </div>
-              <Show
-                when={profile()}
-                fallback={
-                  <>
-                    <div class="mx-3">Not signed in</div>
-                    <div class="grow" />
-                    <IconButton name="login" href="/login" />
-                  </>
-                }
-              >
-                <div class="min-w-0 mx-3">
-                  <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                  <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
-                </div>
-                <div class="grow" />
-                <IconButton name="logout" href="/logout" />
-              </Show>
+              <div class="min-w-0 mx-3">
+                <div class="truncate text-body-md text-on-surface">{profile.data?.email}</div>
+                <div class="truncate text-label-sm text-on-surface-variant">{profile.data?.user_id}</div>
+              </div>
+              <div class="grow" />
+              <IconButton name="logout" href="/logout" />
             </div>
           </Suspense>
         </ButtonBase>
@@ -114,28 +110,41 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
-  const [profile] = createResource(getProfile)
+  const devices = createQuery(deviceQueries.getAllDevices)
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
     if (urlState().dongleId) return undefined
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')
-    if (devices()?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
-    return devices()?.[0]?.dongle_id
+    if (devices.data?.some((device) => device.dongle_id === lastSelectedDongleId)) return lastSelectedDongleId
+    return devices.data?.[0]?.dongle_id
   }
 
+  const selectedDevice = () => devices.data?.find((d) => d.dongle_id === urlState().dongleId)
+
+  const queryClient = useQueryClient()
+  createEffect(() => {
+    if (devices.data) {
+      for (const device of devices.data) {
+        queryClient.setQueryData(deviceQueries.forDevice(device.dongle_id), device)
+      }
+    }
+  })
+
   return (
-    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+    <Drawer drawer={<DashboardDrawer devices={devices.data ?? []} />}>
       <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
-        <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
-          <PairActivity onPaired={refetch} />
+        <Match when={!isSignedIn()}>
+          <Navigate href="/login" />
         </Match>
-        <Match when={urlState().dongleId} keyed>
-          {(dongleId) => (
+        <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
+          <PairActivity onPaired={devices.refetch} />
+        </Match>
+        <Match when={selectedDevice()} keyed>
+          {(device) => (
             <DashboardLayout
-              paneOne={<DeviceActivity dongleId={dongleId} />}
+              paneOne={<DeviceActivity device={device} />}
               paneTwo={
                 <Switch
                   fallback={
@@ -146,11 +155,16 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   }
                 >
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
-                    <SettingsActivity dongleId={dongleId} />
+                    <SettingsActivity dongleId={device.dongle_id} />
                   </Match>
                   <Match when={urlState().dateStr} keyed>
                     {(dateStr) => (
-                      <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />
+                      <RouteActivity
+                        dongleId={device.dongle_id}
+                        dateStr={dateStr}
+                        startTime={urlState().startTime}
+                        endTime={urlState().endTime}
+                      />
                     )}
                   </Match>
                 </Switch>

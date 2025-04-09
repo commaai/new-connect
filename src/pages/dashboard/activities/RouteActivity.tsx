@@ -17,6 +17,8 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 import { createQuery, queryOptions } from '@tanstack/solid-query'
+import { Route } from '~/api/types'
+import { getPlaceName } from '~/map/geocode'
 
 type RouteActivityProps = {
   dongleId: string
@@ -27,8 +29,33 @@ type RouteActivityProps = {
 
 export const queries = {
   route: ['route'],
+  statistics: () => [...queries.route, 'statistics'],
+  location: () => [...queries.route, 'location'],
   forRoute: (routeName: string) => [...queries.route, routeName],
+  forRouteStatistics: (routeName: string) => [...queries.statistics(), routeName],
+  forRouteLocation: (routeName: string) => [...queries.location(), routeName],
   getRoute: (routeName: string) => queryOptions({ queryKey: queries.forRoute(routeName), queryFn: () => getRoute(routeName) }),
+  getRouteStatistics: (route?: Route) =>
+    queryOptions({
+      queryKey: queries.forRouteStatistics(route?.fullname ?? ''),
+      queryFn: () => getRouteStatistics(route!),
+      enabled: !!route,
+    }),
+  getRouteLocation: (route?: Route) =>
+    queryOptions({
+      queryKey: queries.forRouteLocation(route?.fullname ?? ''),
+      queryFn: async () => {
+        const startPos = [route?.start_lng || 0, route?.start_lat || 0]
+        const endPos = [route?.end_lng || 0, route?.end_lat || 0]
+        const startPlace = await getPlaceName(startPos)
+        const endPlace = await getPlaceName(endPos)
+        if (!startPlace && !endPlace) return ''
+        if (!endPlace || startPlace === endPlace) return startPlace
+        if (!startPlace) return endPlace
+        return `${startPlace} to ${endPlace}`
+      },
+      enabled: !!route,
+    }),
 }
 
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
@@ -42,7 +69,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
-  const [statistics] = createResource(route(), getRouteStatistics)
+  const statistics = createQuery(() => queries.getRouteStatistics(route()))
 
   const onTimelineChange = (newTime: number) => {
     const video = videoRef()
@@ -72,7 +99,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} statistics={statistics()} />
+          <Timeline class="mb-1" seekTime={seekTime()} updateTime={onTimelineChange} statistics={statistics.data} />
 
           <Show when={selection().startTime || selection().endTime}>
             <A
@@ -88,7 +115,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-label-md uppercase">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
+            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics.data} />
 
             <RouteActions routeName={routeName()} route={route()} />
           </div>

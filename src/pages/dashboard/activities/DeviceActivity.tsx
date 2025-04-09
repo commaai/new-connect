@@ -1,9 +1,10 @@
-import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
+import { queryOptions } from '@tanstack/solid-query'
 import clsx from 'clsx'
 
 import { takeSnapshot } from '~/api/athena'
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getDevice, getDevices } from '~/api/devices'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -14,18 +15,23 @@ import UploadQueue from '~/components/UploadQueue'
 import { deviceIsOnline, getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
+import { Device } from '~/api/types'
 
 type DeviceActivityProps = {
-  dongleId: string
+  device: Device
+}
+
+export const queries = {
+  device: ['device'],
+  allDevices: () => [...queries.device],
+  forDevice: (dongleId: string) => [...queries.device, 'dongle', dongleId],
+  getDevice: (dongleId: string) => queryOptions({ queryKey: queries.forDevice(dongleId), queryFn: () => getDevice(dongleId) }),
+  getAllDevices: () => queryOptions({ queryKey: queries.allDevices(), queryFn: getDevices }),
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
-  const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
-  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
-  // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
-  const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
+  const deviceName = () => getDeviceName(props.device)
+
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createStore<{
     error: string | null
@@ -40,7 +46,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const onClickSnapshot = async () => {
     setSnapshot({ error: null, fetching: true })
     try {
-      const resp = await takeSnapshot(props.dongleId)
+      const resp = await takeSnapshot(props.device.dongle_id)
       const images = [resp.result?.jpegFront, resp.result?.jpegBack].filter((it) => it !== undefined)
       if (images.length > 0) {
         setSnapshot('images', images)
@@ -91,30 +97,27 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
           <Suspense fallback={<div class="h-[240px] skeleton-loader size-full" />}>
-            <DeviceLocation dongleId={props.dongleId} deviceName={deviceName()!} />
+            <DeviceLocation dongleId={props.device.dongle_id} deviceName={deviceName()!} />
           </Suspense>
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
-                <div
-                  class={clsx(
-                    'm-2 size-2 shrink-0 rounded-full',
-                    device.latest && deviceIsOnline(device.latest) ? 'bg-green-400' : 'bg-gray-400',
-                  )}
-                />
+                <div class={clsx('m-2 size-2 shrink-0 rounded-full', deviceIsOnline(props.device) ? 'bg-green-400' : 'bg-gray-400')} />
 
                 {<div class="text-xl font-bold">{deviceName()}</div>}
               </div>
             </Suspense>
             <div class="flex gap-4">
               <IconButton name="camera" onClick={onClickSnapshot} />
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+              <IconButton name="settings" href={`/${props.device.dongle_id}/settings`} />
             </div>
           </div>
-          <Show when={isDeviceUser()}>
-            <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+          <Show when={true}>
+            {' '}
+            {/* FIXME: isDeviceUser() */}
+            <DeviceStatistics dongleId={props.device.dongle_id} class="p-4" />
             <Show when={queueVisible()}>
-              <UploadQueue dongleId={props.dongleId} />
+              <UploadQueue dongleId={props.device.dongle_id} />
             </Show>
             <button
               class={clsx(
@@ -158,7 +161,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </div>
           </Show>
         </div>
-        <RouteList dongleId={props.dongleId} />
+        <RouteList dongleId={props.device.dongle_id} />
       </div>
     </>
   )

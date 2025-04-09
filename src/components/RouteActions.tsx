@@ -1,10 +1,11 @@
-import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
+import { createSignal, Show, type VoidComponent, createEffect } from 'solid-js'
 import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
 import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/api/types'
+import { createQuery } from '@tanstack/solid-query'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -38,7 +39,12 @@ interface RouteActionsProps {
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
+  const preservedRoutes = createQuery(() => ({
+    queryKey: ['preservedRoutes', parseRouteName(props.routeName).dongleId],
+    queryFn: () => getPreservedRoutes(parseRouteName(props.routeName).dongleId),
+    enabled: !!parseRouteName(props.routeName).dongleId,
+    refetchOnMount: false,
+  }))
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
@@ -46,12 +52,11 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const useradminUrl = () => `${USERADMIN_URL}/?onebox=${currentRouteId()}`
 
   createEffect(() => {
-    const preservedRoutes = preservedRoutesResource()
     if (!props.route) return
     setIsPublic(props.route.is_public)
-    if (preservedRoutes) {
+    if (preservedRoutes.data) {
       const { fullname } = props.route
-      setIsPreserved(preservedRoutes.some((r) => r.fullname === fullname))
+      setIsPreserved(preservedRoutes.data.some((r) => r.fullname === fullname))
     } else {
       setIsPreserved(undefined)
     }
