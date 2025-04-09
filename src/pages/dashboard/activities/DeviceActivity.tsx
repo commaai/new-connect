@@ -67,11 +67,10 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     document.body.removeChild(link)
   }
 
-  const clearImage = (index: number) =>
-    setSnapshot(
-      'images',
-      snapshot.images.filter((_, i) => i !== index),
-    )
+  const clearImage = (index: number) => {
+    const newImages = snapshot.images.filter((_, i) => i !== index)
+    setSnapshot('images', newImages)
+  }
 
   const clearError = () => setSnapshot('error', null)
 
