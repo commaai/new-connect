@@ -83,7 +83,7 @@
     "@tanstack/solid-query": "^5.72.2",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.13",
-    "hls.js": "^1.6.1",
+    "hls.js": "1.5.20",
     "leaflet": "^1.9.4",
     "qr-scanner": "^1.4.2",
     "solid-js": "^1.9.5"
