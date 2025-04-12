@@ -11,6 +11,12 @@ import TopAppBar from '~/components/material/TopAppBar'
 
 import './PairActivity.css'
 
+const toError = (error: unknown): Error => {
+  if (error instanceof Error) return error
+  if (typeof error === 'string') return new Error(error)
+  return new Error('An unknown error occurred', { cause: error })
+}
+
 const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
   const { pair } = useLocation().query
   const pairToken: string | undefined = Array.isArray(pair) ? pair[0] : pair
@@ -53,7 +59,11 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
               highlightScanRegion: true,
             },
           )
-          void qrScanner.start()
+          void qrScanner.start().catch((reason) => {
+            const error = toError(reason)
+            console.error('Error starting QR scanner', error, error.cause)
+            to.error({ error })
+          })
         })
 
         onCleanup(() => {
@@ -81,12 +91,7 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
           .then((dongleId) => navigate(`/${dongleId}`))
           .then(props.onPaired)
           .catch((reason) => {
-            let error: Error
-            if (reason instanceof Error) {
-              error = reason
-            } else {
-              error = new Error('An unknown error occurred', { cause: reason })
-            }
+            const error = toError(reason)
             console.error('Error pairing device', error, error.cause)
             to.error({ error })
           })
