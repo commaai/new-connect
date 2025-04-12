@@ -81,7 +81,7 @@ const DashboardLayout: Component<{
         class={clsx(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
-          'flex transition-transform duration-300 ease-out',
+          'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
