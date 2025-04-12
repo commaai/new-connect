@@ -44,12 +44,12 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const drawerVisible = () => !modal() || open()
 
   return (
-    <div class={clsx(!modal() && 'fixed inset-0 top-[4rem] transition-all duration-300')}>
+    <div>
       <DrawerContext.Provider value={{ modal, open, setOpen }}>
         <nav
           class={clsx(
-            'hide-scrollbar absolute inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300',
-            modal() ? 'absolute z-[9999]' : 'fixed',
+            'hide-scrollbar inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300',
+            modal() && open() ? 'absolute z-[9999]' : 'fixed top-[4rem]',
           )}
           style={{
             left: drawerVisible() ? 0 : `${modal() ? -drawerWidth() : -PEEK}px`,
@@ -57,7 +57,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
             width: `${drawerWidth()}px`,
           }}
         >
-          <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
+          <div class="flex size-full flex-col rounded-r-lg bg-surface-container-high text-on-surface-variant sm:rounded-r-none">
             {props.drawer}
           </div>
         </nav>

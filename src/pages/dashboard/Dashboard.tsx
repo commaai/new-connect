@@ -33,17 +33,12 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
 
   return (
     <>
-      <TopAppBar
-        class="mx-6 mt-8"
-        leading={
-          <Show when={modal()}>
-            <IconButton name="arrow_back" onClick={onClose} />
-          </Show>
-        }
-      >
-        Devices
-      </TopAppBar>
-      <DeviceList class="overflow-y-auto p-2" devices={props.devices} />
+      <Show when={modal() && open()}>
+        <TopAppBar class="p-4" leading={<img src="/images/comma-white.svg" height="32" width="32" />}>
+          connect
+        </TopAppBar>
+      </Show>
+      <DeviceList class="overflow-y-auto p-4" devices={props.devices} />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
@@ -81,7 +76,7 @@ const AppHeader: VoidComponent = () => {
 
   return (
     <TopAppBar
-      class="fixed top-0 inset-x-0 left-0 right-0 mx-6 mt-8"
+      class="fixed top-0 inset-x-0 left-0 right-0 p-4 bg-surface-container-high"
       leading={
         <Show
           when={modal()}
@@ -112,8 +107,8 @@ const DashboardLayout: Component<{
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
-        <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
-        <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
+        <div class="pt-4 min-w-full overflow-y-scroll">{props.paneOne}</div>
+        <div class="pt-4 min-w-full overflow-y-scroll">{props.paneTwo}</div>
       </div>
     </div>
   )
