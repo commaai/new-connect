@@ -24,7 +24,7 @@ const ToggleButton: VoidComponent<{
       }`}
     >
       <div
-        class={`absolute top-1 size-3 rounded-full bg-surface-container-highest transition-transform duration-500 ease-in-out ${
+        class={`absolute top-1 size-3 rounded-full bg-surface-container-highest transition-transform duration-300 ease-in-out ${
           props.active ? 'translate-x-5' : 'translate-x-1'
         }`}
       />
