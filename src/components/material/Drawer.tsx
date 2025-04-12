@@ -1,3 +1,4 @@
+import clsx from 'clsx'
 import { createContext, createSignal, Show, useContext } from 'solid-js'
 import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
 
@@ -43,38 +44,43 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const drawerVisible = () => !modal() || open()
 
   return (
-    <DrawerContext.Provider value={{ modal, open, setOpen }}>
-      <nav
-        class="hide-scrollbar fixed inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300"
-        style={{
-          left: drawerVisible() ? 0 : `${-PEEK}px`,
-          opacity: drawerVisible() ? 1 : 0.5,
-          width: `${drawerWidth()}px`,
-        }}
-      >
-        <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
-          {props.drawer}
-        </div>
-      </nav>
-
-      <main
-        class="absolute inset-y-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
-        style={{
-          left: drawerVisible() ? `${drawerWidth()}px` : 0,
-          width: contentWidth(),
-        }}
-      >
-        {props.children}
-        <div
-          class="absolute inset-0 z-[9999] bg-background transition-drawer ease-in-out duration-300"
+    <div class={clsx(!modal() && 'fixed inset-0 top-[4rem] transition-all duration-300')}>
+      <DrawerContext.Provider value={{ modal, open, setOpen }}>
+        <nav
+          class={clsx(
+            'hide-scrollbar absolute inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300',
+            modal() ? 'absolute z-[9999]' : 'fixed',
+          )}
           style={{
-            'pointer-events': modal() && open() ? 'auto' : 'none',
-            opacity: modal() && open() ? 0.5 : 0,
+            left: drawerVisible() ? 0 : `${modal() ? -drawerWidth() : -PEEK}px`,
+            opacity: modal() || drawerVisible() ? 1 : 0.5,
+            width: `${drawerWidth()}px`,
           }}
-          onClick={() => setOpen(false)}
-        />
-      </main>
-    </DrawerContext.Provider>
+        >
+          <div class="flex size-full flex-col rounded-r-lg bg-surface-container-low text-on-surface-variant sm:rounded-r-none">
+            {props.drawer}
+          </div>
+        </nav>
+
+        <main
+          class="absolute inset-y-0 z-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
+          style={{
+            left: !modal() ? `${drawerWidth()}px` : 0,
+            width: contentWidth(),
+          }}
+        >
+          {props.children}
+          <div
+            class="absolute inset-0 z-[9999] bg-background transition-drawer ease-in-out duration-300"
+            style={{
+              'pointer-events': modal() && open() ? 'auto' : 'none',
+              opacity: modal() && open() ? 0.5 : 0,
+            }}
+            onClick={() => setOpen(false)}
+          />
+        </main>
+      </DrawerContext.Provider>
+    </div>
   )
 }
 

@@ -1,6 +1,6 @@
 import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
-import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
+import { Navigate, type RouteSectionProps, useLocation, useNavigate } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
@@ -15,13 +15,13 @@ import ButtonBase from '~/components/material/ButtonBase'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import BuildInfo from '~/components/BuildInfo'
+import TopAppBar from '~/components/material/TopAppBar'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -34,7 +34,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
   return (
     <>
       <TopAppBar
-        component="h2"
+        class="mx-6 mt-8"
         leading={
           <Show when={modal()}>
             <IconButton name="arrow_back" onClick={onClose} />
@@ -71,6 +71,31 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
   )
 }
 
+const AppHeader: VoidComponent = () => {
+  const navigate = useNavigate()
+  const { modal, open, setOpen } = useDrawerContext()
+  const goHome = () => {
+    setOpen(false)
+    navigate('/')
+  }
+
+  return (
+    <TopAppBar
+      class="fixed top-0 inset-x-0 left-0 right-0 mx-6 mt-8"
+      leading={
+        <Show
+          when={modal()}
+          fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
+        >
+          <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
+        </Show>
+      }
+    >
+      connect
+    </TopAppBar>
+  )
+}
+
 const DashboardLayout: Component<{
   paneOne: JSXElement
   paneTwo: JSXElement
@@ -78,9 +103,10 @@ const DashboardLayout: Component<{
 }> = (props) => {
   return (
     <div class="relative size-full overflow-hidden">
+      <AppHeader />
       <div
         class={clsx(
-          'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
+          'mt-16 mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
