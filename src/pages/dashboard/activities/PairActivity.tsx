@@ -53,7 +53,16 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
               highlightScanRegion: true,
             },
           )
-          void qrScanner.start()
+          void qrScanner.start().catch((reason) => {
+            let error: Error
+            if (reason instanceof Error) {
+              error = reason
+            } else {
+              error = new Error('Error starting QR scanner', { cause: reason })
+            }
+            console.error('Error starting QR scanner', error, error.cause)
+            to.error({ error })
+          })
         })
 
         onCleanup(() => {
