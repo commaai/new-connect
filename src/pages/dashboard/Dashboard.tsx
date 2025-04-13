@@ -33,6 +33,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   return (
     <>
       <TopAppBar
+        component="h2"
         leading={
           <Show when={modal()}>
             <IconButton name="arrow_back" onClick={onClose} />
@@ -118,13 +119,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch
-        fallback={
-          <TopAppBar component="h1" leading={<DrawerToggleButton />}>
-            No device
-          </TopAppBar>
-        }
-      >
+      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
