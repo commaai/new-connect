@@ -69,7 +69,7 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
         <div class="flex items-center min-w-0 flex-1">
           <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item().isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-xs font-mono truncate text-on-surface">{[item().route, item().segment, item().filename].join(' ')}</span>
+            <span class="text-xs font-mono truncate text-on-surface">{`${item().route}/${item().segment} ${item().filename}`}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
