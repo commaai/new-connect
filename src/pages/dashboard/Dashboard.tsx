@@ -155,7 +155,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<NoDeviceActivity />}>
+      <Switch>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
@@ -191,6 +191,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+        </Match>
+        <Match when={devices.state === 'ready' && devices()?.length === 0}>
+          <NoDeviceActivity />
         </Match>
       </Switch>
     </Drawer>
