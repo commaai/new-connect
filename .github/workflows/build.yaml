@@ -105,5 +105,7 @@ jobs:
           builder: ${{ steps.buildx.outputs.name }}
           context: .
           push: ${{ github.ref == 'refs/heads/master' && github.repository == 'commaai/connect' }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
