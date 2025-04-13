@@ -7,7 +7,6 @@ import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
-import { resolved } from '~/utils/reactivity'
 import storage from '~/utils/storage'
 import type { Device } from '~/api/types'
 
@@ -25,7 +24,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
+const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
@@ -107,7 +106,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
+  const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -157,7 +156,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
         </Match>
-        <Match when={resolved(devices) && devices()?.length === 0}>
+        <Match when={devices()?.length === 0}>
           <TopAppBar leading={<DrawerToggleButton />}>No devices</TopAppBar>
         </Match>
       </Switch>
