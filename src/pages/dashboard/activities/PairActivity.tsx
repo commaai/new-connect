@@ -108,7 +108,7 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
           <>
             <TopAppBar trailing={<IconButton name="close" href="/" />}>Add new device</TopAppBar>
 
-            <div class="flex flex-col items-center gap-4">
+            <div class="flex flex-col items-center gap-4 px-4 max-w-sm mx-auto">
               An error occurred: {input.error.message}
               <Button color="primary" onClick={() => to.scanning()}>
                 Retry
