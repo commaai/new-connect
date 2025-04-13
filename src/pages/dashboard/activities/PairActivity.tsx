@@ -46,10 +46,9 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
     states: {
       scanning(_input, to) {
         let videoRef!: HTMLVideoElement
-        let qrScanner: QrScanner
 
         onMount(() => {
-          qrScanner = new QrScanner(
+          const qrScanner = new QrScanner(
             videoRef,
             (result) => {
               qrScanner.destroy()
@@ -64,14 +63,11 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
             console.error('Error starting QR scanner', error, error.cause)
             to.error({ error })
           })
-        })
-
-        onCleanup(() => {
-          try {
-            qrScanner?.destroy()
-          } catch (_) {
-            /* empty */
-          }
+          onCleanup(() => {
+            try {
+              qrScanner.destroy()
+            } catch (_) {}
+          })
         })
 
         return (
