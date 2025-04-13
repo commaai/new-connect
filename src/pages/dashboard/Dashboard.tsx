@@ -92,6 +92,49 @@ const DashboardLayout: Component<{
   )
 }
 
+const NoDeviceActivity: Component = () => {
+  const { modal } = useDrawerContext()
+  return (
+    <>
+      <TopAppBar
+        class="font-bold"
+        leading={
+          <Show when={!modal()} fallback={<DrawerToggleButton />}>
+            <img alt="" src="/images/comma-white.png" class="h-8" />
+          </Show>
+        }
+      >
+        connect
+      </TopAppBar>
+      <div class="flex flex-col items-center mx-4 md:mx-6 lg:mx-8 mt-4 sm:mt-8 md:mt-16">
+        <div class="flex flex-col gap-4 py-2 items-center max-w-sm">
+          <h2 class="text-xl">Pair your device</h2>
+          <p class="text-lg">Scan the QR code on your device</p>
+          <div class="flex flex-col gap-4 py-2">
+            <p class="text-md">If you cannot see a QR code, check the following:</p>
+            <ul class="text-md list-disc list-inside">
+              <li>Your device is connected to the internet</li>
+              <li>You have installed the latest version of openpilot</li>
+            </ul>
+            <p class="text-md">
+              If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to
+              connect with the same account you may have used previously.
+            </p>
+          </div>
+          <Button leading={<Icon name="add" />} href="/pair">
+            Add new device
+          </Button>
+        </div>
+        <picture class="max-w-3xl mt-4 p-4">
+          <source type="image/webp" srcset="/images/c3x-ad.webp" />
+          <source type="image/png" srcset="/images/c3x-ad.png" />
+          <img alt="comma 3X" />
+        </picture>
+      </div>
+    </>
+  )
+}
+
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
   const urlState = createMemo(() => {
@@ -119,7 +162,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch fallback={<NoDeviceActivity />}>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>

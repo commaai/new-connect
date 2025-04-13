@@ -26,7 +26,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   return (
     <List variant="nav" class={props.class}>
       <Suspense fallback={<div class="h-14 skeleton-loader rounded-xl" />}>
-        <For each={props.devices}>
+        <For each={props.devices} fallback={<div class="text-md mx-2 text-on-surface-variant">No devices found</div>}>
           {(device) => (
             <ListItem
               variant="nav"
