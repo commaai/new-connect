@@ -119,7 +119,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
             <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
             <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
           </div>
-          <Icon class={clsx('px-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
+          <Icon class={clsx('mx-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
         </button>
       </div>
 
