@@ -93,6 +93,40 @@ const DashboardLayout: Component<{
   )
 }
 
+const NoDeviceActivity: Component = () => {
+  const { modal } = useDrawerContext()
+  return (
+    <>
+      <TopAppBar
+        class="font-bold"
+        leading={
+          <Show when={!modal()} fallback={<DrawerToggleButton />}>
+            <img alt="" src="/images/comma-white.png" class="h-8" />
+          </Show>
+        }
+      >
+        connect
+      </TopAppBar>
+      <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-sm px-4 mt-4 sm:mt-8 md:mt-16">
+        <h2 class="text-xl">Pair your device</h2>
+        <p class="text-lg">Scan the QR code on your device</p>
+        <p class="text-md mt-4">If you cannot see a QR code, check the following:</p>
+        <ul class="text-md list-disc list-inside">
+          <li>Your device is connected to the internet</li>
+          <li>You have installed the latest version of openpilot</li>
+        </ul>
+        <p class="text-md">
+          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
+          with the same account you may have used previously.
+        </p>
+        <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
+          Add new device
+        </Button>
+      </section>
+    </>
+  )
+}
+
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
   const urlState = createMemo(() => {
@@ -158,7 +192,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
         </Match>
         <Match when={resolved(devices) && devices()?.length === 0}>
-          <TopAppBar leading={<DrawerToggleButton />}>No devices</TopAppBar>
+          <NoDeviceActivity />
         </Match>
       </Switch>
     </Drawer>
