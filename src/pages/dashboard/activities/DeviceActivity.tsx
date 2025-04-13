@@ -80,7 +80,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     <>
       <TopAppBar
         class="font-bold"
-        component="h1"
         leading={
           <Show when={!modal()} fallback={<DrawerToggleButton />}>
             <img alt="" src="/images/comma-white.png" class="h-8" />
