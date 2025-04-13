@@ -12,6 +12,7 @@
     "strict": true,
     "types": ["bun", "vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/pwa-assets"],
     "isolatedModules": true,
+    "noUncheckedIndexedAccess": true,
     "paths": {
       "~/*": ["./src/*"]
     },
