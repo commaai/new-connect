@@ -33,7 +33,6 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   return (
     <>
       <TopAppBar
-        component="h1"
         leading={
           <Show when={modal()}>
             <IconButton name="arrow_back" onClick={onClose} />
