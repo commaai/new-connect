@@ -56,59 +56,6 @@
     --color-surface-container-highest: rgb(228 225 233);
   }
 
-  .dark,
-  [data-theme="dark"] {
-    --color-primary: rgb(188 195 255);
-    --color-surface-tint: rgb(188 195 255);
-    --color-on-primary: rgb(36 43 97);
-    --color-primary-container: rgb(59 66 121);
-    --color-on-primary-container: rgb(223 224 255);
-    --color-secondary: rgb(196 197 221);
-    --color-on-secondary: rgb(45 47 66);
-    --color-secondary-container: rgb(67 69 89);
-    --color-on-secondary-container: rgb(224 225 249);
-    --color-tertiary: rgb(168 210 147);
-    --color-on-tertiary: rgb(21 56 9);
-    --color-tertiary-container: rgb(43 79 30);
-    --color-on-tertiary-container: rgb(195 239 173);
-    --color-error: rgb(255 180 171);
-    --color-on-error: rgb(105 0 5);
-    --color-error-container: rgb(147 0 10);
-    --color-on-error-container: rgb(255 218 214);
-    --color-background: rgb(19 19 24);
-    --color-on-background: rgb(228 225 233);
-    --color-surface: rgb(19 19 24);
-    --color-on-surface: rgb(228 225 233);
-    --color-surface-variant: rgb(70 70 79);
-    --color-on-surface-variant: rgb(199 197 208);
-    --color-outline: rgb(144 144 154);
-    --color-outline-variant: rgb(70 70 79);
-    --color-shadow: rgb(0 0 0);
-    --color-scrim: rgb(0 0 0);
-    --color-inverse-surface: rgb(228 225 233);
-    --color-inverse-on-surface: rgb(48 48 54);
-    --color-inverse-primary: rgb(83 90 146);
-    --color-primary-fixed: rgb(223 224 255);
-    --color-on-primary-fixed: rgb(13 21 75);
-    --color-primary-fixed-dim: rgb(188 195 255);
-    --color-on-primary-fixed-variant: rgb(59 66 121);
-    --color-secondary-fixed: rgb(224 225 249);
-    --color-on-secondary-fixed: rgb(24 26 44);
-    --color-secondary-fixed-dim: rgb(196 197 221);
-    --color-on-secondary-fixed-variant: rgb(67 69 89);
-    --color-tertiary-fixed: rgb(195 239 173);
-    --color-on-tertiary-fixed: rgb(4 33 0);
-    --color-tertiary-fixed-dim: rgb(168 210 147);
-    --color-on-tertiary-fixed-variant: rgb(43 79 30);
-    --color-surface-dim: rgb(19 19 24);
-    --color-surface-bright: rgb(57 57 63);
-    --color-surface-container-lowest: rgb(13 14 19);
-    --color-surface-container-low: rgb(27 27 33);
-    --color-surface-container: rgb(33 33 39);
-    --color-surface-container-high: rgb(41 41 47);
-    --color-surface-container-highest: rgb(52 52 58);
-  }
-
   html {
     /* prevent selecting text, transparent highlight */
     @apply select-none selection:bg-transparent;
