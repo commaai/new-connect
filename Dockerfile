@@ -2,10 +2,11 @@
 # check=skip=SecretsUsedInArgOrEnv;error=true
 
 # *** build app ***
-FROM oven/bun:1.2.5-alpine AS build
+FROM oven/bun:1.2.9-alpine AS build
 WORKDIR /app
-ADD . ./
+ADD package.json bun.lock ./
 RUN bun install --frozen-lockfile
+ADD . ./
 
 # env
 ARG VITE_APP_GIT_SHA=unknown
