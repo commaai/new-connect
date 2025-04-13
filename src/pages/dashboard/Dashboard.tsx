@@ -106,7 +106,7 @@ const FirstPairActivity: Component = () => {
       >
         connect
       </TopAppBar>
-      <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-sm px-4 mt-4 sm:mt-8 md:mt-16">
+      <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
         <h2 class="text-xl">Pair your device</h2>
         <p class="text-lg">Scan the QR code on your device</p>
         <p class="text-md mt-4">If you cannot see a QR code, check the following:</p>
