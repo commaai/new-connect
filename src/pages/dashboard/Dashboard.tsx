@@ -92,7 +92,7 @@ const DashboardLayout: Component<{
   )
 }
 
-const NoDeviceActivity: Component = () => {
+const FirstPairActivity: Component = () => {
   const { modal } = useDrawerContext()
   return (
     <>
@@ -191,7 +191,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
         </Match>
         <Match when={devices()?.length === 0}>
-          <NoDeviceActivity />
+          <FirstPairActivity />
         </Match>
       </Switch>
     </Drawer>
