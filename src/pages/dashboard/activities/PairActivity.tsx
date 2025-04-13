@@ -115,8 +115,10 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
               .then(() => {
                 to.scanning()
               })
-              .catch((err) => {
-                console.error('Failed to request permission', err)
+              .catch((reason) => {
+                const error = toError(reason)
+                console.error('Failed to request permission', error)
+                to.error({ error })
               })
           }
         })
