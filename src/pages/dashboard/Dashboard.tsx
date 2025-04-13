@@ -24,7 +24,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
+const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
@@ -106,7 +106,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [devices, { refetch }] = createResource(getDevices, { initialValue: [] })
+  const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -119,7 +119,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
@@ -155,6 +155,9 @@ const Dashboard: Component<RouteSectionProps> = () => {
         </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+        </Match>
+        <Match when={devices()?.length === 0}>
+          <TopAppBar leading={<DrawerToggleButton />}>No devices</TopAppBar>
         </Match>
       </Switch>
     </Drawer>
