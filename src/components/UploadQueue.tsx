@@ -1,5 +1,5 @@
 import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
-import { createMutation, createQuery, queryOptions, useQueryClient } from '@tanstack/solid-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createStore, reconcile } from 'solid-js/store'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
@@ -22,7 +22,7 @@ export const queries = {
     queryOptions({ queryKey: queries.offlineForDongle(dongleId), queryFn: () => getAthenaOfflineQueue(dongleId) }),
   cancelUpload: (dongleId: string) => {
     const queryClient = useQueryClient()
-    return createMutation(() => ({
+    return useMutation(() => ({
       mutationFn: (ids: string[]) => cancelUpload(dongleId, ids),
       onSettled: () => queryClient.invalidateQueries({ queryKey: queries.onlineForDongle(dongleId) }),
     }))
@@ -95,8 +95,8 @@ const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueue = createQuery(() => queries.getOnline(props.dongleId))
-  const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
+  const onlineQueue = useQuery(() => queries.getOnline(props.dongleId))
+  const offlineQueue = useQuery(() => queries.getOffline(props.dongleId))
   const cancel = createMemo(() => queries.cancelUpload(props.dongleId))
 
   const [items, setItems] = createStore<UploadQueueItemWithAttributes[]>([])
