@@ -24,7 +24,9 @@ jobs:
             ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('**/bun.lockb') }}
 
-      - run: ./test.sh
+      - run: |
+          echo "::add-matcher::.github/tsc.json"
+          ./test.sh
         env:
           SKIP_PLAYWRIGHT_INSTALL: ${{ steps.playwright-cache.outputs.cache-hit }}
 
