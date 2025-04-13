@@ -118,7 +118,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch
+        fallback={
+          <TopAppBar component="h1" leading={<DrawerToggleButton />}>
+            No device
+          </TopAppBar>
+        }
+      >
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
