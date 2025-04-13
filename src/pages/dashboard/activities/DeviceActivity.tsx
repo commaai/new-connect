@@ -123,7 +123,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               )}
               onClick={() => setQueueVisible(!queueVisible())}
             >
-              <p class="text-sm mr-2">Upload Queue</p>
+              <p class="mr-2">Upload Queue</p>
               <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </button>
           </Show>
