@@ -2,7 +2,7 @@
 # check=skip=SecretsUsedInArgOrEnv;error=true
 
 # *** build app ***
-FROM oven/bun:1.2.5-alpine AS build
+FROM oven/bun:1.2.9-alpine AS build
 WORKDIR /app
 ADD . ./
 RUN bun install --frozen-lockfile
