@@ -17,8 +17,8 @@ export default function Login() {
         <img src="/images/logo-connect-light.svg" alt="comma connect" width={96} height={96} />
 
         <div class="flex flex-col items-center gap-2 text-center">
-          <h1 class="text-display-sm font-extrabold md:mt-4">comma connect</h1>
-          <p class="text-body-lg">Manage your openpilot experience.</p>
+          <h1 class="text-2xl font-extrabold md:mt-4">comma connect</h1>
+          <p class="text-md">Manage your openpilot experience.</p>
         </div>
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
@@ -46,9 +46,7 @@ export default function Login() {
         </div>
 
         <div class="flex justify-between gap-4">
-          <p class="text-body-md xs:text-body-lg">
-            Make sure to sign in with the same account if you have previously paired your comma three.
-          </p>
+          <p class="text-sm xs:text-md">Make sure to sign in with the same account if you have previously paired your comma three.</p>
 
           <img src="/images/icon-comma-three-light.svg" alt="" width={32} height={32} />
         </div>

@@ -1,22 +1,28 @@
 import { createEffect, createResource, createSignal, For, Index, onCleanup, onMount, Show, Suspense, type VoidComponent } from 'solid-js'
 import dayjs from 'dayjs'
+import utc from 'dayjs/plugin/utc.js'
+import timezone from 'dayjs/plugin/timezone.js'
+dayjs.extend(utc)
+dayjs.extend(timezone)
 
 import { fetcher } from '~/api'
-import { getTimelineStatistics } from '~/api/derived'
+import { getRouteStatistics } from '~/api/derived'
 import Card, { CardContent, CardHeader } from '~/components/material/Card'
 import Icon from '~/components/material/Icon'
-import RouteStatistics from '~/components/RouteStatistics'
+import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import { getPlaceName } from '~/map/geocode'
-import type { RouteSegments } from '~/api/types'
+import type { Route } from '~/api/types'
+import { dateTimeToColorBetween } from '~/utils/format'
 
 interface RouteCardProps {
-  route: RouteSegments
+  route: Route
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  const startTime = () => dayjs(props.route.start_time_utc_millis)
-  const endTime = () => dayjs(props.route.end_time_utc_millis)
-  const [timeline] = createResource(() => props.route, getTimelineStatistics)
+  const startTime = () => dayjs.utc(props.route.start_time).local()
+  const endTime = () => dayjs.utc(props.route.end_time).local()
+  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), [30, 57, 138], [218, 161, 28])
+  const [statistics] = createResource(() => props.route, getRouteStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
     const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
@@ -31,15 +37,11 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
-        headline={
-          <span>
-            {startTime().format('h:mm A')} to {endTime().format('h:mm A')}
-          </span>
-        }
+        headline={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
         subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
         trailing={
           <Suspense>
-            <Show when={timeline()?.userFlags}>
+            <Show when={statistics()?.userFlags}>
               <div class="flex items-center justify-center rounded-full p-1 border-amber-300 border-2">
                 <Icon class="text-yellow-300" size="24" name="flag" filled />
               </div>
@@ -49,8 +51,9 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
       />
 
       <CardContent>
-        <RouteStatistics route={timeline.loading ? undefined : props.route} timeline={timeline.latest} />
+        <RouteStatisticsBar route={props.route} statistics={statistics} />
       </CardContent>
+      <div class="h-2.5 w-full" style={{ background: color() }} />
     </Card>
   )
 }
@@ -72,24 +75,24 @@ const Sentinel = (props: { onTrigger: () => void }) => {
 const PAGE_SIZE = 10
 
 const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
-  const endpoint = () => `/v1/devices/${props.dongleId}/routes_segments?limit=${PAGE_SIZE}`
-  const getKey = (previousPageData?: RouteSegments[]): string | undefined => {
+  const endpoint = () => `/v1/devices/${props.dongleId}/routes?limit=${PAGE_SIZE}`
+  const getKey = (previousPageData?: Route[]): string | undefined => {
     if (!previousPageData) return endpoint()
     if (previousPageData.length === 0) return undefined
-    return `${endpoint()}&end=${previousPageData.at(-1)!.start_time_utc_millis - 1}`
+    return `${endpoint()}&created_before=${previousPageData.at(-1)!.create_time}`
   }
-  const getPage = (page: number): Promise<RouteSegments[]> => {
+  const getPage = (page: number): Promise<Route[]> => {
     if (pages[page] === undefined) {
       pages[page] = (async () => {
         const previousPageData = page > 0 ? await getPage(page - 1) : undefined
         const key = getKey(previousPageData)
-        return key ? fetcher<RouteSegments[]>(key) : []
+        return key ? fetcher<Route[]>(key).catch(() => []) : []
       })()
     }
     return pages[page]
   }
 
-  const pages: Promise<RouteSegments[]>[] = []
+  const pages: Promise<Route[]>[] = []
   const [size, setSize] = createSignal(1)
   const pageNumbers = () => Array.from({ length: size() })
 
@@ -102,8 +105,8 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
 
   // Group and display headers for each day
   let prevDayHeader: string | null = null
-  function getDayHeader(route: RouteSegments): string | null {
-    const date = dayjs(route.start_time_utc_millis)
+  function getDayHeader(route: Route): string | null {
+    const date = dayjs.utc(route.start_time).local()
     let dayHeader = null
     if (date.isSame(dayjs(), 'day')) {
       dayHeader = `Today – ${date.format('dddd, MMM D')}`
@@ -130,7 +133,10 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
           return (
             <Suspense
               fallback={
-                <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+                <>
+                  <h2 class="skeleton-loader rounded-md min-h-7"></h2>
+                  <Index each={new Array(PAGE_SIZE)}>{() => <div class="skeleton-loader flex h-[140px] flex-col rounded-lg" />}</Index>
+                </>
               }
             >
               <For each={routes()}>
@@ -141,9 +147,9 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                     <>
                       <Show when={dayHeader}>
                         <Show when={!firstHeader}>
-                          <div class="6 w-full" />
+                          <div class="w-full" />
                         </Show>
-                        <h2 class="px-4 text-xl font-bold">{dayHeader}</h2>
+                        <h2 class="px-4 text-lg font-bold text-on-surface-variant">{dayHeader}</h2>
                       </Show>
                       <RouteCard route={route} />
                     </>

@@ -27,9 +27,9 @@ export const formatDistance = (miles: number | undefined): string | undefined =>
 
 const _formatDuration = (duration: Duration): string => {
   if (duration.hours() > 0) {
-    return duration.format('H[h] m[m]')
+    return duration.format('H [hr] m [min]')
   } else {
-    return duration.format('m[m]')
+    return duration.format('m [min]')
   }
 }
 
@@ -51,16 +51,16 @@ export const formatVideoTime = (seconds: number): string => {
 }
 
 export const getRouteDuration = (route: Route | undefined): Duration | undefined => {
-  if (!route || !route.end_time) return undefined
+  if (!route || !route.start_time || !route.end_time) return undefined
   const startTime = dayjs(route.start_time)
   const endTime = dayjs(route.end_time)
   return dayjs.duration(endTime.diff(startTime))
 }
 
-export const formatRouteDuration = (route: Route | undefined): string => {
-  if (!route) return ''
+export const formatRouteDuration = (route: Route | undefined): string | undefined => {
+  if (!route) return undefined
   const duration = getRouteDuration(route)
-  return duration ? _formatDuration(duration) : ''
+  return duration ? _formatDuration(duration) : undefined
 }
 
 const parseTimestamp = (input: dayjs.ConfigType): dayjs.Dayjs => {
@@ -76,4 +76,25 @@ export const formatDate = (input: dayjs.ConfigType): string => {
   // Hide current year
   const yearStr = date.year() === dayjs().year() ? '' : ', YYYY'
   return date.format('MMMM Do' + yearStr)
+}
+
+export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColor: number[], endColor: number[]): string => {
+  // FIXME: adjust based on season
+  const sunrise = 5.5 // hours
+  const sunset = 6.5 + 12
+  const fade = 1.5 // wide transition since this accounts for different seasons
+
+  const startHours = startTime.getHours() + startTime.getMinutes() / 60
+  const endHours = endTime.getHours() + endTime.getMinutes() / 60
+  const hours = (startHours + endHours) / 2
+
+  let blendFactor = 0
+  if (sunrise < hours && hours < sunset) {
+    blendFactor = Math.min((hours - sunrise) / fade, 1)
+  } else if (sunset <= hours) {
+    blendFactor = Math.max(1 - (hours - sunset) / fade, 0)
+  }
+
+  const blended = startColor.map((c, i) => Math.round(c + (endColor[i] - c) * blendFactor))
+  return `rgb(${blended.join(', ')})`
 }

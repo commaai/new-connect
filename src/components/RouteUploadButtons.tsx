@@ -7,15 +7,15 @@ import Button from './material/Button'
 import { uploadAllSegments, type FileType } from '~/api/file'
 import type { Route } from '~/api/types'
 
-const BUTTON_TYPES = ['road', 'driver', 'logs', 'route']
+const BUTTON_TYPES = ['road', 'driver', 'logs', 'route'] as const
 type ButtonType = (typeof BUTTON_TYPES)[number]
 type ButtonState = 'idle' | 'loading' | 'success' | 'error'
 
-const BUTTON_TO_FILE_TYPES: Record<Exclude<ButtonType, 'route'>, FileType[]> = {
+const BUTTON_TO_FILE_TYPES = {
   road: ['cameras', 'ecameras'],
   driver: ['dcameras'],
   logs: ['logs'],
-}
+} as const
 
 interface UploadButtonProps {
   state: ButtonState
@@ -59,13 +59,11 @@ interface RouteUploadButtonsProps {
 }
 
 const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
-  const [uploadStore, setUploadStore] = createStore({
-    states: {
-      road: 'idle',
-      driver: 'idle',
-      logs: 'idle',
-      route: 'idle',
-    } as Record<ButtonType, ButtonState>,
+  const [uploadStore, setUploadStore] = createStore<Record<ButtonType, ButtonState>>({
+    road: 'idle',
+    driver: 'idle',
+    logs: 'idle',
+    route: 'idle',
   })
   const [abortController, setAbortController] = createSignal(new AbortController())
 
@@ -75,7 +73,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
       () => {
         abortController().abort()
         setAbortController(new AbortController())
-        setUploadStore('states', BUTTON_TYPES, 'idle')
+        setUploadStore(BUTTON_TYPES, 'idle')
       },
     ),
   )
@@ -87,13 +85,13 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
 
     const updateButtonStates = (types: readonly ButtonType[], state: ButtonState) => {
       if (signal.aborted) return
-      setUploadStore('states', types, state)
+      setUploadStore(types, state)
     }
 
     const uploadButtonTypes: ButtonType[] = [type]
     let uploadFileTypes: FileType[] = []
     for (const check of type === 'route' ? (['road', 'driver', 'logs'] as const) : [type]) {
-      const state = uploadStore.states[check]
+      const state = uploadStore[check]
       if (state === 'loading' || state === 'success') continue
       uploadButtonTypes.push(check)
       uploadFileTypes = uploadFileTypes.concat(BUTTON_TO_FILE_TYPES[check])
@@ -112,10 +110,10 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
   return (
     <div class="flex flex-col rounded-b-md m-5">
       <div class="grid grid-cols-2 gap-3 w-full lg:grid-cols-4">
-        <UploadButton text="Road" icon="videocam" state={uploadStore.states.road} onClick={() => handleUpload('road')} />
-        <UploadButton text="Driver" icon="person" state={uploadStore.states.driver} onClick={() => handleUpload('driver')} />
-        <UploadButton text="Logs" icon="description" state={uploadStore.states.logs} onClick={() => handleUpload('logs')} />
-        <UploadButton text="All" icon="upload" state={uploadStore.states.route} onClick={() => handleUpload('route')} />
+        <UploadButton text="Road" icon="videocam" state={uploadStore.road} onClick={() => handleUpload('road')} />
+        <UploadButton text="Driver" icon="person" state={uploadStore.driver} onClick={() => handleUpload('driver')} />
+        <UploadButton text="Logs" icon="description" state={uploadStore.logs} onClick={() => handleUpload('logs')} />
+        <UploadButton text="All" icon="upload" state={uploadStore.route} onClick={() => handleUpload('route')} />
       </div>
     </div>
   )

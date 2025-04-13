@@ -1,8 +1,9 @@
-import { createMemo, createResource, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
+import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import { getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
@@ -23,7 +24,7 @@ import SettingsActivity from './activities/SettingsActivity'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
+const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
@@ -32,7 +33,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
   return (
     <>
       <TopAppBar
-        component="h1"
+        component="h2"
         leading={
           <Show when={modal()}>
             <IconButton name="arrow_back" onClick={onClose} />
@@ -51,25 +52,16 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] }> = (props) => {
           <Suspense fallback={<div class="min-h-16 rounded-md skeleton-loader" />}>
             <div class="flex max-w-full items-center px-3 rounded-md outline outline-1 outline-outline-variant min-h-16">
               <div class="shrink-0 size-10 inline-flex items-center justify-center rounded-full bg-primary-container text-on-primary-container">
-                <Icon name={!profile.loading && !profile.latest ? 'person_off' : 'person'} filled />
+                <Icon name="person" filled />
               </div>
-              <Show
-                when={profile()}
-                fallback={
-                  <>
-                    <div class="mx-3">Not signed in</div>
-                    <div class="grow" />
-                    <IconButton name="login" href="/login" />
-                  </>
-                }
-              >
-                <div class="min-w-0 mx-3">
-                  <div class="truncate text-body-md text-on-surface">{profile()?.email}</div>
-                  <div class="truncate text-label-sm text-on-surface-variant">{profile()?.user_id}</div>
-                </div>
-                <div class="grow" />
-                <IconButton name="logout" href="/logout" />
-              </Show>
+              <div class="min-w-0 mx-3">
+                <ErrorBoundary fallback="Error loading profile">
+                  <div class="truncate text-sm text-on-surface">{profile()?.email}</div>
+                  <div class="truncate text-xs text-on-surface-variant">{profile()?.user_id}</div>
+                </ErrorBoundary>
+              </div>
+              <div class="grow" />
+              <IconButton name="logout" href="/logout" />
             </div>
           </Suspense>
         </ButtonBase>
@@ -87,7 +79,7 @@ const DashboardLayout: Component<{
     <div class="relative size-full overflow-hidden">
       <div
         class={clsx(
-          'mx-auto size-full max-w-[1560px] md:grid md:grid-cols-2 lg:gap-2',
+          'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
@@ -100,19 +92,55 @@ const DashboardLayout: Component<{
   )
 }
 
+const FirstPairActivity: Component = () => {
+  const { modal } = useDrawerContext()
+  return (
+    <>
+      <TopAppBar
+        class="font-bold"
+        leading={
+          <Show when={!modal()} fallback={<DrawerToggleButton />}>
+            <img alt="" src="/images/comma-white.png" class="h-8" />
+          </Show>
+        }
+      >
+        connect
+      </TopAppBar>
+      <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
+        <h2 class="text-xl">Pair your device</h2>
+        <p class="text-lg">Scan the QR code on your device</p>
+        <p class="text-md mt-4">If you cannot see a QR code, check the following:</p>
+        <ul class="text-md list-disc list-inside">
+          <li>Your device is connected to the internet</li>
+          <li>You have installed the latest version of openpilot</li>
+        </ul>
+        <p class="text-md">
+          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
+          with the same account you may have used previously.
+        </p>
+        <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
+          Add new device
+        </Button>
+      </section>
+    </>
+  )
+}
+
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
   const urlState = createMemo(() => {
     const parts = location.pathname.split('/').slice(1).filter(Boolean)
+    const startTime = parts[2] ? Math.max(Number(parts[2]), 0) : 0
+    const endTime = parts[3] ? Math.max(Number(parts[3]), startTime + 1) : undefined
     return {
       dongleId: parts[0] as string | undefined,
       dateStr: parts[1] as string | undefined,
-      startTime: parts[2] ? Number(parts[2]) : 0,
+      startTime,
+      endTime,
     }
   })
 
-  const [devices] = createResource(getDevices, { initialValue: [] })
-  const [profile] = createResource(getProfile)
+  const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -125,9 +153,12 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <Switch fallback={<TopAppBar leading={<DrawerToggleButton />}>No device</TopAppBar>}>
+      <Switch>
+        <Match when={!isSignedIn()}>
+          <Navigate href="/login" />
+        </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
-          <PairActivity />
+          <PairActivity onPaired={refetch} />
         </Match>
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (
@@ -138,15 +169,17 @@ const Dashboard: Component<RouteSectionProps> = () => {
                   fallback={
                     <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
                       <Icon name="search" size="48" />
-                      <span class="text-title-md">Select a route to view</span>
+                      <span class="text-md">Select a route to view</span>
                     </div>
                   }
                 >
                   <Match when={urlState().dateStr === 'settings' || urlState().dateStr === 'prime'}>
                     <SettingsActivity dongleId={dongleId} />
                   </Match>
-                  <Match when={urlState().dateStr}>
-                    {(dateStr) => <RouteActivity dongleId={dongleId} dateStr={dateStr()} startTime={urlState().startTime} />}
+                  <Match when={urlState().dateStr} keyed>
+                    {(dateStr) => (
+                      <RouteActivity dongleId={dongleId} dateStr={dateStr} startTime={urlState().startTime} endTime={urlState().endTime} />
+                    )}
                   </Match>
                 </Switch>
               }
@@ -154,11 +187,11 @@ const Dashboard: Component<RouteSectionProps> = () => {
             />
           )}
         </Match>
-        <Match when={!profile.loading && !profile.latest}>
-          <Navigate href="/login" />
-        </Match>
         <Match when={getDefaultDongleId()} keyed>
           {(defaultDongleId) => <Navigate href={`/${defaultDongleId}`} />}
+        </Match>
+        <Match when={devices()?.length === 0}>
+          <FirstPairActivity />
         </Match>
       </Switch>
     </Drawer>

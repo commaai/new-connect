@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { formatDate, formatDistance, formatDuration } from './format'
+import { dateTimeToColorBetween, formatDate, formatDistance, formatDuration } from './format'
 
 describe('formatDistance', () => {
   it('should format distance', () => {
@@ -14,11 +14,11 @@ describe('formatDistance', () => {
 
 describe('formatDuration', () => {
   it('should format duration', () => {
-    expect(formatDuration(0)).toBe('0m')
-    expect(formatDuration(12)).toBe('12m')
-    expect(formatDuration(12.34)).toBe('12m')
-    expect(formatDuration(90)).toBe('1h 30m')
-    expect(formatDuration(120)).toBe('2h 0m')
+    expect(formatDuration(0)).toBe('0 min')
+    expect(formatDuration(12)).toBe('12 min')
+    expect(formatDuration(12.34)).toBe('12 min')
+    expect(formatDuration(90)).toBe('1 hr 30 min')
+    expect(formatDuration(120)).toBe('2 hr 0 min')
   })
   it('should be undefined for undefined duration', () => {
     expect(formatDuration(undefined)).toBe(undefined)
@@ -50,5 +50,22 @@ describe('formatDate', () => {
     expect(formatDate(1482652800)).toBe('December 25th, 2016')
     expect(formatDate(1738943059)).toBe('February 7th')
     expect(formatDate(1738943059000)).toBe('February 7th')
+  })
+})
+
+describe('dateTimeToColorBetween', () => {
+  it('should generate a color between two colors', () => {
+    expect(
+      dateTimeToColorBetween(new Date('2025-02-01T00:00:00.000Z'), new Date('2025-02-01T00:00:00.000Z'), [30, 57, 138], [218, 161, 28]),
+    ).toBe('rgb(30, 57, 138)')
+    expect(
+      dateTimeToColorBetween(new Date('2025-02-01T06:00:00.000Z'), new Date('2025-02-01T06:00:00.000Z'), [30, 57, 138], [218, 161, 28]),
+    ).toBe('rgb(93, 92, 101)')
+    expect(
+      dateTimeToColorBetween(new Date('2025-02-01T12:00:00.000Z'), new Date('2025-02-01T12:00:00.000Z'), [30, 57, 138], [218, 161, 28]),
+    ).toBe('rgb(218, 161, 28)')
+    expect(
+      dateTimeToColorBetween(new Date('2025-02-01T18:00:00.000Z'), new Date('2025-02-01T18:00:00.000Z'), [30, 57, 138], [218, 161, 28]),
+    ).toBe('rgb(218, 161, 28)')
   })
 })

@@ -54,43 +54,42 @@ export interface DrivingStatistics {
 }
 
 export interface Route extends ApiResponseBase {
-  can?: boolean
+  can: boolean
   create_time: number
   devicetype: number
   dongle_id: string
-  end_lat?: number
-  end_lng?: number
-  end_time?: string
+  end_lat: number // default to 0
+  end_lng: number // default to 0
+  end_time: string | null
   fullname: string
-  git_branch?: string
-  git_commit?: string
-  git_dirty?: boolean
-  git_remote?: string
-  hpgps?: boolean
-  init_logmonotime?: number
+  git_branch: string | null
+  git_commit: string | null
+  git_dirty: boolean | null
+  git_remote: string | null
+  hpgps: boolean
+  init_logmonotime: number | null
   is_public: boolean
-  is_preserved: boolean
-  length?: number
+  length: number // default to 0
   maxcamera: number
   maxdcamera: number
   maxecamera: number
   maxlog: number
   maxqcamera: number
   maxqlog: number
-  passive?: boolean
-  platform?: string
+  passive: boolean | null
+  platform: string | null
   proccamera: number
   proclog: number
   procqcamera: number
   procqlog: number
-  radar?: boolean
-  start_lat?: number
-  start_lng?: number
-  start_time: string
+  radar: boolean
+  start_lat: number // default to 0
+  start_lng: number // default to 0
+  start_time: string | null
   url: string
   user_id: string | null
-  version?: string
-  vin?: string
+  version: string | null
+  vin: string | null
 }
 
 export interface RouteInfo {
@@ -101,14 +100,6 @@ export interface RouteInfo {
 export interface RouteShareSignature extends Record<string, string> {
   exp: string
   sig: string
-}
-
-export interface RouteSegments extends Route {
-  end_time_utc_millis: number
-  is_preserved: boolean
-  share_exp: RouteShareSignature['exp']
-  share_sig: RouteShareSignature['sig']
-  start_time_utc_millis: number
 }
 
 export interface Files {

@@ -1,5 +1,5 @@
 import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
-import { createMutation, createQuery, queryOptions, useQueryClient } from '@tanstack/solid-query'
+import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createStore, reconcile } from 'solid-js/store'
 import LinearProgress from './material/LinearProgress'
 import Icon, { IconName } from './material/Icon'
@@ -22,7 +22,7 @@ export const queries = {
     queryOptions({ queryKey: queries.offlineForDongle(dongleId), queryFn: () => getAthenaOfflineQueue(dongleId) }),
   cancelUpload: (dongleId: string) => {
     const queryClient = useQueryClient()
-    return createMutation(() => ({
+    return useMutation(() => ({
       mutationFn: (ids: string[]) => cancelUpload(dongleId, ids),
       onSettled: () => queryClient.invalidateQueries({ queryKey: queries.onlineForDongle(dongleId) }),
     }))
@@ -69,12 +69,12 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
         <div class="flex items-center min-w-0 flex-1">
           <Icon class="text-on-surface-variant flex-shrink-0 mr-2" name={item().isFirehose ? 'local_fire_department' : 'person'} />
           <div class="flex min-w-0 gap-1">
-            <span class="text-body-sm font-mono truncate text-on-surface">{[item().route, item().segment, item().filename].join(' ')}</span>
+            <span class="text-xs font-mono truncate text-on-surface">{`${item().route}/${item().segment} ${item().filename}`}</span>
           </div>
         </div>
         <div class="flex items-center gap-0.5 flex-shrink-0 justify-end">
-          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close_small" onClick={cancel} />}>
-            <span class="text-body-sm font-mono whitespace-nowrap pr-[0.5rem]">
+          <Show when={!item().id || item().progress !== 0} fallback={<IconButton size="20" name="close" onClick={cancel} />}>
+            <span class="text-xs font-mono whitespace-nowrap pr-[0.5rem]">
               {item().id ? `${Math.round(item().progress * 100)}%` : 'Offline'}
             </span>
           </Show>
@@ -90,13 +90,13 @@ const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: Upl
 const StatusMessage: VoidComponent<{ iconClass?: string; icon: IconName; message: string }> = (props) => (
   <div class="flex items-center gap-2">
     <Icon name={props.icon} class={props.iconClass} />
-    <span class="text-body-lg">{props.message}</span>
+    <span class="text-md">{props.message}</span>
   </div>
 )
 
 const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
-  const onlineQueue = createQuery(() => queries.getOnline(props.dongleId))
-  const offlineQueue = createQuery(() => queries.getOffline(props.dongleId))
+  const onlineQueue = useQuery(() => queries.getOnline(props.dongleId))
+  const offlineQueue = useQuery(() => queries.getOffline(props.dongleId))
   const cancel = createMemo(() => queries.cancelUpload(props.dongleId))
 
   const [items, setItems] = createStore<UploadQueueItemWithAttributes[]>([])
@@ -118,8 +118,8 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
         <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
-        <Button onClick={cancelAll} class="px-2 md:px-3" leading={<Icon name="close" size="20" />} color="primary">
-          <span class="flex items-center gap-1 font-mono">Cancel All</span>
+        <Button color="text" leading={<Icon name="clear_all" />} onClick={cancelAll}>
+          Cancel all
         </Button>
       </div>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">

@@ -26,7 +26,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   return (
     <List variant="nav" class={props.class}>
       <Suspense fallback={<div class="h-14 skeleton-loader rounded-xl" />}>
-        <For each={props.devices}>
+        <For each={props.devices} fallback={<span class="text-md mx-2 text-on-surface-variant">No devices found</span>}>
           {(device) => (
             <ListItem
               variant="nav"
@@ -37,8 +37,8 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
               activeClass="before:bg-primary"
             >
               <ListItemContent
-                headline={getDeviceName(device)}
-                subhead={<span class="font-mono text-label-sm lowercase">{device.dongle_id}</span>}
+                headline={<span class="font-medium">{getDeviceName(device)}</span>}
+                subhead={<span class="font-mono text-xs lowercase">{device.dongle_id}</span>}
               />
             </ListItem>
           )}

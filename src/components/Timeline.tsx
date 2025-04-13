@@ -1,4 +1,4 @@
-import { For, createResource, createSignal, createEffect, onMount, onCleanup } from 'solid-js'
+import { For, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
@@ -98,10 +98,9 @@ interface TimelineProps {
 }
 
 const Timeline: VoidComponent<TimelineProps> = (props) => {
-  const route = () => props.route
   // TODO: align to first camera frame event
   const [markerOffsetPct, setMarkerOffsetPct] = createSignal(0)
-  const [duration] = createResource(route, (route) => getRouteDuration(route)?.asSeconds() ?? 0, { initialValue: 0 })
+  const duration = () => getRouteDuration(props.route)?.asSeconds() ?? 0
 
   let ref!: HTMLDivElement
 
@@ -112,8 +111,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       const fraction = x / rect.width
       // Update marker immediately without waiting for video
       setMarkerOffsetPct(fraction * 100)
-      const newTime = duration() * fraction
-      props.updateTime(newTime)
+      props.updateTime(duration() * fraction)
     }
 
     const onStart = () => {
@@ -159,7 +157,8 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
   })
 
   createEffect(() => {
-    setMarkerOffsetPct((props.seekTime / duration()) * 100)
+    if (duration() === 0) setMarkerOffsetPct(0)
+    else setMarkerOffsetPct((props.seekTime / duration()) * 100)
   })
 
   return (
@@ -176,7 +175,9 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
         )}
         title="Disengaged"
       >
-        {renderTimelineEvents(props.route, props.events)}
+        <div class="absolute inset-0 size-full rounded-b-md overflow-hidden">
+          <Suspense fallback={<div class="skeleton-loader size-full" />}>{renderTimelineEvents(props.route, props.events)}</Suspense>
+        </div>
         <div
           class="absolute top-0 z-10 h-full"
           style={{

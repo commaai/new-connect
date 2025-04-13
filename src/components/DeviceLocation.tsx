@@ -174,9 +174,9 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
             color="secondary"
             class="bg-surface-container-low text-on-surface-variant"
             onClick={() => void requestUserLocation()}
-            trailing={<span class="pr-2 text-sm">Show my location</span>}
+            leading={<Icon name="my_location" size="20" />}
           >
-            <Icon name="my_location" size="20" />
+            Show my location
           </Button>
         </div>
       </Show>
@@ -202,11 +202,11 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         )}
       >
         <div class="mb-2 flex flex-row items-center justify-between gap-4">
-          <span class="truncate text-title-md">{selectedLocation()?.label}</span>
+          <span class="truncate text-md">{selectedLocation()?.label}</span>
           <IconButton name="close" onClick={() => setShowSelectedLocation(false)} />
         </div>
         <div class="flex flex-col items-end gap-3 xs:flex-row">
-          <span class="text-body-md text-on-surface-variant">{selectedLocation()?.address}</span>
+          <span class="text-sm text-on-surface-variant">{selectedLocation()?.address}</span>
           <Button
             color="secondary"
             onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
