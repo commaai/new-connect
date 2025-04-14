@@ -43,7 +43,7 @@ const createSharedDevice = (dongleId: string): Device => ({
 export const getDevice = async (dongleId: string) => {
   try {
     const device = await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
-    device.is_online = !!device.last_athena_ping && device.last_athena_ping >= Date.now() / 1000 - 120
+    device.is_online = !!device.last_athena_ping && device.last_athena_ping >= Math.floor(Date.now() / 1000) - 120
     return device
   } catch {
     return createSharedDevice(dongleId)
