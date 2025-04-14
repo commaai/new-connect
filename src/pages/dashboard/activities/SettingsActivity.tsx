@@ -403,7 +403,11 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 const updateDeviceAction = action(
   async (dongleId: string, formData: FormData) => {
     const alias = formData.get('alias') as string
-    await updateDevice(dongleId, { alias })
+    try {
+      await updateDevice(dongleId, { alias })
+    } catch (error) {
+      throw new Error('Failed to update name', { cause: error })
+    }
   },
   {
     name: 'updateDevice',
