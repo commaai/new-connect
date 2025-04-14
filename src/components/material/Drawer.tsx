@@ -47,7 +47,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <nav
-        class={clsx('fixed hide-scrollbar inset-y-0 transition-drawer ease-in-out duration-300 z-[99]')}
+        class={clsx('fixed hide-scrollbar inset-y-0 z-10 transition-drawer ease-in-out duration-300')}
         style={{
           left: drawerVisible() ? 0 : `${-drawerWidth()}px`,
           width: `${drawerWidth()}px`,
@@ -57,7 +57,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       </nav>
 
       <main
-        class="absolute inset-y-0 z-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
+        class="absolute inset-y-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
         style={{
           left: !modal() ? `${drawerWidth()}px` : 0,
           width: contentWidth(),
@@ -65,10 +65,10 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
       >
         {props.children}
         <div
-          class="absolute inset-0 z-[9999] bg-background transition-drawer ease-in-out duration-300"
+          class="absolute inset-0 bg-background transition-drawer ease-in-out duration-300"
           style={{
             'pointer-events': modal() && open() ? 'auto' : 'none',
-            opacity: modal() && open() ? 0.75 : 0,
+            opacity: modal() && open() ? 0.5 : 0,
           }}
           onClick={() => setOpen(false)}
         />
