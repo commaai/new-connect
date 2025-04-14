@@ -22,7 +22,7 @@ import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 
-import { currentDevice as device, refetchDevices } from '../data'
+import { currentDevice as device, refetchCurrentDevice } from '../data'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -407,7 +407,7 @@ const updateDeviceAction = action(
   },
   {
     name: 'updateDevice',
-    onComplete: () => refetchDevices(),
+    onComplete: () => refetchCurrentDevice(),
   },
 )
 
