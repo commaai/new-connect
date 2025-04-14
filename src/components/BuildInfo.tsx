@@ -3,7 +3,7 @@ import clsx from 'clsx'
 
 import { dayjs } from '~/utils/format'
 
-const sha = import.meta.env.VITE_APP_GIT_SHA || 'development'
+const sha = import.meta.env.VITE_APP_GIT_SHA || 'develop'
 const timestamp = import.meta.env.VITE_APP_GIT_TIMESTAMP
 const formattedTimestamp = timestamp ? dayjs(timestamp).format('YYYY-MM-DD HH:mm') : 'local'
 console.debug('BuildInfo', { sha, timestamp, formattedTimestamp })
