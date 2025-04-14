@@ -1,4 +1,4 @@
-import { createResource, createSignal } from 'solid-js'
+import { createMemo, createResource, createSignal } from 'solid-js'
 
 import { accessToken } from '~/api/auth/client'
 import { getDevice, getDevices } from '~/api/devices'
@@ -25,4 +25,8 @@ const refetchCurrentDevice = () => {
 }
 export { currentDevice, refetchCurrentDevice }
 
-export const [currentDeviceName] = createResource(currentDevice, getDeviceName)
+export const currentDeviceName = createMemo(() => {
+  const device = currentDevice()
+  if (!device) return ''
+  return getDeviceName(device)
+})
