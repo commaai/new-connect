@@ -16,8 +16,7 @@ type TextFieldProps = {
 const baseColors = {
   label: 'text-on-surface-variant',
   indicator: 'bg-on-surface-variant',
-  input: 'text-on-surface',
-  caret: 'caret-primary',
+  input: 'text-on-surface caret-primary',
   helper: 'text-on-surface-variant',
 }
 
@@ -32,7 +31,7 @@ const stateColors = {
   error: {
     label: 'text-error',
     indicator: 'bg-error',
-    caret: 'caret-error',
+    input: 'text-on-surface caret-error',
     helper: 'text-error',
   },
   errorHover: {
@@ -55,15 +54,13 @@ const TextField: Component<TextFieldProps> = (props) => {
     }
   })
 
-  const hasValue = () => inputValue().length > 0
-  const hasError = () => !!props.error
-  const labelFloating = () => focused() || hasValue()
+  const labelFloating = () => focused() || inputValue().length > 0
 
   // Determine current state for styling
   const getStateStyle = () => {
     const state = { ...baseColors }
     if (!props.disabled) {
-      if (hasError()) {
+      if (props.error) {
         Object.assign(state, stateColors.error)
         if (hovered()) {
           Object.assign(state, stateColors.errorHover)
@@ -75,18 +72,6 @@ const TextField: Component<TextFieldProps> = (props) => {
       }
     }
     return state
-  }
-
-  const handleInput = (e: InputEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }) => {
-    setInputValue(e.currentTarget.value)
-    props.onInput?.(e)
-  }
-
-  const handleKeyDown = (e: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
-    if (e.key === 'Enter' && props.onEnter) {
-      e.preventDefault()
-      props.onEnter(inputValue())
-    }
   }
 
   return (
@@ -122,12 +107,19 @@ const TextField: Component<TextFieldProps> = (props) => {
               'w-full bg-transparent outline-none px-4 py-4 text-body-lg z-10',
               'select-text selection:bg-primary-container',
               getStateStyle().input,
-              getStateStyle().caret,
               props.label && labelFloating() && 'pt-6 pb-2',
             )}
             value={inputValue()}
-            onInput={handleInput}
-            onKeyDown={handleKeyDown}
+            onInput={(e) => {
+              setInputValue(e.currentTarget.value)
+              props.onInput?.(e)
+            }}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' && props.onEnter) {
+                e.preventDefault()
+                props.onEnter(inputValue())
+              }
+            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
