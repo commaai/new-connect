@@ -10,8 +10,8 @@ console.debug('BuildInfo', { sha, timestamp, formattedTimestamp })
 
 const BuildInfo: VoidComponent<{ class?: string }> = (props) => {
   return (
-    <div class={clsx('text-xs text-on-surface opacity-20 select-text', props.class)}>
-      <span class="font-mono cursor-text select-all selection:bg-current">{sha.substring(0, 7)}</span>
+    <div class={clsx('text-xs text-on-surface opacity-25 select-text', props.class)}>
+      <span class="font-mono cursor-text select-all selection:bg-primary-container">{sha.substring(0, 7)}</span>
       <span class="mx-1">•</span>
       <span>{formattedTimestamp}</span>
     </div>
