@@ -22,6 +22,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
 import { resolved } from '~/utils/reactivity'
+import TextField from '~/components/material/TextField'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -405,8 +406,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [deviceName] = createResource(device, getDeviceName)
 
   const [deviceNameInput, setDeviceNameInput] = createSignal('')
-  const [updateSuccess, setUpdateSuccess] = createSignal(false)
-  const [updateError, setUpdateError] = createSignal<string | null>(null)
+  const [updateError, setUpdateError] = createSignal<string>()
   const [isUpdating, setIsUpdating] = createSignal(false)
 
   createEffect(() => {
@@ -423,15 +423,11 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
     }
 
     setIsUpdating(true)
-    setUpdateSuccess(false)
-    setUpdateError(null)
+    setUpdateError()
 
     try {
       await updateDevice(props.dongleId, { alias: name })
       await refetchDevice()
-      setUpdateSuccess(true)
-      // Clear success message after 3 seconds
-      setTimeout(() => setUpdateSuccess(false), 3000)
     } catch (error) {
       setUpdateError(error instanceof Error ? error.message : 'Failed to update device name')
     } finally {
@@ -450,32 +446,19 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <div class="flex gap-2">
-          <input
-            type="text"
+        <div class="flex gap-2 items-center">
+          <TextField
+            class="flex-1"
             value={deviceNameInput()}
             onInput={(e) => setDeviceNameInput(e.currentTarget.value)}
-            class="bg-surface-container-low px-3 py-2 rounded-md flex-1 selection:bg-primary-container focus:ring-primary-container focus:border-primary-container"
-            placeholder="Device name"
+            label="Device name"
+            error={updateError()}
+            disabled={device.loading || isUpdating()}
           />
-          <Button color="primary" onClick={() => updateName()} disabled={isUpdating()} loading={isUpdating()}>
+          <Button color="primary" onClick={() => updateName()} disabled={device.loading || isUpdating()} loading={isUpdating()}>
             Update
           </Button>
         </div>
-
-        <Show when={updateError()}>
-          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-            <Icon class="text-error" name="error" size="20" />
-            {updateError()}
-          </div>
-        </Show>
-
-        <Show when={updateSuccess()}>
-          <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-sm text-on-tertiary-container">
-            <Icon name="check" size="20" />
-            Device name updated successfully
-          </div>
-        </Show>
 
         <Show when={unpairData.error}>
           <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
@@ -487,7 +470,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
           Unpair this device
         </Button>
         <hr class="mx-4 opacity-20" />
-        <h2 class="text-lg">comma prime</h2>
+        <h3 class="text-lg">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>
