@@ -1,4 +1,5 @@
 import Button from '~/components/material/Button'
+import BuildInfo from '~/components/BuildInfo'
 
 export default function OfflinePage() {
   return (
@@ -17,6 +18,8 @@ export default function OfflinePage() {
       <Button color="secondary" onClick={() => window.location.reload()}>
         Try again
       </Button>
+
+      <BuildInfo class="absolute bottom-4" />
     </div>
   )
 }
