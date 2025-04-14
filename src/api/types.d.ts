@@ -15,7 +15,7 @@ export interface DeviceLocation {
   bearing: number
 }
 
-export interface Device {
+export interface ApiDevice {
   dongle_id: string
   alias: string
   serial: string
@@ -36,7 +36,9 @@ export interface Device {
     prime_data: boolean
     nav: boolean
   }
-  // connect custom attributes
+}
+
+export interface Device extends ApiDevice {
   is_online: boolean
 }
 
