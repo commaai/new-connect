@@ -13,14 +13,13 @@ type TextFieldProps = {
   onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class'>
 
-const baseColors = {
-  label: 'text-on-surface-variant',
-  indicator: 'bg-on-surface-variant',
-  input: 'text-on-surface caret-primary',
-  helper: 'text-on-surface-variant',
-}
-
 const stateColors = {
+  base: {
+    label: 'text-on-surface-variant',
+    indicator: 'bg-on-surface-variant',
+    input: 'text-on-surface caret-primary',
+    helper: 'text-on-surface-variant',
+  },
   hover: {
     indicator: 'bg-on-surface',
   },
@@ -49,16 +48,14 @@ const TextField: Component<TextFieldProps> = (props) => {
 
   // Keep local value in sync with prop value
   createEffect(() => {
-    if (props.value !== undefined) {
-      setInputValue(props.value)
-    }
+    if (props.value !== undefined) setInputValue(props.value)
   })
 
   const labelFloating = () => focused() || inputValue().length > 0
 
   // Determine current state for styling
   const getStateStyle = () => {
-    const state = { ...baseColors }
+    const state = { ...stateColors.base }
     if (!props.disabled) {
       if (props.error) {
         Object.assign(state, stateColors.error)
@@ -78,16 +75,15 @@ const TextField: Component<TextFieldProps> = (props) => {
     <div class={clsx('flex flex-col', props.class)}>
       <div
         class={clsx(
-          'relative flex items-center rounded-t-xs overflow-hidden min-h-[56px]',
-          'bg-surface-container-highest',
-          hovered() && !props.disabled && 'after:absolute after:inset-0 after:bg-on-surface after:opacity-[0.08] after:pointer-events-none',
+          'relative flex rounded-t-xs min-h-[56px] bg-surface-container-highest',
+          hovered() && !props.disabled && 'after:absolute after:inset-0 after:bg-on-surface after:opacity-[0.08]',
           props.disabled && 'opacity-40',
         )}
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
         {/* Input and label container */}
-        <div class="relative flex-1 flex">
+        <div class="relative flex-1">
           <Show when={props.label}>
             <label
               class={clsx(
