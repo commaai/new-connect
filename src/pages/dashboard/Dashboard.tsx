@@ -34,7 +34,10 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
   return (
     <>
       <Show when={modal() && open()}>
-        <TopAppBar class="p-4" leading={<img src="/images/comma-white.svg" height="32" width="32" />}>
+        <TopAppBar
+          class="p-4 bg-surface-container-highest border-b-4"
+          leading={<img src="/images/comma-white.svg" height="32" width="32" />}
+        >
           connect
         </TopAppBar>
       </Show>
@@ -68,7 +71,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
 
 const AppHeader: VoidComponent = () => {
   const navigate = useNavigate()
-  const { modal, open, setOpen } = useDrawerContext()
+  const { modal, setOpen } = useDrawerContext()
   const goHome = () => {
     setOpen(false)
     navigate('/')
@@ -76,13 +79,13 @@ const AppHeader: VoidComponent = () => {
 
   return (
     <TopAppBar
-      class="fixed top-0 inset-x-0 left-0 right-0 p-4 bg-surface-container-high"
+      class="fixed top-0 inset-x-0 left-0 right-0 z-10 p-4 bg-surface-container-highest border-b-4"
       leading={
         <Show
           when={modal()}
           fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
         >
-          <IconButton name={open() ? 'close' : 'menu'} onClick={() => setOpen((prev) => !prev)} />
+          <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
         </Show>
       }
     >

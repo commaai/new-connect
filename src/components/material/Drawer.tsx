@@ -44,43 +44,40 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const drawerVisible = () => !modal() || open()
 
   return (
-    <div>
-      <DrawerContext.Provider value={{ modal, open, setOpen }}>
-        <nav
-          class={clsx(
-            'hide-scrollbar inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300',
-            modal() && open() ? 'absolute z-[9999]' : 'fixed top-[4rem]',
-          )}
-          style={{
-            left: drawerVisible() ? 0 : `${modal() ? -drawerWidth() : -PEEK}px`,
-            opacity: modal() || drawerVisible() ? 1 : 0.5,
-            width: `${drawerWidth()}px`,
-          }}
-        >
-          <div class="flex size-full flex-col rounded-r-lg bg-surface-container-high text-on-surface-variant sm:rounded-r-none">
-            {props.drawer}
-          </div>
-        </nav>
+    <DrawerContext.Provider value={{ modal, open, setOpen }}>
+      <nav
+        class={clsx(
+          'hide-scrollbar inset-y-0 left-0 h-full touch-pan-y overflow-y-auto overscroll-y-contain transition-drawer ease-in-out duration-300',
+          modal() && open() ? 'absolute z-[9999]' : 'fixed top-[4rem] h-[calc(100vh-4rem)]',
+        )}
+        style={{
+          left: drawerVisible() ? 0 : `${-drawerWidth()}px`,
+          width: `${drawerWidth()}px`,
+        }}
+      >
+        <div class="flex size-full flex-col rounded-r-lg bg-surface-container border text-on-surface-variant sm:rounded-r-none">
+          {props.drawer}
+        </div>
+      </nav>
 
-        <main
-          class="absolute inset-y-0 z-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
+      <main
+        class="absolute inset-y-0 z-0 overflow-y-auto bg-background transition-drawer ease-in-out duration-300"
+        style={{
+          left: !modal() ? `${drawerWidth()}px` : 0,
+          width: contentWidth(),
+        }}
+      >
+        {props.children}
+        <div
+          class="absolute inset-0 z-[9999] bg-background transition-drawer ease-in-out duration-300"
           style={{
-            left: !modal() ? `${drawerWidth()}px` : 0,
-            width: contentWidth(),
+            'pointer-events': modal() && open() ? 'auto' : 'none',
+            opacity: modal() && open() ? 0.75 : 0,
           }}
-        >
-          {props.children}
-          <div
-            class="absolute inset-0 z-[9999] bg-background transition-drawer ease-in-out duration-300"
-            style={{
-              'pointer-events': modal() && open() ? 'auto' : 'none',
-              opacity: modal() && open() ? 0.5 : 0,
-            }}
-            onClick={() => setOpen(false)}
-          />
-        </main>
-      </DrawerContext.Provider>
-    </div>
+          onClick={() => setOpen(false)}
+        />
+      </main>
+    </DrawerContext.Provider>
   )
 }
 
