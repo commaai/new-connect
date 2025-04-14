@@ -450,7 +450,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
           <TextField
             class="flex-1"
             value={deviceNameInput()}
-            onEnter={updateName}
+            onEnter={() => updateName()}
             onInput={(e) => setDeviceNameInput(e.currentTarget.value)}
             label="Device name"
             error={updateError()}
