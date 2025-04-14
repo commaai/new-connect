@@ -5,6 +5,7 @@ import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
+import storage from '~/utils/storage'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
@@ -20,7 +21,6 @@ import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 
 import { devices, profile, setCurrentDongleId } from './data'
-import storage from '~/utils/storage'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
