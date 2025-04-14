@@ -1,6 +1,6 @@
-import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, ErrorBoundary, lazy, Match, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
-import { Navigate, type RouteSectionProps, useLocation, useNavigate } from '@solidjs/router'
+import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
@@ -26,21 +26,14 @@ import TopAppBar from '~/components/material/TopAppBar'
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
-  const { modal, setOpen } = useDrawerContext()
+  const { setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
   const [profile] = createResource(getProfile)
 
   return (
     <>
-      <Show when={modal() && open()}>
-        <TopAppBar
-          class="p-4 bg-surface-container-highest border-b-4"
-          leading={<img src="/images/comma-white.svg" height="32" width="32" />}
-        >
-          connect
-        </TopAppBar>
-      </Show>
+      <AppHeader />
       <DeviceList class="overflow-y-auto p-4" devices={props.devices} />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
@@ -69,25 +62,12 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
   )
 }
 
-const AppHeader: VoidComponent = () => {
-  const navigate = useNavigate()
-  const { modal, setOpen } = useDrawerContext()
-  const goHome = () => {
-    setOpen(false)
-    navigate('/')
-  }
-
+const AppHeader: VoidComponent<{ class?: string; leading?: JSXElement }> = (props) => {
   return (
     <TopAppBar
-      class="fixed top-0 inset-x-0 left-0 right-0 z-10 p-4 bg-surface-container-highest border-b-4"
-      leading={
-        <Show
-          when={modal()}
-          fallback={<img onClick={goHome} class="cursor-pointer" alt="comma logo" src="/images/comma-white.svg" height="32" width="32" />}
-        >
-          <IconButton name="menu" onClick={() => setOpen((prev) => !prev)} />
-        </Show>
-      }
+      component="h2"
+      class={clsx('text-white p-4 bg-surface-container-highest border-b-2 border-b-outline-variant h-[4rem]', props.class)}
+      leading={props.leading || <img src="/images/comma-white.svg" height="32" width="32" />}
     >
       connect
     </TopAppBar>
@@ -101,7 +81,7 @@ const DashboardLayout: Component<{
 }> = (props) => {
   return (
     <div class="relative size-full overflow-hidden">
-      <AppHeader />
+      <AppHeader class="fixed top-0 inset-x-0 left-0 right-0" leading={<DrawerToggleButton />} />
       <div
         class={clsx(
           'mt-16 mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
@@ -118,19 +98,9 @@ const DashboardLayout: Component<{
 }
 
 const FirstPairActivity: Component = () => {
-  const { modal } = useDrawerContext()
   return (
     <>
-      <TopAppBar
-        class="font-bold"
-        leading={
-          <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
-          </Show>
-        }
-      >
-        connect
-      </TopAppBar>
+      <AppHeader class="fixed top-0 inset-x-0 left-0 right-0" />
       <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
         <h2 class="text-xl">Pair your device</h2>
         <p class="text-lg">Scan the QR code on your device</p>
