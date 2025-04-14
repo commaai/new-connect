@@ -21,9 +21,8 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
-import { getDeviceName } from '~/utils/device'
 
-import { currentDevice as device } from '../data'
+import { currentDevice as device, currentDeviceName as deviceName } from '../data'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -402,8 +401,6 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 }
 
 const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device> }> = (props) => {
-  const [deviceName] = createResource(props.device, getDeviceName)
-
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin

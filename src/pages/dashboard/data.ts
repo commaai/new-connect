@@ -6,14 +6,11 @@ import { getProfile } from '~/api/profile'
 import { getDeviceName } from '~/utils/device'
 import { resolved } from '~/utils/reactivity'
 
-const [profile, { refetch: refetchProfile }] = createResource(accessToken, getProfile)
-export { profile, refetchProfile }
+export const [profile, { refetch: refetchProfile }] = createResource(accessToken, getProfile)
 
-const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices)
-export { devices, refetchDevices }
+export const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices)
 
-const [currentDongleId, setCurrentDongleId] = createSignal<string>()
-export { currentDongleId, setCurrentDongleId }
+export const [currentDongleId, setCurrentDongleId] = createSignal<string>()
 
 const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(currentDongleId, (dongleId) => {
   const device = resolved(devices) ? devices.latest.find((device) => device.dongle_id === dongleId) : undefined
@@ -28,4 +25,4 @@ const refetchCurrentDevice = () => {
 }
 export { currentDevice, refetchCurrentDevice }
 
-export const [selectedDeviceName] = createResource(currentDevice, getDeviceName)
+export const [currentDeviceName] = createResource(currentDevice, getDeviceName)
