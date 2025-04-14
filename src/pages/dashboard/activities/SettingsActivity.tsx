@@ -1,9 +1,9 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation } from '@solidjs/router'
+import { action, useLocation, useSubmission } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { unpairDevice } from '~/api/devices'
+import { unpairDevice, updateDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -12,17 +12,17 @@ import {
   getSubscribeInfo,
   getSubscriptionStatus,
 } from '~/api/prime'
-import type { Device } from '~/api/types'
 import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
+import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 
-import { currentDevice as device, currentDeviceName as deviceName } from '../store'
+import { currentDevice as device, refetchCurrentDevice } from '../store'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -400,7 +400,24 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   )
 }
 
-const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device> }> = (props) => {
+const updateDeviceAction = action(
+  async (dongleId: string, formData: FormData) => {
+    const alias = formData.get('alias') as string
+    try {
+      await updateDevice(dongleId, { alias })
+    } catch (error) {
+      throw new Error('Failed to update name', { cause: error })
+    }
+  },
+  {
+    name: 'updateDevice',
+    onComplete: () => refetchCurrentDevice(),
+  },
+)
+
+const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
+  const submission = useSubmission(updateDeviceAction)
+
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
@@ -408,7 +425,23 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
 
   return (
     <div class="flex flex-col gap-4">
-      <h2 class="text-lg">{deviceName()}</h2>
+      <form action={updateDeviceAction.with(props.dongleId)} method="post">
+        <div class="flex gap-2">
+          <TextField
+            class="flex-1"
+            id="device-alias"
+            name="alias"
+            value={device()?.alias}
+            label="Device name"
+            disabled={device.loading || submission.pending}
+            error={submission.error?.message}
+          />
+          <Button class="mt-2" color="primary" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
+            Update
+          </Button>
+        </div>
+      </form>
+
       <Show when={unpairData.error}>
         <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
           <Icon class="text-error" name="error" size="20" />
@@ -429,11 +462,9 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <DeviceSettingsForm dongleId={props.dongleId} device={device} />
+        <DeviceSettingsForm dongleId={props.dongleId} />
 
-        <hr class="mx-4 opacity-20" />
-
-        <h2 class="text-lg">comma prime</h2>
+        <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>

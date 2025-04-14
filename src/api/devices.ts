@@ -54,6 +54,15 @@ export const getDevice = async (dongleId: string): Promise<Device> => {
   }
 }
 
+export const updateDevice = async (dongleId: string, data: Partial<Pick<ApiDevice, 'alias'>>) =>
+  fetcher<ApiDevice>(`/v1/devices/${dongleId}/`, {
+    method: 'PATCH',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(data),
+  })
+
 export const getAthenaOfflineQueue = (dongleId: string) =>
   fetcher<AthenaOfflineQueueResponse>(`/v1/devices/${dongleId}/athena_offline_queue`)
 
