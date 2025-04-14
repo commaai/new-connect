@@ -9,7 +9,7 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
-import { refetchDevices } from '../data'
+import { refetchDevices } from '../store'
 import './PairActivity.css'
 
 const toError = (error: unknown): Error => {
