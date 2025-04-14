@@ -21,6 +21,7 @@ import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
+import BuildInfo from '~/components/BuildInfo'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -170,6 +171,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
                     <div class="hidden size-full flex-col items-center justify-center gap-4 md:flex">
                       <Icon name="search" size="48" />
                       <span class="text-md">Select a route to view</span>
+                      <BuildInfo class="absolute bottom-4" />
                     </div>
                   }
                 >
