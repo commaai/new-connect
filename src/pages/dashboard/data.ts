@@ -6,7 +6,7 @@ import { getProfile } from '~/api/profile'
 import { getDeviceName } from '~/utils/device'
 import { resolved } from '~/utils/reactivity'
 
-export const [profile, { refetch: refetchProfile }] = createResource(accessToken, getProfile)
+export const [profile, { refetch: refetchProfile }] = createResource(accessToken, () => getProfile().catch(() => undefined))
 
 export const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices)
 
