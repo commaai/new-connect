@@ -6,7 +6,7 @@ import ButtonBase, { ButtonBaseProps } from './ButtonBase'
 import Icon from './Icon'
 
 type ButtonProps = ButtonBaseProps & {
-  color?: 'primary' | 'secondary' | 'tertiary' | 'error'
+  color?: 'primary' | 'secondary' | 'tertiary' | 'error' | 'text'
   disabled?: boolean
   loading?: boolean
   leading?: JSXElement
@@ -17,10 +17,11 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   const color = () => props.color || 'primary'
   const colorClasses = () =>
     ({
-      primary: 'bg-primary before:bg-on-primary text-on-primary',
-      secondary: 'bg-secondary before:bg-on-secondary text-on-secondary',
-      tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary',
-      error: 'bg-error before:bg-on-error text-on-error',
+      text: 'text-primary before:bg-on-primary',
+      primary: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1',
+      secondary: 'bg-secondary before:bg-on-secondary text-on-secondary hover:elevation-1',
+      tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary hover:elevation-1',
+      error: 'bg-error before:bg-on-error text-on-error hover:elevation-1',
     })[color()]
   const [, rest] = splitProps(props, ['color', 'leading', 'trailing', 'class', 'children', 'disabled', 'loading'])
   const disabled = () => props.disabled || props.loading
@@ -28,7 +29,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer hover:elevation-1 inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
+        'state-layer inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
         colorClasses(),
         disabled() && 'cursor-not-allowed opacity-50',
         !disabled() && 'hover:opacity-80',

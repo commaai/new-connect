@@ -1,7 +1,3 @@
-export interface ApiResponseBase {
-  fetched_at: number
-}
-
 export interface Profile {
   email: string
   id: string
@@ -10,7 +6,7 @@ export interface Profile {
   user_id: string
 }
 
-export interface DeviceLocation extends ApiResponseBase {
+export interface DeviceLocation {
   lat: number
   lng: number
   time: number
@@ -19,7 +15,7 @@ export interface DeviceLocation extends ApiResponseBase {
   bearing: number
 }
 
-export interface Device extends ApiResponseBase {
+export interface ApiDevice {
   dongle_id: string
   alias: string
   serial: string
@@ -42,6 +38,10 @@ export interface Device extends ApiResponseBase {
   }
 }
 
+export interface Device extends ApiDevice {
+  is_online: boolean
+}
+
 export interface DrivingStatisticsAggregation {
   distance: number
   minutes: number
@@ -53,7 +53,7 @@ export interface DrivingStatistics {
   week: DrivingStatisticsAggregation
 }
 
-export interface Route extends ApiResponseBase {
+export interface Route {
   can: boolean
   create_time: number
   devicetype: number
@@ -113,7 +113,7 @@ export interface Files {
 
 export type AthenaOfflineQueueResponse = AthenaOfflineQueueItem<unknown>[]
 
-export interface AthenaOfflineQueueItem<T> extends ApiResponseBase, AthenaCallRequest<T> {
+export interface AthenaOfflineQueueItem<T> extends AthenaCallRequest<T> {
   expiry: number
 }
 
