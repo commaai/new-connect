@@ -3,7 +3,7 @@ import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXEle
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, unpairDevice } from '~/api/devices'
+import { getDevice, unpairDevice, updateDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -21,6 +21,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
+import { resolved } from '~/utils/reactivity'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -400,20 +401,82 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
+  const [device, { refetch: refetchDevice }] = createResource(() => props.dongleId, getDevice)
   const [deviceName] = createResource(device, getDeviceName)
+
+  const [deviceNameInput, setDeviceNameInput] = createSignal('')
+  const [updateSuccess, setUpdateSuccess] = createSignal(false)
+  const [updateError, setUpdateError] = createSignal<string | null>(null)
+  const [isUpdating, setIsUpdating] = createSignal(false)
+
+  createEffect(() => {
+    if (resolved(deviceName)) {
+      setDeviceNameInput(deviceName())
+    }
+  })
+
+  const updateName = async () => {
+    const name = deviceNameInput().trim()
+    if (!name) {
+      setUpdateError('Device name cannot be empty')
+      return
+    }
+
+    setIsUpdating(true)
+    setUpdateSuccess(false)
+    setUpdateError(null)
+
+    try {
+      await updateDevice(props.dongleId, { alias: name })
+      await refetchDevice()
+      setUpdateSuccess(true)
+      // Clear success message after 3 seconds
+      setTimeout(() => setUpdateSuccess(false), 3000)
+    } catch (error) {
+      setUpdateError(error instanceof Error ? error.message : 'Failed to update device name')
+    } finally {
+      setIsUpdating(false)
+    }
+  }
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
   })
+
   return (
     <>
       <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <h2 class="text-lg">{deviceName()}</h2>
+        <div class="flex gap-2">
+          <input
+            type="text"
+            value={deviceNameInput()}
+            onInput={(e) => setDeviceNameInput(e.currentTarget.value)}
+            class="bg-surface-container-low px-3 py-2 rounded-md flex-1 selection:bg-primary-container focus:ring-primary-container focus:border-primary-container"
+            placeholder="Device name"
+          />
+          <Button color="primary" onClick={() => updateName()} disabled={isUpdating()} loading={isUpdating()}>
+            Update
+          </Button>
+        </div>
+
+        <Show when={updateError()}>
+          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
+            <Icon class="text-error" name="error" size="20" />
+            {updateError()}
+          </div>
+        </Show>
+
+        <Show when={updateSuccess()}>
+          <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-sm text-on-tertiary-container">
+            <Icon name="check" size="20" />
+            Device name updated successfully
+          </div>
+        </Show>
+
         <Show when={unpairData.error}>
           <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
             <Icon class="text-error" name="error" size="20" />
