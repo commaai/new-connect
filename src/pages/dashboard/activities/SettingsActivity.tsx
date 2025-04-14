@@ -3,7 +3,7 @@ import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXEle
 import { action, useLocation, useSubmission } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, unpairDevice, updateDevice } from '~/api/devices'
+import { unpairDevice, updateDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -12,7 +12,6 @@ import {
   getSubscribeInfo,
   getSubscriptionStatus,
 } from '~/api/prime'
-import type { Device } from '~/api/types'
 import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
@@ -22,6 +21,8 @@ import IconButton from '~/components/material/IconButton'
 import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
+
+import { currentDevice as device } from '../data'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -95,7 +96,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   const [selectedPlan, setSelectedPlan] = createSignal<PrimePlan>()
 
   const dongleId = () => props.dongleId
-  const [device] = createResource(dongleId, getDevice)
   const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
 
   const stripeCancelled = () => new URLSearchParams(useLocation().search).has('stripe_cancelled')
@@ -405,7 +405,7 @@ const updateDeviceAction = action(async (dongleId: string, formData: FormData) =
   await updateDevice(dongleId, { alias })
 }, 'updateDevice')
 
-const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device>; refetchDevice: () => void }> = (props) => {
+const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
   const submission = useSubmission(updateDeviceAction)
 
   const [unpair, unpairData] = useAction(async () => {
@@ -421,18 +421,12 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
             class="flex-1"
             id="device-alias"
             name="alias"
-            value={props.device.latest?.alias}
+            value={device()?.alias}
             label="Device name"
-            disabled={props.device.loading || submission.pending}
+            disabled={device.loading || submission.pending}
             error={submission.error?.message}
           />
-          <Button
-            class="mt-2"
-            color="primary"
-            type="submit"
-            disabled={props.device.loading || submission.pending}
-            loading={submission.pending}
-          >
+          <Button class="mt-2" color="primary" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
             Update
           </Button>
         </div>
@@ -452,14 +446,13 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device, { refetch: refetchDevice }] = createResource(() => props.dongleId, getDevice)
   return (
     <>
       <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <DeviceSettingsForm dongleId={props.dongleId} device={device} refetchDevice={refetchDevice} />
+        <DeviceSettingsForm dongleId={props.dongleId} />
 
         <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
