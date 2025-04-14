@@ -12,14 +12,13 @@ type TextFieldProps = {
   onInput?: JSX.EventHandler<HTMLInputElement, InputEvent>
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class' | 'onInput'>
 
-const baseColors = {
-  label: 'text-on-surface-variant',
-  indicator: 'bg-on-surface-variant',
-  input: 'text-on-surface caret-primary',
-  helper: 'text-on-surface-variant',
-}
-
 const stateColors = {
+  base: {
+    label: 'text-on-surface-variant',
+    indicator: 'bg-on-surface-variant',
+    input: 'text-on-surface caret-primary',
+    helper: 'text-on-surface-variant',
+  },
   hover: {
     indicator: 'bg-on-surface',
   },
@@ -48,15 +47,13 @@ const TextField: Component<TextFieldProps> = (props) => {
 
   // Keep local value in sync with prop value
   createEffect(() => {
-    if (props.value !== undefined) {
-      setInputValue(props.value)
-    }
+    if (props.value !== undefined) setInputValue(props.value)
   })
 
   const labelFloating = () => focused() || inputValue().length > 0
 
   const getStateStyle = () => {
-    const state = { ...baseColors }
+    const state = { ...stateColors.base }
     if (!props.disabled) {
       if (props.error) {
         Object.assign(state, stateColors.error)
