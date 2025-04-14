@@ -1,4 +1,4 @@
-import { JSX, Show, createEffect, createSignal, splitProps, type Component } from 'solid-js'
+import { Show, createEffect, createSignal, splitProps, type Component, type JSX } from 'solid-js'
 import clsx from 'clsx'
 
 type TextFieldProps = {
@@ -10,8 +10,8 @@ type TextFieldProps = {
   required?: boolean
   value?: string
   onEnter?: (value: string) => void
-  onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>
-} & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class'>
+  onInput?: JSX.EventHandler<HTMLInputElement, InputEvent>
+} & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class' | 'onInput'>
 
 const stateColors = {
   base: {
