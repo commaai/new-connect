@@ -11,8 +11,6 @@ type TextFieldProps = {
   value?: string
   onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>
   onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>
-  onFocus?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>
-  onBlur?: JSX.EventHandlerUnion<HTMLInputElement, FocusEvent>
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class'>
 
 const baseColors = {
@@ -48,17 +46,7 @@ const stateColors = {
 }
 
 const TextField: Component<TextFieldProps> = (props) => {
-  const [, inputProps] = splitProps(props, [
-    'class',
-    'label',
-    'helperText',
-    'error',
-    'disabled',
-    'value',
-    'onInput',
-    'onChange',
-    'children',
-  ])
+  const [, inputProps] = splitProps(props, ['class', 'label', 'helperText', 'error', 'value', 'onInput', 'onChange', 'children'])
 
   const [focused, setFocused] = createSignal(false)
   const [hovered, setHovered] = createSignal(false)
@@ -103,16 +91,6 @@ const TextField: Component<TextFieldProps> = (props) => {
     props.onChange?.(e)
   }
 
-  const handleFocus = (e: FocusEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }) => {
-    setFocused(true)
-    props.onFocus?.(e)
-  }
-
-  const handleBlur = (e: FocusEvent & { currentTarget: HTMLInputElement; target: HTMLInputElement }) => {
-    setFocused(false)
-    props.onBlur?.(e)
-  }
-
   return (
     <div class={clsx('flex flex-col', props.class)}>
       <div
@@ -150,11 +128,10 @@ const TextField: Component<TextFieldProps> = (props) => {
               props.label && labelFloating() && 'pt-6 pb-2',
             )}
             value={inputValue()}
-            disabled={props.disabled}
             onInput={handleInput}
             onChange={handleChange}
-            onFocus={handleFocus}
-            onBlur={handleBlur}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
           />
         </div>
 
