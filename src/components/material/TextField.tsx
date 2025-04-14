@@ -18,8 +18,6 @@ const baseColors = {
   indicator: 'bg-on-surface-variant',
   input: 'text-on-surface',
   caret: 'caret-primary',
-  iconLeading: 'text-on-surface-variant',
-  iconTrailing: 'text-on-surface-variant',
   helper: 'text-on-surface-variant',
 }
 
@@ -35,13 +33,11 @@ const stateColors = {
     label: 'text-error',
     indicator: 'bg-error',
     caret: 'caret-error',
-    iconTrailing: 'text-error',
     helper: 'text-error',
   },
   errorHover: {
     label: 'text-on-error-container',
     indicator: 'bg-on-error-container',
-    iconTrailing: 'text-on-error-container',
   },
 }
 
