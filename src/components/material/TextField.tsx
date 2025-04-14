@@ -86,6 +86,7 @@ const TextField: Component<TextFieldProps> = (props) => {
                 labelFloating() ? 'text-xs top-2' : 'top-1/2 -translate-y-1/2',
                 getStateStyle().label,
               )}
+              for={props.id}
             >
               {props.label}
             </label>
@@ -112,9 +113,9 @@ const TextField: Component<TextFieldProps> = (props) => {
 
       {/* Helper text or error */}
       <Show when={props.helperText || props.error}>
-        <span class={clsx('text-body-sm px-4 pt-1', getStateStyle().helper, props.disabled && 'opacity-40')}>
+        <label class={clsx('text-body-sm px-4 pt-1', getStateStyle().helper, props.disabled && 'opacity-40')} for={props.id}>
           {props.error || props.helperText}
-        </span>
+        </label>
       </Show>
     </div>
   )

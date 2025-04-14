@@ -419,6 +419,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
         <div class="flex gap-2">
           <TextField
             class="flex-1"
+            id="device-alias"
             name="alias"
             value={props.device.latest?.alias}
             label="Device name"
