@@ -19,7 +19,7 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 
-import { devices, profile, setSelectedDongleId } from './data'
+import { devices, profile, setCurrentDongleId } from './data'
 import storage from '~/utils/storage'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
@@ -138,7 +138,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  createEffect(() => setSelectedDongleId(urlState().dongleId))
+  createEffect(() => setCurrentDongleId(urlState().dongleId))
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected

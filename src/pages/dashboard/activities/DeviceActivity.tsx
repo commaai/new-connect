@@ -13,7 +13,7 @@ import DeviceStatistics from '~/components/DeviceStatistics'
 import UploadQueue from '~/components/UploadQueue'
 
 import RouteList from '../components/RouteList'
-import { selectedDevice as device, selectedDeviceName as deviceName } from '../data'
+import { currentDevice as device, selectedDeviceName as deviceName } from '../data'
 
 type DeviceActivityProps = {
   dongleId: string

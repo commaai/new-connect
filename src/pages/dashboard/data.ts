@@ -12,20 +12,20 @@ export { profile, refetchProfile }
 const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices)
 export { devices, refetchDevices }
 
-const [selectedDongleId, setSelectedDongleId] = createSignal<string>()
-export { selectedDongleId, setSelectedDongleId }
+const [currentDongleId, setCurrentDongleId] = createSignal<string>()
+export { currentDongleId, setCurrentDongleId }
 
-const [selectedDevice, { refetch: _refetchSelectedDevice }] = createResource(selectedDongleId, (dongleId) => {
+const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(currentDongleId, (dongleId) => {
   const device = resolved(devices) ? devices.latest.find((device) => device.dongle_id === dongleId) : undefined
   if (device) return device
   return getDevice(dongleId)
 })
-const refetchSelectedDevice = () => {
-  const dongleId = selectedDongleId()
+const refetchCurrentDevice = () => {
+  const dongleId = currentDongleId()
   if (!dongleId) return
   if (resolved(devices) && devices.latest.some((device) => device.dongle_id === dongleId)) return refetchDevices()
-  return _refetchSelectedDevice()
+  return _refetchCurrentDevice()
 }
-export { selectedDevice, refetchSelectedDevice }
+export { currentDevice, refetchCurrentDevice }
 
-export const [selectedDeviceName] = createResource(selectedDevice, getDeviceName)
+export const [selectedDeviceName] = createResource(currentDevice, getDeviceName)

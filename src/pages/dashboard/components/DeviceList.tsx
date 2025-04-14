@@ -7,7 +7,7 @@ import type { Device } from '~/api/types'
 import { getDeviceName } from '~/utils/device'
 import storage from '~/utils/storage'
 
-import { devices, selectedDongleId } from '../data'
+import { devices, currentDongleId } from '../data'
 
 type DeviceListProps = {
   class?: string
@@ -16,7 +16,7 @@ type DeviceListProps = {
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   const { setOpen } = useDrawerContext()
 
-  const isSelected = (device: Device) => selectedDongleId() === device.dongle_id
+  const isSelected = (device: Device) => currentDongleId() === device.dongle_id
   const onClick = (device: Device) => () => {
     setOpen(false)
     storage.setItem('lastSelectedDongleId', device.dongle_id)
