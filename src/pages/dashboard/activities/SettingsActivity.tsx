@@ -22,7 +22,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 
-import { currentDevice as device, currentDeviceName as deviceName } from '../data'
+import { currentDevice as device, currentDeviceName as deviceName } from '../store'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)

@@ -7,7 +7,7 @@ import type { Device } from '~/api/types'
 import { getDeviceName } from '~/utils/device'
 import storage from '~/utils/storage'
 
-import { devices, currentDongleId } from '../data'
+import { devices, currentDongleId } from '../store'
 
 type DeviceListProps = {
   class?: string

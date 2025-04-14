@@ -16,7 +16,7 @@ import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
 
-import { profile, currentDevice as device } from '../data'
+import { profile, currentDevice as device } from '../store'
 
 type RouteActivityProps = {
   dongleId: string

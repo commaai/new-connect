@@ -20,7 +20,7 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 
-import { devices, profile, setCurrentDongleId } from './data'
+import { devices, profile, setCurrentDongleId } from './store'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
