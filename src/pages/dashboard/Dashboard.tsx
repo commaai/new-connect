@@ -15,13 +15,13 @@ import ButtonBase from '~/components/material/ButtonBase'
 import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
+import TopAppBar from '~/components/material/TopAppBar'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import BuildInfo from '~/components/BuildInfo'
-import TopAppBar from '~/components/material/TopAppBar'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
