@@ -18,11 +18,11 @@ import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
+import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
 import { resolved } from '~/utils/reactivity'
-import TextField from '~/components/material/TextField'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
