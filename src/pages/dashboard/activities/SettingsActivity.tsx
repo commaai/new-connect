@@ -405,7 +405,7 @@ const updateDeviceAction = action(async (dongleId: string, formData: FormData) =
   await updateDevice(dongleId, { alias })
 }, 'updateDevice')
 
-const DeviceSettings: VoidComponent<{ dongleId: string; device: Resource<Device>; refetchDevice: () => void }> = (props) => {
+const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device>; refetchDevice: () => void }> = (props) => {
   const submission = useSubmission(updateDeviceAction)
 
   const [unpair, unpairData] = useAction(async () => {
@@ -458,7 +458,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <DeviceSettings dongleId={props.dongleId} device={device} refetchDevice={refetchDevice} />
+        <DeviceSettingsForm dongleId={props.dongleId} device={device} refetchDevice={refetchDevice} />
 
         <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
@@ -466,7 +466,6 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
             <Match when={device()?.prime === false}>
               <PrimeCheckout dongleId={props.dongleId} />
             </Match>
-
             <Match when={device()?.prime === true}>
               <PrimeManage dongleId={props.dongleId} />
             </Match>
