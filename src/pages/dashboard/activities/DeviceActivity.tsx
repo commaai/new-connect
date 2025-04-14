@@ -93,8 +93,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
                 <div class={clsx('m-2 size-2 shrink-0 rounded-full', device()?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
-
-                {<div class="text-lg font-bold">{deviceName()}</div>}
+                <div class="text-lg font-bold">{deviceName()}</div>
               </div>
             </Suspense>
             <div class="flex gap-4">

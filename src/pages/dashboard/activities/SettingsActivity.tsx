@@ -22,7 +22,7 @@ import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 
-import { currentDevice as device } from '../data'
+import { currentDevice as device, refetchDevices } from '../data'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -400,10 +400,16 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   )
 }
 
-const updateDeviceAction = action(async (dongleId: string, formData: FormData) => {
-  const alias = formData.get('alias') as string
-  await updateDevice(dongleId, { alias })
-}, 'updateDevice')
+const updateDeviceAction = action(
+  async (dongleId: string, formData: FormData) => {
+    const alias = formData.get('alias') as string
+    await updateDevice(dongleId, { alias })
+  },
+  {
+    name: 'updateDevice',
+    onComplete: () => refetchDevices(),
+  },
+)
 
 const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
   const submission = useSubmission(updateDeviceAction)
