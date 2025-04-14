@@ -1,4 +1,3 @@
-import clsx from 'clsx'
 import { createContext, createEffect, createSignal, useContext } from 'solid-js'
 import type { Accessor, JSXElement, ParentComponent, Setter, VoidComponent } from 'solid-js'
 
@@ -36,7 +35,6 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   const modal = () => dimensions().width < 1280
   const contentWidth = () => `calc(100% - ${modal() ? 0 : drawerWidth()}px)`
 
-  // close the drawer when the screen size changes
   createEffect(() => {
     if (!modal() && open()) setOpen(false)
   })
@@ -47,7 +45,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <nav
-        class={clsx('fixed hide-scrollbar inset-y-0 z-10 transition-drawer ease-in-out duration-300')}
+        class={'fixed hide-scrollbar inset-y-0 z-10 transition-drawer ease-in-out duration-300'}
         style={{
           left: drawerVisible() ? 0 : `${-drawerWidth()}px`,
           width: `${drawerWidth()}px`,
