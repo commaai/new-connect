@@ -13,9 +13,12 @@ export const [devices, { refetch: refetchDevices }] = createResource(accessToken
 export const [currentDongleId, setCurrentDongleId] = createSignal<string>()
 
 const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(
-  () => ({ dongleId: currentDongleId(), devices: resolved(devices) ? devices.latest : undefined }),
+  () => {
+    const dongleId = currentDongleId()
+    if (!dongleId) return null
+    return { dongleId, devices: resolved(devices) ? devices.latest : undefined }
+  },
   ({ dongleId, devices }) => {
-    if (!dongleId) return undefined
     const device = devices?.find((device) => device.dongle_id === dongleId)
     if (device) return device
     return getDevice(dongleId)
