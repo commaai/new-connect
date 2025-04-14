@@ -1,6 +1,6 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation } from '@solidjs/router'
+import { action, useLocation, useSubmission } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice, unpairDevice, updateDevice } from '~/api/devices'
@@ -12,6 +12,7 @@ import {
   getSubscribeInfo,
   getSubscriptionStatus,
 } from '~/api/prime'
+import type { Device } from '~/api/types'
 import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
@@ -21,8 +22,6 @@ import IconButton from '~/components/material/IconButton'
 import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
-import { getDeviceName } from '~/utils/device'
-import { resolved } from '~/utils/reactivity'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -401,39 +400,13 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   )
 }
 
-const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device, { refetch: refetchDevice }] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+const updateDeviceAction = action(async (dongleId: string, formData: FormData) => {
+  const alias = formData.get('alias') as string
+  await updateDevice(dongleId, { alias })
+}, 'updateDevice')
 
-  const [deviceNameInput, setDeviceNameInput] = createSignal('')
-  const [updateError, setUpdateError] = createSignal<string>()
-  const [isUpdating, setIsUpdating] = createSignal(false)
-
-  createEffect(() => {
-    if (resolved(deviceName)) {
-      setDeviceNameInput(deviceName())
-    }
-  })
-
-  const updateName = async () => {
-    const name = deviceNameInput().trim()
-    if (!name) {
-      setUpdateError('Device name cannot be empty')
-      return
-    }
-
-    setIsUpdating(true)
-    setUpdateError()
-
-    try {
-      await updateDevice(props.dongleId, { alias: name })
-      await refetchDevice()
-    } catch (error) {
-      setUpdateError(error instanceof Error ? error.message : 'Failed to update device name')
-    } finally {
-      setIsUpdating(false)
-    }
-  }
+const DeviceSettings: VoidComponent<{ dongleId: string; device: Resource<Device>; refetchDevice: () => void }> = (props) => {
+  const submission = useSubmission(updateDeviceAction)
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
@@ -441,41 +414,51 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   })
 
   return (
+    <div class="flex flex-col gap-4">
+      <form action={updateDeviceAction.with(props.dongleId)} method="post">
+        <div class="flex gap-2">
+          <TextField
+            class="flex-1"
+            name="alias"
+            value={props.device.latest?.alias}
+            label="Device name"
+            disabled={props.device.loading || submission.pending}
+            error={submission.error?.message}
+          />
+          <Button
+            class="mt-2"
+            color="primary"
+            type="submit"
+            disabled={props.device.loading || submission.pending}
+            loading={submission.pending}
+          >
+            Update
+          </Button>
+        </div>
+      </form>
+
+      <Show when={unpairData.error}>
+        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
+          <Icon class="text-error" name="error" size="20" />
+          {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
+        </div>
+      </Show>
+      <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+        Unpair this device
+      </Button>
+    </div>
+  )
+}
+
+const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
+  const [device, { refetch: refetchDevice }] = createResource(() => props.dongleId, getDevice)
+  return (
     <>
       <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <div class="flex gap-2">
-          <TextField
-            class="flex-1"
-            value={deviceNameInput()}
-            onEnter={() => updateName()}
-            onInput={(e) => setDeviceNameInput(e.currentTarget.value)}
-            label="Device name"
-            error={updateError()}
-            disabled={device.loading || isUpdating()}
-          />
-          <Button
-            class="mt-2"
-            color="primary"
-            onClick={() => updateName()}
-            disabled={device.loading || isUpdating() || (resolved(deviceName) && deviceName.latest === deviceNameInput())}
-            loading={isUpdating()}
-          >
-            Update
-          </Button>
-        </div>
-
-        <Show when={unpairData.error}>
-          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-            <Icon class="text-error" name="error" size="20" />
-            {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-          </div>
-        </Show>
-        <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
-          Unpair this device
-        </Button>
+        <DeviceSettings dongleId={props.dongleId} device={device} refetchDevice={refetchDevice} />
 
         <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
