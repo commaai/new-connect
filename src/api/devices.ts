@@ -14,7 +14,7 @@ const sortDevices = (devices: ApiDevice[]) =>
     }
   })
 
-const updateDeviceOnline = (device: ApiDevice): Device => ({
+const createDevice = (device: ApiDevice): Device => ({
   ...device,
   is_online: !!device.last_athena_ping && device.last_athena_ping >= Math.floor(Date.now() / 1000) - 120,
 })
@@ -48,7 +48,7 @@ const createSharedDevice = (dongleId: string): Device => ({
 export const getDevice = async (dongleId: string): Promise<Device> => {
   try {
     const device = await fetcher<ApiDevice>(`/v1.1/devices/${dongleId}/`)
-    return updateDeviceOnline(device)
+    return createDevice(device)
   } catch {
     return createSharedDevice(dongleId)
   }
@@ -66,7 +66,7 @@ export const getDeviceStats = async (dongleId: string) =>
 export const getDevices = async (): Promise<Device[]> =>
   fetcher<ApiDevice[]>('/v1/me/devices/')
     .then(sortDevices)
-    .then((devices) => devices.map(updateDeviceOnline))
+    .then((devices) => devices.map(createDevice))
     .catch(() => [])
 
 export const unpairDevice = async (dongleId: string) =>
