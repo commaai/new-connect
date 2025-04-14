@@ -44,7 +44,7 @@ const TextField: Component<TextFieldProps> = (props) => {
 
   // Keep local value in sync with prop value
   createEffect(() => {
-    if (props.value !== undefined) setInputValue(props.value)
+    if (props.value) setInputValue(props.value)
   })
 
   const labelFloating = () => focused() || inputValue()?.length > 0
@@ -101,8 +101,8 @@ const TextField: Component<TextFieldProps> = (props) => {
               props.label && labelFloating() && 'pt-6 pb-2',
             )}
             value={inputValue()}
+            onInput={(e) => setInputValue(e.target.value)}
             onFocus={() => setFocused(true)}
-            onFocusOut={() => setFocused(false)}
             onBlur={() => setFocused(false)}
           />
         </div>
