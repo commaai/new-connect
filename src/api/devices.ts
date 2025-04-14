@@ -14,6 +14,11 @@ const sortDevices = (devices: Device[]) =>
     }
   })
 
+const updateDeviceOnline = (device: Device) => {
+  device.is_online = !!device.last_athena_ping && device.last_athena_ping >= Math.floor(Date.now() / 1000) - 120
+  return device
+}
+
 export const SHARED_DEVICE = 'Shared Device'
 
 const createSharedDevice = (dongleId: string): Device => ({
@@ -43,8 +48,7 @@ const createSharedDevice = (dongleId: string): Device => ({
 export const getDevice = async (dongleId: string) => {
   try {
     const device = await fetcher<Device>(`/v1.1/devices/${dongleId}/`)
-    device.is_online = !!device.last_athena_ping && device.last_athena_ping >= Math.floor(Date.now() / 1000) - 120
-    return device
+    return updateDeviceOnline(device)
   } catch {
     return createSharedDevice(dongleId)
   }
@@ -62,6 +66,7 @@ export const getDeviceStats = async (dongleId: string) =>
 export const getDevices = async () =>
   fetcher<Device[]>('/v1/me/devices/')
     .then(sortDevices)
+    .then((devices) => devices.map(updateDeviceOnline))
     .catch(() => [])
 
 export const unpairDevice = async (dongleId: string) =>
