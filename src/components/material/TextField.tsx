@@ -73,8 +73,7 @@ const TextField: Component<TextFieldProps> = (props) => {
     <div class={clsx('flex flex-col', props.class)}>
       <div
         class={clsx(
-          'relative flex items-center rounded-t-xs overflow-hidden min-h-[56px]',
-          'bg-surface-container-highest',
+          'relative flex rounded-t-xs min-h-[56px] bg-surface-container-highest',
           hovered() && !props.disabled && 'after:absolute after:inset-0 after:bg-on-surface after:opacity-[0.08] after:pointer-events-none',
           props.disabled && 'opacity-40',
         )}
@@ -82,7 +81,7 @@ const TextField: Component<TextFieldProps> = (props) => {
         onMouseLeave={() => setHovered(false)}
       >
         {/* Input and label container */}
-        <div class="relative flex-1 flex">
+        <div class="relative flex-1">
           <Show when={props.label}>
             <label
               class={clsx(
