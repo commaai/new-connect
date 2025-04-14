@@ -7,6 +7,7 @@ type TextFieldProps = {
   helperText?: string
   error?: string
   disabled?: boolean
+  required?: boolean
   value?: string
   onEnter?: (value: string) => void
   onInput?: JSX.EventHandler<HTMLInputElement, InputEvent>
@@ -52,6 +53,7 @@ const TextField: Component<TextFieldProps> = (props) => {
 
   const labelFloating = () => focused() || inputValue().length > 0
 
+  // Determine current state for styling
   const getStateStyle = () => {
     const state = { ...stateColors.base }
     if (!props.disabled) {
@@ -91,6 +93,7 @@ const TextField: Component<TextFieldProps> = (props) => {
               )}
             >
               {props.label}
+              {props.required && <span class="text-error ml-1">*</span>}
             </label>
           </Show>
 
