@@ -8,8 +8,8 @@ type TextFieldProps = {
   error?: string
   disabled?: boolean
   value?: string
-  onEnter?: (value: string) => void
   onInput?: JSX.EventHandler<HTMLInputElement, InputEvent>
+  onEnter?: (value: string) => void
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class' | 'onInput'>
 
 const stateColors = {
@@ -39,7 +39,7 @@ const stateColors = {
 }
 
 const TextField: Component<TextFieldProps> = (props) => {
-  const [, inputProps] = splitProps(props, ['class', 'label', 'helperText', 'error', 'value', 'onInput', 'onEnter', 'children'])
+  const [, inputProps] = splitProps(props, ['class', 'label', 'helperText', 'error', 'value', 'onInput', 'onEnter'])
 
   const [focused, setFocused] = createSignal(false)
   const [hovered, setHovered] = createSignal(false)
