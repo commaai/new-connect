@@ -1,7 +1,6 @@
 import { getGoogleAuthUrl, getAppleAuthUrl, getGitHubAuthUrl } from '~/api/auth'
 import { setAccessToken } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
-import BuildInfo from '~/components/BuildInfo'
 
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
@@ -56,8 +55,6 @@ export default function Login() {
           Try the demo
         </Button>
       </div>
-
-      <BuildInfo class="absolute bottom-4" />
     </div>
   )
 }
