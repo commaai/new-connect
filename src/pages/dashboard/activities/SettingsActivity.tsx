@@ -446,16 +446,23 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <div class="flex gap-2 items-center">
+        <div class="flex gap-2">
           <TextField
             class="flex-1"
             value={deviceNameInput()}
+            onEnter={updateName}
             onInput={(e) => setDeviceNameInput(e.currentTarget.value)}
             label="Device name"
             error={updateError()}
             disabled={device.loading || isUpdating()}
           />
-          <Button color="primary" onClick={() => updateName()} disabled={device.loading || isUpdating()} loading={isUpdating()}>
+          <Button
+            class="mt-2"
+            color="primary"
+            onClick={() => updateName()}
+            disabled={device.loading || isUpdating() || (resolved(deviceName) && deviceName.latest === deviceNameInput())}
+            loading={isUpdating()}
+          >
             Update
           </Button>
         </div>
@@ -469,8 +476,8 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
         <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
           Unpair this device
         </Button>
-        <hr class="mx-4 opacity-20" />
-        <h3 class="text-lg">comma prime</h3>
+
+        <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>

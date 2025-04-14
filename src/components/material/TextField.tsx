@@ -9,8 +9,8 @@ type TextFieldProps = {
   disabled?: boolean
   required?: boolean
   value?: string
+  onEnter?: (value: string) => void
   onInput?: JSX.EventHandlerUnion<HTMLInputElement, InputEvent>
-  onChange?: JSX.EventHandlerUnion<HTMLInputElement, Event>
 } & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class'>
 
 const baseColors = {
@@ -46,7 +46,7 @@ const stateColors = {
 }
 
 const TextField: Component<TextFieldProps> = (props) => {
-  const [, inputProps] = splitProps(props, ['class', 'label', 'helperText', 'error', 'value', 'onInput', 'onChange', 'children'])
+  const [, inputProps] = splitProps(props, ['class', 'label', 'helperText', 'error', 'value', 'onInput', 'onEnter', 'children'])
 
   const [focused, setFocused] = createSignal(false)
   const [hovered, setHovered] = createSignal(false)
@@ -86,9 +86,11 @@ const TextField: Component<TextFieldProps> = (props) => {
     props.onInput?.(e)
   }
 
-  const handleChange = (e: Event & { currentTarget: HTMLInputElement; target: HTMLInputElement }) => {
-    setInputValue(e.currentTarget.value)
-    props.onChange?.(e)
+  const handleKeyDown = (e: KeyboardEvent & { currentTarget: HTMLInputElement }) => {
+    if (e.key === 'Enter' && props.onEnter) {
+      e.preventDefault()
+      props.onEnter(inputValue())
+    }
   }
 
   return (
@@ -129,7 +131,7 @@ const TextField: Component<TextFieldProps> = (props) => {
             )}
             value={inputValue()}
             onInput={handleInput}
-            onChange={handleChange}
+            onKeyDown={handleKeyDown}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
