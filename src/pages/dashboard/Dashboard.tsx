@@ -138,6 +138,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
+  // Synchronise global state with URL
   createEffect(() => setCurrentDongleId(urlState().dongleId))
 
   const getDefaultDongleId = () => {
