@@ -8,7 +8,7 @@ import { resolved } from '~/utils/reactivity'
 
 export const [profile] = createResource(accessToken, getProfile)
 
-export const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices, { initialValue: [] })
+export const [devices, { refetch: refetchDevices }] = createResource(accessToken, getDevices)
 
 export const [currentDongleId, setCurrentDongleId] = createSignal<string>()
 
@@ -16,7 +16,7 @@ const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(
   () => {
     const dongleId = currentDongleId()
     if (!dongleId) return null
-    return { dongleId, devices: resolved(devices) ? devices.latest : undefined }
+    return { dongleId, devices: devices.latest }
   },
   ({ dongleId, devices }) => {
     const device = devices?.find((device) => device.dongle_id === dongleId)
