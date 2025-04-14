@@ -1,14 +1,10 @@
-import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createEffect, createMemo, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
-import { getDevices } from '~/api/devices'
-import { getProfile } from '~/api/profile'
-import storage from '~/utils/storage'
-import type { Device } from '~/api/types'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
@@ -16,20 +12,21 @@ import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/mater
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
+import BuildInfo from '~/components/BuildInfo'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
-import BuildInfo from '~/components/BuildInfo'
+
+import { devices, profile, setSelectedDongleId } from './data'
+import storage from '~/utils/storage'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
-const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
+const DashboardDrawer: VoidComponent = () => {
   const { modal, setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
-
-  const [profile] = createResource(getProfile)
 
   return (
     <>
@@ -43,7 +40,7 @@ const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props
       >
         Devices
       </TopAppBar>
-      <DeviceList class="overflow-y-auto p-2" devices={props.devices} />
+      <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
@@ -141,7 +138,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     }
   })
 
-  const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
+  createEffect(() => setSelectedDongleId(urlState().dongleId))
 
   const getDefaultDongleId = () => {
     // Do not redirect if dongle ID already selected
@@ -153,13 +150,13 @@ const Dashboard: Component<RouteSectionProps> = () => {
   }
 
   return (
-    <Drawer drawer={<DashboardDrawer devices={devices()} />}>
+    <Drawer drawer={<DashboardDrawer />}>
       <Switch>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
         </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
-          <PairActivity onPaired={refetch} />
+          <PairActivity />
         </Match>
         <Match when={urlState().dongleId} keyed>
           {(dongleId) => (

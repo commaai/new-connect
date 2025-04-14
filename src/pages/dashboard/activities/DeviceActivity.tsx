@@ -1,9 +1,9 @@
-import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
 import { takeSnapshot } from '~/api/athena'
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { SHARED_DEVICE } from '~/api/devices'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -11,19 +11,15 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import UploadQueue from '~/components/UploadQueue'
-import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
+import { selectedDevice as device, selectedDeviceName as deviceName } from '../data'
 
 type DeviceActivityProps = {
   dongleId: string
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
-  const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
-  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
   // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
@@ -96,7 +92,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
-                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
+                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device()?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
 
                 {<div class="text-lg font-bold">{deviceName()}</div>}
               </div>

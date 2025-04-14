@@ -3,7 +3,7 @@ import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXEle
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, unpairDevice } from '~/api/devices'
+import { unpairDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -22,6 +22,8 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
+
+import { selectedDevice as device } from '../data'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -95,7 +97,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   const [selectedPlan, setSelectedPlan] = createSignal<PrimePlan>()
 
   const dongleId = () => props.dongleId
-  const [device] = createResource(dongleId, getDevice)
   const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
 
   const stripeCancelled = () => new URLSearchParams(useLocation().search).has('stripe_cancelled')
@@ -425,8 +426,6 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
 }
 
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-
   return (
     <>
       <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
