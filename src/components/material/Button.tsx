@@ -17,7 +17,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   const color = () => props.color || 'primary'
   const colorClasses = () =>
     ({
-      text: 'text-primary before:bg-on-primary',
+      text: 'text-primary before:bg-primary',
       primary: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1',
       secondary: 'bg-secondary before:bg-on-secondary text-on-secondary hover:elevation-1',
       tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary hover:elevation-1',
