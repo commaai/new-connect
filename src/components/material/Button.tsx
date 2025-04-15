@@ -10,7 +10,8 @@ type ButtonState = 'enabled' | 'disabled'
 
 const ButtonStyles: Record<ButtonVariant, Record<ButtonState, string>> = {
   filled: {
-    enabled: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1 focus-visible:outline-secondary',
+    enabled:
+      'bg-primary before:bg-on-primary text-on-primary hover:elevation-1 focus-visible:outline-secondary sm:before:hover:opacity-[.16]',
     disabled: 'bg-on-surface/[.12] text-on-surface/[.38]',
   },
   tonal: {
@@ -41,7 +42,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
+        'state-layer inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 transition',
         'focus:outline-none focus-visible:outline focus:outline-[3px] focus:outline-offset-[2px]',
         style().enabled,
         disabled() && [style().disabled, 'cursor-not-allowed !elevation-0 before:!opacity-0'],
