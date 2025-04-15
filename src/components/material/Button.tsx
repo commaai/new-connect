@@ -1,7 +1,6 @@
 import type { JSXElement, ParentComponent } from 'solid-js'
 import { Show, splitProps } from 'solid-js'
-
-import { cn } from '~/utils/style'
+import clsx from 'clsx'
 
 import ButtonBase, { ButtonBaseProps } from './ButtonBase'
 import Icon from './Icon'
@@ -41,7 +40,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
 
   return (
     <ButtonBase
-      class={cn(
+      class={clsx(
         'state-layer inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
         'focus:outline-none focus-visible:outline focus:outline-[3px] focus:outline-offset-[2px]',
         style().enabled,
@@ -54,7 +53,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       disabled={disabled()}
     >
       {props.leading}
-      <span class={cn('text-label-lg', props.loading && 'invisible')}>{props.children}</span>
+      <span class={clsx('text-label-lg', props.loading && 'invisible')}>{props.children}</span>
       <Show when={props.loading}>
         <Icon name="autorenew" class="absolute left-1/2 top-1/2 ml-[-10px] mt-[-10px] animate-spin" size="20" />
       </Show>
