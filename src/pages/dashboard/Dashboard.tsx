@@ -42,7 +42,7 @@ const DashboardDrawer: VoidComponent = () => {
       </TopAppBar>
       <DeviceList class="overflow-y-auto p-2" />
       <div class="grow" />
-      <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose} disabled>
+      <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
       </Button>
       <div class="m-4 mt-0">
