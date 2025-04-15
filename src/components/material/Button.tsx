@@ -2,7 +2,7 @@ import type { JSXElement, ParentComponent } from 'solid-js'
 import { Show, splitProps } from 'solid-js'
 import clsx from 'clsx'
 
-import ButtonBase, { ButtonBaseProps } from './ButtonBase'
+import ButtonBase, { type ButtonBaseProps } from './ButtonBase'
 import Icon from './Icon'
 
 type ButtonVariant = 'filled' | 'tonal' | 'text'

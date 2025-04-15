@@ -16,6 +16,7 @@ import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
+import Dialog from '~/components/material/Dialog'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TextField from '~/components/material/TextField'
@@ -374,33 +375,26 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         </Switch>
       </Suspense>
 
-      <Show when={cancelDialog()}>
-        <div
-          class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
-          onClick={() => setCancelDialog(false)}
-        >
-          <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-            <h2 class="text-lg">Cancel subscription</h2>
-            <p class="text-sm">Are you sure you want to cancel your subscription?</p>
-            <div class="mt-4 flex flex-wrap justify-between gap-4">
-              <Button
-                variant="text"
-                disabled={loading()}
-                loading={cancelData.loading}
-                onClick={() => {
-                  cancel()
-                  setCancelDialog(false)
-                }}
-              >
-                Yes, cancel subscription
-              </Button>
-              <Button variant="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
-                No, keep subscription
-              </Button>
-            </div>
-          </div>
+      <Dialog open={cancelDialog()} onClose={() => setCancelDialog(false)}>
+        <h2 class="text-lg">Cancel subscription</h2>
+        <p class="text-sm">Are you sure you want to cancel your subscription?</p>
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <Button variant="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
+            Not now
+          </Button>
+          <Button
+            variant="text"
+            disabled={loading()}
+            loading={cancelData.loading}
+            onClick={() => {
+              cancel()
+              setCancelDialog(false)
+            }}
+          >
+            Cancel subscription
+          </Button>
         </div>
-      </Show>
+      </Dialog>
     </div>
   )
 }
@@ -423,9 +417,14 @@ const updateDeviceAction = action(
 const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
   const submission = useSubmission(updateDeviceAction)
 
+  const [unpairDialog, setUnpairDialog] = createSignal(false)
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
-    if (success) window.location.href = window.location.origin
+    if (success) {
+      setUnpairDialog(false)
+      window.location.href = window.location.origin
+    }
+    return success
   })
 
   return (
@@ -447,15 +446,30 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
         </div>
       </form>
 
-      <Show when={unpairData.error}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-          <Icon class="text-error" name="error" size="20" />
-          {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-        </div>
-      </Show>
-      <Button variant="tonal" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+      <Button variant="tonal" leading={<Icon name="delete" />} onClick={() => setUnpairDialog(true)}>
         Unpair this device
       </Button>
+
+      <Dialog open={unpairDialog()} onClose={() => setUnpairDialog(false)}>
+        <h2 class="text-lg">Unpair this device?</h2>
+        <p class="text-sm">This will remove the device from your account. You will need to pair it again to use it.</p>
+
+        <Show when={unpairData.error}>
+          <div class="mt-4 flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
+            <Icon class="text-error" name="error" size="20" />
+            {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
+          </div>
+        </Show>
+
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <Button color="text" onClick={() => setUnpairDialog(false)}>
+            Cancel
+          </Button>
+          <Button color="text" loading={unpairData.loading} onClick={() => unpair()}>
+            Unpair
+          </Button>
+        </div>
+      </Dialog>
     </div>
   )
 }
