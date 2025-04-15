@@ -16,6 +16,7 @@ import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
+import Dialog from '~/components/material/Dialog'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TextField from '~/components/material/TextField'
@@ -370,31 +371,26 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       </Suspense>
 
       <Show when={cancelDialog()}>
-        <div
-          class="bg-scrim/10 fixed inset-0 z-50 flex items-center justify-center backdrop-blur-sm"
-          onClick={() => setCancelDialog(false)}
-        >
-          <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-            <h2 class="text-lg">Cancel subscription?</h2>
-            <p class="text-sm">Your subscription will end immediately, and you will receive a pro-rated refund.</p>
-            <div class="mt-4 flex flex-wrap justify-end gap-2">
-              <Button color="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
-                Not now
-              </Button>
-              <Button
-                color="text"
-                disabled={loading()}
-                loading={cancelData.loading}
-                onClick={() => {
-                  cancel()
-                  setCancelDialog(false)
-                }}
-              >
-                Cancel subscription
-              </Button>
-            </div>
+        <Dialog open={cancelDialog()} onClose={() => setCancelDialog(false)}>
+          <h2 class="text-lg">Cancel subscription?</h2>
+          <p class="text-sm">Your subscription will end immediately, and you will receive a pro-rated refund.</p>
+          <div class="mt-4 flex flex-wrap justify-end gap-2">
+            <Button color="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
+              Not now
+            </Button>
+            <Button
+              color="text"
+              disabled={loading()}
+              loading={cancelData.loading}
+              onClick={() => {
+                cancel()
+                setCancelDialog(false)
+              }}
+            >
+              Cancel subscription
+            </Button>
           </div>
-        </div>
+        </Dialog>
       </Show>
     </div>
   )
