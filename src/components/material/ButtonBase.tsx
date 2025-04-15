@@ -7,7 +7,14 @@ export type ButtonBaseProps = { class?: string } & (AnchorProps | JSX.ButtonHTML
 
 const ButtonBase: Component<ButtonBaseProps> = (props) => {
   const [, rest] = splitProps(props, ['class'])
-  return <Dynamic component={'href' in props ? A : 'button'} class={clsx('relative isolate overflow-hidden', props.class)} {...rest} />
+  return (
+    <Dynamic
+      component={'href' in props ? A : 'button'}
+      class={clsx('relative isolate overflow-hidden', props.class)}
+      {...rest}
+      data-disabled={'disabled' in props && props.disabled}
+    />
+  )
 }
 
 export default ButtonBase
