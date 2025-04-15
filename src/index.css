@@ -142,8 +142,9 @@
 
 @layer components {
   .state-layer {
-    @apply relative before:absolute before:inset-0 before:transition before:opacity-0 before:overflow-hidden;
-    @apply sm:before:hover:opacity-[0.08] sm:before:focus:opacity-[.12] before:active:opacity-[.12];
+    @apply relative before:absolute before:inset-0 before:transition-opacity before:opacity-0 before:overflow-hidden;
+    @apply sm:before:hover:opacity-[.08] sm:before:focus:opacity-[.12];
+    @apply before:active:opacity-[.12];
     @apply disabled:before:!opacity-0 data-[disabled=true]:before:!opacity-0;
   }
 
