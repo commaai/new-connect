@@ -1,4 +1,4 @@
-import { type ParentComponent, createEffect, onMount, onCleanup } from 'solid-js'
+import { type ParentComponent, createEffect } from 'solid-js'
 import clsx from 'clsx'
 
 type DialogProps = {
@@ -23,17 +23,12 @@ const Dialog: ParentComponent<DialogProps> = (props) => {
     if (props.open) props.onClose?.()
   }
 
-  onMount(() => {
-    if (!dialogRef) return
-    dialogRef.addEventListener('close', handleDialogClose)
-    onCleanup(() => dialogRef?.removeEventListener('close', handleDialogClose))
-  })
-
   return (
     <dialog
       ref={dialogRef}
       class="fixed inset-0 max-w-[unset] z-50 flex flex-col items-center justify-center bg-transparent backdrop:bg-scrim/[.32] size-full m-0 max-h-[unset]"
       onClick={() => dialogRef?.close()}
+      onClose={handleDialogClose}
     >
       <div
         class={clsx(
