@@ -49,7 +49,7 @@ export default function Auth() {
             <Icon class="text-error shrink-0" name="error" size="24" />
             <span class="text-md">{error()}</span>
           </div>
-          <Button color="secondary" href="/login">
+          <Button variant="tonal" href="/login">
             Try again
           </Button>
         </Show>

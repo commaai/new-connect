@@ -105,8 +105,13 @@ export default {
           'surface-container',
           'surface-container-high',
           'surface-container-highest',
-        ].map((name) => [name, `var(--color-${name})`]),
+        ].map((name) => [name, `rgba(var(--color-${name}), <alpha-value>)`]),
       ),
+      opacity: {
+        '8': '0.08',
+        '12': '0.12',
+        '38': '0.38',
+      },
       keyframes: {
         shimmer: {
           '100%': {

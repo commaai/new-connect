@@ -86,7 +86,8 @@
     "hls.js": "1.5.20",
     "leaflet": "^1.9.4",
     "qr-scanner": "^1.4.2",
-    "solid-js": "^1.9.5"
+    "solid-js": "^1.9.5",
+    "tailwind-merge": "2.6.0"
   },
   "engines": {
     "node": ">=20.11.0"

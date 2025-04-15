@@ -119,7 +119,7 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
     <div class="flex flex-col gap-4 bg-surface-container-lowest">
       <div class="flex p-4 justify-between items-center border-b-2 border-b-surface-container-low">
         <StatisticBar statistics={[{ label: 'Queued', value: () => items.length }]} />
-        <Button color="text" leading={<Icon name="clear_all" />} onClick={cancelAll}>
+        <Button variant="text" leading={<Icon name="clear_all" />} onClick={cancelAll}>
           Cancel all
         </Button>
       </div>

@@ -227,7 +227,12 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
       <Show when={uiState()?.checkoutText} keyed>
         {(text) => (
-          <Button color="tertiary" disabled={!selectedPlan()} loading={checkoutData.loading} onClick={checkout}>
+          <Button
+            class="bg-tertiary before:bg-on-tertiary text-on-tertiary"
+            disabled={!selectedPlan()}
+            loading={checkoutData.loading}
+            onClick={checkout}
+          >
             {text}
           </Button>
         )}
@@ -356,10 +361,10 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                 </div>
 
                 <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
-                  <Button color="error" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>
+                  <Button variant="tonal" disabled={loading()} loading={cancelData.loading} onClick={() => setCancelDialog(true)}>
                     Cancel subscription
                   </Button>
-                  <Button color="secondary" disabled={loading()} loading={updateData.loading} onClick={update}>
+                  <Button disabled={loading()} loading={updateData.loading} onClick={update}>
                     Update payment method
                   </Button>
                 </div>
@@ -377,9 +382,9 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
             <h2 class="text-lg">Cancel subscription</h2>
             <p class="text-sm">Are you sure you want to cancel your subscription?</p>
-            <div class="mt-4 flex flex-wrap justify-stretch gap-4">
+            <div class="mt-4 flex flex-wrap justify-between gap-4">
               <Button
-                color="error"
+                variant="tonal"
                 disabled={loading()}
                 loading={cancelData.loading}
                 onClick={() => {
@@ -389,7 +394,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
               >
                 Yes, cancel subscription
               </Button>
-              <Button color="secondary" disabled={loading()} onClick={() => setCancelDialog(false)}>
+              <Button disabled={loading()} onClick={() => setCancelDialog(false)}>
                 No, keep subscription
               </Button>
             </div>
@@ -436,7 +441,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
             disabled={device.loading || submission.pending}
             error={submission.error?.message}
           />
-          <Button class="mt-2" color="primary" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
+          <Button class="mt-2" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
             Update
           </Button>
         </div>
@@ -448,7 +453,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
           {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
         </div>
       </Show>
-      <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+      <Button variant="tonal" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
         Unpair this device
       </Button>
     </div>

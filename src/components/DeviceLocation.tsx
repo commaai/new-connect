@@ -171,7 +171,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         <div class="absolute bottom-2 right-2 z-[9999]">
           <Button
             title="Show your current location"
-            color="secondary"
+            variant="tonal"
             class="bg-surface-container-low text-on-surface-variant"
             onClick={() => void requestUserLocation()}
             leading={<Icon name="my_location" size="20" />}
@@ -208,7 +208,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
         <div class="flex flex-col items-end gap-3 xs:flex-row">
           <span class="text-sm text-on-surface-variant">{selectedLocation()?.address}</span>
           <Button
-            color="secondary"
+            variant="tonal"
             onClick={() => window.open(`https://www.google.com/maps?q=${selectedLocation()!.lat},${selectedLocation()!.lng}`, '_blank')}
             trailing={<Icon name="open_in_new" size="20" />}
           >

@@ -14,7 +14,7 @@ export default function OfflinePage() {
         </div>
       </div>
       <p class="text-md">Please check your network connection</p>
-      <Button color="secondary" onClick={() => window.location.reload()}>
+      <Button variant="tonal" onClick={() => window.location.reload()}>
         Try again
       </Button>
     </div>
