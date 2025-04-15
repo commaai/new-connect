@@ -3,21 +3,25 @@
     "target": "ESNext",
     "module": "ESNext",
     "moduleResolution": "Bundler",
-    "allowSyntheticDefaultImports": true,
-    "esModuleInterop": true,
     "jsx": "preserve",
     "jsxImportSource": "solid-js",
+
     "allowJs": true,
-    "noEmit": true,
-    "strict": true,
-    "types": ["bun", "vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/pwa-assets"],
+    "esModuleInterop": true,
     "isolatedModules": true,
+    "allowSyntheticDefaultImports": true,
+
+    "strict": true,
+    "skipLibCheck": true,
     "noUncheckedIndexedAccess": true,
+
+    "noEmit": true,
+    "incremental": true,
+
+    "types": ["bun", "vite/client", "vite-plugin-pwa/client", "vite-plugin-pwa/pwa-assets"],
     "paths": {
       "~/*": ["./src/*"]
-    },
-    "skipLibCheck": true,
-    "incremental": true
+    }
   },
   "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs"],
   "exclude": ["node_modules", "dist"]
