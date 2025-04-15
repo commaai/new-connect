@@ -414,9 +414,14 @@ const updateDeviceAction = action(
 const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
   const submission = useSubmission(updateDeviceAction)
 
+  const [unpairDialog, setUnpairDialog] = createSignal(false)
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
-    if (success) window.location.href = window.location.origin
+    if (success) {
+      setUnpairDialog(false)
+      window.location.href = window.location.origin
+    }
+    return success
   })
 
   return (
@@ -438,15 +443,30 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
         </div>
       </form>
 
-      <Show when={unpairData.error}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-          <Icon class="text-error" name="error" size="20" />
-          {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-        </div>
-      </Show>
-      <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+      <Button color="error" leading={<Icon name="delete" />} onClick={() => setUnpairDialog(true)}>
         Unpair this device
       </Button>
+
+      <Dialog open={unpairDialog()} onClose={() => setUnpairDialog(false)}>
+        <h2 class="text-lg">Unpair this device?</h2>
+        <p class="text-sm">This will remove the device from your account. You will need to pair it again to use it.</p>
+
+        <Show when={unpairData.error}>
+          <div class="mt-4 flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
+            <Icon class="text-error" name="error" size="20" />
+            {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
+          </div>
+        </Show>
+
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <Button color="text" onClick={() => setUnpairDialog(false)}>
+            Cancel
+          </Button>
+          <Button color="text" loading={unpairData.loading} onClick={() => unpair()}>
+            Unpair
+          </Button>
+        </div>
+      </Dialog>
     </div>
   )
 }
