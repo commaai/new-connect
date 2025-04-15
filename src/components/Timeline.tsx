@@ -1,10 +1,10 @@
 import { For, createSignal, createEffect, onMount, onCleanup, Suspense } from 'solid-js'
 import type { VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import type { TimelineEvent } from '~/api/derived'
 import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
+import { cn } from '~/utils/style'
 
 function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
   if (!route) return
@@ -74,7 +74,7 @@ function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[])
         return (
           <div
             title={title}
-            class={clsx('absolute top-0 h-full', classes)}
+            class={cn('absolute top-0 h-full', classes)}
             style={{
               left,
               width,
@@ -168,7 +168,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       </div>
       <div
         ref={ref!}
-        class={clsx(
+        class={cn(
           'relative isolate flex h-8 cursor-pointer touch-none self-stretch rounded-b-md bg-blue-900',
           'after:absolute after:inset-0 after:rounded-b-md after:bg-gradient-to-b after:from-black/0 after:via-black/10 after:to-black/30',
           props.class,

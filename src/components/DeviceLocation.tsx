@@ -1,6 +1,5 @@
 import { createResource, createSignal, onMount, onCleanup, Show, type VoidComponent } from 'solid-js'
 import { render } from 'solid-js/web'
-import clsx from 'clsx'
 import L from 'leaflet'
 
 import Icon from './material/Icon'
@@ -12,6 +11,7 @@ import type { IconName } from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import { getTileUrl } from '~/map'
 import { getFullAddress } from '~/map/geocode'
+import { cn } from '~/utils/style'
 
 type Location = {
   lat: number
@@ -134,7 +134,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
 
     render(
       () => (
-        <div class={clsx('flex size-[40px] items-center justify-center rounded-full bg-primary-container', iconClass)}>
+        <div class={cn('flex size-[40px] items-center justify-center rounded-full bg-primary-container', iconClass)}>
           <Icon name={iconName} />
         </div>
       ),
@@ -196,7 +196,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       </Show>
 
       <Card
-        class={clsx(
+        class={cn(
           'absolute inset-2 top-auto z-[9999] flex !bg-surface-container-high p-4 pt-3 transition-opacity duration-150',
           showSelectedLocation() ? 'opacity-100' : 'pointer-events-none opacity-0',
         )}

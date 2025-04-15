@@ -1,10 +1,10 @@
 import { Show, createEffect, createResource, createSignal, on, onCleanup, onMount, type VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import { getQCameraStreamUrl } from '~/api/route'
 import IconButton from '~/components/material/IconButton'
 import { formatVideoTime } from '~/utils/format'
 import type Hls from '~/utils/hls'
+import { cn } from '~/utils/style'
 
 type RouteVideoPlayerProps = {
   class?: string
@@ -160,7 +160,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   return (
     <div
-      class={clsx(
+      class={cn(
         'relative flex aspect-[241/151] items-center justify-center self-stretch overflow-hidden rounded-t-md bg-surface-container-low isolate',
         props.class,
       )}

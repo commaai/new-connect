@@ -1,6 +1,7 @@
 import type { VoidComponent } from 'solid-js'
 import { splitProps } from 'solid-js'
-import clsx from 'clsx'
+
+import { cn } from '~/utils/style'
 
 import ButtonBase, { ButtonBaseProps } from './ButtonBase'
 import Icon, { type IconName, type IconProps } from '~/components/material/Icon'
@@ -23,7 +24,7 @@ const IconButton: VoidComponent<IconButtonProps> = (props) => {
   const [, rest] = splitProps(props, ['class', 'children', 'filled', 'size'])
   return (
     <ButtonBase
-      class={clsx(
+      class={cn(
         'state-layer inline-flex items-center justify-center rounded-full p-2 before:rounded-full before:bg-on-surface',
         buttonSize(),
         props.class,

@@ -1,10 +1,10 @@
-import clsx from 'clsx'
 import { For, Suspense, VoidComponent } from 'solid-js'
+import { cn } from '~/utils/style'
 
 const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string; value: () => unknown }[] }> = (props) => {
   return (
     <div class="flex flex-col">
-      <div class={clsx('flex h-auto w-full justify-between gap-8', props.class)}>
+      <div class={cn('flex h-auto w-full justify-between gap-8', props.class)}>
         <For each={props.statistics}>
           {(statistic) => (
             <div class="flex basis-0 grow flex-col justify-between">

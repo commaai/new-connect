@@ -1,5 +1,6 @@
 import { type VoidComponent } from 'solid-js'
-import clsx from 'clsx'
+
+import { cn } from '~/utils/style'
 
 // Specify icon names to load only the necessary icons, reducing font payload.
 // https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
@@ -31,7 +32,7 @@ const Icon: VoidComponent<IconProps> = (props) => {
   // size-20, 24 etc. defined in root.css
   const size = () => `size-${props.size || '24'}`
   return (
-    <span class={clsx('material-symbols-outlined flex', props.filled ? 'icon-filled' : 'icon-outline', size(), props.class)}>
+    <span class={cn('material-symbols-outlined flex', props.filled ? 'icon-filled' : 'icon-outline', size(), props.class)}>
       {props.name}
     </span>
   )

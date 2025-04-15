@@ -1,7 +1,6 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
 import { action, useLocation, useSubmission } from '@solidjs/router'
-import clsx from 'clsx'
 
 import { unpairDevice, updateDevice } from '~/api/devices'
 import {
@@ -13,6 +12,7 @@ import {
   getSubscriptionStatus,
 } from '~/api/prime'
 import { formatDate } from '~/utils/format'
+import { cn } from '~/utils/style'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
@@ -72,7 +72,7 @@ const PlanSelector: ParentComponent<{
         <For each={plans()}>
           {(plan) => (
             <ButtonBase
-              class={clsx(
+              class={cn(
                 'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
                 'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
                 props.plan() === plan.name && 'ring-4 ring-on-tertiary',

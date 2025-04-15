@@ -1,11 +1,11 @@
 import { createResource, Match, Switch } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import { GPSPathPoint, getCoords } from '~/api/derived'
 import { Coords, getPathStaticMapUrl } from '~/map'
 import { getThemeId } from '~/theme'
 import type { Route } from '~/api/types'
+import { cn } from '~/utils/style'
 
 import Icon from '~/components/material/Icon'
 
@@ -39,7 +39,7 @@ const State = (props: {
   opaque?: boolean
 }) => {
   return (
-    <div class={clsx('absolute flex size-full items-center justify-center gap-2', props.opaque && 'bg-surface text-on-surface')}>
+    <div class={cn('absolute flex size-full items-center justify-center gap-2', props.opaque && 'bg-surface text-on-surface')}>
       <span class="text-xs">{props.children}</span>
       {props.trailing}
     </div>
@@ -57,7 +57,7 @@ const RouteStaticMap: VoidComponent<RouteStaticMapProps> = (props) => {
   const [loadedUrl] = createResource(url, loadImage)
 
   return (
-    <div class={clsx('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>
+    <div class={cn('relative isolate flex h-full flex-col justify-end self-stretch bg-surface text-on-surface', props.class)}>
       <Switch>
         <Match when={!!coords.error || !!url.error || !!loadedUrl.error} keyed>
           <State trailing={<Icon name="error" filled />}>Problem loading map</State>

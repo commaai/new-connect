@@ -1,7 +1,7 @@
 import { type JSXElement, type ParentComponent, Show, type VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
+import { cn } from '~/utils/style'
 
 type CardHeaderProps = {
   class?: string
@@ -13,7 +13,7 @@ type CardHeaderProps = {
 
 export const CardHeader: VoidComponent<CardHeaderProps> = (props) => {
   return (
-    <div class={clsx('flex min-h-[72px] items-center gap-4 px-4 py-3', props.class)}>
+    <div class={cn('flex min-h-[72px] items-center gap-4 px-4 py-3', props.class)}>
       {props.leading}
       <div class="flex min-h-12 grow flex-col justify-between">
         {props.headline && <span class="text-title-md">{props.headline}</span>}
@@ -29,7 +29,7 @@ type CardContentProps = {
 }
 
 export const CardContent: ParentComponent<CardContentProps> = (props) => {
-  return <div class={clsx('flex flex-col gap-4 p-4', props.class)}>{props.children}</div>
+  return <div class={cn('flex flex-col gap-4 p-4', props.class)}>{props.children}</div>
 }
 
 type CardTextContentProps = {
@@ -38,7 +38,7 @@ type CardTextContentProps = {
 
 export const CardTextContent: ParentComponent<CardTextContentProps> = (props) => {
   return (
-    <div class={clsx('flex', props.class)}>
+    <div class={cn('flex', props.class)}>
       <span class="text-body-md text-on-surface-variant">{props.children}</span>
     </div>
   )
@@ -49,7 +49,7 @@ type CardActionsProps = {
 }
 
 export const CardActions: ParentComponent<CardActionsProps> = (props) => {
-  return <div class={clsx('flex justify-end gap-4', props.class)}>{props.children}</div>
+  return <div class={cn('flex justify-end gap-4', props.class)}>{props.children}</div>
 }
 
 type CardProps = {
@@ -62,12 +62,12 @@ type CardProps = {
 const Card: ParentComponent<CardProps> = (props) => {
   const cardStyle = 'flex max-w-md flex-col rounded-lg bg-surface-container text-on-surface before:bg-on-surface'
   return (
-    <Show when={props.onClick || props.href} fallback={<div class={clsx(cardStyle, props.class)}>{props.children}</div>}>
+    <Show when={props.onClick || props.href} fallback={<div class={cn(cardStyle, props.class)}>{props.children}</div>}>
       <ButtonBase
-        class={clsx(cardStyle, (props.href || props.onClick) && 'state-layer', props.class)}
+        class={cn(cardStyle, (props.href || props.onClick) && 'state-layer', props.class)}
         onClick={props.onClick}
         href={props.href}
-        activeClass={clsx('before:opacity-[.12]', props.activeClass)}
+        activeClass={cn('before:opacity-[.12]', props.activeClass)}
       >
         {props.children}
       </ButtonBase>

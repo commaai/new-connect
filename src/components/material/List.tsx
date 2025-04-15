@@ -1,7 +1,7 @@
 import type { JSXElement, ParentComponent, VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import ButtonBase from '~/components/material/ButtonBase'
+import { cn } from '~/utils/style'
 
 type ListItemContentProps = {
   headline: JSXElement
@@ -40,7 +40,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
     })[variant()]
   return (
     <ButtonBase
-      class={clsx(
+      class={cn(
         'elevation-0 state-layer flex shrink-0 items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
         variantStyle(),
         props.selected && 'before:opacity-[.12]',
@@ -48,7 +48,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       )}
       onClick={props.onClick}
       href={props.href}
-      activeClass={clsx('before:opacity-[.12]', props.activeClass)}
+      activeClass={cn('before:opacity-[.12]', props.activeClass)}
     >
       {props.leading}
       {props.children}
@@ -63,7 +63,7 @@ type ListProps = {
 }
 
 const List: ParentComponent<ListProps> = (props) => {
-  return <div class={clsx('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
+  return <div class={cn('flex flex-col', props.variant === 'nav' ? 'gap-0' : 'gap-2', props.class)}>{props.children}</div>
 }
 
 export default List

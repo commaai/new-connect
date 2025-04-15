@@ -1,6 +1,5 @@
 import { createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
-import clsx from 'clsx'
 
 import { takeSnapshot } from '~/api/athena'
 import { SHARED_DEVICE } from '~/api/devices'
@@ -11,6 +10,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import UploadQueue from '~/components/UploadQueue'
+import { cn } from '~/utils/style'
 
 import RouteList from '../components/RouteList'
 import { currentDevice as device, currentDeviceName as deviceName } from '../store'
@@ -92,7 +92,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
-                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device()?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
+                <div class={cn('m-2 size-2 shrink-0 rounded-full', device()?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
 
                 {<div class="text-lg font-bold">{deviceName()}</div>}
               </div>
@@ -108,7 +108,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               <UploadQueue dongleId={props.dongleId} />
             </Show>
             <button
-              class={clsx(
+              class={cn(
                 'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
                 queueVisible() && 'border-t-2 border-t-surface-container-low',
               )}

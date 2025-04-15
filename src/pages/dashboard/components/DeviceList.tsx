@@ -1,11 +1,11 @@
 import { For, Suspense, type VoidComponent } from 'solid-js'
-import clsx from 'clsx'
 
 import { useDrawerContext } from '~/components/material/Drawer'
 import List, { ListItem, ListItemContent } from '~/components/material/List'
 import type { Device } from '~/api/types'
 import { getDeviceName } from '~/utils/device'
 import storage from '~/utils/storage'
+import { cn } from '~/utils/style'
 
 import { devices, currentDongleId } from '../store'
 
@@ -29,7 +29,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
           {(device) => (
             <ListItem
               variant="nav"
-              leading={<div class={clsx('m-2 size-2 shrink-0 rounded-full', device.is_online ? 'bg-green-400' : 'bg-gray-400')} />}
+              leading={<div class={cn('m-2 size-2 shrink-0 rounded-full', device.is_online ? 'bg-green-400' : 'bg-gray-400')} />}
               selected={isSelected(device)}
               onClick={onClick(device)}
               href={`/${device.dongle_id}`}

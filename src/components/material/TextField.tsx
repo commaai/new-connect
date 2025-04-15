@@ -1,5 +1,6 @@
 import { Show, createEffect, createSignal, splitProps, type Component, type JSX } from 'solid-js'
-import clsx from 'clsx'
+
+import { cn } from '~/utils/style'
 
 type TextFieldProps = {
   class?: string
@@ -67,9 +68,9 @@ const TextField: Component<TextFieldProps> = (props) => {
   }
 
   return (
-    <div class={clsx('flex flex-col', props.class)}>
+    <div class={cn('flex flex-col', props.class)}>
       <div
-        class={clsx(
+        class={cn(
           'relative flex rounded-t-xs min-h-[56px] bg-surface-container-highest',
           hovered() && !props.disabled && 'after:absolute after:inset-0 after:bg-on-surface after:opacity-[0.08] after:pointer-events-none',
           props.disabled && 'opacity-40',
@@ -81,7 +82,7 @@ const TextField: Component<TextFieldProps> = (props) => {
         <div class="relative flex-1">
           <Show when={props.label}>
             <label
-              class={clsx(
+              class={cn(
                 'absolute pointer-events-none transition-all text-body-lg left-4',
                 labelFloating() ? 'text-xs top-2' : 'top-1/2 -translate-y-1/2',
                 getStateStyle().label,
@@ -94,7 +95,7 @@ const TextField: Component<TextFieldProps> = (props) => {
 
           <input
             {...inputProps}
-            class={clsx(
+            class={cn(
               'w-full bg-transparent outline-none px-4 py-4 text-body-lg z-10',
               'select-text selection:bg-primary-container',
               getStateStyle().input,
@@ -108,12 +109,12 @@ const TextField: Component<TextFieldProps> = (props) => {
         </div>
 
         {/* Active indicator line */}
-        <div class={clsx('absolute bottom-0 left-0 w-full transition-all', focused() ? 'h-[2px]' : 'h-[1px]', getStateStyle().indicator)} />
+        <div class={cn('absolute bottom-0 left-0 w-full transition-all', focused() ? 'h-[2px]' : 'h-[1px]', getStateStyle().indicator)} />
       </div>
 
       {/* Helper text or error */}
       <Show when={props.helperText || props.error}>
-        <label class={clsx('text-body-sm px-4 pt-1', getStateStyle().helper, props.disabled && 'opacity-40')} for={props.id}>
+        <label class={cn('text-body-sm px-4 pt-1', getStateStyle().helper, props.disabled && 'opacity-40')} for={props.id}>
           {props.error || props.helperText}
         </label>
       </Show>

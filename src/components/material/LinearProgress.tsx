@@ -1,5 +1,6 @@
 import { Show, type VoidComponent } from 'solid-js'
-import clsx from 'clsx'
+
+import { cn } from '~/utils/style'
 
 type LinearProgressProps = {
   class?: string
@@ -22,7 +23,7 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
   }
   return (
     <div
-      class={clsx(
+      class={cn(
         'relative z-0 block h-1 overflow-hidden rounded-none bg-transparent before:absolute before:inset-0 before:opacity-30',
         color().container,
         props.class,
@@ -32,17 +33,13 @@ const LinearProgress: VoidComponent<LinearProgressProps> = (props) => {
         when={state().indeterminate}
         fallback={
           <div
-            class={clsx('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', color().bar)}
+            class={cn('absolute inset-y-0 left-0 h-1 transition-[background-color,width] duration-200 ease-linear', color().bar)}
             style={{ width: `${props.progress! * 100}%` }}
           />
         }
       >
-        <div
-          class={clsx('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate1', color().bar)}
-        />
-        <div
-          class={clsx('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate2', color().bar)}
-        />
+        <div class={cn('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate1', color().bar)} />
+        <div class={cn('absolute inset-y-0 left-0 h-1 w-auto origin-left transition-indeterminate animate-indeterminate2', color().bar)} />
       </Show>
     </div>
   )

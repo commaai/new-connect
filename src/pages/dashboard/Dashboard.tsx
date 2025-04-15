@@ -1,11 +1,11 @@
 import { createEffect, createMemo, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
-import clsx from 'clsx'
 
 import { isSignedIn } from '~/api/auth/client'
 import { USERADMIN_URL } from '~/api/config'
 import storage from '~/utils/storage'
+import { cn } from '~/utils/style'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
@@ -76,7 +76,7 @@ const DashboardLayout: Component<{
   return (
     <div class="relative size-full overflow-hidden">
       <div
-        class={clsx(
+        class={cn(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
           // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',

@@ -72,7 +72,8 @@
     "dayjs": "work with dates (e.g., parse, validate, etc.)",
     "hls.js": "stream video data",
     "leaflet": "interactive maps",
-    "solid-js": "JS ui framework"
+    "solid-js": "JS ui framework",
+    "tailwind-merge": "merge Tailwind classes without style conflicts"
   },
   "dependencies": {
     "@mapbox/polyline": "^1.2.1",
@@ -86,7 +87,8 @@
     "hls.js": "1.5.20",
     "leaflet": "^1.9.4",
     "qr-scanner": "^1.4.2",
-    "solid-js": "^1.9.5"
+    "solid-js": "^1.9.5",
+    "tailwind-merge": "2.6.0"
   },
   "engines": {
     "node": ">=20.11.0"

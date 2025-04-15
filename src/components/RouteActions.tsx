@@ -1,10 +1,10 @@
 import { createSignal, Show, type VoidComponent, createEffect, createResource } from 'solid-js'
-import clsx from 'clsx'
 
 import { USERADMIN_URL } from '~/api/config'
 import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/api/types'
+import { cn } from '~/utils/style'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -120,7 +120,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
             <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
             <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
           </div>
-          <Icon class={clsx('mx-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
+          <Icon class={cn('mx-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
         </button>
       </div>
 

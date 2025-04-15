@@ -1,11 +1,11 @@
 import { createEffect, createSignal, on, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
-import clsx from 'clsx'
 
 import Icon, { type IconName } from '~/components/material/Icon'
 import Button from './material/Button'
 import { uploadAllSegments, type FileType } from '~/api/file'
 import type { Route } from '~/api/types'
+import { cn } from '~/utils/style'
 
 const BUTTON_TYPES = ['road', 'driver', 'logs', 'route'] as const
 type ButtonType = (typeof BUTTON_TYPES)[number]
@@ -46,7 +46,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       onClick={() => handleUpload()}
       class="px-2 md:px-3"
       disabled={disabled()}
-      leading={<Icon class={clsx(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
+      leading={<Icon class={cn(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
       color="primary"
     >
       <span class="flex items-center gap-1 font-mono">{props.text}</span>
