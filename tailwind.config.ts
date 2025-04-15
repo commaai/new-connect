@@ -105,7 +105,7 @@ export default {
           'surface-container',
           'surface-container-high',
           'surface-container-highest',
-        ].map((name) => [name, `var(--color-${name})`]),
+        ].map((name) => [name, `rgb(var(--color-${name}) / <alpha-value>)`]),
       ),
       keyframes: {
         shimmer: {
