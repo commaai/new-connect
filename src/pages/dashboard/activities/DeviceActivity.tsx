@@ -165,7 +165,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
                   <img src={`data:image/jpeg;base64,${image}`} alt={`Device Snapshot ${index() + 1}`} />
                   <div class="absolute right-4 top-4 p-4">
                     <IconButton class="text-white" name="download" onClick={() => downloadSnapshot(image, index())} />
-                    <IconButton class="text-white" name="clear" onClick={() => clearImage(index())} />
+                    <IconButton class="text-white" name="close" onClick={() => clearImage(index())} />
                   </div>
                 </div>
               </div>
@@ -181,8 +181,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <Show when={snapshot.error}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
               <div class="flex items-center p-4">
+<<<<<<< Updated upstream
                 <IconButton class="text-white" name="clear" onClick={clearError} />
                 <span>Error: {snapshot.error}</span>
+=======
+                <IconButton class="text-white" name="close" onClick={clearError} />
+                <span>Error: {snapshot().error}</span>
+>>>>>>> Stashed changes
               </div>
             </div>
           </Show>

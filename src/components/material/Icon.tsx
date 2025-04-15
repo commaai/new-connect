@@ -1,6 +1,7 @@
-import { type VoidComponent } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
+<<<<<<< Updated upstream
 // Specify icon names to load only the necessary icons, reducing font payload.
 // https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
 // biome-ignore format: the array should not be formatted
@@ -10,6 +11,14 @@ export const Icons = [
   'open_in_new', 'payments', 'person', 'progress_activity', 'satellite_alt', 'search', 'settings', 'upload', 'videocam', 'refresh',
   'login', 'person_off', 'autorenew', 'close_small', 'pause', 'play_arrow', 'clear_all', 'bolt',
 ] as const
+=======
+/**
+ * Specify icon names to load only the necessary icons, reducing font payload.
+ *
+ * @see https://developers.google.com/fonts/docs/material_symbols#optimize_the_icon_font
+ */
+import Icons from './icons'
+>>>>>>> Stashed changes
 
 export type IconName = (typeof Icons)[number]
 

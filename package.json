@@ -12,8 +12,14 @@
     "build": "bun run --bun vite build",
     "bundle-size": "bun src/ci/check_bundle_size.ts",
     "dependency-report": "bun src/ci/dependency_report.ts",
+<<<<<<< Updated upstream
     "dev": "bun run --bun vite --open",
     "serve": "vite preview",
+=======
+    "dev": "vite",
+    "generate-font": "bun src/ci/generate_font.ts",
+    "serve": "vite prefix",
+>>>>>>> Stashed changes
     "lines": "bun src/ci/check_lines.ts",
     "check": "biome check",
     "fix": "biome check --write",

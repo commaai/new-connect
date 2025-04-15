@@ -4,9 +4,6 @@ import devtools from 'solid-devtools/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
 import { VitePWA } from 'vite-plugin-pwa'
 
-// noinspection ES6PreferShortImport
-import { Icons } from './src/components/material/Icon'
-
 export default defineConfig({
   plugins: [
     devtools(),
@@ -54,6 +51,7 @@ export default defineConfig({
         ],
       },
     }),
+<<<<<<< Updated upstream
     {
       name: 'inject-material-symbols',
       transformIndexHtml(html) {
@@ -79,6 +77,8 @@ export default defineConfig({
       project: 'new-connect',
       telemetry: false,
     }),
+=======
+>>>>>>> Stashed changes
   ],
   server: {
     port: 3000,

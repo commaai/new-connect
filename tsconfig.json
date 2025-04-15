@@ -7,7 +7,14 @@
     "jsxImportSource": "solid-js",
 
     "allowJs": true,
+<<<<<<< Updated upstream
     "esModuleInterop": true,
+=======
+    "resolveJsonModule": true,
+    "noEmit": true,
+    "strict": true,
+    "types": ["vite/client", "bun"],
+>>>>>>> Stashed changes
     "isolatedModules": true,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
@@ -28,6 +35,6 @@
       "~/*": ["./src/*"]
     }
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs"],
+  "include": ["**/*.ts", "**/*.tsx", "**/*.js", "**/*.cjs", "**/*.json"],
   "exclude": ["node_modules", "dist"]
 }
