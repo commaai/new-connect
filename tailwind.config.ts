@@ -105,7 +105,7 @@ export default {
           'surface-container',
           'surface-container-high',
           'surface-container-highest',
-        ].map((name) => [name, `rgba(var(--color-${name}), <alpha-value>)`]),
+        ].map((name) => [name, `rgb(var(--color-${name}) / <alpha-value>)`]),
       ),
       opacity: {
         '8': '0.08',
