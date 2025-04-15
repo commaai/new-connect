@@ -102,7 +102,7 @@ const validatePairToken = (
 
   try {
     // jwt is base64url encoded
-    const payload = atob(parts[1].replace(/-/g, '+').replace(/_/g, '/'))
+    const payload = atob(parts[1]!.replace(/-/g, '+').replace(/_/g, '/'))
     const { identity, pair } = JSON.parse(payload) as Record<string, unknown>
     if (pair !== true || typeof identity !== 'string') return null
     return { identity, token }
