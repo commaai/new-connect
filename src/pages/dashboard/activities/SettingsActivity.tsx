@@ -370,28 +370,26 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
         </Switch>
       </Suspense>
 
-      <Show when={cancelDialog()}>
-        <Dialog open={cancelDialog()} onClose={() => setCancelDialog(false)}>
-          <h2 class="text-lg">Cancel subscription?</h2>
-          <p class="text-sm">Your subscription will end immediately, and you will receive a pro-rated refund.</p>
-          <div class="mt-4 flex flex-wrap justify-end gap-2">
-            <Button color="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
-              Not now
-            </Button>
-            <Button
-              color="text"
-              disabled={loading()}
-              loading={cancelData.loading}
-              onClick={() => {
-                cancel()
-                setCancelDialog(false)
-              }}
-            >
-              Cancel subscription
-            </Button>
-          </div>
-        </Dialog>
-      </Show>
+      <Dialog open={cancelDialog()} onClose={() => setCancelDialog(false)}>
+        <h2 class="text-lg">Cancel subscription?</h2>
+        <p class="text-sm">Your subscription will end immediately, and you will receive a pro-rated refund.</p>
+        <div class="mt-4 flex flex-wrap justify-end gap-2">
+          <Button color="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
+            Not now
+          </Button>
+          <Button
+            color="text"
+            disabled={loading()}
+            loading={cancelData.loading}
+            onClick={() => {
+              cancel()
+              setCancelDialog(false)
+            }}
+          >
+            Cancel subscription
+          </Button>
+        </div>
+      </Dialog>
     </div>
   )
 }
