@@ -47,7 +47,6 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       class="px-2 md:px-3"
       disabled={disabled()}
       leading={<Icon class={clsx(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
-      color="primary"
     >
       <span class="flex items-center gap-1 font-mono">{props.text}</span>
     </Button>

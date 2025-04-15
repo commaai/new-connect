@@ -436,7 +436,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
             disabled={device.loading || submission.pending}
             error={submission.error?.message}
           />
-          <Button class="mt-2" color="primary" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
+          <Button class="mt-2" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
             Update
           </Button>
         </div>
