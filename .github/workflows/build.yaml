@@ -38,10 +38,14 @@ jobs:
       - uses: actions/checkout@v4
       - uses: oven-sh/setup-bun@v2
 
+      - name: get commit date
+        run: echo "VITE_APP_GIT_TIMESTAMP=$(git show -s --format=%cI)" >> $GITHUB_ENV
+
       - run: bun install --frozen-lockfile
       - run: bun run build
         env:
           VITE_SENTRY_ENVIRONMENT: ${{ github.ref == 'refs/heads/master' && 'production' || 'staging' }}
+          VITE_APP_GIT_SHA: ${{ github.event_name == 'push' && github.sha || github.event.pull_request.head.sha }}
 
       - name: Bundle size breakdown
         run: bun dependency-report | column -t -s ":"
@@ -93,7 +97,7 @@ jobs:
         env:
           DOCKER_METADATA_PR_HEAD_SHA: true
 
-      - name: get date
+      - name: get commit date
         run: echo "GIT_TIMESTAMP=$(git show -s --format=%cI)" >> $GITHUB_ENV
 
       - uses: docker/build-push-action@v6

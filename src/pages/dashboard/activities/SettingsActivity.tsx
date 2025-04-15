@@ -1,9 +1,9 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation } from '@solidjs/router'
+import { action, useLocation, useSubmission } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, unpairDevice } from '~/api/devices'
+import { unpairDevice, updateDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -18,9 +18,11 @@ import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
+import TextField from '~/components/material/TextField'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
-import { getDeviceName } from '~/utils/device'
+
+import { currentDevice as device, refetchCurrentDevice } from '../store'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -94,7 +96,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   const [selectedPlan, setSelectedPlan] = createSignal<PrimePlan>()
 
   const dongleId = () => props.dongleId
-  const [device] = createResource(dongleId, getDevice)
   const [subscribeInfo] = createResource(dongleId, getSubscribeInfo)
 
   const stripeCancelled = () => new URLSearchParams(useLocation().search).has('stripe_cancelled')
@@ -399,38 +400,76 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
   )
 }
 
-const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
-  const [device] = createResource(() => props.dongleId, getDevice)
-  const [deviceName] = createResource(device, getDeviceName)
+const updateDeviceAction = action(
+  async (dongleId: string, formData: FormData) => {
+    const alias = formData.get('alias') as string
+    try {
+      await updateDevice(dongleId, { alias })
+    } catch (error) {
+      throw new Error('Failed to update name', { cause: error })
+    }
+  },
+  {
+    name: 'updateDevice',
+    onComplete: () => refetchCurrentDevice(),
+  },
+)
+
+const DeviceSettingsForm: VoidComponent<{ dongleId: string }> = (props) => {
+  const submission = useSubmission(updateDeviceAction)
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
   })
+
+  return (
+    <div class="flex flex-col gap-4">
+      <form action={updateDeviceAction.with(props.dongleId)} method="post">
+        <div class="flex gap-2">
+          <TextField
+            class="flex-1"
+            id="device-alias"
+            name="alias"
+            value={device()?.alias}
+            label="Device name"
+            disabled={device.loading || submission.pending}
+            error={submission.error?.message}
+          />
+          <Button class="mt-2" color="primary" type="submit" disabled={device.loading || submission.pending} loading={submission.pending}>
+            Update
+          </Button>
+        </div>
+      </form>
+
+      <Show when={unpairData.error}>
+        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
+          <Icon class="text-error" name="error" size="20" />
+          {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
+        </div>
+      </Show>
+      <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+        Unpair this device
+      </Button>
+    </div>
+  )
+}
+
+const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   return (
     <>
       <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
         Device Settings
       </TopAppBar>
       <div class="flex flex-col gap-4 max-w-lg px-4">
-        <h2 class="text-lg">{deviceName()}</h2>
-        <Show when={unpairData.error}>
-          <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-            <Icon class="text-error" name="error" size="20" />
-            {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-          </div>
-        </Show>
-        <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
-          Unpair this device
-        </Button>
-        <hr class="mx-4 opacity-20" />
-        <h2 class="text-lg">comma prime</h2>
+        <DeviceSettingsForm dongleId={props.dongleId} />
+
+        <h3 class="text-lg mt-4">comma prime</h3>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>
               <PrimeCheckout dongleId={props.dongleId} />
             </Match>
-
             <Match when={device()?.prime === true}>
               <PrimeManage dongleId={props.dongleId} />
             </Match>
