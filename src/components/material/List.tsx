@@ -43,12 +43,12 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
       class={clsx(
         'state-layer flex shrink-0 items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
         variantStyle(),
-        props.selected && 'before:opacity-12',
+        props.selected && 'before:opacity-[0.12]',
         props.class,
       )}
       onClick={props.onClick}
       href={props.href}
-      activeClass={clsx('before:opacity-12', props.activeClass)}
+      activeClass={clsx('before:opacity-[0.12]', props.activeClass)}
     >
       {props.leading}
       {props.children}
