@@ -1,0 +1,35 @@
+{
+  "name": "comma connect",
+  "short_name": "connect",
+  "description": "manage your openpilot experience",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#131318",
+  "theme_color": "#131318",
+  "lang": "en",
+  "scope": "/",
+  "id": "/",
+  "icons": [
+    {
+      "src": "pwa-64x64.png",
+      "sizes": "64x64",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "pwa-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    },
+    {
+      "src": "maskable-icon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ]
+}
