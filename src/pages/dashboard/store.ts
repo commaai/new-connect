@@ -16,6 +16,7 @@ const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(
   () => {
     const dongleId = currentDongleId()
     if (!dongleId) return null
+    if (devices.state === 'unresolved' || devices.state === 'pending') return null
     return { dongleId, devices: resolved(devices) ? devices.latest : null }
   },
   ({ dongleId, devices }) => {
