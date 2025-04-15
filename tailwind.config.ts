@@ -46,12 +46,12 @@ export default {
     },
     fontSize: {
       ...fontSize,
-      '2xl': fontSize['display-sm'],
-      xl: fontSize['headline-md'],
-      lg: fontSize['title-lg'],
-      md: fontSize['body-lg'],
-      sm: fontSize['body-md'],
-      xs: fontSize['label-md'],
+      '2xl': fontSize['display-sm']!,
+      xl: fontSize['headline-md']!,
+      lg: fontSize['title-lg']!,
+      md: fontSize['body-lg']!,
+      sm: fontSize['body-md']!,
+      xs: fontSize['label-md']!,
     },
     extend: {
       colors: Object.fromEntries(

@@ -1,8 +1,9 @@
-import type { Position } from 'geojson'
 import * as Sentry from '@sentry/browser'
 
 import type { ReverseGeocodingResponse, ReverseGeocodingFeature } from '~/map/api-types'
 import { MAPBOX_TOKEN } from '~/map/config'
+
+type Position = [number, number]
 
 export async function reverseGeocode(position: Position): Promise<ReverseGeocodingFeature | null> {
   if (Math.abs(position[0]) < 0.001 && Math.abs(position[1]) < 0.001) {

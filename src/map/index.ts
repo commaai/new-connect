@@ -16,7 +16,7 @@ function prepareCoords(coords: Coords, sampleSize: number): Coords {
   const sample = []
   const step = Math.max(Math.floor(coords.length / sampleSize), 1)
   for (let i = 0; i < coords.length; i += step) {
-    const point = coords[i]
+    const point = coords[i]!
     // 1. mapbox uses lng,lat order
     // 2. polyline output is off by 10x when precision is 4
     sample.push([point[1] * 10, point[0] * 10] as [number, number])
