@@ -13,6 +13,9 @@
 
     "strict": true,
     "skipLibCheck": true,
+    "noFallthroughCasesInSwitch": true,
+    "noImplicitReturns": true,
+    "noImplicitOverride": true,
     "noUncheckedIndexedAccess": true,
 
     "noEmit": true,
