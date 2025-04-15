@@ -1,8 +1,8 @@
-import { createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createSignal, For, Match, onMount, Show, Suspense, Switch, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
-import { takeSnapshot } from '~/api/athena'
+import { makeAthenaCall, takeSnapshot } from '~/api/athena'
 import { SHARED_DEVICE } from '~/api/devices'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
@@ -14,6 +14,57 @@ import UploadQueue from '~/components/UploadQueue'
 
 import RouteList from '../components/RouteList'
 import { currentDevice as device, currentDeviceName as deviceName } from '../store'
+import { resolved } from '~/utils/reactivity'
+
+interface Event {
+  logMonoTime: number
+  valid: boolean
+}
+
+interface PeripheralState extends Event {
+  peripheralState: {
+    voltage: number
+  }
+}
+
+const DeviceBatteryVoltage: VoidComponent<{ dongleId: string }> = (props) => {
+  const [online, setOnline] = createSignal(resolved(device) ? device.latest.is_online : false)
+  const [voltage, setVoltage] = createSignal<number>()
+
+  createEffect(() => {
+    if (!resolved(device)) return
+    setOnline(device.latest.is_online)
+  })
+
+  const fetchPeripheralState = async () => {
+    const resp = await makeAthenaCall(props.dongleId, 'getMessage', { service: 'peripheralState', timeout: 5000 })
+    if (resp.result) {
+      setOnline(true)
+      setVoltage((resp.result as PeripheralState).peripheralState?.voltage)
+    } else {
+      setOnline(false)
+    }
+  }
+  onMount(() => void fetchPeripheralState())
+
+  return (
+    <div
+      class={clsx(
+        'h-8 w-24 rounded-full flex items-center justify-center gap-2 bg-surface-container-high',
+        online() && !voltage() && 'skeleton-loader',
+      )}
+      title="Detected Battery Voltage"
+    >
+      <Icon name="bolt" filled={online()} size="20" />
+      <Switch>
+        <Match when={!online()}>
+          <div class="text-sm">Offline</div>
+        </Match>
+        <Match when={voltage()}>{(voltage) => <div class="text-sm">{(voltage() / 1000).toFixed(1)} V</div>}</Match>
+      </Switch>
+    </div>
+  )
+}
 
 type DeviceActivityProps = {
   dongleId: string
@@ -98,6 +149,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               </div>
             </Suspense>
             <div class="flex gap-4">
+              <DeviceBatteryVoltage dongleId={props.dongleId} />
               <IconButton name="camera" onClick={onClickSnapshot} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>
