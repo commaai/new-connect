@@ -11,16 +11,16 @@ type ButtonState = 'enabled' | 'disabled'
 const ButtonStyles: Record<ButtonVariant, Record<ButtonState, string>> = {
   filled: {
     enabled: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1 focus-visible:outline-secondary',
-    disabled: 'bg-on-surface/12 text-on-surface/38',
+    disabled: 'bg-on-surface/[.12] text-on-surface/[.38]',
   },
   tonal: {
     enabled:
       'bg-secondary-container before:bg-on-secondary-container text-on-secondary-container hover:elevation-1 focus-visible:outline-secondary',
-    disabled: 'bg-on-surface/12 text-on-surface/38',
+    disabled: 'bg-on-surface/[.12] text-on-surface/[.38]',
   },
   text: {
     enabled: 'text-primary before:bg-primary focus:outline-secondary',
-    disabled: 'text-on-surface/38',
+    disabled: 'text-on-surface/[.38]',
   },
 } as const
 
