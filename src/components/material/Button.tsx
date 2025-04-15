@@ -17,7 +17,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   const color = () => props.color || 'primary'
   const colorClasses = () =>
     ({
-      text: 'text-primary before:bg-on-primary',
+      text: 'text-primary before:bg-primary',
       primary: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1',
       secondary: 'bg-secondary before:bg-on-secondary text-on-secondary hover:elevation-1',
       tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary hover:elevation-1',
@@ -31,8 +31,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
       class={clsx(
         'state-layer inline-flex h-10 shrink-0 items-center justify-center gap-2 rounded-full py-1 contrast-100 transition',
         colorClasses(),
-        disabled() && 'cursor-not-allowed opacity-50',
-        !disabled() && 'hover:opacity-80',
+        disabled() && 'cursor-not-allowed opacity-40',
         props.leading ? 'pl-4' : 'pl-6',
         props.trailing ? 'pr-4' : 'pr-6',
         props.class,
