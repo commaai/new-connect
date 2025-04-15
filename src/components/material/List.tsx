@@ -41,7 +41,7 @@ export const ListItem: ParentComponent<ListItemProps> = (props) => {
   return (
     <ButtonBase
       class={clsx(
-        'state-layer flex shrink-0 items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
+        'elevation-0 state-layer flex shrink-0 items-center gap-4 py-2 pl-4 pr-6 transition-colors before:bg-on-surface',
         variantStyle(),
         props.selected && 'before:opacity-[.12]',
         props.class,
