@@ -375,11 +375,14 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
           onClick={() => setCancelDialog(false)}
         >
           <div class="flex size-full flex-col gap-4 bg-surface-container p-6 sm:h-auto sm:max-w-lg sm:rounded-lg sm:shadow-lg">
-            <h2 class="text-lg">Cancel subscription</h2>
-            <p class="text-sm">Are you sure you want to cancel your subscription?</p>
-            <div class="mt-4 flex flex-wrap justify-stretch gap-4">
+            <h2 class="text-lg">Cancel subscription?</h2>
+            <p class="text-sm">Your subscription will end immediately, and you will receive a pro-rated refund.</p>
+            <div class="mt-4 flex flex-wrap justify-end gap-2">
+              <Button color="text" disabled={loading()} onClick={() => setCancelDialog(false)}>
+                Not now
+              </Button>
               <Button
-                color="error"
+                color="text"
                 disabled={loading()}
                 loading={cancelData.loading}
                 onClick={() => {
@@ -387,10 +390,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                   setCancelDialog(false)
                 }}
               >
-                Yes, cancel subscription
-              </Button>
-              <Button color="secondary" disabled={loading()} onClick={() => setCancelDialog(false)}>
-                No, keep subscription
+                Cancel subscription
               </Button>
             </div>
           </div>
