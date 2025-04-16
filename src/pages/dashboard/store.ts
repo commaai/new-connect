@@ -4,6 +4,7 @@ import { accessToken } from '~/api/auth/client'
 import { getDevice, getDevices } from '~/api/devices'
 import { getProfile } from '~/api/profile'
 import { getDeviceName } from '~/utils/device'
+import { resolved } from '~/utils/reactivity'
 
 export const [profile] = createResource(accessToken, getProfile)
 
@@ -15,7 +16,7 @@ const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(
   () => {
     const dongleId = currentDongleId()
     if (!dongleId) return null
-    return { dongleId, devices: devices.latest }
+    return { dongleId, devices: resolved(devices) ? devices.latest : null }
   },
   ({ dongleId, devices }) => {
     const device = devices?.find((device) => device.dongle_id === dongleId)
@@ -26,7 +27,7 @@ const [currentDevice, { refetch: _refetchCurrentDevice }] = createResource(
 const refetchCurrentDevice = () => {
   const dongleId = currentDongleId()
   if (!dongleId) return
-  if (devices.latest?.some((device) => device.dongle_id === dongleId)) {
+  if (resolved(devices) && devices.latest?.some((device) => device.dongle_id === dongleId)) {
     refetchDevices()
     return
   }
