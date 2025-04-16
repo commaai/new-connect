@@ -1,4 +1,5 @@
 import { For, Suspense, type VoidComponent } from 'solid-js'
+import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { useDrawerContext } from '~/components/material/Drawer'
@@ -7,16 +8,16 @@ import type { Device } from '~/api/types'
 import { getDeviceName } from '~/utils/device'
 import storage from '~/utils/storage'
 
-import { devices, currentDongleId } from '../store'
-
 type DeviceListProps = {
   class?: string
+  devices: Device[] | undefined
 }
 
 const DeviceList: VoidComponent<DeviceListProps> = (props) => {
+  const location = useLocation()
   const { setOpen } = useDrawerContext()
 
-  const isSelected = (device: Device) => currentDongleId() === device.dongle_id
+  const isSelected = (device: Device) => location.pathname.includes(device.dongle_id)
   const onClick = (device: Device) => () => {
     setOpen(false)
     storage.setItem('lastSelectedDongleId', device.dongle_id)
@@ -25,7 +26,7 @@ const DeviceList: VoidComponent<DeviceListProps> = (props) => {
   return (
     <List variant="nav" class={props.class}>
       <Suspense fallback={<div class="h-14 skeleton-loader rounded-xl" />}>
-        <For each={devices.latest} fallback={<span class="text-md mx-2 text-on-surface-variant">No devices found</span>}>
+        <For each={props.devices} fallback={<span class="text-md mx-2 text-on-surface-variant">No devices found</span>}>
           {(device) => (
             <ListItem
               variant="nav"

@@ -120,7 +120,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       if (foundLocations.length > 1) {
         args.map.fitBounds(L.latLngBounds(foundLocations.map((l) => [l.lat, l.lng])), { padding: [50, 50] })
       } else if (foundLocations.length === 1) {
-        args.map.setView([foundLocations[0]!.lat, foundLocations[0]!.lng], 15)
+        args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
       } else {
         throw new Error('Offline')
       }

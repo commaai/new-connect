@@ -1,5 +1,5 @@
 import clsx from 'clsx'
-import { For, Suspense, type VoidComponent } from 'solid-js'
+import { For, Suspense, VoidComponent } from 'solid-js'
 
 const StatisticBar: VoidComponent<{ class?: string; statistics: { label: string; value: () => unknown }[] }> = (props) => {
   return (
