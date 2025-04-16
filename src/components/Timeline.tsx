@@ -120,7 +120,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
       }
       const onTouchMove = (ev: TouchEvent) => {
         if (ev.touches.length !== 1) return
-        updateMarker(ev.touches[0]!.clientX)
+        updateMarker(ev.touches[0].clientX)
       }
       const onStop = () => {
         window.removeEventListener('mousemove', onMouseMove)
@@ -144,7 +144,7 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
 
     const onTouchStart = (ev: TouchEvent) => {
       if (ev.touches.length !== 1 || !props.route) return
-      updateMarker(ev.touches[0]!.clientX)
+      updateMarker(ev.touches[0].clientX)
       onStart()
     }
 

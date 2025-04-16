@@ -1,8 +1,8 @@
 import { Show, createEffect, createResource, createSignal, Suspense, type VoidComponent } from 'solid-js'
-import { A } from '@solidjs/router'
 
 import { setRouteViewed } from '~/api/athena'
-import { generateRouteStatistics, getTimelineEvents } from '~/api/derived'
+import { getDevice } from '~/api/devices'
+import { getProfile } from '~/api/profile'
 import { getRoute } from '~/api/route'
 import { dayjs } from '~/utils/format'
 import { resolved } from '~/utils/reactivity'
@@ -15,8 +15,8 @@ import RouteStatisticsBar from '~/components/RouteStatisticsBar'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-
-import { profile, currentDevice as device } from '../store'
+import { generateRouteStatistics, getTimelineEvents } from '~/api/derived'
+import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
   dongleId: string
@@ -53,6 +53,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
     onTimelineChange(props.startTime)
   })
 
+  const [device] = createResource(() => props.dongleId, getDevice)
+  const [profile] = createResource(getProfile)
   createEffect(() => {
     if (!resolved(device) || !resolved(profile) || (!device().is_owner && !profile().superuser)) return
     void setRouteViewed(device().dongle_id, props.dateStr)

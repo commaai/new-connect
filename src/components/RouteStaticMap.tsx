@@ -2,8 +2,8 @@ import { createResource, Match, Switch } from 'solid-js'
 import type { JSXElement, VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
-import { type GPSPathPoint, getCoords } from '~/api/derived'
-import { type Coords, getPathStaticMapUrl } from '~/map'
+import { GPSPathPoint, getCoords } from '~/api/derived'
+import { Coords, getPathStaticMapUrl } from '~/map'
 import { getThemeId } from '~/theme'
 import type { Route } from '~/api/types'
 

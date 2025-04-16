@@ -2,7 +2,7 @@ import type { JSXElement, ParentComponent } from 'solid-js'
 import { Show, splitProps } from 'solid-js'
 import clsx from 'clsx'
 
-import ButtonBase, { type ButtonBaseProps } from './ButtonBase'
+import ButtonBase, { ButtonBaseProps } from './ButtonBase'
 import Icon from './Icon'
 
 type ButtonProps = ButtonBaseProps & {
@@ -17,7 +17,7 @@ const Button: ParentComponent<ButtonProps> = (props) => {
   const color = () => props.color || 'primary'
   const colorClasses = () =>
     ({
-      text: 'text-primary before:bg-primary',
+      text: 'text-primary before:bg-on-primary',
       primary: 'bg-primary before:bg-on-primary text-on-primary hover:elevation-1',
       secondary: 'bg-secondary before:bg-on-secondary text-on-secondary hover:elevation-1',
       tertiary: 'bg-tertiary before:bg-on-tertiary text-on-tertiary hover:elevation-1',

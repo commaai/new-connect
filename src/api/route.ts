@@ -3,9 +3,8 @@ import type { Route, RouteInfo, RouteShareSignature } from '~/api/types'
 import { fetcher } from '.'
 import { API_URL } from './config'
 
-export const parseRouteName = (routeName: string): RouteInfo | undefined => {
+export const parseRouteName = (routeName: string): RouteInfo => {
   const [dongleId, routeId] = routeName.split('|')
-  if (!dongleId || !routeId) return undefined
   return { dongleId, routeId }
 }
 

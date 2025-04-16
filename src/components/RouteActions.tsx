@@ -38,8 +38,7 @@ interface RouteActionsProps {
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
-  const dongleId = () => parseRouteName(props.routeName)?.dongleId
-  const [preservedRoutesResource] = createResource(dongleId, getPreservedRoutes)
+  const [preservedRoutesResource] = createResource(() => parseRouteName(props.routeName).dongleId, getPreservedRoutes)
 
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
