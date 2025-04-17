@@ -21,8 +21,8 @@ describe('Demo mode', () => {
   beforeEach(() => setAccessToken(Demo.ACCESS_TOKEN))
 
   test('View dashboard', async () => {
-    const { findByText } = renderApp('/')
-    expect(await findByText('demo 3X')).toBeTruthy()
+    const { findAllByText } = renderApp('/')
+    expect(await findAllByText('demo 3X')).toHaveLength(2)
   })
 
   test('View demo route', async () => {

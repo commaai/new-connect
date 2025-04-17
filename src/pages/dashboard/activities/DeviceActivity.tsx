@@ -1,9 +1,9 @@
-import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createResource, createSignal, For, Match, Show, Suspense, Switch, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
 
-import { takeSnapshot } from '~/api/athena'
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { makeAthenaCall, takeSnapshot } from '~/api/athena'
+import { SHARED_DEVICE } from '~/api/devices'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
@@ -11,19 +11,52 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import UploadQueue from '~/components/UploadQueue'
-import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
+import { currentDevice as device, currentDeviceName as deviceName } from '../store'
+import { resolved } from '~/utils/reactivity'
+
+interface PeripheralState {
+  peripheralState: {
+    voltage: number
+  }
+}
+
+const DeviceBatteryVoltage: VoidComponent<{ dongleId: string }> = (props) => {
+  const [voltage] = createResource(
+    () => props.dongleId,
+    async (dongleId) => {
+      const resp = await makeAthenaCall(dongleId, 'getMessage', { service: 'peripheralState', timeout: 5000 })
+      return resp.result ? (resp.result as PeripheralState).peripheralState?.voltage : null
+    },
+  )
+
+  return (
+    <div
+      class={clsx(
+        'h-8 w-24 rounded-full flex items-center justify-center gap-2 bg-surface-container-high text-sm',
+        voltage.loading && 'skeleton-loader',
+      )}
+      title="Detected Battery Voltage"
+    >
+      <Icon name="bolt" filled={resolved(voltage) && !!voltage.latest} size="20" />
+      <Switch>
+        <Match when={voltage.state === 'errored'}>Offline</Match>
+        <Match when={resolved(voltage)}>
+          <Show when={voltage.latest} fallback={<div class="text-sm">Offline</div>}>
+            {(voltage) => <div class="text-sm">{(voltage() / 1000).toFixed(1)} V</div>}
+          </Show>
+        </Match>
+      </Switch>
+    </div>
+  )
+}
 
 type DeviceActivityProps = {
   dongleId: string
 }
 
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
-  const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
-  const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
   // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
@@ -96,12 +129,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
               <div class="inline-flex items-center gap-2">
-                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
+                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device()?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
 
                 {<div class="text-lg font-bold">{deviceName()}</div>}
               </div>
             </Suspense>
             <div class="flex gap-4">
+              <DeviceBatteryVoltage dongleId={props.dongleId} />
               <IconButton name="camera" onClick={onClickSnapshot} />
               <IconButton name="settings" href={`/${props.dongleId}/settings`} />
             </div>

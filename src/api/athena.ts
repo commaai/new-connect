@@ -1,4 +1,4 @@
-import { AthenaCallResponse, BackendAthenaCallResponse, BackendAthenaCallResponseError } from '~/api/types'
+import type { AthenaCallResponse, BackendAthenaCallResponse, BackendAthenaCallResponseError } from '~/api/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
 

@@ -9,6 +9,7 @@ import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 
+import { refetchDevices } from '../store'
 import './PairActivity.css'
 
 const toError = (error: unknown): Error => {
@@ -17,7 +18,7 @@ const toError = (error: unknown): Error => {
   return new Error('An unknown error occurred', { cause: error })
 }
 
-const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
+const PairActivity: VoidComponent = () => {
   const { pair } = useLocation().query
   const pairToken: string | undefined = Array.isArray(pair) ? pair[0] : pair
 
@@ -85,7 +86,7 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
 
         pairDevice(input.pairToken)
           .then((dongleId) => navigate(`/${dongleId}`))
-          .then(props.onPaired)
+          .then(() => refetchDevices())
           .catch((reason) => {
             const error = toError(reason)
             console.error('Error pairing device', error, error.cause)
@@ -110,9 +111,7 @@ const PairActivity: VoidComponent<{ onPaired: () => void }> = (props) => {
 
             <div class="flex flex-col items-center gap-4 px-4 max-w-sm mx-auto">
               An error occurred: {input.error.message}
-              <Button color="primary" onClick={() => to.scanning()}>
-                Retry
-              </Button>
+              <Button onClick={() => to.scanning()}>Retry</Button>
             </div>
           </>
         )

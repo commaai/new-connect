@@ -1,12 +1,12 @@
-import { createEffect, createMemo, For, Match, Show, Switch, VoidComponent } from 'solid-js'
+import { createEffect, createMemo, For, Match, Show, Switch, type VoidComponent } from 'solid-js'
 import { queryOptions, useMutation, useQuery, useQueryClient } from '@tanstack/solid-query'
 import { createStore, reconcile } from 'solid-js/store'
 import LinearProgress from './material/LinearProgress'
-import Icon, { IconName } from './material/Icon'
+import Icon, { type IconName } from './material/Icon'
 import IconButton from './material/IconButton'
 import StatisticBar from './StatisticBar'
 import Button from '~/components/material/Button'
-import { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/api/types'
+import type { AthenaOfflineQueueResponse, UploadFilesToUrlsRequest, UploadQueueItem } from '~/api/types'
 import { cancelUpload, getUploadQueue } from '~/api/file'
 import { getAthenaOfflineQueue } from '~/api/devices'
 
@@ -54,10 +54,11 @@ interface UploadQueueItemWithAttributes extends UploadQueueItem {
 const populateAttributes = (item: UploadQueueItem): UploadQueueItemWithAttributes => {
   const parsed = new URL(item.url)
   const parts = parsed.pathname.split('/')
+  // TODO: use regex capture groups
   if (parsed.hostname === 'upload.commadotai.com') {
-    return { ...item, route: parts[2], segment: parseInt(parts[3], 10), filename: parts[4], isFirehose: true }
+    return { ...item, route: parts[2]!, segment: parseInt(parts[3]!, 10), filename: parts[4]!, isFirehose: true }
   }
-  return { ...item, route: parts[3], segment: parseInt(parts[4], 10), filename: parts[5], isFirehose: false }
+  return { ...item, route: parts[3]!, segment: parseInt(parts[4]!, 10), filename: parts[5]!, isFirehose: false }
 }
 
 const UploadQueueRow: VoidComponent<{ cancel: (ids: string[]) => void; item: UploadQueueItemWithAttributes }> = (props) => {

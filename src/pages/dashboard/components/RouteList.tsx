@@ -24,10 +24,8 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), [30, 57, 138], [218, 161, 28])
   const [statistics] = createResource(() => props.route, getRouteStatistics)
   const [location] = createResource(async () => {
-    const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
-    const endPos = [props.route.end_lng || 0, props.route.end_lat || 0]
-    const startPlace = await getPlaceName(startPos)
-    const endPlace = await getPlaceName(endPos)
+    const startPlace = await getPlaceName([props.route.start_lng || 0, props.route.start_lat || 0])
+    const endPlace = await getPlaceName([props.route.end_lng || 0, props.route.end_lat || 0])
     if (!startPlace && !endPlace) return ''
     if (!endPlace || startPlace === endPlace) return startPlace
     if (!startPlace) return endPlace
@@ -62,7 +60,7 @@ const Sentinel = (props: { onTrigger: () => void }) => {
   let sentinel!: HTMLDivElement
   const observer = new IntersectionObserver(
     (entries) => {
-      if (!entries[0].isIntersecting) return
+      if (!entries[0]?.isIntersecting) return
       props.onTrigger()
     },
     { threshold: 0.1 },

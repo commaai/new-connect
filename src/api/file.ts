@@ -1,4 +1,4 @@
-import {
+import type {
   CancelUploadRequest,
   CancelUploadResponse,
   Files,
@@ -87,13 +87,14 @@ const generateMissingFilePaths = (
 }
 
 const prepareUploadRequests = (paths: string[], presignedUrls: UploadFileMetadata[]): UploadFile[] =>
-  paths.map((path, i) => ({ filePath: path, ...presignedUrls[i] }))
+  paths.map((path, i) => ({ filePath: path, ...presignedUrls[i]! }))
 
 export const uploadAllSegments = (routeName: string, totalSegments: number, types?: FileType[]) =>
   uploadSegments(routeName, 0, totalSegments - 1, types)
 
 export const uploadSegments = async (routeName: string, segmentStart: number, segmentEnd: number, types?: FileType[]) => {
   const routeInfo = parseRouteName(routeName)
+  if (!routeInfo) return []
   const alreadyUploadedFiles = await getFiles(routeName, types)
   const paths = generateMissingFilePaths(routeInfo, segmentStart, segmentEnd, alreadyUploadedFiles, types)
   const pathPresignedUrls = await requestToUploadFiles(routeInfo.dongleId, paths)
