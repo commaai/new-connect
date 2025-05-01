@@ -63,6 +63,9 @@ export const getDeviceLocation = async (dongleId: string) =>
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`).catch(() => undefined)
 
+export const getFirehoseStats = async (dongleId: string) =>
+  fetcher<FireStatistics>(`/v1/devices/${dongleId}/firehose_stats`).catch(() => undefined)
+
 export const getDevices = async (): Promise<Device[]> =>
   fetcher<ApiDevice[]>('/v1/me/devices/')
     .then(sortDevices)
