@@ -436,6 +436,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
   return (
     <div class="flex flex-col gap-4">
       <h2 class="text-lg">{deviceName()}</h2>
+      <Show when={props.device()?.is_owner}>
       <div class="flex flex-col gap-2">
         <h3 class='text-md'>{((deviceUsers() || []).length - 1) > 0 ? "shared with:" : "share device"}</h3>
         <For each={deviceUsers()} fallback={<div>loading</div>}>
@@ -464,6 +465,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
           </Button>
         </div>
       </div>
+      </Show>
 
       <Show when={unpairData.error}>
         <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
