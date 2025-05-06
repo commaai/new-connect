@@ -454,11 +454,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
             )}
           </For>
           <div class="flex items-center gap-2">
-            <TextField
-              placeholder="email"
-              id="email-box"
-              value={shareEmail()}
-            />
+            <TextField placeholder="email" id="email-box" value={shareEmail()} />
             <Button color="secondary" leading={<Icon name="share" />} onClick={share} loading={shareData.loading}>
               Share
             </Button>
