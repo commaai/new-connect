@@ -408,14 +408,12 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
   })
-  const share = async () => {
+  const [share, shareData] = useAction(async () => {
     updateShareEmail()
-    console.log(shareEmail())
     const { success } = await shareDevice(props.dongleId, shareEmail())
-    //update deviceUsers
     if (success) refetchDeviceUsers()
     clearShareEmail()
-  }
+  })
 
   const updateShareEmail = () => {
     const emailBox = document.getElementById('email-box') as HTMLInputElement
@@ -428,9 +426,13 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     setShareEmail('')
   }
 
+  const [unshareLoading, setUnshareLoading] = createSignal(false)
+
   const unshare = async (email: string) => {
+    setUnshareLoading(true)
     const { success } = await unshareDevice(props.dongleId, email)
     if (success) refetchDeviceUsers()
+    setUnshareLoading(false)
   }
 
   return (
@@ -444,7 +446,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               <Show when={user.permission !== 'owner'}>
                 <div class="flex items-center gap-2">
                   <div>{user.email}</div>
-                  <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)}>
+                  <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)} loading={unshareLoading()}>
                     Remove
                   </Button>
                 </div>
@@ -456,11 +458,8 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               placeholder="email"
               id="email-box"
               value={shareEmail()}
-              onKeyPress={(_i) => {
-                updateShareEmail()
-              }}
             />
-            <Button color="secondary" leading={<Icon name="share" />} onClick={share}>
+            <Button color="secondary" leading={<Icon name="share" />} onClick={share} loading={shareData.loading}>
               Share
             </Button>
           </div>
