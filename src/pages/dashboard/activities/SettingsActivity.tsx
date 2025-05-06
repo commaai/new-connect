@@ -3,7 +3,7 @@ import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXEle
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, getDeviceUsers, shareDevice, unpairDevice } from '~/api/devices'
+import { getDevice, getDeviceUsers, shareDevice, unpairDevice, unshareDevice } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -409,6 +409,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     if (success) window.location.href = window.location.origin
   })
   const share = async () => {
+    updateShareEmail()
     console.log(shareEmail())
     const { success } = await shareDevice(props.dongleId, shareEmail())
     //update deviceUsers
@@ -427,19 +428,29 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     setShareEmail('')
   }
 
+  const unshare = async (email: string) => {
+    const { success } = await unshareDevice(props.dongleId, email)
+    if (success) refetchDeviceUsers()
+  }
+
   return (
     <div class="flex flex-col gap-4">
       <h2 class="text-lg">{deviceName()}</h2>
-      <div>
-        shared with:
+      <div class="flex flex-col gap-2">
+        <h3 class='text-md'>{((deviceUsers() || []).length - 1) > 0 ? "shared with:" : "share device"}</h3>
         <For each={deviceUsers()} fallback={<div>loading</div>}>
           {(user, _index) => (
             <Show when={user.permission !== 'owner'}>
-              <div>{user.email}</div>
+              <div class="flex items-center gap-2">
+                <div>{user.email}</div>
+                <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)}>
+                  Remove
+                </Button>
+              </div>
             </Show>
           )}
         </For>
-        <div class="flex">
+        <div class="flex items-center gap-2">
           <TextField
             placeholder="email"
             id="email-box"

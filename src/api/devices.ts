@@ -87,6 +87,9 @@ export const unshareDevice = async (dongleId: string, email: string) =>
   fetcher<{ success: number }>(`/v1/devices/${dongleId}/del_user`, {
     method: 'POST',
     body: JSON.stringify({ email: email }),
+    headers: {
+      'Content-Type': 'application/json',
+    },
   })
 
 export const getDeviceUsers = async (dongleId: string): Promise<{ email: string; permission: string }[]> =>
