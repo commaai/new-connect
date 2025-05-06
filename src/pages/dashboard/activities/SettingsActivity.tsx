@@ -437,34 +437,34 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     <div class="flex flex-col gap-4">
       <h2 class="text-lg">{deviceName()}</h2>
       <Show when={props.device()?.is_owner}>
-      <div class="flex flex-col gap-2">
-        <h3 class='text-md'>{((deviceUsers() || []).length - 1) > 0 ? "shared with:" : "share device"}</h3>
-        <For each={deviceUsers()} fallback={<div>loading</div>}>
-          {(user, _index) => (
-            <Show when={user.permission !== 'owner'}>
-              <div class="flex items-center gap-2">
-                <div>{user.email}</div>
-                <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)}>
-                  Remove
-                </Button>
-              </div>
-            </Show>
-          )}
-        </For>
-        <div class="flex items-center gap-2">
-          <TextField
-            placeholder="email"
-            id="email-box"
-            value={shareEmail()}
-            onKeyPress={(_i) => {
-              updateShareEmail()
-            }}
-          />
-          <Button color="secondary" leading={<Icon name="share" />} onClick={share}>
-            Share
-          </Button>
+        <div class="flex flex-col gap-2">
+          <h3 class="text-md">{(deviceUsers() || []).length - 1 > 0 ? 'shared with:' : 'share device'}</h3>
+          <For each={deviceUsers()} fallback={<div>loading</div>}>
+            {(user, _index) => (
+              <Show when={user.permission !== 'owner'}>
+                <div class="flex items-center gap-2">
+                  <div>{user.email}</div>
+                  <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)}>
+                    Remove
+                  </Button>
+                </div>
+              </Show>
+            )}
+          </For>
+          <div class="flex items-center gap-2">
+            <TextField
+              placeholder="email"
+              id="email-box"
+              value={shareEmail()}
+              onKeyPress={(_i) => {
+                updateShareEmail()
+              }}
+            />
+            <Button color="secondary" leading={<Icon name="share" />} onClick={share}>
+              Share
+            </Button>
+          </div>
         </div>
-      </div>
       </Show>
 
       <Show when={unpairData.error}>
