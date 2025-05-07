@@ -74,7 +74,7 @@ export const unpairDevice = async (dongleId: string) =>
     method: 'POST',
   })
 
-export const shareDevice = async (dongleId: string, email: string) =>
+export const grantDeviceReadPermission = async (dongleId: string, email: string) =>
   fetcher<{ success: number }>(`/v1/devices/${dongleId}/add_user`, {
     method: 'POST',
     body: JSON.stringify({ email: email }),
@@ -83,7 +83,7 @@ export const shareDevice = async (dongleId: string, email: string) =>
     },
   })
 
-export const unshareDevice = async (dongleId: string, email: string) =>
+export const removeDeviceReadPermission = async (dongleId: string, email: string) =>
   fetcher<{ success: number }>(`/v1/devices/${dongleId}/del_user`, {
     method: 'POST',
     body: JSON.stringify({ email: email }),

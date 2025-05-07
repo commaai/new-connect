@@ -3,7 +3,7 @@ import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXEle
 import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
-import { getDevice, getDeviceUsers, shareDevice, unpairDevice, unshareDevice } from '~/api/devices'
+import { getDevice, getDeviceUsers, grantDeviceReadPermission, unpairDevice, removeDeviceReadPermission } from '~/api/devices'
 import {
   cancelSubscription,
   getStripeCheckout,
@@ -409,28 +409,16 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     if (success) window.location.href = window.location.origin
   })
   const [share, shareData] = useAction(async () => {
-    updateShareEmail()
-    const { success } = await shareDevice(props.dongleId, shareEmail())
+    const { success } = await grantDeviceReadPermission(props.dongleId, shareEmail())
     if (success) refetchDeviceUsers()
-    clearShareEmail()
-  })
-
-  const updateShareEmail = () => {
-    const emailBox = document.getElementById('email-box') as HTMLInputElement
-    setShareEmail(emailBox.value)
-  }
-
-  const clearShareEmail = () => {
-    const emailBox = document.getElementById('email-box') as HTMLInputElement
-    emailBox.value = ''
     setShareEmail('')
-  }
+  })
 
   const [unshareLoading, setUnshareLoading] = createSignal(false)
 
   const unshare = async (email: string) => {
     setUnshareLoading(true)
-    const { success } = await unshareDevice(props.dongleId, email)
+    const { success } = await removeDeviceReadPermission(props.dongleId, email)
     if (success) refetchDeviceUsers()
     setUnshareLoading(false)
   }
@@ -444,19 +432,26 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
           <For each={deviceUsers()} fallback={<div>loading</div>}>
             {(user, _index) => (
               <Show when={user.permission !== 'owner'}>
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 justify-between">
                   <div>{user.email}</div>
-                  <Button color="error" leading={<Icon name="delete" />} onClick={() => unshare(user.email)} loading={unshareLoading()}>
-                    Remove
+                  <Button color="error" onClick={() => unshare(user.email)} loading={unshareLoading()}>
+                    <Icon name="delete" />
                   </Button>
                 </div>
               </Show>
             )}
           </For>
-          <div class="flex items-center gap-2">
-            <TextField placeholder="email" id="email-box" value={shareEmail()} />
-            <Button color="secondary" leading={<Icon name="share" />} onClick={share} loading={shareData.loading}>
-              Share
+          <div class="flex items-center gap-2 justify-between">
+            <TextField
+              label="email"
+              id="email-box"
+              value={shareEmail()}
+              onInput={(val: string) => {
+                setShareEmail(val)
+              }}
+            />
+            <Button color="secondary" onClick={share} loading={shareData.loading}>
+              <Icon name="share" />
             </Button>
           </div>
         </div>
