@@ -7,8 +7,7 @@ type TextFieldProps = {
   helperText?: string
   error?: string
   value?: string
-  onInput?: (value: string) => void
-} & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class' | 'onInput'>
+} & Omit<JSX.InputHTMLAttributes<HTMLInputElement>, 'class'>
 
 const stateColors = {
   base: {
@@ -96,9 +95,6 @@ const TextField: Component<TextFieldProps> = (props) => {
               props.label && labelFloating() && 'pt-6 pb-2',
             )}
             value={props.value}
-            onInput={(e) => {
-              if (props.onInput) props.onInput(e.target.value)
-            }}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />

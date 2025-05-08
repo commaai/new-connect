@@ -446,9 +446,8 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               label="email"
               id="email-box"
               value={shareEmail()}
-              onInput={(val: string) => {
-                setShareEmail(val)
-              }}
+              class="w-full"
+              onInput={(e) => setShareEmail(e.currentTarget.value)}
             />
             <Button color="secondary" onClick={share} loading={shareData.loading}>
               <Icon name="share" />
