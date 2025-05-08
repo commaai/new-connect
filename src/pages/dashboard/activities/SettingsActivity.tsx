@@ -448,12 +448,7 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               </Show>
             )}
           </For>
-          <form
-            action={share}
-            class="flex items-center gap-2 justify-between"
-            method="post"
-            ref={formRef}
-          >
+          <form action={share} class="flex items-center gap-2 justify-between" method="post" ref={formRef}>
             <TextField label="email" id="email-box" name="email" class="w-full" />
             <Button color="secondary" type="submit" loading={shareState.pending}>
               <Icon name="share" />
