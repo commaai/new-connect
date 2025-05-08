@@ -1,6 +1,6 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
 import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { useLocation } from '@solidjs/router'
+import { action, useLocation, useSubmission } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice, getDeviceUsers, grantDeviceReadPermission, unpairDevice, removeDeviceReadPermission } from '~/api/devices'
@@ -403,16 +403,21 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device> }> = (props) => {
   const [deviceName] = createResource(props.device, getDeviceName)
   const [deviceUsers, { refetch: refetchDeviceUsers }] = createResource(props.dongleId, getDeviceUsers)
-  const [shareEmail, setShareEmail] = createSignal('')
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
   })
-  const [share, shareData] = useAction(async () => {
-    const { success } = await grantDeviceReadPermission(props.dongleId, shareEmail())
-    if (success) refetchDeviceUsers()
-    setShareEmail('')
+
+  const share = action(async (formData: FormData) => {
+    const email = formData.get('email') as string
+    const { success } = await grantDeviceReadPermission(props.dongleId, email)
+    if (success) {
+      refetchDeviceUsers()
+      formRef?.reset()
+    }
   })
+
+  const shareState = useSubmission(share)
 
   const [unshareLoading, setUnshareLoading] = createSignal(false)
 
@@ -422,6 +427,8 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     if (success) refetchDeviceUsers()
     setUnshareLoading(false)
   }
+
+  let formRef: HTMLFormElement | undefined
 
   return (
     <div class="flex flex-col gap-4">
@@ -441,18 +448,17 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               </Show>
             )}
           </For>
-          <div class="flex items-center gap-2 justify-between">
-            <TextField
-              label="email"
-              id="email-box"
-              value={shareEmail()}
-              class="w-full"
-              onInput={(e) => setShareEmail(e.currentTarget.value)}
-            />
-            <Button color="secondary" onClick={share} loading={shareData.loading}>
+          <form
+            action={share}
+            class="flex items-center gap-2 justify-between"
+            method="post"
+            ref={formRef}
+          >
+            <TextField label="email" id="email-box" name="email" class="w-full" />
+            <Button color="secondary" type="submit" loading={shareState.pending}>
               <Icon name="share" />
             </Button>
-          </div>
+          </form>
         </div>
       </Show>
 

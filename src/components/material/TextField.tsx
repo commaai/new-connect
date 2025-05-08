@@ -1,4 +1,4 @@
-import { Show, createSignal, splitProps, type Component, type JSX } from 'solid-js'
+import { Show, createEffect, createSignal, splitProps, type Component, type JSX } from 'solid-js'
 import clsx from 'clsx'
 
 type TextFieldProps = {
@@ -40,8 +40,14 @@ const TextField: Component<TextFieldProps> = (props) => {
 
   const [focused, setFocused] = createSignal(false)
   const [hovered, setHovered] = createSignal(false)
+  const [inputValue, setInputValue] = createSignal(props.value || '')
 
-  const labelFloating = () => focused() || (props.value?.length || 0) > 0
+  // Keep local value in sync with prop value
+  createEffect(() => {
+    if (props.value) setInputValue(props.value)
+  })
+
+  const labelFloating = () => focused() || inputValue()?.length > 0
 
   const getStateStyle = () => {
     const state = { ...stateColors.base }
@@ -94,7 +100,8 @@ const TextField: Component<TextFieldProps> = (props) => {
               getStateStyle().input,
               props.label && labelFloating() && 'pt-6 pb-2',
             )}
-            value={props.value}
+            value={inputValue()}
+            onInput={(e) => setInputValue(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
           />
