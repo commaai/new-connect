@@ -1,6 +1,6 @@
 import { createResource, Match, Show, Suspense, Switch, children, createMemo, For, createSignal, createEffect } from 'solid-js'
-import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement } from 'solid-js'
-import { action, useLocation, useSubmission } from '@solidjs/router'
+import type { Accessor, VoidComponent, Setter, ParentComponent, Resource, JSXElement, JSX } from 'solid-js'
+import { useLocation } from '@solidjs/router'
 import clsx from 'clsx'
 
 import { getDevice, getDeviceUsers, grantDeviceReadPermission, unpairDevice, removeDeviceReadPermission } from '~/api/devices'
@@ -407,17 +407,20 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     const { success } = await unpairDevice(props.dongleId)
     if (success) window.location.href = window.location.origin
   })
-
-  const share = action(async (formData: FormData) => {
+  const [shareLoading, setShareLoading] = createSignal(false)
+  const share: JSX.EventHandler<HTMLFormElement, SubmitEvent> = async (event) => {
+    event.preventDefault()
+    setShareLoading(true)
+    const formData = new FormData(event.target as HTMLFormElement)
+    console.log(formData)
     const email = formData.get('email') as string
     const { success } = await grantDeviceReadPermission(props.dongleId, email)
+    setShareLoading(false)
     if (success) {
       refetchDeviceUsers()
       formRef?.reset()
     }
-  })
-
-  const shareState = useSubmission(share)
+  }
 
   const [unshareLoading, setUnshareLoading] = createSignal(false)
 
@@ -448,9 +451,9 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
               </Show>
             )}
           </For>
-          <form action={share} class="flex items-center gap-2 justify-between" method="post" ref={formRef}>
+          <form onSubmit={share} class="flex items-center gap-2 justify-between" method="post" ref={formRef}>
             <TextField label="email" id="email-box" name="email" class="w-full" />
-            <Button color="secondary" type="submit" loading={shareState.pending}>
+            <Button color="secondary" type="submit" loading={shareLoading()}>
               <Icon name="share" />
             </Button>
           </form>
