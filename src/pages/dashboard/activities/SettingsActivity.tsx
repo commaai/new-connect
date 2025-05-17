@@ -188,7 +188,6 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
         <li>Take pictures remotely</li>
         <li>1 year storage of drive videos</li>
         <li>Simple SSH for developers</li>
-        <li>Turn-by-turn navigation</li>
       </ul>
 
       <p>
