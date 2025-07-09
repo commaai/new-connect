@@ -53,6 +53,10 @@ export interface DrivingStatistics {
   week: DrivingStatisticsAggregation
 }
 
+export interface FirehoseStatistics {
+  firehose: number
+}
+
 export interface Route {
   can: boolean
   create_time: number

@@ -1,4 +1,4 @@
-import type { ApiDevice, AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics } from '~/api/types'
+import type { ApiDevice, AthenaOfflineQueueResponse, Device, DeviceLocation, DrivingStatistics, FirehoseStatistics } from '~/api/types'
 import { fetcher } from '.'
 
 const sortDevices = (devices: ApiDevice[]) =>
@@ -62,6 +62,9 @@ export const getDeviceLocation = async (dongleId: string) =>
 
 export const getDeviceStats = async (dongleId: string) =>
   fetcher<DrivingStatistics>(`/v1.1/devices/${dongleId}/stats`).catch(() => undefined)
+
+export const getFirehoseStats = async (dongleId: string) =>
+  fetcher<FirehoseStatistics>(`/v1/devices/${dongleId}/firehose_stats`).catch(() => undefined)
 
 export const getDevices = async (): Promise<Device[]> =>
   fetcher<ApiDevice[]>('/v1/me/devices/')
