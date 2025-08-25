@@ -3,9 +3,13 @@ import './index.css'
 
 import * as Sentry from '@sentry/solid'
 import { render } from 'solid-js/web'
-import 'solid-devtools'
 import App from './App'
 import './pwa.ts'
+
+// Load Solid devtools only in development to keep production bundles lean
+if (import.meta.env.DEV) {
+  void import('solid-devtools')
+}
 
 const environment = import.meta.env.VITE_SENTRY_ENVIRONMENT as string | undefined
 Sentry.init({

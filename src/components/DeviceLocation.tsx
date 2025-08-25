@@ -1,7 +1,9 @@
 import { createResource, createSignal, onMount, onCleanup, Show, type VoidComponent } from 'solid-js'
 import { render } from 'solid-js/web'
 import clsx from 'clsx'
-import L from 'leaflet'
+// Leaflet types only at compile time; runtime loaded dynamically
+import type * as Leaflet from 'leaflet'
+let LeafletRuntime: typeof import('leaflet') | null = null
 
 import Icon from './material/Icon'
 import Button from './material/Button'
@@ -30,7 +32,7 @@ type DeviceLocationProps = {
 const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
   let mapRef!: HTMLDivElement
 
-  const [map, setMap] = createSignal<L.Map | null>(null)
+  const [map, setMap] = createSignal<Leaflet.Map | null>(null)
   const [selectedLocation, setSelectedLocation] = createSignal<Location | null>(null)
   const [showSelectedLocation, setShowSelectedLocation] = createSignal(false)
   const [userPosition, setUserPosition] = createSignal<GeolocationPosition | null>(null)
@@ -39,7 +41,9 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     (dongleId) => getDeviceLocation(dongleId),
   )
 
-  onMount(() => {
+  onMount(async () => {
+    const mod = await import('leaflet')
+    LeafletRuntime = mod.default ?? (mod as unknown as typeof import('leaflet'))
     navigator.permissions
       .query({ name: 'geolocation' })
       .then((permission) => {
@@ -52,9 +56,9 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       .catch(() => setUserPosition(null))
 
     const tileUrl = getTileUrl()
-    const tileLayer = L.tileLayer(tileUrl)
+    const tileLayer = LeafletRuntime!.tileLayer(tileUrl)
 
-    const m = L.map(mapRef, {
+    const m = LeafletRuntime!.map(mapRef, {
       attributionControl: false,
       zoomControl: false,
       layers: [tileLayer],
@@ -118,7 +122,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       }
 
       if (foundLocations.length > 1) {
-        args.map.fitBounds(L.latLngBounds(foundLocations.map((l) => [l.lat, l.lng])), { padding: [50, 50] })
+        args.map.fitBounds(LeafletRuntime!.latLngBounds(foundLocations.map((l) => [l.lat, l.lng])), { padding: [50, 50] })
       } else if (foundLocations.length === 1) {
         args.map.setView([foundLocations[0].lat, foundLocations[0].lng], 15)
       } else {
@@ -129,7 +133,7 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
     },
   )
 
-  const addMarker = (instance: L.Map, loc: Location, iconName: IconName, iconClass?: string) => {
+  const addMarker = (instance: Leaflet.Map, loc: Location, iconName: IconName, iconClass?: string) => {
     const el = document.createElement('div')
 
     render(
@@ -141,14 +145,15 @@ const DeviceLocation: VoidComponent<DeviceLocationProps> = (props) => {
       el,
     )
 
-    const icon = L.divIcon({
+    const icon = LeafletRuntime!.divIcon({
       className: 'border-none bg-none',
       html: el.innerHTML,
       iconSize: [40, 40],
       iconAnchor: [20, 20],
     })
 
-    L.marker([loc.lat, loc.lng], { icon })
+    LeafletRuntime!
+      .marker([loc.lat, loc.lng], { icon })
       .addTo(instance)
       .on('click', () => {
         setSelectedLocation(loc)
