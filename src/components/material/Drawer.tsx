@@ -45,7 +45,7 @@ const Drawer: ParentComponent<DrawerProps> = (props) => {
   return (
     <DrawerContext.Provider value={{ modal, open, setOpen }}>
       <nav
-        class={'fixed hide-scrollbar inset-y-0 z-10 transition-drawer ease-in-out duration-300'}
+        class="fixed hide-scrollbar inset-y-0 z-10 transition-drawer ease-in-out duration-300"
         style={{
           left: drawerVisible() ? 0 : `${-drawerWidth()}px`,
           width: `${drawerWidth()}px`,

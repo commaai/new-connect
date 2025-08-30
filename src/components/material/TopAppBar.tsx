@@ -11,13 +11,13 @@ type TopAppBarProps = {
 
 const TopAppBar: ParentComponent<TopAppBarProps> = (props) => {
   return (
-    <div class={clsx('flex gap-4 items-center', props.class)}>
+    <header class={clsx('flex gap-4 items-center', props.class)}>
       {props.leading}
       <Dynamic class="grow truncate text-title-lg" component={props.component || 'h1'}>
         {props.children}
       </Dynamic>
       {props.trailing}
-    </div>
+    </header>
   )
 }
 
