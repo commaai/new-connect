@@ -24,7 +24,7 @@ jobs:
       - name: Check whether branch is up-to-date
         id: status
         run: |
-          git remote add commaai https://github.com/commaai/connect.git
+          git remote add commaai https://github.com/commaai/new-connect.git
           git fetch commaai master
           echo "${{ github.event.pull_request.head.sha }}"
           git rev-list --left-right --count commaai/master...${{ github.event.pull_request.head.sha }} | awk '{print "Behind "$1" - Ahead "$2""}'

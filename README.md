@@ -16,7 +16,7 @@ curl -fsSL https://bun.sh/install | bash
 source ~/.bashrc  # or source ~/.zshrc
 
 cd ~
-git clone https://github.com/commaai/connect.git
+git clone https://github.com/commaai/new-connect.git
 
 cd connect
 bun install  # sets up pre-commit hook

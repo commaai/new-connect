@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       number: ${{ steps.pr.outputs.number }}
-    if: github.repository == 'commaai/connect' && github.event.workflow_run.event == 'pull_request'
+    if: github.repository == 'commaai/new-connect' && github.event.workflow_run.event == 'pull_request'
     steps:
       # use `gr pr view` to get the PR number
       # https://github.com/orgs/community/discussions/25220#discussioncomment-11285971
