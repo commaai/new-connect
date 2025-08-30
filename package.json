@@ -6,7 +6,7 @@
   "author": "comma.ai",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commaai/connect.git"
+    "url": "https://github.com/commaai/new-connect.git"
   },
   "scripts": {
     "build": "bun run --bun vite build",
