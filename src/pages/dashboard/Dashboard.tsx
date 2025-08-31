@@ -131,7 +131,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
 
   return (
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
-      <FloatingMenuButton onMenuClick={() => useDrawerContext().setOpen(true)} />
+      <FloatingMenuButton />
       <Switch>
         <Match when={!isSignedIn()}>
           <Navigate href="/login" />
