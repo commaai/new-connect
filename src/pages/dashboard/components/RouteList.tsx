@@ -19,9 +19,10 @@ interface RouteCardProps {
 }
 
 const RouteCard: VoidComponent<RouteCardProps> = (props) => {
-  const startTime = () => dayjs.utc(props.route.start_time).local()
-  const endTime = () => dayjs.utc(props.route.end_time).local()
-  const color = () => dateTimeToColorBetween(startTime().toDate(), endTime().toDate(), [30, 57, 138], [218, 161, 28])
+  const startTime = () => (props.route.start_time ? dayjs.utc(props.route.start_time).local() : undefined)
+  const endTime = () => (props.route.end_time ? dayjs.utc(props.route.end_time).local() : undefined)
+  const color = () =>
+    startTime() && endTime() ? dateTimeToColorBetween(startTime()!.toDate(), endTime()!.toDate(), [30, 57, 138], [218, 161, 28]) : '#000000'
   const [statistics] = createResource(() => props.route, getRouteStatistics)
   const [location] = createResource(async () => {
     const startPos = [props.route.start_lng || 0, props.route.start_lat || 0]
@@ -34,10 +35,19 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
     return `${startPlace} to ${endPlace}`
   })
 
+  const getCardHeadline = () => {
+    if (!startTime() || !endTime()) return <>{props.route.fullname.split('|')[1]}</>
+    return (
+      <>
+        {startTime()?.format('h:mm A')} to {endTime()?.format('h:mm A')}
+      </>
+    )
+  }
+
   return (
     <Card class="max-w-none" href={`/${props.route.dongle_id}/${props.route.fullname.slice(17)}`} activeClass="md:before:bg-primary">
       <CardHeader
-        headline={`${startTime().format('h:mm A')} to ${endTime().format('h:mm A')}`}
+        headline={getCardHeadline()}
         subhead={<Suspense fallback={<div class="h-[20px] w-auto skeleton-loader rounded-xs" />}>{location()}</Suspense>}
         trailing={
           <Suspense>
@@ -106,6 +116,8 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
   // Group and display headers for each day
   let prevDayHeader: string | null = null
   function getDayHeader(route: Route): string | null {
+    // group route without start or end time with the nearest day
+    if (route.start_time === null || route.end_time === null) return null
     const date = dayjs.utc(route.start_time).local()
     let dayHeader = null
     if (date.isSame(dayjs(), 'day')) {
