@@ -36,12 +36,8 @@ const RouteCard: VoidComponent<RouteCardProps> = (props) => {
   })
 
   const getCardHeadline = () => {
-    if (!startTime() || !endTime()) return <>{props.route.fullname.split('|')[1]}</>
-    return (
-      <>
-        {startTime()?.format('h:mm A')} to {endTime()?.format('h:mm A')}
-      </>
-    )
+    if (!startTime() || !endTime()) return props.route.fullname.split('|')[1]
+    return `${startTime()!.format('h:mm A')} to ${endTime()!.format('h:mm A')}`
   }
 
   return (
