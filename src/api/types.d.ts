@@ -127,7 +127,7 @@ export interface AthenaCallRequest<T> {
 
 export interface AthenaCallResponse<T> {
   queued: boolean
-  error?: string
+  error?: { code: number; message: string }
   result?: T
 }
 
@@ -138,7 +138,7 @@ export interface BackendAthenaCallResponse<T> {
 }
 
 export interface BackendAthenaCallResponseError {
-  error: string
+  error: { code: number; message: string }
 }
 
 export interface DataFile {
@@ -189,4 +189,17 @@ export interface UploadQueueItem {
   progress: number
   retry_count: number
   url: string
+}
+
+export interface SimDescription {
+  is_bootstrapped: boolean
+  profiles: SimProfile[]
+}
+
+export interface SimProfile {
+  nickname: string
+  iccid: string
+  enabled: boolean
+  provider: string
+  is_comma_profile: boolean
 }

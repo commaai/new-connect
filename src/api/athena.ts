@@ -1,8 +1,13 @@
-import { AthenaCallResponse, BackendAthenaCallResponse, BackendAthenaCallResponseError } from '~/api/types'
+import { AthenaCallResponse, BackendAthenaCallResponse, BackendAthenaCallResponseError, SimDescription } from '~/api/types'
 import { fetcher } from '.'
 import { ATHENA_URL } from './config'
 
 export const getNetworkMetered = (dongleId: string) => makeAthenaCall<void, boolean>(dongleId, 'getNetworkMetered')
+
+export const describeSim = (dongleId: string) => makeAthenaCall<void, SimDescription>(dongleId, 'describeSim')
+
+export const setSimProfile = (dongleId: string, iccid: string) =>
+  makeAthenaCall<{ iccid: string }, void>(dongleId, 'setSimProfile', { iccid })
 
 export const setRouteViewed = (dongleId: string, route: string) =>
   makeAthenaCall<{ route: string }, void>(dongleId, 'setRouteViewed', { route })

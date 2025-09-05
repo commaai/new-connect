@@ -21,8 +21,5 @@ export async function fetcher<T>(endpoint: string, init?: RequestInit, apiUrl: s
   } catch (err) {
     throw new Error('Failed to parse response from server', { cause: err })
   }
-  if (json.error) {
-    throw new Error(`Server error: ${json.description}`, { cause: json })
-  }
   return json
 }
