@@ -54,9 +54,7 @@ export interface DrivingStatistics {
 }
 
 export interface Route {
-  can: boolean
   create_time: number
-  devicetype: number
   dongle_id: string
   end_lat: number // default to 0
   end_lng: number // default to 0
@@ -66,23 +64,11 @@ export interface Route {
   git_commit: string | null
   git_dirty: boolean | null
   git_remote: string | null
-  hpgps: boolean
-  init_logmonotime: number | null
   is_public: boolean
-  length: number // default to 0
-  maxcamera: number
-  maxdcamera: number
-  maxecamera: number
-  maxlog: number
-  maxqcamera: number
+  distance: number // default to 0
   maxqlog: number
-  passive: boolean | null
   platform: string | null
-  proccamera: number
-  proclog: number
-  procqcamera: number
   procqlog: number
-  radar: boolean
   start_lat: number // default to 0
   start_lng: number // default to 0
   start_time: string | null
