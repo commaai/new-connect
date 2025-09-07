@@ -22,6 +22,7 @@
   "packageManager": "bun@1.2.9",
   "type": "module",
   "//devDependencies": {
+    "@biomejs/biome": "code formatter and linter",
     "@solidjs/testing-library": "test solid components (only used for App.jsx component)",
     "@types/mapbox__polyline": "types for mapbox elements",
     "@vite-pwa/assets-generator": "generate PWA assets during build",
@@ -41,7 +42,7 @@
     "wrangler": "used for deploying assets to cloudflare"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
+    "@biomejs/biome": "2.2.3",
     "@solidjs/testing-library": "^0.8.10",
     "@tanstack/solid-query-devtools": "^5.72.2",
     "@types/bun": "^1.2.9",
@@ -91,5 +92,11 @@
   "engines": {
     "node": ">=20.11.0"
   },
-  "trustedDependencies": ["@biomejs/biome", "@sentry/cli", "esbuild", "lefthook", "workerd"]
+  "trustedDependencies": [
+    "@biomejs/biome",
+    "@sentry/cli",
+    "esbuild",
+    "lefthook",
+    "workerd"
+  ]
 }

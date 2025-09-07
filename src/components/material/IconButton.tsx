@@ -2,7 +2,7 @@ import type { VoidComponent } from 'solid-js'
 import { splitProps } from 'solid-js'
 import clsx from 'clsx'
 
-import ButtonBase, { ButtonBaseProps } from './ButtonBase'
+import ButtonBase, { type ButtonBaseProps } from './ButtonBase'
 import Icon, { type IconName, type IconProps } from '~/components/material/Icon'
 
 type IconButtonProps = ButtonBaseProps & {
