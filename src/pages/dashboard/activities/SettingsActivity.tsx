@@ -151,21 +151,21 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
         disabledDataPlanText = [
           'Standard plan not available, old SIM type detected, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
             shop
           </a>,
         ]
       } else if (source.subscribeInfo.sim_usable === false && source.subscribeInfo.sim_type === 'blue') {
         disabledDataPlanText = [
           'Standard plan not available, SIM has been canceled and is therefore no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
             shop
           </a>,
         ]
       } else if (source.subscribeInfo.sim_usable === false) {
         disabledDataPlanText = [
           'Standard plan not available, SIM is no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank">
+          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
             shop
           </a>,
         ]
@@ -192,7 +192,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
 
       <p>
         Learn more from our{' '}
-        <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank">
+        <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank" rel="noopener">
           FAQ
         </a>
         .

@@ -1,4 +1,4 @@
-import { type VoidComponent } from 'solid-js'
+import type { VoidComponent } from 'solid-js'
 import clsx from 'clsx'
 
 // Specify icon names to load only the necessary icons, reducing font payload.
