@@ -16,7 +16,7 @@ const RouteStatisticsBar: VoidComponent<{ class?: string; route: Route | undefin
     <StatisticBar
       class={props.class}
       statistics={[
-        { label: 'Distance', value: () => formatDistance(props.route?.length) },
+        { label: 'Distance', value: () => formatDistance(props.route?.distance) },
         {
           label: 'Duration',
           value: () =>
