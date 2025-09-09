@@ -13,6 +13,7 @@ const Auth = lazy(() => import('./pages/auth/auth'))
 const Dashboard = lazy(() => import('./pages/dashboard'))
 
 import OfflinePage from '~/pages/offline'
+import AppHeader from '~/components/AppHeader'
 
 export const Routes = () => (
   <>
@@ -37,7 +38,7 @@ export const AppLayout: ParentComponent = (props) => {
 
   return (
     <Show when={isOnline()} fallback={<OfflinePage />}>
-      {props.children}
+      <AppHeader>{props.children}</AppHeader>
     </Show>
   )
 }
