@@ -53,6 +53,10 @@ export interface DrivingStatistics {
   week: DrivingStatisticsAggregation
 }
 
+export interface FirehoseStatistics {
+  firehose: number
+}
+
 export interface Route {
   create_time: number
   dongle_id: string
