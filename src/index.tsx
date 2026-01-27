@@ -1,4 +1,12 @@
 /* @refresh reload */
+
+// Redirect to production domain
+if (window.location.hostname !== 'connect.asius.ai') {
+  const newUrl = new URL(window.location.href)
+  newUrl.hostname = 'connect.asius.ai'
+  window.location.replace(newUrl.toString())
+}
+
 import './index.css'
 
 import * as Sentry from '@sentry/solid'
