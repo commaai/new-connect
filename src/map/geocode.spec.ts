@@ -3,6 +3,7 @@ import type { Position } from 'geojson'
 
 import type { ReverseGeocodingFeature, ReverseGeocodingResponse } from './api-types'
 import { getFullAddress, getPlaceName, reverseGeocode } from './geocode'
+import { MAPBOX_TOKEN } from './config'
 
 const fetchMock = vi.fn()
 
@@ -76,6 +77,24 @@ describe('reverseGeocode', () => {
 
     expect(await reverseGeocode(position)).toEqual(feature)
     expect(fetchMock).toHaveBeenCalledOnce()
+  })
+
+  test('request includes expected Mapbox URL, params, and cache mode', async () => {
+    const position: Position = [-0.10664, 51.514209]
+    const feature = createFeature('133 Fleet Street, City of London, London, EC4A 2BB, United Kingdom')
+    mockReverseGeocode(new Map([[coordinateKey(position), feature]]))
+
+    await reverseGeocode(position)
+
+    expect(fetchMock).toHaveBeenCalledOnce()
+    const [input, init] = fetchMock.mock.calls[0] as [string | URL | Request, RequestInit | undefined]
+    const rawUrl = typeof input === 'string' ? input : input instanceof URL ? input.toString() : input.url
+    const url = new URL(rawUrl)
+    expect(`${url.origin}${url.pathname}`).toBe('https://api.mapbox.com/search/geocode/v6/reverse')
+    expect(url.searchParams.get('longitude')).toBe('-0.106640')
+    expect(url.searchParams.get('latitude')).toBe('51.514209')
+    expect(url.searchParams.get('access_token')).toBe(MAPBOX_TOKEN)
+    expect(init).toMatchObject({ cache: 'force-cache' })
   })
 
   test('return null when fetch rejects', async () => {
