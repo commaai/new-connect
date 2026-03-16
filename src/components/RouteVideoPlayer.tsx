@@ -25,6 +25,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   let controls!: HTMLDivElement
 
   const [isPlaying, setIsPlaying] = createSignal(true)
+  const [isMuted, setIsMuted] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
@@ -47,13 +48,27 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const startProgressTracking = () => {
     requestAnimationFrame(updateProgressContinuously)
   }
+  const requestPlay = () => {
+    const playResult = video.play()
+    if (playResult) {
+      void playResult.catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        console.debug('[RouteVideoPlayer] play interrupted', error)
+      })
+    }
+  }
 
   const togglePlayback = () => {
     if (video.paused) {
-      void video.play()
+      requestPlay()
     } else {
       video.pause()
     }
+  }
+  const toggleMuted = (e: Event) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsMuted((muted) => !muted)
   }
   const onClick = (e: Event) => {
     e.preventDefault()
@@ -83,7 +98,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onEnded = () => setIsPlaying(false)
   const onStalled = () => {
     if (!isPlaying()) return
-    void video.play()
+    requestPlay()
   }
 
   onMount(() => {
@@ -91,6 +106,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.currentTime = props.selection.startTime
     }
 
+    video.defaultMuted = true
+    video.muted = true
     props.ref?.(video)
 
     controls.addEventListener('click', onClick)
@@ -143,8 +160,16 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     on(routeName, () => {
       setVideoLoading(true)
       setErrorMessage('')
+      setIsMuted(true)
     }),
   )
+
+  createEffect(() => {
+    if (!video) return
+    const muted = isMuted()
+    video.defaultMuted = muted
+    video.muted = muted
+  })
 
   createEffect(() => {
     const url = streamUrl()
@@ -172,7 +197,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           class="size-full object-cover"
           data-testid="route-video"
           autoplay
-          muted
+          muted={isMuted()}
           controls={false}
           playsinline
           loop
@@ -205,6 +230,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
+
+          <div class="grow" />
+          <IconButton name={isMuted() ? 'volume_off' : 'volume_up'} aria-label={isMuted() ? 'Unmute' : 'Mute'} onClick={toggleMuted} />
         </div>
       </div>
     </div>

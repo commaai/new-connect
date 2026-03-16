@@ -1,5 +1,5 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
-import { configure, render, waitFor } from '@solidjs/testing-library'
+import { configure, fireEvent, render, waitFor } from '@solidjs/testing-library'
 
 import { setAccessToken, signOut } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
@@ -26,10 +26,14 @@ describe('Demo mode', () => {
   })
 
   test('View demo route', async () => {
-    const { findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
+    const { findByLabelText, findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
+    expect(video.muted).toBe(true)
+    await fireEvent.click(await findByLabelText('Unmute'))
+    expect(video.muted).toBe(false)
+    expect(await findByLabelText('Mute')).toBeTruthy()
   })
 })
 
