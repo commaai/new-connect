@@ -25,7 +25,9 @@ export default function Login() {
           <Button
             class="h-14 gap-4 xs:h-16"
             type="button"
-            onclick={() => window.location.href = getGoogleAuthUrl()}
+            onclick={() => {
+              window.location.href = getGoogleAuthUrl()
+            }}
             leading={<img src="/images/logo-google.svg" alt="" width={32} height={32} />}
           >
             Sign in with Google
@@ -33,7 +35,9 @@ export default function Login() {
           <Button
             class="h-14 gap-4 xs:h-16"
             type="button"
-            onclick={() => window.location.href = getAppleAuthUrl()}
+            onclick={() => {
+              window.location.href = getAppleAuthUrl()
+            }}
             leading={<img src="/images/logo-apple.svg" alt="" width={32} height={32} />}
           >
             Sign in with Apple&nbsp&nbsp
@@ -41,7 +45,9 @@ export default function Login() {
           <Button
             class="h-14 gap-4 xs:h-16"
             type="button"
-            onclick={() => window.location.href = getGitHubAuthUrl()}
+            onclick={() => {
+              window.location.href = getGitHubAuthUrl()
+            }}
             leading={<img src="/images/logo-github.svg" alt="" width={32} height={32} />}
           >
             Sign in with GitHub
