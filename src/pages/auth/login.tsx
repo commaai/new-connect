@@ -24,21 +24,24 @@ export default function Login() {
         <div class="flex flex-col items-stretch gap-4 self-stretch">
           <Button
             class="h-14 gap-4 xs:h-16"
-            href={getGoogleAuthUrl()}
+            type="button"
+            onclick={() => window.location.href = getGoogleAuthUrl()}
             leading={<img src="/images/logo-google.svg" alt="" width={32} height={32} />}
           >
             Sign in with Google
           </Button>
           <Button
             class="h-14 gap-4 xs:h-16"
-            href={getAppleAuthUrl()}
+            type="button"
+            onclick={() => window.location.href = getAppleAuthUrl()}
             leading={<img src="/images/logo-apple.svg" alt="" width={32} height={32} />}
           >
             Sign in with Apple&nbsp&nbsp
           </Button>
           <Button
             class="h-14 gap-4 xs:h-16"
-            href={getGitHubAuthUrl()}
+            type="button"
+            onclick={() => window.location.href = getGitHubAuthUrl()}
             leading={<img src="/images/logo-github.svg" alt="" width={32} height={32} />}
           >
             Sign in with GitHub
