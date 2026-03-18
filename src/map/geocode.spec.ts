@@ -159,4 +159,27 @@ describe('getPlaceName', () => {
     expect(await getPlaceName([5.572254, 50.64428])).toBe('Liège')
     expect(await getPlaceName([-2.236802, 53.480931])).toBe('Northern Quarter')
   })
+
+  test('prefer more specific context values first', async () => {
+    mockReverseGeocode(
+      new Map([
+        [
+          coordinateKey([-122.4194, 37.7749]),
+          createFeature('', {
+            neighborhood: { name: 'Mission District' },
+            place: { name: 'San Francisco' },
+            locality: { name: 'California' },
+          }),
+        ],
+      ]),
+    )
+
+    expect(await getPlaceName([-122.4194, 37.7749])).toBe('Mission District')
+  })
+
+  test('return empty string when no place context is available', async () => {
+    mockReverseGeocode(new Map([[coordinateKey([1, 1]), createFeature('')]]))
+
+    expect(await getPlaceName([1, 1])).toBe('')
+  })
 })
