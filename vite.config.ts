@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv, type HtmlTagDescriptor, type PluginOption } from 'vite'
 import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -7,8 +7,9 @@ import { VitePWA } from 'vite-plugin-pwa'
 // noinspection ES6PreferShortImport
 import { Icons } from './src/components/material/Icon'
 
-export default defineConfig({
-  plugins: [
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '')
+  const plugins: PluginOption[] = [
     devtools(),
     solid({
       ssr: false,
@@ -16,9 +17,9 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       manifest: {
-        name: 'comma connect',
-        short_name: 'connect',
-        description: 'manage your openpilot experience',
+        name: 'new connect',
+        short_name: 'new connect',
+        description: 'Monitor your devices, trips, and uploads from one place.',
         background_color: '#131318',
         theme_color: '#131318',
         start_url: '/',
@@ -56,40 +57,50 @@ export default defineConfig({
     }),
     {
       name: 'inject-material-symbols',
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         const icons = Icons.toSorted().join(',')
+        const tags: HtmlTagDescriptor[] = [
+          {
+            tag: 'link',
+            attrs: {
+              rel: 'stylesheet',
+              href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
+            },
+            injectTo: 'head',
+          },
+        ]
         return {
           html,
-          tags: [
-            {
-              tag: 'link',
-              attrs: {
-                rel: 'stylesheet',
-                href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
-              },
-              injectTo: 'head',
-            },
-          ],
+          tags,
         }
       },
     },
-    // put the Sentry plugin after all other plugins
-    sentryVitePlugin({
-      org: 'commaai',
-      project: 'new-connect',
-      telemetry: false,
-    }),
-  ],
-  server: {
-    port: 3000,
-  },
-  build: {
-    target: 'esnext',
-    sourcemap: true, // must be turned on for Sentry
-  },
-  resolve: {
-    alias: {
-      '~': '/src',
+  ]
+
+  if (env.VITE_SENTRY_ORG && env.VITE_SENTRY_PROJECT) {
+    plugins.push(
+      sentryVitePlugin({
+        org: env.VITE_SENTRY_ORG,
+        project: env.VITE_SENTRY_PROJECT,
+        authToken: env.SENTRY_AUTH_TOKEN || undefined,
+        telemetry: false,
+      }),
+    )
+  }
+
+  return {
+    plugins,
+    server: {
+      port: 3000,
     },
-  },
+    build: {
+      target: 'esnext',
+      sourcemap: true,
+    },
+    resolve: {
+      alias: {
+        '~': '/src',
+      },
+    },
+  }
 })

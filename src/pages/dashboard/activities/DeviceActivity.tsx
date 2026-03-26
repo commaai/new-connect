@@ -11,6 +11,7 @@ import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
 import UploadQueue from '~/components/UploadQueue'
+import { dayjs } from '~/utils/format'
 import { getDeviceName } from '~/utils/device'
 
 import RouteList from '../components/RouteList'
@@ -75,6 +76,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const clearError = () => setSnapshot('error', null)
 
   const { modal } = useDrawerContext()
+  const onlineStatus = () => (device.latest?.is_online ? 'Online now' : 'Offline')
+  const lastSeen = () => {
+    const lastPing = device.latest?.last_athena_ping
+    if (!lastPing) return 'Last seen unavailable'
+    return `Last seen ${dayjs.unix(lastPing).format('MMM D, h:mm A')}`
+  }
+  const versionLabel = () => device.latest?.openpilot_version || 'Version unavailable'
 
   return (
     <>
@@ -82,11 +90,11 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
         class="font-bold"
         leading={
           <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
+            <img alt="new connect" src="/images/logo-connect-light.svg" class="h-8" />
           </Show>
         }
       >
-        connect
+        new connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
@@ -95,15 +103,21 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Suspense>
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
-              <div class="inline-flex items-center gap-2">
-                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
-
-                {<div class="text-lg font-bold">{deviceName()}</div>}
+              <div class="flex flex-col gap-2">
+                <div class="inline-flex items-center gap-2">
+                  <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
+                  <div class="text-lg font-bold">{deviceName()}</div>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs text-on-surface-variant">
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{onlineStatus()}</span>
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{lastSeen()}</span>
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{versionLabel()}</span>
+                </div>
               </div>
             </Suspense>
             <div class="flex gap-4">
-              <IconButton name="camera" onClick={onClickSnapshot} />
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+              <IconButton title="Take remote snapshot" name="camera" onClick={onClickSnapshot} />
+              <IconButton title="Open device settings" name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
           <Show when={isDeviceUser()}>
@@ -113,12 +127,12 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </Show>
             <button
               class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                'flex w-full cursor-pointer items-center justify-center gap-2 rounded-b-lg bg-surface-container-lowest p-3 text-sm',
                 queueVisible() && 'border-t-2 border-t-surface-container-low',
               )}
               onClick={() => setQueueVisible(!queueVisible())}
             >
-              <p class="mr-2">Upload Queue</p>
+              <p>{queueVisible() ? 'Hide upload status' : 'Show upload status'}</p>
               <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </button>
           </Show>
@@ -139,16 +153,19 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </For>
           <Show when={snapshot.fetching}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <div>Loading snapshots...</div>
+              <div class="flex items-center gap-3 p-4 text-on-surface-variant">
+                <Icon class="animate-spin" name="autorenew" size="20" />
+                <div>Fetching latest snapshots...</div>
               </div>
             </div>
           </Show>
           <Show when={snapshot.error}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="flex items-center p-4">
+              <div class="flex items-center gap-3 p-4">
+                <Icon class="text-error" name="error" size="20" />
+                <span>{snapshot.error}</span>
+                <div class="grow" />
                 <IconButton class="text-white" name="clear" onClick={clearError} />
-                <span>Error: {snapshot.error}</span>
               </div>
             </div>
           </Show>

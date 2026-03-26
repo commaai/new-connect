@@ -14,11 +14,11 @@ export default function Login() {
   return (
     <div class="flex min-h-screen flex-col items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-8">
-        <img src="/images/logo-connect-light.svg" alt="comma connect" width={96} height={96} />
+        <img src="/images/logo-connect-light.svg" alt="new connect" width={96} height={96} />
 
         <div class="flex flex-col items-center gap-2 text-center">
-          <h1 class="text-2xl font-extrabold md:mt-4">comma connect</h1>
-          <p class="text-md">Manage your openpilot experience.</p>
+          <h1 class="text-2xl font-extrabold md:mt-4">new connect</h1>
+          <p class="text-md">Check devices, trips, uploads, and settings from one place.</p>
         </div>
 
         <div class="flex flex-col items-stretch gap-4 self-stretch">
@@ -46,7 +46,9 @@ export default function Login() {
         </div>
 
         <div class="flex justify-between gap-4">
-          <p class="text-sm xs:text-md">Make sure to sign in with the same account if you have previously paired your comma three.</p>
+          <p class="text-sm xs:text-md">
+            Use the same account that your device was originally paired with so your trips and settings show up correctly.
+          </p>
 
           <img src="/images/icon-comma-three-light.svg" alt="" width={32} height={32} />
         </div>

@@ -58,7 +58,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   })
 
   const [error, setError] = createSignal<string | null>(null)
-  const [copied, setCopied] = createSignal(false)
+  const [copied, setCopied] = createSignal<'path' | 'link' | null>(null)
 
   const toggleRoute = async (property: 'public' | 'preserved') => {
     setError(null)
@@ -71,7 +71,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         setIsPublic(newValue)
       } catch (err) {
         console.error('Failed to update public toggle', err)
-        setError('Failed to update toggle')
+        setError('Could not update public access right now.')
       }
     } else {
       const currentValue = isPreserved()
@@ -83,22 +83,23 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
         setIsPreserved(newValue)
       } catch (err) {
         console.error('Failed to update preserved toggle', err)
-        setError('Failed to update toggle')
+        setError('Could not update saved status right now.')
       }
     }
   }
 
   const currentRouteId = () => props.routeName.replace('|', '/')
+  const currentRouteLink = () => new URL(`/${currentRouteId()}`, window.location.origin).toString()
 
-  const copyCurrentRouteId = async () => {
-    if (!props.routeName || !navigator.clipboard) return
+  const copyValue = async (value: string, mode: 'path' | 'link') => {
+    if (!value || !navigator.clipboard) return
 
     try {
-      await navigator.clipboard.writeText(currentRouteId())
-      setCopied(true)
-      setTimeout(() => setCopied(false), 2000)
+      await navigator.clipboard.writeText(value)
+      setCopied(mode)
+      setTimeout(() => setCopied(null), 2000)
     } catch (err) {
-      console.error('Failed to copy route ID: ', err)
+      console.error('Failed to copy route value: ', err)
     }
   }
 
@@ -106,25 +107,42 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     <div class="flex flex-col rounded-b-md gap-4 mx-5 mb-4">
       <div class="font-mono text-xs text-zinc-500">
         <div class="flex justify-between">
-          <span class="mb-2 text-on-surface-variant">Route ID:</span>
+          <span class="mb-2 text-on-surface-variant">Route path</span>
           <a href={useradminUrl()} class="text-blue-400 hover:text-blue-500 duration-200" target="_blank" rel="noopener noreferrer">
-            View in useradmin
+            Open backend view
           </a>
         </div>
         <button
-          onClick={() => void copyCurrentRouteId()}
+          onClick={() => void copyValue(currentRouteId(), 'path')}
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
           <div class="lg:text-sm">
             <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
             <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
           </div>
-          <Icon class={clsx('mx-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
+          <Icon
+            class={clsx('mx-2', copied() === 'path' && 'text-green-300')}
+            name={copied() === 'path' ? 'check' : 'file_copy'}
+            size="20"
+          />
         </button>
       </div>
 
+      <div class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        <button
+          class="flex items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest px-4 py-3 text-sm hover:bg-surface-container-low"
+          onClick={() => void copyValue(currentRouteLink(), 'link')}
+        >
+          <span>Copy page link</span>
+          <Icon class={clsx(copied() === 'link' && 'text-green-300')} name={copied() === 'link' ? 'check' : 'file_copy'} size="20" />
+        </button>
+        <div class="flex items-center rounded-lg border-2 border-surface-container-high bg-surface-container-lowest px-4 py-3 text-sm text-on-surface-variant">
+          {isPublic() ? 'Anyone with access can open this route.' : 'Only signed-in viewers can open this route.'}
+        </div>
+      </div>
+
       <div class="flex flex-col gap-2">
-        <ToggleButton label="Preserve Route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
+        <ToggleButton label="Save route" active={isPreserved()} onToggle={() => void toggleRoute('preserved')} />
         <ToggleButton label="Public Access" active={isPublic()} onToggle={() => void toggleRoute('public')} />
       </div>
 

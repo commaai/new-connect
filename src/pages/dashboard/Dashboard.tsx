@@ -101,11 +101,11 @@ const FirstPairActivity: Component = () => {
         class="font-bold"
         leading={
           <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
+            <img alt="new connect" src="/images/logo-connect-light.svg" class="h-8" />
           </Show>
         }
       >
-        connect
+        new connect
       </TopAppBar>
       <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
         <h2 class="text-xl">Pair your device</h2>
@@ -116,8 +116,8 @@ const FirstPairActivity: Component = () => {
           <li>You have installed the latest version of openpilot</li>
         </ul>
         <p class="text-md">
-          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
-          with the same account you may have used previously.
+          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in with the
+          same account you used before.
         </p>
         <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
           Add new device
