@@ -30,6 +30,20 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [errorMessage, setErrorMessage] = createSignal<string>('')
+  const selectionEndTime = () => props.selection.endTime ?? duration()
+
+  const clampTime = (nextTime: number) => {
+    const startTime = props.selection.startTime
+    const endTime = selectionEndTime()
+    return Math.max(startTime, Math.min(nextTime, endTime))
+  }
+
+  const seekTo = (nextTime: number) => {
+    const clampedTime = clampTime(nextTime)
+    video.currentTime = clampedTime
+    setCurrentTime(clampedTime)
+    props.onProgress?.(clampedTime)
+  }
 
   const onLoadedData = () => {
     setVideoLoading(false)
@@ -65,6 +79,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
       video.pause()
     }
   }
+  const skipBy = (seconds: number) => (e: Event) => {
+    e.preventDefault()
+    e.stopPropagation()
+    seekTo(video.currentTime + seconds)
+  }
   const toggleMuted = (e: Event) => {
     e.preventDefault()
     e.stopPropagation()
@@ -76,18 +95,17 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   const onTimeUpdate = (e: Event) => {
-    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
+    const nextCurrentTime = (e.currentTarget as HTMLVideoElement).currentTime
+    setCurrentTime(nextCurrentTime)
 
     // If there is a selection, loop within it
-    if (currentTime() < props.selection.startTime) {
-      video.currentTime = props.selection.startTime
-    } else if (props.selection.endTime !== undefined) {
-      if (currentTime() > props.selection.endTime) {
-        video.currentTime = props.selection.startTime
-      }
+    if (nextCurrentTime < props.selection.startTime) {
+      seekTo(props.selection.startTime)
+    } else if (props.selection.endTime !== undefined && nextCurrentTime > props.selection.endTime) {
+      seekTo(props.selection.startTime)
+    } else if (video.paused) {
+      updateProgress()
     }
-
-    if (video.paused) updateProgress()
   }
   const onLoadedMetadata = () => setDuration(Math.ceil(video.duration))
   const onPlay = () => {
@@ -103,7 +121,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
   onMount(() => {
     if (props.selection.startTime > 0) {
-      video.currentTime = props.selection.startTime
+      seekTo(props.selection.startTime)
     }
 
     video.defaultMuted = true
@@ -225,7 +243,9 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
 
         {/* Controls container */}
         <div class="relative flex w-full items-center gap-3 pb-3 px-2">
-          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          <IconButton name="replay_10" aria-label="Skip back 10 seconds" onClick={skipBy(-10)} />
+          <IconButton aria-label={isPlaying() ? 'Pause' : 'Play'} name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          <IconButton name="forward_10" aria-label="Skip forward 10 seconds" onClick={skipBy(10)} />
 
           <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}

@@ -29,7 +29,7 @@ export const queries = {
   },
 }
 
-const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem[] =>
+export const mapOfflineQueueItems = (data: AthenaOfflineQueueResponse): UploadQueueItem[] =>
   data
     .filter((item) => item.method === 'uploadFilesToUrls')
     .flatMap((item) =>
@@ -122,6 +122,13 @@ const UploadQueue: VoidComponent<{ dongleId: string }> = (props) => {
           Cancel all
         </Button>
       </div>
+      <Show when={items.length > 0}>
+        <div class="px-4 text-xs text-on-surface-variant">
+          {onlineQueue.isSuccess
+            ? 'Uploads are active or waiting on the device.'
+            : 'Uploads are queued and will continue when the device is reachable.'}
+        </div>
+      </Show>
       <div class="relative h-[calc(4*3rem)] sm:h-[calc(6*3rem)] flex justify-center items-center text-on-surface-variant">
         <Switch
           fallback={

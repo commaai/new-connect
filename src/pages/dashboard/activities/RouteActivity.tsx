@@ -36,9 +36,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
-  const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
-  const [statistics] = createResource(
-    () => [route(), events()] as const,
+  const [events, { mutate: setEvents }] = createResource(route, getTimelineEvents)
+  const [statistics, { mutate: setStatistics }] = createResource(
+    () => {
+      const currentRoute = route()
+      const routeEvents = events()
+      if (!currentRoute || !routeEvents || events.loading) return undefined
+      return [currentRoute, routeEvents] as const
+    },
     ([r, e]) => generateRouteStatistics(r, e),
   )
 
@@ -50,6 +55,8 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   createEffect(() => {
     routeName() // track changes
     setSeekTime(props.startTime)
+    setEvents(undefined)
+    setStatistics(undefined)
     onTimelineChange(props.startTime)
   })
 
@@ -69,7 +76,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events() ?? []} />
 
           <Show when={selection().startTime || selection().endTime}>
             <A

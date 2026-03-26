@@ -1,31 +1,40 @@
-import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
-
 import { takeSnapshot } from '~/api/athena'
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getAthenaOfflineQueue, getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getUploadQueue } from '~/api/file'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import UploadQueue from '~/components/UploadQueue'
+import UploadQueue, { mapOfflineQueueItems } from '~/components/UploadQueue'
 import { dayjs } from '~/utils/format'
 import { getDeviceName } from '~/utils/device'
-
 import RouteList from '../components/RouteList'
-
 type DeviceActivityProps = {
   dongleId: string
 }
-
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
+  const getOnlineUploadSummary = async (dongleId: string) => {
+    try {
+      return await getUploadQueue(dongleId)
+    } catch {
+      return { result: [] }
+    }
+  }
+
+  const getOfflineUploadSummary = async (dongleId: string) => {
+    try {
+      return await getAthenaOfflineQueue(dongleId)
+    } catch {
+      return []
+    }
+  }
   const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
   const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
-  // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createStore<{
@@ -37,7 +46,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     fetching: false,
     images: [],
   })
-
   const onClickSnapshot = async () => {
     setSnapshot({ error: null, fetching: true })
     try {
@@ -58,7 +66,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       setSnapshot('fetching', false)
     }
   }
-
   const downloadSnapshot = (image: string, index: number) => {
     const link = document.createElement('a')
     link.href = `data:image/jpeg;base64,${image}`
@@ -67,23 +74,35 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     link.click()
     document.body.removeChild(link)
   }
-
-  const clearImage = (index: number) => {
-    const newImages = snapshot.images.filter((_, i) => i !== index)
-    setSnapshot('images', newImages)
-  }
-
+  const clearImage = (index: number) =>
+    setSnapshot(
+      'images',
+      snapshot.images.filter((_, i) => i !== index),
+    )
   const clearError = () => setSnapshot('error', null)
-
   const { modal } = useDrawerContext()
+  const [onlineQueue] = createResource(() => props.dongleId, getOnlineUploadSummary)
+  const [offlineQueue] = createResource(() => props.dongleId, getOfflineUploadSummary)
   const onlineStatus = () => (device.latest?.is_online ? 'Online now' : 'Offline')
-  const lastSeen = () => {
-    const lastPing = device.latest?.last_athena_ping
-    if (!lastPing) return 'Last seen unavailable'
-    return `Last seen ${dayjs.unix(lastPing).format('MMM D, h:mm A')}`
-  }
+  const lastSeen = () =>
+    device.latest?.last_athena_ping
+      ? `Last seen ${dayjs.unix(device.latest.last_athena_ping).format('MMM D, h:mm A')}`
+      : 'Last seen unavailable'
   const versionLabel = () => device.latest?.openpilot_version || 'Version unavailable'
-
+  const uploadSummary = () => {
+    const onlineItems = onlineQueue.latest?.result ?? []
+    const offlineItems = offlineQueue.latest ? mapOfflineQueueItems(offlineQueue.latest) : []
+    const queuedCount = onlineItems.length + offlineItems.length
+    if (queuedCount === 0) return { count: 0, label: 'No pending uploads' }
+    if (onlineItems.some((item) => item.progress > 0 && item.progress < 1)) {
+      return { count: queuedCount, label: `${queuedCount} upload${queuedCount === 1 ? '' : 's'} in progress` }
+    }
+    if (offlineItems.length > 0 && onlineItems.length === 0) {
+      return { count: queuedCount, label: `${queuedCount} queued until the device reconnects` }
+    }
+    return { count: queuedCount, label: `${queuedCount} upload${queuedCount === 1 ? '' : 's'} queued` }
+  }
+  createEffect(() => uploadSummary().count > 0 && setQueueVisible(true))
   return (
     <>
       <TopAppBar
@@ -133,6 +152,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
               onClick={() => setQueueVisible(!queueVisible())}
             >
               <p>{queueVisible() ? 'Hide upload status' : 'Show upload status'}</p>
+              <span class="rounded-full bg-surface-container-high px-2 py-1 text-xs text-on-surface-variant">{uploadSummary().label}</span>
               <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </button>
           </Show>

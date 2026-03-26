@@ -1,13 +1,24 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 import { configure, fireEvent, render, waitFor } from '@solidjs/testing-library'
+import { QueryClientProvider } from '@tanstack/solid-query'
+import type { ParentComponent } from 'solid-js'
 
 import { setAccessToken, signOut } from '~/api/auth/client'
+import { getAppQueryClient } from '~/api/query-client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 
-const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
+const renderApp = (location: string) => {
+  const queryClient = getAppQueryClient()
+  const Wrapper: ParentComponent = (props) => (
+    <QueryClientProvider client={queryClient}>
+      <AppLayout>{props.children}</AppLayout>
+    </QueryClientProvider>
+  )
+  return render(() => <Routes />, { location, wrapper: Wrapper })
+}
 
 beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
 beforeEach(() => signOut())
@@ -31,6 +42,8 @@ describe('Demo mode', () => {
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
     expect(video.muted).toBe(true)
+    expect(await findByLabelText('Skip back 10 seconds')).toBeTruthy()
+    expect(await findByLabelText('Skip forward 10 seconds')).toBeTruthy()
     await fireEvent.click(await findByLabelText('Unmute'))
     expect(video.muted).toBe(false)
     expect(await findByLabelText('Mute')).toBeTruthy()

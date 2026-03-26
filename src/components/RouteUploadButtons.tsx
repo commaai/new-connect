@@ -40,6 +40,11 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
     success: 'check',
     error: 'error',
   }
+  const color = () => {
+    if (state() === 'success') return 'secondary'
+    if (state() === 'error') return 'error'
+    return 'primary'
+  }
 
   return (
     <Button
@@ -47,7 +52,7 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
       class="px-2 md:px-3"
       disabled={disabled()}
       leading={<Icon class={clsx(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
-      color="primary"
+      color={color()}
     >
       <span class="flex items-center gap-1 font-mono">{props.text}</span>
     </Button>
@@ -66,6 +71,12 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     route: 'idle',
   })
   const [abortController, setAbortController] = createSignal(new AbortController())
+  const statusMessage = () => {
+    if (Object.values(uploadStore).includes('loading')) return 'Submitting upload request...'
+    if (Object.values(uploadStore).includes('error')) return 'Some uploads failed to start. Try again.'
+    if (Object.values(uploadStore).includes('success')) return 'Upload request accepted. Track progress in the device upload status.'
+    return 'Choose which files to request from this route.'
+  }
 
   createEffect(
     on(
@@ -115,6 +126,7 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
         <UploadButton text="Logs" icon="description" state={uploadStore.logs} onClick={() => handleUpload('logs')} />
         <UploadButton text="All" icon="upload" state={uploadStore.route} onClick={() => handleUpload('route')} />
       </div>
+      <p class="mt-3 text-sm text-on-surface-variant">{statusMessage()}</p>
     </div>
   )
 }
