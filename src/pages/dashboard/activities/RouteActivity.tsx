@@ -28,14 +28,10 @@ type RouteActivityProps = {
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
-
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
   const startTime = () => (route.latest ? dayjs(route().start_time).format('dddd, MMM D, YYYY') : '')
-
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
-
-  // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events, { mutate: setEvents }] = createResource(route, getTimelineEvents)
   const [statistics, { mutate: setStatistics }] = createResource(
     () => {
@@ -53,7 +49,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   }
 
   createEffect(() => {
-    routeName() // track changes
+    routeName()
     setSeekTime(props.startTime)
     setEvents(undefined)
     setStatistics(undefined)

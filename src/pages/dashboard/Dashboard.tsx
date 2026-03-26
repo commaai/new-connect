@@ -81,7 +81,6 @@ const DashboardLayout: Component<{
       <div
         class={clsx(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
-          // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
@@ -144,7 +143,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
 
   const getDefaultDongleId = () => {
-    // Do not redirect if dongle ID already selected
     if (urlState().dongleId) return undefined
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')

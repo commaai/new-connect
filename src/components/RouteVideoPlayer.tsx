@@ -30,16 +30,8 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [errorMessage, setErrorMessage] = createSignal<string>('')
-  const selectionEndTime = () => props.selection.endTime ?? duration()
-
-  const clampTime = (nextTime: number) => {
-    const startTime = props.selection.startTime
-    const endTime = selectionEndTime()
-    return Math.max(startTime, Math.min(nextTime, endTime))
-  }
-
   const seekTo = (nextTime: number) => {
-    const clampedTime = clampTime(nextTime)
+    const clampedTime = Math.max(props.selection.startTime, Math.min(nextTime, props.selection.endTime ?? duration()))
     video.currentTime = clampedTime
     setCurrentTime(clampedTime)
     props.onProgress?.(clampedTime)
@@ -72,13 +64,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   }
 
-  const togglePlayback = () => {
-    if (video.paused) {
-      requestPlay()
-    } else {
-      video.pause()
-    }
-  }
+  const togglePlayback = () => (video.paused ? requestPlay() : video.pause())
   const skipBy = (seconds: number) => (e: Event) => {
     e.preventDefault()
     e.stopPropagation()
@@ -97,8 +83,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onTimeUpdate = (e: Event) => {
     const nextCurrentTime = (e.currentTarget as HTMLVideoElement).currentTime
     setCurrentTime(nextCurrentTime)
-
-    // If there is a selection, loop within it
     if (nextCurrentTime < props.selection.startTime) {
       seekTo(props.selection.startTime)
     } else if (props.selection.endTime !== undefined && nextCurrentTime > props.selection.endTime) {
@@ -156,8 +140,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         const player = Hls.createHls()
         player.attachMedia(video)
         setHls(player)
-
-        // Hls error handler
         const { Events, ErrorTypes } = Hls.default
         player.on(Events.ERROR, (_, data) => {
           if (data.fatal && data.type === ErrorTypes.NETWORK_ERROR) onError()
@@ -173,7 +155,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   })
 
-  // State reset on route change
   createEffect(
     on(routeName, () => {
       setVideoLoading(true)
@@ -208,7 +189,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         props.class,
       )}
     >
-      {/* Video as background */}
       <div class="absolute inset-0 -z-10">
         <video
           ref={video}
@@ -222,26 +202,17 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           disablepictureinpicture
         />
       </div>
-
-      {/* Loading animation */}
       <Show when={videoLoading()}>
         <div class="absolute inset-0 z-0 skeleton-loader" />
       </Show>
-
-      {/* Error message */}
       <Show when={errorMessage()}>
         <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1">
           <IconButton name="error" />
           <span class="w-[90%] text-center text-wrap">{errorMessage()}</span>
         </div>
       </Show>
-
-      {/* Controls overlay */}
       <div class="absolute inset-0 flex items-end" ref={controls}>
-        {/* Controls background gradient */}
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* Controls container */}
         <div class="relative flex w-full items-center gap-3 pb-3 px-2">
           <IconButton name="replay_10" aria-label="Skip back 10 seconds" onClick={skipBy(-10)} />
           <IconButton aria-label={isPlaying() ? 'Pause' : 'Play'} name={isPlaying() ? 'pause' : 'play_arrow'} filled />

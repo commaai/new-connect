@@ -25,7 +25,6 @@ interface UploadButtonProps {
 }
 
 const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
-  const icon = () => props.icon
   const state = () => props.state
   const disabled = () => state() === 'loading' || state() === 'success'
 
@@ -35,20 +34,16 @@ const UploadButton: VoidComponent<UploadButtonProps> = (props) => {
   }
 
   const stateToIcon: Record<ButtonState, IconName> = {
-    idle: icon(),
+    idle: props.icon,
     loading: 'progress_activity',
     success: 'check',
     error: 'error',
   }
-  const color = () => {
-    if (state() === 'success') return 'secondary'
-    if (state() === 'error') return 'error'
-    return 'primary'
-  }
+  const color = () => (state() === 'success' ? 'secondary' : state() === 'error' ? 'error' : 'primary')
 
   return (
     <Button
-      onClick={() => handleUpload()}
+      onClick={handleUpload}
       class="px-2 md:px-3"
       disabled={disabled()}
       leading={<Icon class={clsx(state() === 'loading' && 'animate-spin')} name={stateToIcon[state()]} size="20" />}
@@ -71,12 +66,14 @@ const RouteUploadButtons: VoidComponent<RouteUploadButtonsProps> = (props) => {
     route: 'idle',
   })
   const [abortController, setAbortController] = createSignal(new AbortController())
-  const statusMessage = () => {
-    if (Object.values(uploadStore).includes('loading')) return 'Submitting upload request...'
-    if (Object.values(uploadStore).includes('error')) return 'Some uploads failed to start. Try again.'
-    if (Object.values(uploadStore).includes('success')) return 'Upload request accepted. Track progress in the device upload status.'
-    return 'Choose which files to request from this route.'
-  }
+  const statusMessage = () =>
+    Object.values(uploadStore).includes('loading')
+      ? 'Submitting upload request...'
+      : Object.values(uploadStore).includes('error')
+        ? 'Some uploads failed to start. Try again.'
+        : Object.values(uploadStore).includes('success')
+          ? 'Upload request accepted. Track progress in the device upload status.'
+          : 'Choose which files to request from this route.'
 
   createEffect(
     on(

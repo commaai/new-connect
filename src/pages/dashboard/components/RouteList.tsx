@@ -112,23 +112,18 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
       return true
     })
   })
-  const hasMore = createMemo(() => (routes()?.length ?? 0) >= size() * PAGE_SIZE)
 
   createEffect(() => {
-    if (props.dongleId) {
-      setSize(1)
-      setFilter('all')
-    }
+    if (!props.dongleId) return
+    setSize(1)
+    setFilter('all')
   })
 
   return (
     <div class="flex w-full flex-col justify-items-stretch gap-4">
       <div class="rounded-lg bg-surface-container-low px-4 py-3">
         <div class="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <h2 class="text-lg font-semibold">Trips</h2>
-            <p class="text-sm text-on-surface-variant">Use quick filters to focus on recent drives or routes you saved for later.</p>
-          </div>
+          <h2 class="text-lg font-semibold">Trips</h2>
           <div class="flex flex-wrap gap-2">
             <For each={['all', 'recent', 'saved'] as RouteFilter[]}>
               {(value) => (
@@ -207,7 +202,7 @@ const RouteList: VoidComponent<{ dongleId: string }> = (props) => {
                 )
               })()}
 
-              <Show when={hasMore()}>
+              <Show when={(routes()?.length ?? 0) >= size() * PAGE_SIZE}>
                 <div class="flex justify-center">
                   <button
                     class="rounded-full bg-surface-container px-4 py-2 text-sm text-on-surface-variant"

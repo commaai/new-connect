@@ -18,6 +18,7 @@ import { formatDate } from '~/utils/format'
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
+import type { IconName } from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
@@ -45,14 +46,24 @@ type PlanProps = {
   disabled?: boolean
 }
 
-const PrimePlanName: Record<PrimePlan, string> = {
-  nodata: 'Lite',
-  data: 'Standard',
-}
+const PrimePlanName: Record<PrimePlan, string> = { nodata: 'Lite', data: 'Standard' }
 
-const Plan = (props: PlanProps) => {
-  return props as unknown as JSXElement
-}
+const Plan = (props: PlanProps) => props as unknown as JSXElement
+
+const supportStoreLink = (
+  <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
+    support store
+  </a>
+)
+
+const supportStoreMessage = (message: string) => [message, ' Replacement SIM cards are available in the ', supportStoreLink]
+
+const Notice: ParentComponent<{ class?: string; icon: IconName; iconClass?: string }> = (props) => (
+  <div class={clsx('flex gap-2 rounded-sm p-2 text-sm', props.class ?? 'bg-surface-container text-on-surface')}>
+    <Icon class={props.iconClass} name={props.icon} size="20" />
+    {props.children}
+  </div>
+)
 
 const PlanSelector: ParentComponent<{
   plan: Accessor<PrimePlan | undefined>
@@ -66,27 +77,25 @@ const PlanSelector: ParentComponent<{
   })
 
   return (
-    <div class="relative">
-      <div class="flex w-full gap-2 xs:gap-4">
-        <For each={plans()}>
-          {(plan) => (
-            <ButtonBase
-              class={clsx(
-                'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
-                'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
-                props.plan() === plan.name && 'ring-4 ring-on-tertiary',
-                plan.disabled && 'cursor-not-allowed opacity-50',
-              )}
-              onClick={() => props.setPlan(plan.name)}
-              disabled={plan.disabled || props.disabled}
-            >
-              <span class="text-md">{PrimePlanName[plan.name].toLowerCase()}</span>
-              <span class="text-lg font-bold">{formatCurrency(plan.amount)}/month</span>
-              <span class="text-xs">{plan.description}</span>
-            </ButtonBase>
-          )}
-        </For>
-      </div>
+    <div class="relative flex w-full gap-2 xs:gap-4">
+      <For each={plans()}>
+        {(plan) => (
+          <ButtonBase
+            class={clsx(
+              'flex grow basis-0 flex-col items-center justify-center gap-2 rounded-lg p-2 text-center xs:p-4',
+              'state-layer bg-tertiary text-on-tertiary transition before:bg-on-tertiary',
+              props.plan() === plan.name && 'ring-4 ring-on-tertiary',
+              plan.disabled && 'cursor-not-allowed opacity-50',
+            )}
+            onClick={() => props.setPlan(plan.name)}
+            disabled={plan.disabled || props.disabled}
+          >
+            <span class="text-md">{PrimePlanName[plan.name].toLowerCase()}</span>
+            <span class="text-lg font-bold">{formatCurrency(plan.amount)}/month</span>
+            <span class="text-xs">{plan.description}</span>
+          </ButtonBase>
+        )}
+      </For>
     </div>
   )
 }
@@ -149,26 +158,11 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       } else if (!source.subscribeInfo.is_prime_sim || !source.subscribeInfo.sim_type) {
         disabledDataPlanText = 'Standard plan not available, detected a third-party SIM.'
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
-        disabledDataPlanText = [
-          'Standard plan not available, old SIM type detected. Replacement SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            support store
-          </a>,
-        ]
+        disabledDataPlanText = supportStoreMessage('Standard plan not available, old SIM type detected.')
       } else if (source.subscribeInfo.sim_usable === false && source.subscribeInfo.sim_type === 'blue') {
-        disabledDataPlanText = [
-          'Standard plan not available, SIM has been canceled and is therefore no longer usable. Replacement SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            support store
-          </a>,
-        ]
+        disabledDataPlanText = supportStoreMessage('Standard plan not available, SIM has been canceled and is therefore no longer usable.')
       } else if (source.subscribeInfo.sim_usable === false) {
-        disabledDataPlanText = [
-          'Standard plan not available, SIM is no longer usable. Replacement SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            support store
-          </a>,
-        ]
+        disabledDataPlanText = supportStoreMessage('Standard plan not available, SIM is no longer usable.')
       }
 
       return {
@@ -195,10 +189,9 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </p>
 
       <Show when={stripeCancelled()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-          <Icon name="error" class="text-error" size="20" />
+        <Notice icon="error" iconClass="text-error">
           Checkout canceled
-        </div>
+        </Notice>
       </Show>
 
       <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
@@ -212,12 +205,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </PlanSelector>
 
       <Show when={uiState()?.disabledDataPlanText} keyed>
-        {(text) => (
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-            <Icon name="info" size="20" />
-            {text}
-          </div>
-        )}
+        {(text) => <Notice icon="info">{text}</Notice>}
       </Show>
 
       <Show when={uiState()?.checkoutText} keyed>
@@ -249,7 +237,6 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
     stopCondition: (session) => session?.payment_status === 'paid',
   })
 
-  // TODO: we should wait for the session to be paid before fetching subscription
   const [subscription] = createQuery({
     source: () => props.dongleId,
     fetcher: getSubscriptionStatus,
@@ -283,31 +270,25 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       >
         <Switch>
           <Match when={stripeSession.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-sm font-semibold text-error-container">
-              <Icon name="error" size="20" />
+            <Notice class="bg-on-error-container font-semibold text-error-container" icon="error">
               Unable to check payment status: {stripeSession.error}
-            </div>
+            </Notice>
           </Match>
           <Match when={stripeSession()?.payment_status} keyed>
             {(paymentStatus) => (
               <Switch>
                 <Match when={paymentStatus === 'unpaid'}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-                    <Icon name="payments" size="20" />
-                    Waiting for confirmed payment...
-                  </div>
+                  <Notice icon="payments">Waiting for confirmed payment...</Notice>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && !subscription()}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-                    <Icon class="animate-spin" name="autorenew" size="20" />
+                  <Notice icon="autorenew" iconClass="animate-spin">
                     Processing subscription...
-                  </div>
+                  </Notice>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && subscription()}>
-                  <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-sm text-on-tertiary-container">
-                    <Icon name="check" size="20" />
+                  <Notice class="bg-tertiary-container text-on-tertiary-container" icon="check">
                     <div class="flex flex-col gap-2">
                       <p class="font-semibold">Connectivity activated</p>
                       <Show when={subscription()?.is_prime_sim} keyed>
@@ -315,7 +296,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                         help.
                       </Show>
                     </div>
-                  </div>
+                  </Notice>
                 </Match>
               </Switch>
             )}
@@ -324,17 +305,13 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
         <Switch>
           <Match when={cancelData.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-              <Icon class="text-error" name="error" size="20" />
+            <Notice icon="error" iconClass="text-error">
               Failed to cancel subscription: {cancelData.error}
-            </div>
+            </Notice>
           </Match>
 
           <Match when={cancelData.state === 'ready'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-              <Icon name="check" size="20" />
-              Subscription cancelled
-            </div>
+            <Notice icon="check">Subscription cancelled</Notice>
           </Match>
         </Switch>
 
@@ -407,10 +384,9 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     <div class="flex flex-col gap-4">
       <h2 class="text-lg">{deviceName()}</h2>
       <Show when={unpairData.error}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-          <Icon class="text-error" name="error" size="20" />
+        <Notice class="bg-surface-container-high text-on-surface" icon="error" iconClass="text-error">
           {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-        </div>
+        </Notice>
       </Show>
       <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
         Unpair this device

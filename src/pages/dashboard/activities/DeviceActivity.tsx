@@ -17,22 +17,10 @@ import RouteList from '../components/RouteList'
 type DeviceActivityProps = {
   dongleId: string
 }
-const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  const getOnlineUploadSummary = async (dongleId: string) => {
-    try {
-      return await getUploadQueue(dongleId)
-    } catch {
-      return { result: [] }
-    }
-  }
 
-  const getOfflineUploadSummary = async (dongleId: string) => {
-    try {
-      return await getAthenaOfflineQueue(dongleId)
-    } catch {
-      return []
-    }
-  }
+const safeLoad = <T,>(load: () => Promise<T>, fallback: T) => load().catch(() => fallback)
+
+const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
   const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
@@ -81,8 +69,14 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     )
   const clearError = () => setSnapshot('error', null)
   const { modal } = useDrawerContext()
-  const [onlineQueue] = createResource(() => props.dongleId, getOnlineUploadSummary)
-  const [offlineQueue] = createResource(() => props.dongleId, getOfflineUploadSummary)
+  const [onlineQueue] = createResource(
+    () => props.dongleId,
+    (dongleId) => safeLoad(() => getUploadQueue(dongleId), { queued: false, result: [] }),
+  )
+  const [offlineQueue] = createResource(
+    () => props.dongleId,
+    (dongleId) => safeLoad(() => getAthenaOfflineQueue(dongleId), []),
+  )
   const onlineStatus = () => (device.latest?.is_online ? 'Online now' : 'Offline')
   const lastSeen = () =>
     device.latest?.last_athena_ping

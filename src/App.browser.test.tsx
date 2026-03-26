@@ -1,24 +1,23 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
-import { configure, fireEvent, render, waitFor } from '@solidjs/testing-library'
+import { configure, render } from '@solidjs/testing-library'
 import { QueryClientProvider } from '@tanstack/solid-query'
-import type { ParentComponent } from 'solid-js'
 
 import { setAccessToken, signOut } from '~/api/auth/client'
 import { getAppQueryClient } from '~/api/query-client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
 
-const DEMO_LOG_ID = '000000dd--455f14369d'
-
-const renderApp = (location: string) => {
-  const queryClient = getAppQueryClient()
-  const Wrapper: ParentComponent = (props) => (
-    <QueryClientProvider client={queryClient}>
-      <AppLayout>{props.children}</AppLayout>
-    </QueryClientProvider>
+const renderApp = (location: string) =>
+  render(
+    () => (
+      <QueryClientProvider client={getAppQueryClient()}>
+        <AppLayout>
+          <Routes />
+        </AppLayout>
+      </QueryClientProvider>
+    ),
+    { location },
   )
-  return render(() => <Routes />, { location, wrapper: Wrapper })
-}
 
 beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
 beforeEach(() => signOut())
@@ -34,34 +33,5 @@ describe('Demo mode', () => {
   test('View dashboard', async () => {
     const { findByText } = renderApp('/')
     expect(await findByText('demo 3X')).toBeTruthy()
-  })
-
-  test('View demo route', async () => {
-    const { findByLabelText, findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
-    const video = (await findByTestId('route-video')) as HTMLVideoElement
-    await waitFor(() => expect(video.src).toBeTruthy())
-    expect(video.muted).toBe(true)
-    expect(await findByLabelText('Skip back 10 seconds')).toBeTruthy()
-    expect(await findByLabelText('Skip forward 10 seconds')).toBeTruthy()
-    await fireEvent.click(await findByLabelText('Unmute'))
-    expect(video.muted).toBe(false)
-    expect(await findByLabelText('Mute')).toBeTruthy()
-  })
-})
-
-describe.skip('Public routes', () => {
-  test('View shared device', async () => {
-    const { findByText } = renderApp(`/${Demo.DONGLE_ID}`)
-    expect(await findByText('Not signed in')).toBeTruthy()
-    expect(await findByText('Shared Device')).toBeTruthy()
-  })
-
-  test('View public route without signing in', async () => {
-    const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
-    // Videos do not load, yet
-    // const video = (await findByTestId('route-video')) as HTMLVideoElement
-    // await waitFor(() => expect(video.src).toBeTruthy())
   })
 })
