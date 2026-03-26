@@ -10,10 +10,20 @@ const endpoints = {
   SettingsActivity: '1d3dc3e03047b0c7/settings',
 }
 
+async function gotoPage(page: Awaited<ReturnType<BrowserContext['newPage']>>, path: string) {
+  const url = `${baseUrl}/${path}`
+  try {
+    await page.goto(url, { waitUntil: 'networkidle' })
+  } catch (error) {
+    if (!(error instanceof Error) || !error.message.includes('ERR_ABORTED')) throw error
+    await page.goto(url, { waitUntil: 'domcontentloaded' })
+  }
+}
+
 async function takeScreenshots(deviceType: string, context: BrowserContext) {
   const page = await context.newPage()
   for (const [route, path] of Object.entries(endpoints)) {
-    await page.goto(`${baseUrl}/${path}`, { waitUntil: 'networkidle' })
+    await gotoPage(page, path)
     await page.waitForTimeout(1500)
     await page.screenshot({ path: `${outDir}/${route}-${deviceType}.playwright.png` })
     console.log(`${route}-${deviceType}.playwright.png`)
