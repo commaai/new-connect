@@ -1,4 +1,4 @@
-import { defineConfig, loadEnv } from 'vite'
+import { defineConfig, loadEnv, type HtmlTagDescriptor, type PluginOption } from 'vite'
 import solid from 'vite-plugin-solid'
 import devtools from 'solid-devtools/vite'
 import { sentryVitePlugin } from '@sentry/vite-plugin'
@@ -9,7 +9,7 @@ import { Icons } from './src/components/material/Icon'
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '')
-  const plugins = [
+  const plugins: PluginOption[] = [
     devtools(),
     solid({
       ssr: false,
@@ -57,20 +57,21 @@ export default defineConfig(({ mode }) => {
     }),
     {
       name: 'inject-material-symbols',
-      transformIndexHtml(html) {
+      transformIndexHtml(html: string) {
         const icons = Icons.toSorted().join(',')
+        const tags: HtmlTagDescriptor[] = [
+          {
+            tag: 'link',
+            attrs: {
+              rel: 'stylesheet',
+              href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
+            },
+            injectTo: 'head',
+          },
+        ]
         return {
           html,
-          tags: [
-            {
-              tag: 'link',
-              attrs: {
-                rel: 'stylesheet',
-                href: `https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,400,0..1,0&icon_names=${icons}&display=block`,
-              },
-              injectTo: 'head',
-            },
-          ],
+          tags,
         }
       },
     },
