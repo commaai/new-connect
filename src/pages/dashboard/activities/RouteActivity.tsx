@@ -73,17 +73,17 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
           <Show when={selection().startTime || selection().endTime}>
             <A
-              class="flex items-center justify-center text-center text-label-lg text-gray-500 mt-4"
+              class="mt-4 inline-flex items-center justify-center gap-1 self-center rounded-full bg-surface-container px-4 py-2 text-center text-label-lg text-on-surface-variant"
               href={`/${props.dongleId}/${props.dateStr}`}
             >
-              Clear current route selection
+              Clear clip selection
               <IconButton name="close_small" />
             </A>
           </Show>
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-sm">Route Info</span>
+          <span class="text-sm text-on-surface-variant">Drive summary and sharing</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
 
@@ -92,14 +92,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-sm">Upload Files</span>
+          <span class="text-sm text-on-surface-variant">Upload missing files</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
             <RouteUploadButtons route={route()} />
           </div>
         </div>
 
         <div class="flex flex-col gap-2">
-          <span class="text-sm">Route Map</span>
+          <span class="text-sm text-on-surface-variant">Map overview</span>
           <div class="aspect-square overflow-hidden rounded-lg">
             <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
               <RouteStaticMap route={route()} />

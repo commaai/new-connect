@@ -1,12 +1,12 @@
 {
-  "name": "connect",
+  "name": "new-connect",
   "version": "1.0.0",
-  "homepage": "https://new-connect.connect-d5y.pages.dev",
+  "homepage": "https://new-connect.pages.dev",
   "license": "MIT",
-  "author": "comma.ai",
+  "author": "Mahdi451",
   "repository": {
     "type": "git",
-    "url": "https://github.com/commaai/new-connect.git"
+    "url": "https://github.com/Mahdi451/new-connect.git"
   },
   "scripts": {
     "build": "bun run --bun vite build",

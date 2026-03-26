@@ -4,9 +4,9 @@ export default function OfflinePage() {
   return (
     <div class="flex min-h-screen flex-col gap-12 items-center justify-center bg-background p-6">
       <div class="flex max-w-sm flex-col items-center gap-4">
-        <img src="/images/logo-connect-light.svg" alt="comma connect" width={96} height={96} />
+        <img src="/images/logo-connect-light.svg" alt="new connect" width={96} height={96} />
         <div class="flex flex-col gap-2 items-center">
-          <h1 class="text-2xl">comma connect</h1>
+          <h1 class="text-2xl">new connect</h1>
           <div class="flex items-center gap-3">
             <span class="size-2 rounded-full bg-error-container" />
             <p class="text-lg">offline</p>

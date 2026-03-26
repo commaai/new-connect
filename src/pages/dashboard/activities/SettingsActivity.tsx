@@ -150,23 +150,23 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
         disabledDataPlanText = 'Standard plan not available, detected a third-party SIM.'
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
         disabledDataPlanText = [
-          'Standard plan not available, old SIM type detected, new SIM cards are available in the ',
+          'Standard plan not available, old SIM type detected. Replacement SIM cards are available in the ',
           <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
+            support store
           </a>,
         ]
       } else if (source.subscribeInfo.sim_usable === false && source.subscribeInfo.sim_type === 'blue') {
         disabledDataPlanText = [
-          'Standard plan not available, SIM has been canceled and is therefore no longer usable, new SIM cards are available in the ',
+          'Standard plan not available, SIM has been canceled and is therefore no longer usable. Replacement SIM cards are available in the ',
           <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
+            support store
           </a>,
         ]
       } else if (source.subscribeInfo.sim_usable === false) {
         disabledDataPlanText = [
-          'Standard plan not available, SIM is no longer usable, new SIM cards are available in the ',
+          'Standard plan not available, SIM is no longer usable. Replacement SIM cards are available in the ',
           <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
+            support store
           </a>,
         ]
       }
@@ -184,24 +184,20 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
   return (
     <div class="grid gap-4">
       <ul class="ml-8 list-disc">
-        <li>24/7 connectivity</li>
-        <li>Take pictures remotely</li>
-        <li>1 year storage of drive videos</li>
-        <li>Simple SSH for developers</li>
+        <li>Always-on connectivity for your device</li>
+        <li>Remote snapshots when the device is reachable</li>
+        <li>Longer cloud storage for drive videos</li>
+        <li>Developer-focused remote access tools</li>
       </ul>
 
-      <p>
-        Learn more from our{' '}
-        <a class="text-tertiary underline" href="https://comma.ai/connect#comma-connect-and-prime" target="_blank" rel="noopener">
-          FAQ
-        </a>
-        .
+      <p class="text-sm text-on-surface-variant">
+        Plan availability still depends on the current backend account, device state, and SIM setup.
       </p>
 
       <Show when={stripeCancelled()}>
         <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
           <Icon name="error" class="text-error" size="20" />
-          Checkout cancelled
+          Checkout canceled
         </div>
       </Show>
 
@@ -313,7 +309,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
                   <div class="flex gap-2 rounded-sm bg-tertiary-container p-2 text-sm text-on-tertiary-container">
                     <Icon name="check" size="20" />
                     <div class="flex flex-col gap-2">
-                      <p class="font-semibold">comma prime activated</p>
+                      <p class="font-semibold">Connectivity activated</p>
                       <Show when={subscription()?.is_prime_sim} keyed>
                         Connectivity will be enabled as soon as activation propogates to your local cell tower. Rebooting your device may
                         help.
@@ -436,7 +432,7 @@ const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
 
         <hr class="mx-4 opacity-20" />
 
-        <h2 class="text-lg">comma prime</h2>
+        <h2 class="text-lg">Connectivity plan</h2>
         <Suspense fallback={<div class="h-64 skeleton-loader rounded-md" />}>
           <Switch>
             <Match when={device()?.prime === false}>
