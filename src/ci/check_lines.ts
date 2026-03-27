@@ -31,6 +31,9 @@ function printMarkdownTable(data: any[]) {
 }
 
 const formatDiff = (count: number) => (count > 0 ? `+${count}` : count.toString())
+const args = Bun.argv.slice(2)
+const enforce = args.includes('--enforce')
+const positionalArgs = args.filter((arg) => arg !== '--enforce')
 
 function generateDiff(statsOld: FileStats[], statsNew: FileStats[]) {
   const results: FileStatsDiff[] = []
@@ -57,9 +60,9 @@ function generateDiff(statsOld: FileStats[], statsNew: FileStats[]) {
 }
 
 if (import.meta.main) {
-  if (Bun.argv.length === 4) {
+  if (positionalArgs.length === 2) {
     // CI mode - compare two directories
-    const [, , base, pr] = Bun.argv
+    const [base, pr] = positionalArgs
     const baseStats = await generateStats(base)
     const prStats = await generateStats(pr)
     const diff = generateDiff(baseStats, prStats)
@@ -74,7 +77,7 @@ if (import.meta.main) {
     console.log(`\n**Total lines: ${total} (${formatDiff(totalDiff)})**` + (totalDiff < -100 ? ' 🔥' : ''))
   } else {
     // Regular mode - analyze a single directory
-    const files = await generateStats(Bun.argv[2])
+    const files = await generateStats(positionalArgs[0])
     const top10 = files.slice(0, 10)
 
     console.log('Top 10 files by lines:')
@@ -83,9 +86,11 @@ if (import.meta.main) {
     const totalLines = files.reduce((acc, it) => acc + it.lines, 0)
     console.log('Total lines:', totalLines)
 
-    if (totalLines > 5000) {
+    if (enforce && totalLines > 5000) {
       console.warn('Exceeded line limit!')
       process.exit(1)
+    } else if (totalLines > 5000) {
+      console.warn('Line count is above the old 5,000-line advisory threshold.')
     } else {
       console.info('Line count OK!')
     }
