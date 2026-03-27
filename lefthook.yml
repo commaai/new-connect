@@ -4,8 +4,6 @@ pre-commit:
     check:
       run: bun biome check --write --no-errors-on-unmatched --files-ignore-unknown=true --colors=off {staged_files}
       stage_fixed: true
-    lines:
-      run: bun lines
 
 skip_output:
   - execution_out

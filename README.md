@@ -1,10 +1,8 @@
-# connect
+# new connect
 
-connect is the web and mobile experience for [openpilot](https://github.com/commaai/openpilot).
+new connect is a fork-owned web app for checking devices, trips, uploads, and remote actions from phone or desktop.
 
-Try it out at https://new-connect.connect-d5y.pages.dev.
-
-This is a rewrite of [comma connect](https://github.com/commaai/connect-pwa-archive).
+This fork currently keeps compatibility with the existing backend APIs while taking its own product and workflow direction.
 
 ## Development
 
@@ -16,40 +14,35 @@ curl -fsSL https://bun.sh/install | bash
 source ~/.bashrc  # or source ~/.zshrc
 
 cd ~
-git clone https://github.com/commaai/new-connect.git
+git clone https://github.com/Mahdi451/new-connect.git
 
-cd connect
+cd new-connect
 bun install  # sets up pre-commit hook
 bun dev
 ```
 
-## Contributing
+The app has a demo mode, so you can work on the UI without pairing a live device.
 
-Join the `#dev-connect-web` channel on our [Discord](https://discord.comma.ai).
-
-connect has a demo mode, so no special comma device is needed to develop connect.
-
-A few constraints to keep connect light and the dev environment fun:
+A few constraints keep the app light and the dev environment fast:
 * 5k line limit
 * 500KB bundle size limit
 * 1m timeout for all CI
 
-References:
-* [API docs](https://api.comma.ai)
-* [openpilot docs](https://docs.comma.ai)
-* [Discord](https://discord.comma.ai)
-* [Bounties](https://comma.ai/bounties)
+## Preview Workflow
 
-## Roadmap
+Pull requests into `master` are expected to produce a deploy preview when the repo is configured with:
 
-The first goal is to replace current connect and get this shipped to https://connect.comma.ai.
+* `CLOUDFLARE_ACCOUNT_ID`
+* `CLOUDFLARE_PAGES_TOKEN`
+* `CF_PAGES_PROJECT`
+* `PREVIEW_BASE_DOMAIN`
 
-[This milestone](https://github.com/commaai/connect/milestone/1) tracks that progress. Most of the issues there are [paid bounties](https://comma.ai/bounties).
+The preview workflow comments a URL back onto the PR after a successful build. Screenshots are intentionally disabled until the fork has its own artifact publishing setup.
 
-Once we've shipped v1, next up will be:
-* [Sentry mode](https://www.youtube.com/watch?v=laO0RzsDzfU)
-* SSH console for openpilot developers
-* Replace snapshot with a live stream
-* openpilot clips, like this [community tool](https://github.com/nelsonjchen/op-replay-clipper)
-* Manage the settings on your comma 3X
-* Car mangement: lock doors, EV charge status, etc.
+## Direction
+
+The first phase for this fork is:
+* own the repo and deployment workflow
+* replace upstream-facing branding and copy
+* improve the day-to-day experience for checking devices, trips, uploads, and settings
+* selectively pull upstream fixes only when they are useful

@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       number: ${{ steps.pr.outputs.number }}
-    if: github.repository == 'commaai/new-connect' && github.event.workflow_run.event == 'pull_request'
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
     steps:
       # use `gr pr view` to get the PR number
       # https://github.com/orgs/community/discussions/25220#discussioncomment-11285971
@@ -48,6 +48,7 @@ jobs:
   preview:
     name: Deploy preview
     needs: pr
+    if: needs.pr.outputs.number != '' && vars.CF_PAGES_PROJECT != '' && vars.PREVIEW_BASE_DOMAIN != ''
     outputs:
       check_id: ${{ steps.check.outputs.result }}
     runs-on: ubuntu-latest
@@ -66,7 +67,7 @@ jobs:
                 title: 'Preview deployment',
                 summary: 'In Progress',
               },
-              owner: 'commaai',
+              owner: '${{ github.repository_owner }}',
               repo: '${{ github.event.repository.name }}',
             })
             return response.data.id
@@ -87,7 +88,7 @@ jobs:
         with:
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
           apiToken: ${{ secrets.CLOUDFLARE_PAGES_TOKEN }}
-          command: pages deploy dist --project-name=connect --branch=${{ needs.pr.outputs.number }} --commit-dirty=true
+          command: pages deploy dist --project-name=${{ vars.CF_PAGES_PROJECT }} --branch=pr-${{ needs.pr.outputs.number }} --commit-dirty=true
 
       - name: Comment URL on PR
         uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
@@ -95,69 +96,11 @@ jobs:
           message: |
             <!-- _(run_id **${{ github.run_id }}**)_ -->
 
-            # deployed preview: https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev
+            # preview ready
 
-            Welcome to connect! Make sure to:
-            * read the [contributing guidelines](https://github.com/commaai/connect?tab=readme-ov-file#contributing)
-            * mark your PR as a draft until it's ready to review
-            * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
-          comment-tag: run_id
-          pr-number: ${{ needs.pr.outputs.number }}
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+            https://pr-${{ needs.pr.outputs.number }}.${{ vars.PREVIEW_BASE_DOMAIN }}
 
-      - name: Checkout ci-artifacts
-        uses: actions/checkout@v4
-        with:
-          repository: commaai/ci-artifacts
-          ssh-key: ${{ secrets.CI_ARTIFACTS_DEPLOY_KEY }}
-          path: ${{ github.workspace }}/ci-artifacts
-          ref: master
-
-      - name: take screenshots
-        run: bun src/ci/screenshots.ts https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev ${{ github.workspace }}/ci-artifacts
-
-      - name: Push Screenshots
-        working-directory: ${{ github.workspace }}/ci-artifacts
-        run: |
-          git checkout -b connect/pr-${{ needs.pr.outputs.number }}
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          git add .
-          git commit -m "screenshots for PR #${{ needs.pr.outputs.number }}"
-          git push origin connect/pr-${{ needs.pr.outputs.number }} --force
-
-      - name: Add screenshots to comment on PR
-        uses: thollander/actions-comment-pull-request@24bffb9b452ba05a4f3f77933840a6a841d1b32b
-        with:
-          message: |
-            <!-- _(run_id **${{ github.run_id }}**)_ -->
-
-            # deployed preview: https://${{ needs.pr.outputs.number }}.connect-d5y.pages.dev
-
-            Welcome to connect! Make sure to:
-            * read the [contributing guidelines](https://github.com/commaai/connect?tab=readme-ov-file#contributing)
-            * mark your PR as a draft until it's ready to review
-            * post the preview on [Discord](https://discord.comma.ai); feedback from users will speedup the PR review
-
-            ### Mobile
-            <table>
-              <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/Login-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteList-mobile.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-mobile.playwright.png"></td>
-              </tr>
-            </table>
-
-            ### Desktop
-            <table>
-              <tr>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/Login-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteActivity-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/RouteList-desktop.playwright.png"></td>
-                <td><img src="https://raw.githubusercontent.com/commaai/ci-artifacts/connect/pr-${{ needs.pr.outputs.number }}/SettingsActivity-desktop.playwright.png"></td>
-              </tr>
-            </table>
+            Check the login flow, demo mode, route list, route detail, and settings before merging.
           comment-tag: run_id
           pr-number: ${{ needs.pr.outputs.number }}
           github-token: ${{ secrets.GITHUB_TOKEN }}
@@ -165,7 +108,7 @@ jobs:
   update_pr_check:
     name: Update PR check
     needs: preview
-    if: always() && github.repository == 'commaai/connect' && github.event.workflow_run.event == 'pull_request'
+    if: always() && needs.preview.result != 'skipped' && github.event.workflow_run.event == 'pull_request'
     runs-on: ubuntu-latest
     steps:
     - name: Update PR check
@@ -182,6 +125,6 @@ jobs:
               title: 'Preview deployment',
               summary: 'Result: ${{ needs.preview.result }}',
             },
-            owner: 'commaai',
+            owner: '${{ github.repository_owner }}',
             repo: '${{ github.event.repository.name }}',
           })

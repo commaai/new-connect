@@ -81,7 +81,6 @@ const DashboardLayout: Component<{
       <div
         class={clsx(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
-          // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
@@ -101,11 +100,11 @@ const FirstPairActivity: Component = () => {
         class="font-bold"
         leading={
           <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
+            <img alt="new connect" src="/images/logo-connect-light.svg" class="h-8" />
           </Show>
         }
       >
-        connect
+        new connect
       </TopAppBar>
       <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
         <h2 class="text-xl">Pair your device</h2>
@@ -116,8 +115,8 @@ const FirstPairActivity: Component = () => {
           <li>You have installed the latest version of openpilot</li>
         </ul>
         <p class="text-md">
-          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
-          with the same account you may have used previously.
+          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in with the
+          same account you used before.
         </p>
         <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
           Add new device
@@ -144,7 +143,6 @@ const Dashboard: Component<RouteSectionProps> = () => {
   const [devices, { refetch }] = createResource(getDevices, { initialValue: undefined })
 
   const getDefaultDongleId = () => {
-    // Do not redirect if dongle ID already selected
     if (urlState().dongleId) return undefined
 
     const lastSelectedDongleId = storage.getItem('lastSelectedDongleId')

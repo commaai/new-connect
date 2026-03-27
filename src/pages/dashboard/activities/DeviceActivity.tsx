@@ -1,30 +1,28 @@
-import { createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
+import { createEffect, createResource, createSignal, For, Show, Suspense, type VoidComponent } from 'solid-js'
 import { createStore } from 'solid-js/store'
 import clsx from 'clsx'
-
 import { takeSnapshot } from '~/api/athena'
-import { getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getAthenaOfflineQueue, getDevice, SHARED_DEVICE } from '~/api/devices'
+import { getUploadQueue } from '~/api/file'
 import { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
-import UploadQueue from '~/components/UploadQueue'
+import UploadQueue, { mapOfflineQueueItems } from '~/components/UploadQueue'
+import { dayjs } from '~/utils/format'
 import { getDeviceName } from '~/utils/device'
-
 import RouteList from '../components/RouteList'
-
 type DeviceActivityProps = {
   dongleId: string
 }
 
+const safeLoad = <T,>(load: () => Promise<T>, fallback: T) => load().catch(() => fallback)
+
 const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
-  // TODO: device should be passed in from DeviceList
   const [device] = createResource(() => props.dongleId, getDevice)
-  // Resource as source of another resource blocks component initialization
   const deviceName = () => (device.latest ? getDeviceName(device.latest) : '')
-  // TODO: remove this. if we're listing the routes for a device you should always be a user, this is for viewing public routes which are being removed
   const isDeviceUser = () => (device.loading ? true : device.latest?.is_owner || device.latest?.alias !== SHARED_DEVICE)
   const [queueVisible, setQueueVisible] = createSignal(false)
   const [snapshot, setSnapshot] = createStore<{
@@ -36,7 +34,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     fetching: false,
     images: [],
   })
-
   const onClickSnapshot = async () => {
     setSnapshot({ error: null, fetching: true })
     try {
@@ -57,7 +54,6 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
       setSnapshot('fetching', false)
     }
   }
-
   const downloadSnapshot = (image: string, index: number) => {
     const link = document.createElement('a')
     link.href = `data:image/jpeg;base64,${image}`
@@ -66,27 +62,52 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
     link.click()
     document.body.removeChild(link)
   }
-
-  const clearImage = (index: number) => {
-    const newImages = snapshot.images.filter((_, i) => i !== index)
-    setSnapshot('images', newImages)
-  }
-
+  const clearImage = (index: number) =>
+    setSnapshot(
+      'images',
+      snapshot.images.filter((_, i) => i !== index),
+    )
   const clearError = () => setSnapshot('error', null)
-
   const { modal } = useDrawerContext()
-
+  const [onlineQueue] = createResource(
+    () => props.dongleId,
+    (dongleId) => safeLoad(() => getUploadQueue(dongleId), { queued: false, result: [] }),
+  )
+  const [offlineQueue] = createResource(
+    () => props.dongleId,
+    (dongleId) => safeLoad(() => getAthenaOfflineQueue(dongleId), []),
+  )
+  const onlineStatus = () => (device.latest?.is_online ? 'Online now' : 'Offline')
+  const lastSeen = () =>
+    device.latest?.last_athena_ping
+      ? `Last seen ${dayjs.unix(device.latest.last_athena_ping).format('MMM D, h:mm A')}`
+      : 'Last seen unavailable'
+  const versionLabel = () => device.latest?.openpilot_version || 'Version unavailable'
+  const uploadSummary = () => {
+    const onlineItems = onlineQueue.latest?.result ?? []
+    const offlineItems = offlineQueue.latest ? mapOfflineQueueItems(offlineQueue.latest) : []
+    const queuedCount = onlineItems.length + offlineItems.length
+    if (queuedCount === 0) return { count: 0, label: 'No pending uploads' }
+    if (onlineItems.some((item) => item.progress > 0 && item.progress < 1)) {
+      return { count: queuedCount, label: `${queuedCount} upload${queuedCount === 1 ? '' : 's'} in progress` }
+    }
+    if (offlineItems.length > 0 && onlineItems.length === 0) {
+      return { count: queuedCount, label: `${queuedCount} queued until the device reconnects` }
+    }
+    return { count: queuedCount, label: `${queuedCount} upload${queuedCount === 1 ? '' : 's'} queued` }
+  }
+  createEffect(() => uploadSummary().count > 0 && setQueueVisible(true))
   return (
     <>
       <TopAppBar
         class="font-bold"
         leading={
           <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
+            <img alt="new connect" src="/images/logo-connect-light.svg" class="h-8" />
           </Show>
         }
       >
-        connect
+        new connect
       </TopAppBar>
       <div class="flex flex-col gap-4 px-4 pb-4">
         <div class="h-min overflow-hidden rounded-lg bg-surface-container-low">
@@ -95,15 +116,21 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </Suspense>
           <div class="flex items-center justify-between p-4">
             <Suspense fallback={<div class="h-[32px] skeleton-loader size-full rounded-xs" />}>
-              <div class="inline-flex items-center gap-2">
-                <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
-
-                {<div class="text-lg font-bold">{deviceName()}</div>}
+              <div class="flex flex-col gap-2">
+                <div class="inline-flex items-center gap-2">
+                  <div class={clsx('m-2 size-2 shrink-0 rounded-full', device.latest?.is_online ? 'bg-green-400' : 'bg-gray-400')} />
+                  <div class="text-lg font-bold">{deviceName()}</div>
+                </div>
+                <div class="flex flex-wrap gap-2 text-xs text-on-surface-variant">
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{onlineStatus()}</span>
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{lastSeen()}</span>
+                  <span class="rounded-full bg-surface-container-high px-3 py-1">{versionLabel()}</span>
+                </div>
               </div>
             </Suspense>
             <div class="flex gap-4">
-              <IconButton name="camera" onClick={onClickSnapshot} />
-              <IconButton name="settings" href={`/${props.dongleId}/settings`} />
+              <IconButton title="Take remote snapshot" name="camera" onClick={onClickSnapshot} />
+              <IconButton title="Open device settings" name="settings" href={`/${props.dongleId}/settings`} />
             </div>
           </div>
           <Show when={isDeviceUser()}>
@@ -113,12 +140,13 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
             </Show>
             <button
               class={clsx(
-                'flex w-full cursor-pointer justify-center rounded-b-lg bg-surface-container-lowest p-2',
+                'flex w-full cursor-pointer items-center justify-center gap-2 rounded-b-lg bg-surface-container-lowest p-3 text-sm',
                 queueVisible() && 'border-t-2 border-t-surface-container-low',
               )}
               onClick={() => setQueueVisible(!queueVisible())}
             >
-              <p class="mr-2">Upload Queue</p>
+              <p>{queueVisible() ? 'Hide upload status' : 'Show upload status'}</p>
+              <span class="rounded-full bg-surface-container-high px-2 py-1 text-xs text-on-surface-variant">{uploadSummary().label}</span>
               <Icon class="text-zinc-500" name={queueVisible() ? 'keyboard_arrow_up' : 'keyboard_arrow_down'} />
             </button>
           </Show>
@@ -139,16 +167,19 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </For>
           <Show when={snapshot.fetching}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="p-4">
-                <div>Loading snapshots...</div>
+              <div class="flex items-center gap-3 p-4 text-on-surface-variant">
+                <Icon class="animate-spin" name="autorenew" size="20" />
+                <div>Fetching latest snapshots...</div>
               </div>
             </div>
           </Show>
           <Show when={snapshot.error}>
             <div class="flex-1 overflow-hidden rounded-lg bg-surface-container-low">
-              <div class="flex items-center p-4">
+              <div class="flex items-center gap-3 p-4">
+                <Icon class="text-error" name="error" size="20" />
+                <span>{snapshot.error}</span>
+                <div class="grow" />
                 <IconButton class="text-white" name="clear" onClick={clearError} />
-                <span>Error: {snapshot.error}</span>
               </div>
             </div>
           </Show>

@@ -25,10 +25,17 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   let controls!: HTMLDivElement
 
   const [isPlaying, setIsPlaying] = createSignal(true)
+  const [isMuted, setIsMuted] = createSignal(true)
   const [currentTime, setCurrentTime] = createSignal(0)
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [errorMessage, setErrorMessage] = createSignal<string>('')
+  const seekTo = (nextTime: number) => {
+    const clampedTime = Math.max(props.selection.startTime, Math.min(nextTime, props.selection.endTime ?? duration()))
+    video.currentTime = clampedTime
+    setCurrentTime(clampedTime)
+    props.onProgress?.(clampedTime)
+  }
 
   const onLoadedData = () => {
     setVideoLoading(false)
@@ -47,13 +54,26 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const startProgressTracking = () => {
     requestAnimationFrame(updateProgressContinuously)
   }
-
-  const togglePlayback = () => {
-    if (video.paused) {
-      void video.play()
-    } else {
-      video.pause()
+  const requestPlay = () => {
+    const playResult = video.play()
+    if (playResult) {
+      void playResult.catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === 'AbortError') return
+        console.debug('[RouteVideoPlayer] play interrupted', error)
+      })
     }
+  }
+
+  const togglePlayback = () => (video.paused ? requestPlay() : video.pause())
+  const skipBy = (seconds: number) => (e: Event) => {
+    e.preventDefault()
+    e.stopPropagation()
+    seekTo(video.currentTime + seconds)
+  }
+  const toggleMuted = (e: Event) => {
+    e.preventDefault()
+    e.stopPropagation()
+    setIsMuted((muted) => !muted)
   }
   const onClick = (e: Event) => {
     e.preventDefault()
@@ -61,18 +81,15 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   }
 
   const onTimeUpdate = (e: Event) => {
-    setCurrentTime((e.currentTarget as HTMLVideoElement).currentTime)
-
-    // If there is a selection, loop within it
-    if (currentTime() < props.selection.startTime) {
-      video.currentTime = props.selection.startTime
-    } else if (props.selection.endTime !== undefined) {
-      if (currentTime() > props.selection.endTime) {
-        video.currentTime = props.selection.startTime
-      }
+    const nextCurrentTime = (e.currentTarget as HTMLVideoElement).currentTime
+    setCurrentTime(nextCurrentTime)
+    if (nextCurrentTime < props.selection.startTime) {
+      seekTo(props.selection.startTime)
+    } else if (props.selection.endTime !== undefined && nextCurrentTime > props.selection.endTime) {
+      seekTo(props.selection.startTime)
+    } else if (video.paused) {
+      updateProgress()
     }
-
-    if (video.paused) updateProgress()
   }
   const onLoadedMetadata = () => setDuration(Math.ceil(video.duration))
   const onPlay = () => {
@@ -83,14 +100,16 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onEnded = () => setIsPlaying(false)
   const onStalled = () => {
     if (!isPlaying()) return
-    void video.play()
+    requestPlay()
   }
 
   onMount(() => {
     if (props.selection.startTime > 0) {
-      video.currentTime = props.selection.startTime
+      seekTo(props.selection.startTime)
     }
 
+    video.defaultMuted = true
+    video.muted = true
     props.ref?.(video)
 
     controls.addEventListener('click', onClick)
@@ -121,8 +140,6 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         const player = Hls.createHls()
         player.attachMedia(video)
         setHls(player)
-
-        // Hls error handler
         const { Events, ErrorTypes } = Hls.default
         player.on(Events.ERROR, (_, data) => {
           if (data.fatal && data.type === ErrorTypes.NETWORK_ERROR) onError()
@@ -138,13 +155,20 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
     }
   })
 
-  // State reset on route change
   createEffect(
     on(routeName, () => {
       setVideoLoading(true)
       setErrorMessage('')
+      setIsMuted(true)
     }),
   )
+
+  createEffect(() => {
+    if (!video) return
+    const muted = isMuted()
+    video.defaultMuted = muted
+    video.muted = muted
+  })
 
   createEffect(() => {
     const url = streamUrl()
@@ -165,46 +189,41 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         props.class,
       )}
     >
-      {/* Video as background */}
       <div class="absolute inset-0 -z-10">
         <video
           ref={video}
           class="size-full object-cover"
           data-testid="route-video"
           autoplay
-          muted
+          muted={isMuted()}
           controls={false}
           playsinline
           loop
           disablepictureinpicture
         />
       </div>
-
-      {/* Loading animation */}
       <Show when={videoLoading()}>
         <div class="absolute inset-0 z-0 skeleton-loader" />
       </Show>
-
-      {/* Error message */}
       <Show when={errorMessage()}>
         <div class="absolute inset-0 z-0 flex flex-col items-center justify-center gap-1">
           <IconButton name="error" />
           <span class="w-[90%] text-center text-wrap">{errorMessage()}</span>
         </div>
       </Show>
-
-      {/* Controls overlay */}
       <div class="absolute inset-0 flex items-end" ref={controls}>
-        {/* Controls background gradient */}
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
-
-        {/* Controls container */}
         <div class="relative flex w-full items-center gap-3 pb-3 px-2">
-          <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          <IconButton name="replay_10" aria-label="Skip back 10 seconds" onClick={skipBy(-10)} />
+          <IconButton aria-label={isPlaying() ? 'Pause' : 'Play'} name={isPlaying() ? 'pause' : 'play_arrow'} filled />
+          <IconButton name="forward_10" aria-label="Skip forward 10 seconds" onClick={skipBy(10)} />
 
           <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
+
+          <div class="grow" />
+          <IconButton name={isMuted() ? 'volume_off' : 'volume_up'} aria-label={isMuted() ? 'Unmute' : 'Mute'} onClick={toggleMuted} />
         </div>
       </div>
     </div>

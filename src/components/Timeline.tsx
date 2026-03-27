@@ -106,9 +106,11 @@ const Timeline: VoidComponent<TimelineProps> = (props) => {
 
   onMount(() => {
     const updateMarker = (clientX: number) => {
+      if (!props.route || duration() === 0) return
       const rect = ref.getBoundingClientRect()
-      const x = Math.min(Math.max(clientX - rect.left, 0), rect.width - MARKER_WIDTH)
-      const fraction = x / rect.width
+      const availableWidth = Math.max(rect.width - MARKER_WIDTH, 1)
+      const x = Math.min(Math.max(clientX - rect.left, 0), availableWidth)
+      const fraction = x / availableWidth
       // Update marker immediately without waiting for video
       setMarkerOffsetPct(fraction * 100)
       props.updateTime(duration() * fraction)

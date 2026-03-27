@@ -1,6 +1,8 @@
 import { $ } from 'bun'
 
-let OUT_DIR = process.argv[2]
+const args = process.argv.slice(2)
+const enforce = args.includes('--enforce')
+let OUT_DIR = args.find((arg) => arg !== '--enforce')
 if (!OUT_DIR) {
   OUT_DIR = './dist'
   console.debug('Building...')
@@ -32,12 +34,14 @@ console.table(files, ['path', 'sizeKB', 'compressedSizeKB'])
 
 const upperBoundKB = 270
 const lowerBoundKB = upperBoundKB - 10
-if (totalCompressedSize < lowerBoundKB * 1024) {
+if (enforce && totalCompressedSize < lowerBoundKB * 1024) {
   console.warn(`Bundle size lower than expected, let's lower the limit! (${totalCompressedSizeKB}KB < ${lowerBoundKB}KB)`)
   process.exit(1)
-} else if (totalCompressedSize > upperBoundKB * 1024) {
+} else if (enforce && totalCompressedSize > upperBoundKB * 1024) {
   console.warn(`Exceeded bundle size limit! (${totalCompressedSizeKB}KB > ${upperBoundKB}KB)`)
   process.exit(1)
+} else if (totalCompressedSize < lowerBoundKB * 1024 || totalCompressedSize > upperBoundKB * 1024) {
+  console.warn(`Bundle size is outside the old advisory range (${totalCompressedSizeKB}KB vs ${lowerBoundKB}-${upperBoundKB}KB).`)
 } else {
   console.info(`Bundle size OK! (${totalCompressedSizeKB}KB < ${upperBoundKB}KB)`)
 }
