@@ -6,82 +6,27 @@ import type { TimelineEvent } from '~/api/derived'
 import type { Route } from '~/api/types'
 import { getRouteDuration } from '~/utils/format'
 
+const EVENT_STYLES = {
+  engaged: { title: 'Engaged', classes: 'bg-green-800 min-w-[1px]', z: '1' },
+  overriding: { title: 'Overriding', classes: 'bg-gray-500 min-w-[1px]', z: '2' },
+  alert_1: { title: 'User prompt alert', classes: 'bg-amber-600 min-w-[2px]', z: '3' },
+  alert_2: { title: 'Critical alert', classes: 'bg-red-600 min-w-[2px]', z: '3' },
+  user_flag: { title: 'User flag', classes: 'bg-yellow-500 min-w-[2px]', z: '4' },
+} as const
+
 function renderTimelineEvents(route: Route | undefined, events: TimelineEvent[]) {
   if (!route) return
   const duration = getRouteDuration(route)?.asMilliseconds() ?? 0
   return (
     <For each={events}>
       {(event) => {
-        let left = ''
-        let width = ''
-        switch (event.type) {
-          case 'engaged':
-          case 'overriding':
-          case 'alert': {
-            const { route_offset_millis, end_route_offset_millis } = event
-            const offsetPct = (route_offset_millis / duration) * 100
-            const endOffsetPct = (end_route_offset_millis / duration) * 100
-            const widthPct = endOffsetPct - offsetPct
+        const pct = (ms: number) => `${(ms / duration) * 100}%`
+        const left = pct(event.route_offset_millis)
+        const width = event.type === 'user_flag' ? pct(1000) : pct(event.end_route_offset_millis - event.route_offset_millis)
+        const styleKey = event.type === 'alert' ? (`alert_${event.alertStatus}` as keyof typeof EVENT_STYLES) : event.type
+        const style = EVENT_STYLES[styleKey] ?? EVENT_STYLES.alert_2
 
-            left = `${offsetPct}%`
-            width = `${widthPct}%`
-            break
-          }
-          case 'user_flag': {
-            const { route_offset_millis } = event
-            const offsetPct = (route_offset_millis / duration) * 100
-            const widthPct = (1000 / duration) * 100
-
-            left = `${offsetPct}%`
-            width = `${widthPct}%`
-            break
-          }
-        }
-
-        let classes = ''
-        let title = ''
-        switch (event.type) {
-          case 'engaged':
-            title = 'Engaged'
-            classes = 'bg-green-800 min-w-[1px]'
-            break
-          case 'overriding':
-            title = 'Overriding'
-            classes = 'bg-gray-500 min-w-[1px]'
-            break
-          case 'alert':
-            if (event.alertStatus === 1) {
-              title = 'User prompt alert'
-              classes = 'bg-amber-600'
-            } else {
-              title = 'Critical alert'
-              classes = 'bg-red-600'
-            }
-            classes += ' min-w-[2px]'
-            break
-          case 'user_flag':
-            title = 'User flag'
-            classes = 'bg-yellow-500 min-w-[2px]'
-        }
-
-        const zIndex = {
-          engaged: '1',
-          overriding: '2',
-          alert: '3',
-          user_flag: '4',
-        }[event.type]
-
-        return (
-          <div
-            title={title}
-            class={clsx('absolute top-0 h-full', classes)}
-            style={{
-              left,
-              width,
-              'z-index': zIndex,
-            }}
-          />
-        )
+        return <div title={style.title} class={clsx('absolute top-0 h-full', style.classes)} style={{ left, width, 'z-index': style.z }} />
       }}
     </For>
   )

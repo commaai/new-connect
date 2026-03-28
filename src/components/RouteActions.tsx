@@ -62,29 +62,19 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
 
   const toggleRoute = async (property: 'public' | 'preserved') => {
     setError(null)
-    if (property === 'public') {
-      const currentValue = isPublic()
-      if (currentValue === undefined) return
-      try {
-        const newValue = !currentValue
-        await setRoutePublic(props.routeName, newValue)
-        setIsPublic(newValue)
-      } catch (err) {
-        console.error('Failed to update public toggle', err)
-        setError('Failed to update toggle')
-      }
-    } else {
-      const currentValue = isPreserved()
-      if (currentValue === undefined) return
-
-      try {
-        const newValue = !currentValue
-        await setRoutePreserved(props.routeName, newValue)
-        setIsPreserved(newValue)
-      } catch (err) {
-        console.error('Failed to update preserved toggle', err)
-        setError('Failed to update toggle')
-      }
+    const [getter, setter, api] =
+      property === 'public'
+        ? ([isPublic, setIsPublic, setRoutePublic] as const)
+        : ([isPreserved, setIsPreserved, setRoutePreserved] as const)
+    const current = getter()
+    if (current === undefined) return
+    try {
+      const next = !current
+      await api(props.routeName, next)
+      setter(next)
+    } catch (err) {
+      console.error(`Failed to update ${property} toggle`, err)
+      setError('Failed to update toggle')
     }
   }
 
