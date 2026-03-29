@@ -98,3 +98,14 @@ export const dateTimeToColorBetween = (startTime: Date, endTime: Date, startColo
   const blended = startColor.map((c, i) => Math.round(c + (endColor[i] - c) * blendFactor))
   return `rgb(${blended.join(', ')})`
 }
+
+export const formatMs = (ms: number): string => {
+  const totalMin = ms / 60_000
+  if (totalMin >= 60) {
+    const hrs = Math.floor(totalMin / 60)
+    const mins = Math.round(totalMin % 60)
+    return `${hrs} hr ${mins} min`
+  }
+  if (totalMin >= 1) return `${Math.round(totalMin)} min`
+  return `${Math.round(ms / 1000)}s`
+}

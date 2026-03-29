@@ -10,12 +10,12 @@ import { resolved } from '~/utils/reactivity'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import RouteActions from '~/components/RouteActions'
-import RouteStaticMap from '~/components/RouteStaticMap'
-import RouteStatisticsBar from '~/components/RouteStatisticsBar'
+import RouteEngagementMap from '~/components/RouteEngagementMap'
+import RouteReportCard from '~/components/RouteReportCard'
 import RouteVideoPlayer from '~/components/RouteVideoPlayer'
 import RouteUploadButtons from '~/components/RouteUploadButtons'
 import Timeline from '~/components/Timeline'
-import { generateRouteStatistics, getTimelineEvents } from '~/api/derived'
+import { generateRouteStatistics, getCoords, getTimelineEvents, type EngagementHover } from '~/api/derived'
 import { A } from '@solidjs/router'
 
 type RouteActivityProps = {
@@ -28,6 +28,7 @@ type RouteActivityProps = {
 const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
   const [seekTime, setSeekTime] = createSignal(props.startTime)
   const [videoRef, setVideoRef] = createSignal<HTMLVideoElement>()
+  const [engagementHover, setEngagementHover] = createSignal<EngagementHover>(null)
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
@@ -37,9 +38,10 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
   const [events] = createResource(route, getTimelineEvents, { initialValue: [] })
+  const [coords] = createResource(route, getCoords, { initialValue: [] })
   const [statistics] = createResource(
-    () => [route(), events()] as const,
-    ([r, e]) => generateRouteStatistics(r, e),
+    () => [route(), events(), coords()] as const,
+    ([r, e, c]) => generateRouteStatistics(r, e, c),
   )
 
   const onTimelineChange = (newTime: number) => {
@@ -69,7 +71,15 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
       <div class="flex flex-col gap-6 px-4 pb-4">
         <div class="flex flex-col">
           <RouteVideoPlayer ref={setVideoRef} routeName={routeName()} selection={selection()} onProgress={setSeekTime} />
-          <Timeline class="mb-1" route={route()} seekTime={seekTime()} updateTime={onTimelineChange} events={events()} />
+          <Timeline
+            class="mb-1"
+            route={route()}
+            seekTime={seekTime()}
+            updateTime={onTimelineChange}
+            events={events()}
+            engagementHover={engagementHover()}
+            onEngagementHover={setEngagementHover}
+          />
 
           <Show when={selection().startTime || selection().endTime}>
             <A
@@ -85,8 +95,28 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
         <div class="flex flex-col gap-2">
           <span class="text-sm">Route Info</span>
           <div class="flex flex-col rounded-md overflow-hidden bg-surface-container">
-            <RouteStatisticsBar class="p-5" route={route()} statistics={statistics} />
-
+            <div class="flex flex-col gap-4 p-5">
+              <Suspense fallback={<div class="size-[100px] skeleton-loader rounded-full" />}>
+                <RouteReportCard
+                  events={events()}
+                  statistics={statistics()}
+                  routeName={routeName()}
+                  distanceMi={route()?.distance}
+                  donutOnly
+                  engagementHover={engagementHover()}
+                  onEngagementHover={setEngagementHover}
+                />
+              </Suspense>
+              <Suspense fallback={<div class="h-[80px] skeleton-loader rounded-xs" />}>
+                <RouteReportCard
+                  events={events()}
+                  statistics={statistics()}
+                  routeName={routeName()}
+                  distanceMi={route()?.distance}
+                  gridStats
+                />
+              </Suspense>
+            </div>
             <RouteActions routeName={routeName()} route={route()} />
           </div>
         </div>
@@ -100,10 +130,14 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
         <div class="flex flex-col gap-2">
           <span class="text-sm">Route Map</span>
-          <div class="aspect-square overflow-hidden rounded-lg">
-            <Suspense fallback={<div class="h-full w-full skeleton-loader bg-surface-container" />}>
-              <RouteStaticMap route={route()} />
-            </Suspense>
+          <div class="h-[400px] overflow-hidden rounded-lg bg-surface-container">
+            <RouteEngagementMap
+              route={route()}
+              events={events()}
+              engagementHover={engagementHover()}
+              onEngagementHover={setEngagementHover}
+              class="h-full"
+            />
           </div>
         </div>
       </div>

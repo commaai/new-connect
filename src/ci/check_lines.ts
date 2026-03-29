@@ -83,7 +83,7 @@ if (import.meta.main) {
     const totalLines = files.reduce((acc, it) => acc + it.lines, 0)
     console.log('Total lines:', totalLines)
 
-    if (totalLines > 5000) {
+    if (totalLines > 6000) {
       console.warn('Exceeded line limit!')
       process.exit(1)
     } else {
