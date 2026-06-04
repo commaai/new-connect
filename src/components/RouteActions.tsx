@@ -5,6 +5,7 @@ import { USERADMIN_URL } from '~/api/config'
 import { setRoutePublic, setRoutePreserved, getPreservedRoutes, parseRouteName } from '~/api/route'
 import Icon from '~/components/material/Icon'
 import type { Route } from '~/api/types'
+import { getRouteSegment } from '~/utils/format'
 
 const ToggleButton: VoidComponent<{
   label: string
@@ -35,6 +36,7 @@ const ToggleButton: VoidComponent<{
 interface RouteActionsProps {
   routeName: string
   route: Route | undefined
+  seekTime: number
 }
 
 const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
@@ -43,7 +45,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
   const [isPublic, setIsPublic] = createSignal<boolean | undefined>(undefined)
   const [isPreserved, setIsPreserved] = createSignal<boolean | undefined>(undefined)
 
-  const useradminUrl = () => `${USERADMIN_URL}/?onebox=${currentRouteId()}`
+  const routeInfo = () => parseRouteName(props.routeName)
+  const segment = () => getRouteSegment(props.seekTime, props.route?.maxqlog)
+
+  const useradminUrl = () => `${USERADMIN_URL}/?onebox=${routeInfo().dongleId}/${routeInfo().routeId}`
 
   createEffect(() => {
     const preservedRoutes = preservedRoutesResource()
@@ -88,7 +93,7 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
     }
   }
 
-  const currentRouteId = () => props.routeName.replace('|', '/')
+  const currentRouteId = () => `${routeInfo().dongleId}/${routeInfo().routeId}/${segment()}`
 
   const copyCurrentRouteId = async () => {
     if (!props.routeName || !navigator.clipboard) return
@@ -116,8 +121,10 @@ const RouteActions: VoidComponent<RouteActionsProps> = (props) => {
           class="flex w-full cursor-pointer items-center justify-between rounded-lg border-2 border-surface-container-high bg-surface-container-lowest p-3 hover:bg-surface-container-low"
         >
           <div class="lg:text-sm">
-            <span class="break-keep inline-block">{currentRouteId().split('/')[0] || ''}/</span>
-            <span class="break-keep inline-block">{currentRouteId().split('/')[1] || ''}</span>
+            <span class="break-keep inline-block">{routeInfo().dongleId}/</span>
+            <span class="break-keep inline-block">
+              {routeInfo().routeId}/{segment()}
+            </span>
           </div>
           <Icon class={clsx('mx-2', copied() && 'text-green-300')} name={copied() ? 'check' : 'file_copy'} size="20" />
         </button>
