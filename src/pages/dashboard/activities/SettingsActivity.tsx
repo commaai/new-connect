@@ -22,6 +22,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
+import Dialog from '~/components/material/Dialog'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -401,6 +402,7 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
 const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Device> }> = (props) => {
   const [deviceName] = createResource(props.device, getDeviceName)
+  const [unpairDialog, setUnpairDialog] = createSignal(false)
 
   const [unpair, unpairData] = useAction(async () => {
     const { success } = await unpairDevice(props.dongleId)
@@ -416,9 +418,29 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
           {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
         </div>
       </Show>
-      <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
+      <Button color="error" leading={<Icon name="delete" />} onClick={() => setUnpairDialog(true)} disabled={unpairData.loading}>
         Unpair this device
       </Button>
+
+      <Dialog open={unpairDialog()} onClose={() => setUnpairDialog(false)}>
+        <h2 class="text-lg">Unpair device?</h2>
+        <p class="text-sm">Are you sure you want to unpair this device? You will need to pair it again to access it.</p>
+        <div class="mt-4 flex flex-wrap justify-stretch gap-4">
+          <Button
+            color="error"
+            loading={unpairData.loading}
+            onClick={() => {
+              unpair()
+              setUnpairDialog(false)
+            }}
+          >
+            Yes, unpair
+          </Button>
+          <Button color="secondary" onClick={() => setUnpairDialog(false)}>
+            Cancel
+          </Button>
+        </div>
+      </Dialog>
     </div>
   )
 }

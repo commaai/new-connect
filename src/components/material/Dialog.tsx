@@ -26,7 +26,7 @@ const Dialog: ParentComponent<DialogProps> = (props) => {
   return (
     <dialog
       ref={dialogRef}
-      class="fixed inset-0 max-w-[unset] z-50 bg-transparent backdrop:bg-scrim/[.32] size-full max-h-[unset]"
+      class="fixed inset-0 max-w-[unset] z-50 bg-transparent size-full max-h-[unset] [&::backdrop]:bg-black/50"
       onClick={() => dialogRef?.close()}
       onClose={handleDialogClose}
     >
@@ -34,7 +34,7 @@ const Dialog: ParentComponent<DialogProps> = (props) => {
         <div
           class={clsx(
             'flex w-full flex-col justify-center gap-4 bg-surface-container text-on-surface p-6 m-auto',
-            'sm:max-w-lg sm:rounded-lg sm:shadow-lg',
+            'sm:max-w-lg sm:rounded-lg sm:shadow-2xl sm:shadow-black/60',
             props.class,
           )}
           onClick={(ev) => ev.stopPropagation()}
