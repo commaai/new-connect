@@ -22,6 +22,7 @@ import DeviceActivity from './activities/DeviceActivity'
 import RouteActivity from './activities/RouteActivity'
 import SettingsActivity from './activities/SettingsActivity'
 import BuildInfo from '~/components/BuildInfo'
+import { saveRedirect } from '~/api/auth/redirect'
 
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
@@ -127,6 +128,12 @@ const FirstPairActivity: Component = () => {
   )
 }
 
+const RedirectToLogin: VoidComponent = () => {
+  const location = useLocation()
+  saveRedirect(`${location.pathname}${location.search}`)
+  return <Navigate href="/login" />
+}
+
 const Dashboard: Component<RouteSectionProps> = () => {
   const location = useLocation()
   const urlState = createMemo(() => {
@@ -156,7 +163,7 @@ const Dashboard: Component<RouteSectionProps> = () => {
     <Drawer drawer={<DashboardDrawer devices={devices()} />}>
       <Switch>
         <Match when={!isSignedIn()}>
-          <Navigate href="/login" />
+          <RedirectToLogin />
         </Match>
         <Match when={urlState().dongleId === 'pair' || !!location.query.pair}>
           <PairActivity onPaired={refetch} />

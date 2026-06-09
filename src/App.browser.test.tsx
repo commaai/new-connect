@@ -4,6 +4,7 @@ import { configure, render, waitFor } from '@solidjs/testing-library'
 import { setAccessToken, signOut } from '~/api/auth/client'
 import * as Demo from '~/api/auth/demo'
 import { AppLayout, Routes } from './App'
+import { isSafeInternalPath, popRedirect } from '~/api/auth/redirect'
 
 const DEMO_LOG_ID = '000000dd--455f14369d'
 
@@ -30,6 +31,24 @@ describe('Demo mode', () => {
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
+  })
+})
+
+describe('Post-login redirect', () => {
+  test('open-redirect guard rejects external and malformed targets', () => {
+    expect(isSafeInternalPath('/abc123/route')).toBe(true)
+    expect(isSafeInternalPath('//evil.com')).toBe(false)
+    expect(isSafeInternalPath('/\\evil.com')).toBe(false)
+    expect(isSafeInternalPath('https://evil.com')).toBe(false)
+    expect(isSafeInternalPath('')).toBe(false)
+    expect(isSafeInternalPath(null)).toBe(false)
+  })
+
+  test('remembers intended destination when visiting a protected route signed out', async () => {
+    const dest = `/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`
+    const { findByText } = renderApp(dest)
+    expect(await findByText('Sign in with Google')).toBeTruthy()
+    expect(popRedirect()).toBe(dest)
   })
 })
 

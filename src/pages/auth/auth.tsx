@@ -4,6 +4,7 @@ import { Navigate, useNavigate, useSearchParams } from '@solidjs/router'
 import { refreshAccessToken } from '~/api/auth/client'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
+import { popRedirect } from '~/api/auth/redirect'
 
 type AuthParams = {
   code: string
@@ -18,7 +19,7 @@ export default function Auth() {
   const { code, provider } = params
   if (code && provider) {
     void refreshAccessToken(code, provider)
-      .then(() => navigate('/'))
+      .then(() => navigate(popRedirect() ?? '/'))
       .catch((err) => {
         console.error(err)
         if (err instanceof Error && err.message) {
