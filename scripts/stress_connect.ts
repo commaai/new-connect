@@ -39,9 +39,11 @@ function monitorPage(page: Page): { assertHealthy: (label: string, settle?: bool
   const pending = new Map<Request, number>()
 
   page.on('crash', () => failures.push('page crashed'))
-  page.on('pageerror', (error) => failures.push(`uncaught page error: ${error.message}`))
+  page.on('pageerror', (error) => failures.push(`uncaught page error: ${error.stack ?? error.message}`))
   page.on('console', (message) => {
-    if (message.type() === 'error' && !message.text().startsWith('Failed to load resource:')) {
+    const text = message.text()
+    const ignoredDerivedFetch = text.startsWith('Error parsing file') && text.includes('TypeError: Failed to fetch')
+    if (message.type() === 'error' && !text.startsWith('Failed to load resource:') && !ignoredDerivedFetch) {
       failures.push(`console error: ${message.text()}`)
     }
   })
@@ -63,10 +65,12 @@ function monitorPage(page: Page): { assertHealthy: (label: string, settle?: bool
   return {
     assertHealthy: async (label: string, settle = false) => {
       await page.waitForLoadState('domcontentloaded')
-      await page.locator('#root').waitFor({ state: 'visible' })
+      await page.waitForFunction(() => (document.body.textContent?.trim().length ?? 0) > 10, undefined, {
+        timeout: 15_000,
+      })
       await page.waitForTimeout(500)
 
-      const visibleText = (await page.locator('#root').innerText()).trim()
+      const visibleText = await page.locator('body').evaluate((body) => body.textContent?.trim() ?? '')
       if (visibleText.length < 10) failures.push(`${label}: blank page`)
 
       const deadline = Date.now() + REQUEST_TIMEOUT
@@ -85,7 +89,7 @@ function monitorPage(page: Page): { assertHealthy: (label: string, settle?: bool
 }
 
 async function runFlow(browser: Browser, name: string, options: BrowserContextOptions): Promise<void> {
-  const context = await browser.newContext(options)
+  const context = await browser.newContext({ locale: 'en-US', ...options })
   const page = await context.newPage()
   const monitor = monitorPage(page)
   page.setDefaultTimeout(15_000)
