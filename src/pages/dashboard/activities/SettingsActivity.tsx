@@ -17,7 +17,7 @@ import { formatDate } from '~/utils/format'
 
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
-import Icon from '~/components/material/Icon'
+import Icon, { type IconName } from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
@@ -31,6 +31,24 @@ const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
 }
 
 const formatCurrency = (amount: number) => `$${(amount / 100).toFixed(amount % 100 === 0 ? 0 : 2)}`
+
+const shopLink = (
+  <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
+    shop
+  </a>
+)
+
+const StatusBanner: ParentComponent<{ icon?: IconName; variant?: 'error' }> = (props) => (
+  <div
+    class={clsx(
+      'flex gap-2 rounded-sm p-2 text-sm',
+      props.variant === 'error' ? 'bg-on-error-container text-error-container font-semibold' : 'bg-surface-container text-on-surface',
+    )}
+  >
+    <Icon name={props.icon ?? 'info'} size="20" />
+    {props.children}
+  </div>
+)
 
 type PrimeActivityProps = {
   dongleId: string
@@ -149,26 +167,14 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       } else if (!source.subscribeInfo.is_prime_sim || !source.subscribeInfo.sim_type) {
         disabledDataPlanText = 'Standard plan not available, detected a third-party SIM.'
       } else if (!['blue', 'magenta_new', 'webbing'].includes(source.subscribeInfo.sim_type)) {
-        disabledDataPlanText = [
-          'Standard plan not available, old SIM type detected, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
-          </a>,
-        ]
+        disabledDataPlanText = ['Standard plan not available, old SIM type detected, new SIM cards are available in the ', shopLink]
       } else if (source.subscribeInfo.sim_usable === false && source.subscribeInfo.sim_type === 'blue') {
         disabledDataPlanText = [
           'Standard plan not available, SIM has been canceled and is therefore no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
-          </a>,
+          shopLink,
         ]
       } else if (source.subscribeInfo.sim_usable === false) {
-        disabledDataPlanText = [
-          'Standard plan not available, SIM is no longer usable, new SIM cards are available in the ',
-          <a class="text-tertiary underline" href="https://comma.ai/shop/comma-prime-sim" target="_blank" rel="noopener">
-            shop
-          </a>,
-        ]
+        disabledDataPlanText = ['Standard plan not available, SIM is no longer usable, new SIM cards are available in the ', shopLink]
       }
 
       return {
@@ -199,10 +205,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </p>
 
       <Show when={stripeCancelled()}>
-        <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-          <Icon name="error" class="text-error" size="20" />
-          Checkout cancelled
-        </div>
+        <StatusBanner icon="error">Checkout cancelled</StatusBanner>
       </Show>
 
       <PlanSelector plan={selectedPlan} setPlan={setSelectedPlan} disabled={isLoading()}>
@@ -216,12 +219,7 @@ const PrimeCheckout: VoidComponent<{ dongleId: string }> = (props) => {
       </PlanSelector>
 
       <Show when={uiState()?.disabledDataPlanText} keyed>
-        {(text) => (
-          <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-            <Icon name="info" size="20" />
-            {text}
-          </div>
-        )}
+        {(text) => <StatusBanner>{text}</StatusBanner>}
       </Show>
 
       <Show when={uiState()?.checkoutText} keyed>
@@ -287,26 +285,18 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
       >
         <Switch>
           <Match when={stripeSession.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-on-error-container p-2 text-sm font-semibold text-error-container">
-              <Icon name="error" size="20" />
+            <StatusBanner icon="error" variant="error">
               Unable to check payment status: {stripeSession.error}
-            </div>
+            </StatusBanner>
           </Match>
           <Match when={stripeSession()?.payment_status} keyed>
             {(paymentStatus) => (
               <Switch>
                 <Match when={paymentStatus === 'unpaid'}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-                    <Icon name="payments" size="20" />
-                    Waiting for confirmed payment...
-                  </div>
+                  <StatusBanner icon="payments">Waiting for confirmed payment...</StatusBanner>
                 </Match>
-
                 <Match when={paymentStatus === 'paid' && !subscription()}>
-                  <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-                    <Icon class="animate-spin" name="autorenew" size="20" />
-                    Processing subscription...
-                  </div>
+                  <StatusBanner icon="autorenew">Processing subscription...</StatusBanner>
                 </Match>
 
                 <Match when={paymentStatus === 'paid' && subscription()}>
@@ -328,17 +318,10 @@ const PrimeManage: VoidComponent<{ dongleId: string }> = (props) => {
 
         <Switch>
           <Match when={cancelData.state === 'errored'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-              <Icon class="text-error" name="error" size="20" />
-              Failed to cancel subscription: {cancelData.error}
-            </div>
+            <StatusBanner icon="error">Failed to cancel subscription: {cancelData.error}</StatusBanner>
           </Match>
-
           <Match when={cancelData.state === 'ready'}>
-            <div class="flex gap-2 rounded-sm bg-surface-container p-2 text-sm text-on-surface">
-              <Icon name="check" size="20" />
-              Subscription cancelled
-            </div>
+            <StatusBanner icon="check">Subscription cancelled</StatusBanner>
           </Match>
         </Switch>
 
@@ -411,10 +394,9 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
     <div class="flex flex-col gap-4">
       <h2 class="text-lg">{deviceName()}</h2>
       <Show when={unpairData.error}>
-        <div class="flex gap-2 rounded-sm bg-surface-container-high p-2 text-sm text-on-surface">
-          <Icon class="text-error" name="error" size="20" />
+        <StatusBanner icon="error">
           {unpairData.error?.message ?? unpairData.error?.cause ?? unpairData.error ?? 'Unknown error'}
-        </div>
+        </StatusBanner>
       </Show>
       <Button color="error" leading={<Icon name="delete" />} onClick={unpair} disabled={unpairData.loading}>
         Unpair this device

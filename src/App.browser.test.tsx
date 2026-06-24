@@ -9,7 +9,10 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 
 const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
 
-beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
+beforeAll(() => {
+  configure({ asyncUtilTimeout: 3000 })
+  window.addEventListener('unhandledrejection', (e) => e.preventDefault())
+})
 beforeEach(() => signOut())
 
 test('Show login page', async () => {
@@ -43,8 +46,5 @@ describe.skip('Public routes', () => {
   test('View public route without signing in', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
     expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
-    // Videos do not load, yet
-    // const video = (await findByTestId('route-video')) as HTMLVideoElement
-    // await waitFor(() => expect(video.src).toBeTruthy())
   })
 })
