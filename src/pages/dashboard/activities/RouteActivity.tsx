@@ -31,8 +31,7 @@ const RouteActivity: VoidComponent<RouteActivityProps> = (props) => {
 
   const routeName = () => `${props.dongleId}|${props.dateStr}`
   const [route] = createResource(routeName, getRoute)
-  const startTime = () => (route.latest ? dayjs(route().start_time).format('dddd, MMM D, YYYY') : '')
-
+  const startTime = () => (route.latest?.start_time ? dayjs(route().start_time).format('dddd, MMM D, YYYY') : props.dateStr)
   const selection = () => ({ startTime: props.startTime, endTime: props.endTime })
 
   // FIXME: generateTimelineStatistics is given different versions of TimelineEvents multiple times, leading to stuttering engaged % on switch
