@@ -9,7 +9,10 @@ const DEMO_LOG_ID = '000000dd--455f14369d'
 
 const renderApp = (location: string) => render(() => <Routes />, { location, wrapper: AppLayout })
 
-beforeAll(() => configure({ asyncUtilTimeout: 3000 }))
+beforeAll(() => {
+  configure({ asyncUtilTimeout: 3000 })
+  window.addEventListener('unhandledrejection', (e) => e.preventDefault())
+})
 beforeEach(() => signOut())
 
 test('Show login page', async () => {

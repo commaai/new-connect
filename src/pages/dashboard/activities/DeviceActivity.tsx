@@ -10,6 +10,7 @@ import IconButton from '~/components/material/IconButton'
 import TopAppBar from '~/components/material/TopAppBar'
 import DeviceLocation from '~/components/DeviceLocation'
 import DeviceStatistics from '~/components/DeviceStatistics'
+import ReportCard from '~/components/ReportCard'
 import UploadQueue from '~/components/UploadQueue'
 import { getDeviceName } from '~/utils/device'
 
@@ -108,6 +109,7 @@ const DeviceActivity: VoidComponent<DeviceActivityProps> = (props) => {
           </div>
           <Show when={isDeviceUser()}>
             <DeviceStatistics dongleId={props.dongleId} class="p-4" />
+            <ReportCard dongleId={props.dongleId} class="p-4 border-t border-surface-container" />
             <Show when={queueVisible()}>
               <UploadQueue dongleId={props.dongleId} />
             </Show>
