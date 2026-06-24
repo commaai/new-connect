@@ -1,6 +1,6 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { dateTimeToColorBetween, formatDate, formatDistance, formatDuration } from './format'
+import { dateTimeToColorBetween, formatDate, formatDistance, formatDuration, getRouteSegment } from './format'
 
 describe('formatDistance', () => {
   it('should format distance', () => {
@@ -22,6 +22,23 @@ describe('formatDuration', () => {
   })
   it('should be undefined for undefined duration', () => {
     expect(formatDuration(undefined)).toBe(undefined)
+  })
+})
+
+describe('getRouteSegment', () => {
+  it('should map a playback time to its segment number', () => {
+    expect(getRouteSegment(0)).toBe(0)
+    expect(getRouteSegment(59.9)).toBe(0)
+    expect(getRouteSegment(60)).toBe(1)
+    expect(getRouteSegment(125)).toBe(2)
+  })
+  it('should never return a negative segment', () => {
+    expect(getRouteSegment(-10)).toBe(0)
+  })
+  it('should clamp to the last available segment', () => {
+    expect(getRouteSegment(120, 5)).toBe(2)
+    expect(getRouteSegment(600, 3)).toBe(3)
+    expect(getRouteSegment(60, 0)).toBe(0)
   })
 })
 

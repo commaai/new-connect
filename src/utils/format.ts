@@ -50,6 +50,16 @@ export const formatVideoTime = (seconds: number): string => {
   return `${minutes}:${remainingSeconds.padStart(2, '0')}`
 }
 
+// openpilot splits every route into fixed-length segments
+export const SEGMENT_LENGTH = 60 // seconds
+
+// Map a playback time (in seconds) to its segment number, clamped to [0, maxSegment]
+export const getRouteSegment = (seekTime: number, maxSegment?: number): number => {
+  const segment = Math.max(0, Math.floor(seekTime / SEGMENT_LENGTH))
+  if (maxSegment === undefined) return segment
+  return Math.min(segment, Math.max(0, maxSegment))
+}
+
 export const getRouteDuration = (route: Route | undefined): Duration | undefined => {
   if (!route || !route.start_time || !route.end_time) return undefined
   const startTime = dayjs(route.start_time)

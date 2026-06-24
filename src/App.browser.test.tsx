@@ -27,7 +27,8 @@ describe('Demo mode', () => {
 
   test('View demo route', async () => {
     const { findByText, findByTestId } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
+    // Route ID includes the current segment, which starts at 0
+    expect(await findByText(`${DEMO_LOG_ID}/0`)).toBeTruthy()
     const video = (await findByTestId('route-video')) as HTMLVideoElement
     await waitFor(() => expect(video.src).toBeTruthy())
   })
@@ -42,7 +43,7 @@ describe.skip('Public routes', () => {
 
   test('View public route without signing in', async () => {
     const { findByText } = renderApp(`/${Demo.DONGLE_ID}/${DEMO_LOG_ID}`)
-    expect(await findByText(DEMO_LOG_ID)).toBeTruthy()
+    expect(await findByText(`${DEMO_LOG_ID}/0`)).toBeTruthy()
     // Videos do not load, yet
     // const video = (await findByTestId('route-video')) as HTMLVideoElement
     // await waitFor(() => expect(video.src).toBeTruthy())
