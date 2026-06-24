@@ -1,5 +1,5 @@
 > [!NOTE]
-> New connect is no longer in active development! [Comma Connect](https://github.com/commaai/connect) is!
+> new-connect is no longer in active development! [comma connect](https://github.com/commaai/connect) is!
 
 # connect
 
