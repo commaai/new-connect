@@ -1,3 +1,6 @@
+> [!NOTE]
+> new-connect is no longer in active development! [comma connect](https://github.com/commaai/connect) is!
+
 # connect
 
 connect is the web and mobile experience for [openpilot](https://github.com/commaai/openpilot).
