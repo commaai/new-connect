@@ -18,10 +18,9 @@ import { formatDate } from '~/utils/format'
 import ButtonBase from '~/components/material/ButtonBase'
 import Button from '~/components/material/Button'
 import Icon from '~/components/material/Icon'
-import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
 import { createQuery } from '~/utils/createQuery'
 import { getDeviceName } from '~/utils/device'
+import { useDrawerContext } from '~/components/material/Drawer'
 
 const useAction = <T,>(action: () => Promise<T>): [() => void, Resource<T>] => {
   const [source, setSource] = createSignal(false)
@@ -426,12 +425,11 @@ const DeviceSettingsForm: VoidComponent<{ dongleId: string; device: Resource<Dev
 const SettingsActivity: VoidComponent<PrimeActivityProps> = (props) => {
   const [device] = createResource(() => props.dongleId, getDevice)
 
+  const { modal } = useDrawerContext()
+
   return (
     <>
-      <TopAppBar component="h2" leading={<IconButton class="md:hidden" name="arrow_back" href={`/${props.dongleId}`} />}>
-        Device Settings
-      </TopAppBar>
-      <div class="flex flex-col gap-4 max-w-lg px-4">
+      <div class={clsx('flex flex-col gap-4 max-w-lg px-4', modal() ? 'mt-20' : 'mt-4')}>
         <DeviceSettingsForm dongleId={props.dongleId} device={device} />
 
         <hr class="mx-4 opacity-20" />
