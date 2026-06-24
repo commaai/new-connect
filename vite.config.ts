@@ -9,7 +9,8 @@ import { Icons } from './src/components/material/Icon'
 
 export default defineConfig({
   plugins: [
-    devtools(),
+    // Devtools only during local development to avoid prod bundle overhead
+    ...(process.env.NODE_ENV === 'development' ? [devtools()] : []),
     solid({
       ssr: false,
     }),
