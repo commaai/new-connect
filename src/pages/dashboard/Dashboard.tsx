@@ -1,4 +1,4 @@
-import { createMemo, createResource, ErrorBoundary, lazy, Match, Show, Suspense, Switch } from 'solid-js'
+import { createMemo, createResource, ErrorBoundary, lazy, Match, Suspense, Switch, createEffect } from 'solid-js'
 import type { Component, JSXElement, VoidComponent } from 'solid-js'
 import { Navigate, type RouteSectionProps, useLocation } from '@solidjs/router'
 import clsx from 'clsx'
@@ -12,10 +12,10 @@ import type { Device } from '~/api/types'
 
 import Button from '~/components/material/Button'
 import ButtonBase from '~/components/material/ButtonBase'
-import Drawer, { DrawerToggleButton, useDrawerContext } from '~/components/material/Drawer'
+import Drawer, { useDrawerContext } from '~/components/material/Drawer'
 import Icon from '~/components/material/Icon'
 import IconButton from '~/components/material/IconButton'
-import TopAppBar from '~/components/material/TopAppBar'
+import { useHeader } from '~/components/AppHeader'
 
 import DeviceList from './components/DeviceList'
 import DeviceActivity from './activities/DeviceActivity'
@@ -26,24 +26,14 @@ import BuildInfo from '~/components/BuildInfo'
 const PairActivity = lazy(() => import('./activities/PairActivity'))
 
 const DashboardDrawer: VoidComponent<{ devices: Device[] | undefined }> = (props) => {
-  const { modal, setOpen } = useDrawerContext()
+  const { setOpen } = useDrawerContext()
   const onClose = () => setOpen(false)
 
   const [profile] = createResource(getProfile)
 
   return (
     <>
-      <TopAppBar
-        component="h2"
-        leading={
-          <Show when={modal()}>
-            <IconButton name="arrow_back" onClick={onClose} />
-          </Show>
-        }
-      >
-        Devices
-      </TopAppBar>
-      <DeviceList class="overflow-y-auto p-2" devices={props.devices} />
+      <DeviceList class="overflow-y-auto p-4" devices={props.devices} />
       <div class="grow" />
       <Button class="m-4" leading={<Icon name="add" />} href="/pair" onClick={onClose}>
         Add new device
@@ -76,54 +66,60 @@ const DashboardLayout: Component<{
   paneTwo: JSXElement
   paneTwoContent: boolean
 }> = (props) => {
+  const { updateState } = useHeader()
+
+  // Update header when layout changes
+  createEffect(() => {
+    updateState({
+      variant: 'main',
+      leading: <img src="/images/comma-white.svg" height="32" width="32" />,
+    })
+  })
+
   return (
     <div class="relative size-full overflow-hidden">
       <div
         class={clsx(
           'mx-auto size-full max-w-[1600px] md:grid md:grid-cols-2 lg:gap-2',
-          // Flex layout for mobile with horizontal transition
           'flex transition-transform duration-300 ease-in-out',
           props.paneTwoContent ? '-translate-x-full md:translate-x-0' : 'translate-x-0',
         )}
       >
-        <div class="min-w-full overflow-y-scroll">{props.paneOne}</div>
-        <div class="min-w-full overflow-y-scroll">{props.paneTwo}</div>
+        <div class="pt-4 min-w-full overflow-y-scroll">{props.paneOne}</div>
+        <div class="pt-4 min-w-full overflow-y-scroll">{props.paneTwo}</div>
       </div>
     </div>
   )
 }
 
 const FirstPairActivity: Component = () => {
-  const { modal } = useDrawerContext()
+  const { updateState } = useHeader()
+
+  createEffect(() => {
+    updateState({
+      variant: 'main',
+      title: 'connect',
+      leading: <img src="/images/comma-white.svg" height="32" width="32" />,
+    })
+  })
+
   return (
-    <>
-      <TopAppBar
-        class="font-bold"
-        leading={
-          <Show when={!modal()} fallback={<DrawerToggleButton />}>
-            <img alt="" src="/images/comma-white.png" class="h-8" />
-          </Show>
-        }
-      >
-        connect
-      </TopAppBar>
-      <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
-        <h2 class="text-xl">Pair your device</h2>
-        <p class="text-lg">Scan the QR code on your device</p>
-        <p class="text-md mt-4">If you cannot see a QR code, check the following:</p>
-        <ul class="text-md list-disc list-inside">
-          <li>Your device is connected to the internet</li>
-          <li>You have installed the latest version of openpilot</li>
-        </ul>
-        <p class="text-md">
-          If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
-          with the same account you may have used previously.
-        </p>
-        <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
-          Add new device
-        </Button>
-      </section>
-    </>
+    <section class="flex flex-col gap-4 py-2 items-center mx-auto max-w-md px-4 mt-4 sm:mt-8 md:mt-16">
+      <h2 class="text-xl">Pair your device</h2>
+      <p class="text-lg">Scan the QR code on your device</p>
+      <p class="text-md mt-4">If you cannot see a QR code, check the following:</p>
+      <ul class="text-md list-disc list-inside">
+        <li>Your device is connected to the internet</li>
+        <li>You have installed the latest version of openpilot</li>
+      </ul>
+      <p class="text-md">
+        If you still cannot see a QR code, your device may already be paired to another account. Make sure you have signed in to connect
+        with the same account you may have used previously.
+      </p>
+      <Button class="mt-4" leading={<Icon name="add" />} href="/pair">
+        Add new device
+      </Button>
+    </section>
   )
 }
 
