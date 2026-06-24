@@ -17,7 +17,8 @@
     "lines": "bun src/ci/check_lines.ts",
     "check": "biome check",
     "fix": "biome check --write",
-    "test": "TZ=Greenwich vitest"
+    "test": "TZ=Greenwich vitest",
+    "stress": "bun scripts/stress_connect.ts"
   },
   "packageManager": "bun@1.2.9",
   "type": "module",
