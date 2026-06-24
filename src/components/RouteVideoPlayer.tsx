@@ -29,6 +29,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const [duration, setDuration] = createSignal(0)
   const [videoLoading, setVideoLoading] = createSignal(true)
   const [errorMessage, setErrorMessage] = createSignal<string>('')
+  const [isMuted, setIsMuted] = createSignal(true)
 
   const onLoadedData = () => {
     setVideoLoading(false)
@@ -58,6 +59,11 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
   const onClick = (e: Event) => {
     e.preventDefault()
     togglePlayback()
+  }
+
+  const toggleMute = (e: Event) => {
+    e.preventDefault()
+    setIsMuted(!isMuted())
   }
 
   const onTimeUpdate = (e: Event) => {
@@ -172,7 +178,7 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
           class="size-full object-cover"
           data-testid="route-video"
           autoplay
-          muted
+          muted={isMuted()}
           controls={false}
           playsinline
           loop
@@ -199,12 +205,14 @@ const RouteVideoPlayer: VoidComponent<RouteVideoPlayerProps> = (props) => {
         <div class="absolute inset-x-0 bottom-0 h-16 bg-gradient-to-t from-black/50 to-transparent" />
 
         {/* Controls container */}
-        <div class="relative flex w-full items-center gap-3 pb-3 px-2">
+        <div class="relative flex w-full items-center gap-2 pb-3 px-2">
           <IconButton name={isPlaying() ? 'pause' : 'play_arrow'} filled />
 
           <div class="font-mono text-sm text-on-surface">
             {formatVideoTime(currentTime())} / {formatVideoTime(duration())}
           </div>
+
+          <IconButton class="ml-auto" name={isMuted() ? 'volume_off' : 'volume_up'} onclick={toggleMute} />
         </div>
       </div>
     </div>
